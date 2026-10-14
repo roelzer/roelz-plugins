@@ -21,6 +21,7 @@ Projektname: `$ARGUMENTS` (fehlt er, frag danach). Ordnername: Kleinbuchstaben m
      .env.example       ← leer, mit Kommentar „Hier nur Variablennamen, keine echten Werte“
      .claude/
        settings.json    ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/projekt-settings.json (Dev-Team gilt damit auch in Cloud-Sitzungen)
+       dev-team-start.sh ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/projekt-dev-team-start.sh (holt das Dev-Team in Cloud-Sitzungen, tut lokal nichts)
      docs/
        lastenheft.md    ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/lastenheft.md
        risiko-log.md    ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/risiko-log.md

@@ -31,7 +31,7 @@ fachwissen/          ← bei fachlichen Ergebnissen
 tests/referenz/      ← bei fachlichen Ergebnissen
 ```
 
-**Dev-Team für Cloud-Sitzungen:** `.claude/settings.json` aus `${CLAUDE_PLUGIN_ROOT}/vorlagen/projekt-settings.json`. Gibt es die Datei schon: nur die Schlüssel `extraKnownMarketplaces.roelz-plugins` und `enabledPlugins` ergänzen, alles andere unverändert lassen, gültiges JSON sicherstellen. Diese Datei wird mit committet, damit das Dev-Team in jeder Sitzung dieses Repos gilt, auch in der Cloud.
+**Dev-Team für Cloud-Sitzungen:** `.claude/dev-team-start.sh` aus `${CLAUDE_PLUGIN_ROOT}/vorlagen/projekt-dev-team-start.sh` kopieren und `.claude/settings.json` aus `${CLAUDE_PLUGIN_ROOT}/vorlagen/projekt-settings.json`. Gibt es die settings.json schon: nur die Schlüssel `extraKnownMarketplaces.roelz-plugins`, `enabledPlugins` und die vier `hooks`-Einträge ergänzen (bestehende Hooks behalten), alles andere unverändert lassen, gültiges JSON sicherstellen. Diese Datei wird mit committet, damit das Dev-Team in jeder Sitzung dieses Repos gilt, auch in der Cloud.
 
 Gibt es zum Fachgebiet eine Datei in `${CLAUDE_PLUGIN_ROOT}/wissen/fachwissen/`: deren bestätigte Regeln in `fachwissen/regeln.md` übernehmen (Quelle: „aus Bibliothek“).
 

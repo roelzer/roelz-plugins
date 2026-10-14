@@ -1,6 +1,6 @@
 # Dev-Team – Anleitung
 
-Stand: Oktober 2026 · Version 2.2
+Stand: Oktober 2026 · Version 2.3
 
 Dieses Repo enthält zwei Plugins für Claude Code: **`dev-team`** und **`tool-scout`**. Beide enthalten kein Firmen- oder Kundenwissen und dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
 
@@ -79,7 +79,11 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
 
 - **Auf deinen Rechnern:** Das Plugin ist für deinen ganzen Benutzer installiert. Agenten und Grundgesetz gelten damit in **jedem** Projekt, auch in neuen, ohne dass du etwas tun musst.
 - **Neues oder noch nicht aufgenommenes Projekt:** Beim Start merkt der Projektleiter das und bietet dir `/dev-team:neues-projekt` bzw. `/dev-team:projekt-aufnehmen` an.
-- **Cloud-Sitzungen** (z. B. wenn ein Projekt auf GitHub in der Cloud weiterbaut, während dein Laptop aus ist): Dort gibt es deine Laptop-Einstellungen nicht. Deshalb legen `neues-projekt` und `projekt-aufnehmen` in jedes Repo die Datei `.claude/settings.json`. Sie sagt jeder Sitzung dieses Repos: „Lade das Dev-Team von GitHub.“ Das Grundgesetz kommt dann über das Plugin selbst mit.
+- **Cloud-Sitzungen** (ein Projekt baut auf GitHub in der Cloud weiter, während dein Laptop aus ist): Dort gibt es keine installierten Plugins. Deshalb legen `neues-projekt` und `projekt-aufnehmen` in jedes Repo zwei kleine Dateien:
+  - `.claude/settings.json` startet bei jeder Sitzung
+  - `.claude/dev-team-start.sh`, das in der Cloud das Dev-Team von GitHub holt und Grundgesetz, Agenten, Abläufe und Protokoll bereitstellt. Auf deinen Rechnern tut es nichts, dort übernimmt das installierte Plugin.
+- In der Cloud heißen die Befehle mit Bindestrich, z. B. `/dev-team-auftrag`, die Agenten ohne Präfix, z. B. `kritiker`.
+- **Voraussetzung:** Die Cloud-Sitzung muss das private Repo `roelzer/roelz-plugins` lesen dürfen. Wenn nicht, sagt dir der Projektleiter das gleich zu Beginn. Dann `roelz-plugins` in der Cloud-Umgebung als zusätzliches Repo hinzufügen.
 - Lektionen aus Cloud-Sitzungen landen als Vorschlag in `docs/LEKTIONEN_VORSCHLAEGE.md` des Projekts. Übernommen werden sie später, wenn du dabei bist.
 
 ## 8. Befehle

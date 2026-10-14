@@ -1,7 +1,7 @@
 {
   "name": "dev-team",
   "displayName": "Dev-Team",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Programmierabteilung: Projektleitung mit ausführlicher Planung, Kritiker, Fachprüfer mit Recherche-Team, Abwägungsrunde, Tester, Reviewer und Produktprüfer. Kann nach Freigabe eigenständig bauen. Enthält kein Firmen- oder Kundenwissen.",
   "author": {
     "name": "Simon Rölz"
