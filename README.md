@@ -1,10 +1,11 @@
 # roelz-plugins
 
-Privater Claude-Code-Marktplatz mit drei Plugins:
+Privater Claude-Code-Marktplatz mit zwei Plugins:
 
-- `plugins/dev-team` – Programmierabteilung (ohne Firmenwissen, auch einzeln installierbar)
-- `plugins/firma` – Backoffice der eigenen Firma (privat)
-- `plugins/tool-scout` – prüft fertige Skills/Agenten/Plugins
+- `plugins/dev-team` – Programmierabteilung mit Planung, Prüfern, Fachregeln und eigenständigem Bauen
+- `plugins/tool-scout` – prüft fertige Skills/Agenten/Plugins vor der Installation
+
+Beide enthalten kein Firmen- oder Kundenwissen.
 
 Einrichtung und Nutzung: siehe [ANLEITUNG.md](ANLEITUNG.md).
 

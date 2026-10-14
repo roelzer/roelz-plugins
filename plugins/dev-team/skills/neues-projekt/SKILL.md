@@ -1,6 +1,6 @@
 ---
 name: neues-projekt
-description: Legt ein neues Projekt mit sauberer Struktur an – Ordner, Projekt-CLAUDE.md, Lastenheft, Risiko-Log, .gitignore und Git. Für jeden neuen Kunden- oder Eigenprojekt-Start.
+description: Legt ein neues Projekt mit sauberer Struktur an – Ordner, Projekt-CLAUDE.md, Lastenheft, Risiko-Log, .gitignore und Git. Für jeden neuen Kunden- oder Eigenprojekt-Start. Für ein bestehendes Projekt stattdessen `/dev-team:projekt-aufnehmen`.
 disable-model-invocation: true
 argument-hint: "[Projektname]"
 ---
@@ -22,9 +22,16 @@ Projektname: `$ARGUMENTS` (fehlt er, frag danach). Ordnername: Kleinbuchstaben m
      docs/
        lastenheft.md    ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/lastenheft.md
        risiko-log.md    ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/risiko-log.md
-       plan.md          ← leer, Überschrift „Umsetzungsplan“
+       plan.md          ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/plan.md
+       STATUS.md        ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/status.md
+       OFFENE_FRAGEN.md ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/offene-fragen.md
+     fachwissen/        ← nur bei Projekten mit fachlichen Ergebnissen (Berechnung, Dimensionierung …)
+       regeln.md        ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/fachregeln.md
+       quellen/         ← eigene Unterlagen (Handbücher, Datenblätter, Tabellen)
+       recherche/
      src/
      tests/
+       referenz/        ← nur bei fachlichen Ergebnissen: echte Fälle mit bekanntem Ergebnis
    ```
 2. Projektname in CLAUDE.md und Lastenheft eintragen.
 3. Liegt ein Lastenheft aus dem Erstgespräch vor (z. B. vom Plugin „firma“), übernimm es nach `docs/lastenheft.md`.

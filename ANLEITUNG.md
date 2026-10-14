@@ -1,163 +1,116 @@
-# Deine digitale Firma – Anleitung
+# Dev-Team – Anleitung
 
-Stand: Oktober 2026 · Version 1.0
+Stand: Oktober 2026 · Version 2.0
 
-Dieses Repo enthält drei Plugins für Claude Code. Du richtest sie **einmal** ein, danach sind sie in **jedem Projekt** verfügbar – im Terminal genauso wie in VS Code.
+Dieses Repo enthält zwei Plugins für Claude Code: **`dev-team`** und **`tool-scout`**. Beide enthalten kein Firmen- oder Kundenwissen und dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
+
+Du richtest alles **einmal pro Rechner** ein, danach gilt es in **jedem Projekt**, im Terminal genauso wie in VS Code.
 
 ---
 
 ## 1. Wer macht was?
 
-### Plugin `dev-team` – Programmierabteilung (überall nutzbar, auch in der Arbeit)
-| Rolle | Form | So nutzt du sie |
+Du sprichst immer nur mit **einer** Person, dem Projektleiter. Die anderen sind unabhängige Agenten, die er zu festen Zeitpunkten ruft. Jeder fängt frisch an, kennt nur seinen Auftrag und berichtet mit Ampel 🟢🟡🔴 zurück.
+
+| Rolle | Wann | Aufgabe |
 |---|---|---|
-| **Projektleiter** | deine Hauptsitzung + Grundgesetz | ist immer da, du sprichst einfach mit Claude |
-| **Architekt** | Skill | „Wie setzen wir das am besten um?“ – springt automatisch an, oder `/dev-team:architekt` |
-| **Kritiker** | Agent (unabhängig) | prüft Pläne vor dem Bauen und Ergebnisse vor der Abgabe |
-| **Tester** | Agent (unabhängig) | testet nur gegen die Anforderungen |
-| **Reviewer** | Agent (unabhängig) | Senior-Abnahme, Sicherheit, Freigabe |
-| **Produktprüfer** | Agent (unabhängig) | Kundenblick: Stolpersteine + Ideen mit Mehrwert |
-| Sicherheit | Skill | Checkliste, nutzen Reviewer und Kritiker automatisch |
-| Baukasten | Skill | wiederverwendbare Bausteine finden und sicher hinzufügen |
+| **Projektleiter** | immer | Anforderungen festhalten, ausführlich planen, bauen, dir berichten |
+| **Kritiker** | nach dem Plan | Lücken, Risiken, fehlende Anforderungen im Plan finden |
+| **Fachprüfer** | Plan und Ergebnis | Kann das Ergebnis in der Praxis so sein? Fachregeln als automatische Prüfung im Code |
+| ↳ **Rechercheur** | bei Wissenslücken | Fachgrundlagen mit Quellen suchen, zuerst in deinen Unterlagen |
+| ↳ **Quellenprüfer** | nach dem Rechercheur | jede Aussage gegen eine zweite Quelle prüfen |
+| **Abwägungsrunde** | vor der Freigabe | drei unabhängige Urteile: **Fachexperte** (praxistauglich?), **Pragmatiker** (Aufwand/Nutzen?), **Langfrist-Architekt** (rächt sich das später?) |
+| **Tester** | nach dem Bauen | Funktionen, Referenzfälle, Fachregeln über viele erzeugte Fälle |
+| **Reviewer** | nach dem Tester | Code-Qualität, Sicherheit, Architekturregeln |
+| **Produktprüfer** | zum Schluss | jede Anforderung einzeln abnehmen: A1 ✅ A2 ❌ |
+| Tool-Scout | wenn du willst | fremde Plugins/Skills prüfen, bevor du sie installierst |
 
-### Plugin `firma` – Backoffice (nur auf deinen eigenen Rechnern)
-| Rolle | So nutzt du sie |
+## 2. Wie viel Prüfung?
+
+Der Projektleiter sagt dir vor dem Start, welche Stufe er wählt. Du kannst hochstufen („mach das als Stufe Groß“).
+
+| Stufe | Beispiel | Ablauf |
+|---|---|---|
+| **Klein** | Tippfehler, Farbe, klarer Einzelfehler | direkt beheben + Test |
+| **Normal** | neues Feature über mehrere Dateien | voller Ablauf, Abwägungsrunde nur bei 🟡/🔴 |
+| **Groß** | Berechnung, Datenmodell, neues Modul | voller Ablauf mit allen Instanzen |
+
+## 3. Der Ablauf eines Auftrags
+
+Start mit: `/dev-team:auftrag <was gebaut werden soll>`
+
+1. **Anforderungen** – jede deiner Anforderungen einzeln mit Nummer. ⏸ *Du bestätigst.*
+2. **Ausführlicher Plan** – so genau, dass jemand ihn stundenlang ohne Rückfragen umsetzen kann.
+3. **Kritiker** → 4. **Fachprüfer** (+ Recherche) → 5. **Abwägungsrunde**
+6. ⏸ **Freigabe durch dich** – Ampel, wichtigste Punkte, neue Fachregeln, „Freigabe zum eigenständigen Bauen?“
+7. **Eigenständig bauen** – auch wenn du stundenlang weg bist:
+   - Stand jederzeit in `docs/STATUS.md`
+   - Fragen landen in `docs/OFFENE_FRAGEN.md`, es wird nicht geraten
+   - Harter Stopp bei roten Referenzfällen, verletzten Fachregeln oder Änderungen außerhalb des Plans
+8. **Prüfen** – Tester → Fachprüfer → Reviewer → Produktprüfer
+9. ⏸ **Bericht** – mit vollständiger Abnahmeliste
+
+## 4. Fachregeln – damit offensichtliche Fehler nicht durchrutschen
+
+Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich überhaupt möglich** ist. Deshalb hat jedes Projekt mit Berechnungen `fachwissen/regeln.md`, z. B. „Rohrdimension wird in Fließrichtung nie größer“.
+
+- Jede **von dir bestätigte** Regel wird als automatische Prüfung gebaut, die über **jedes** berechnete Ergebnis läuft: Referenzfälle, viele zufällig erzeugte Fälle und im Programm selbst.
+- Neue Regel: Sie muss am fehlerhaften Stand zuerst **rot** werden. Das ist der Beweis, dass sie wirkt.
+- Recherche-Ergebnisse sind nur **Vorschläge**. Nur du machst daraus Regeln.
+- Eigene Unterlagen (Handbücher, Datenblätter, Rohrtabellen) in `fachwissen/quellen/` legen. Die sind die beste Quelle.
+- Recherche gezielt starten: `/dev-team:recherche <Thema>`
+
+## 5. Befehle
+
+| Befehl | Wofür |
 |---|---|
-| **Anforderungsanalyst** | `/firma:erstgespraech vorbereiten` bzw. `auswerten` |
-| **Preisberater** | `/firma:preisberater vorher` / `nachher` / `bewerten` |
-| **Angebot** | `/firma:angebot` |
-| **Büro** | `/firma:buero check` / `eintragen` / `beleg` |
-| **Coach** | `/firma:coach plan` / `einheit` / `quiz` / `thema` |
-
-### Plugin `tool-scout`
-| Rolle | So nutzt du sie |
-|---|---|
-| **Tool-Scout** | `/tool-scout:scout <wofür>` oder `/tool-scout:scout check` |
-
-Die Skills mit Fachwissen (Architekt, Preisberater …) springen meist auch von selbst an, wenn du einfach normal fragst. Die Befehle sind der sichere Weg.
+| `/dev-team:auftrag <…>` | Auftrag Stufe Normal/Groß durchführen |
+| `/dev-team:neues-projekt <name>` | neues Projekt mit Struktur anlegen |
+| `/dev-team:projekt-aufnehmen` | bestehendes Projekt (z. B. SiRo) ins Dev-Team holen |
+| `/dev-team:recherche <Thema>` | Fachgrundlagen recherchieren |
+| `/dev-team:lektion <…>` | Lektion aus einem Fehler festhalten |
+| `/dev-team:uebergabe` | Übergabe an Kunden vorbereiten |
+| `/dev-team:einrichten privat\|arbeit` | einmalige Einrichtung pro Rechner |
+| `/tool-scout:scout <wofür>` | fremde Plugins/Skills suchen und prüfen |
+| `@dev-team:<agent>` | einen Agenten gezielt rufen, z. B. `@dev-team:fachpruefer` |
 
 ---
 
-## 2. Einmalige Einrichtung (privater Rechner)
+## 6. Einrichtung auf einem Rechner
 
-**Voraussetzungen:** Git für Windows, VS Code mit der Claude-Code-Erweiterung, ein GitHub-Konto.
+**Voraussetzungen:** Git für Windows, VS Code mit der Claude-Code-Erweiterung, Zugriff auf dein GitHub-Konto.
 
-1. **Repo auf GitHub anlegen:** neues Repository `roelz-plugins`, **Private** auswählen.
-2. **Ordner ablegen:** ZIP entpacken, z. B. nach `C:\Users\<du>\roelz-plugins`.
-3. **Hochladen** – im VS-Code-Terminal in diesem Ordner:
+1. **Repo klonen** (VS-Code-Terminal):
    ```
-   git init
-   git add .
-   git commit -m "Firma v1.0"
-   git branch -M main
-   git remote add origin https://github.com/<dein-name>/roelz-plugins.git
-   git push -u origin main
+   git clone https://github.com/roelzer/roelz-plugins.git C:/Users/<du>/roelz-plugins
    ```
-4. **Plugins installieren** (Terminal, beliebiger Ordner):
+2. **Plugins installieren:**
    ```
    claude plugin marketplace add C:/Users/<du>/roelz-plugins
    claude plugin install dev-team@roelz-plugins
-   claude plugin install firma@roelz-plugins
    claude plugin install tool-scout@roelz-plugins
    ```
-   Wichtig: Den Marktplatz **aus dem lokalen Ordner** hinzufügen, nicht direkt von GitHub. Nur so werden neue Lektionen direkt in dein Repo geschrieben.
-5. **Einrichten:** Claude Code starten (Terminal: `claude` oder in VS Code) und eingeben:
-   ```
-   /dev-team:einrichten privat
-   ```
-   Claude verknüpft Grundgesetz und Lektionen mit deiner globalen Einstellung und setzt Schutzregeln für Passwortdateien.
-6. **Claude Code neu starten.** Falls Claude fragt, ob verknüpfte Dateien geladen werden dürfen: zustimmen.
+   Den Marktplatz **aus dem lokalen Ordner** hinzufügen, nicht direkt von GitHub. Nur so landen neue Lektionen im Repo.
+3. **VS Code komplett schließen und neu öffnen.** Plugins werden nur beim Start geladen.
+4. **Einrichten:** Claude Code starten und eingeben:
+   - privater Rechner: `/dev-team:einrichten privat`
+   - Arbeitsrechner: `/dev-team:einrichten arbeit` (Lektionen bleiben dann lokal und fließen nicht ins private Repo)
+5. **Noch einmal neu starten.** Fragt Claude, ob verknüpfte Dateien geladen werden dürfen: zustimmen.
+6. Prüfen: `/agents` zeigt die Dev-Team-Agenten mit `dev-team:` davor.
 
-Fertig. Ab jetzt gilt alles in jedem Projekt.
+## 7. Updates
 
----
+Wird am Dev-Team etwas geändert (neue Regel, neuer Agent), landet es auf GitHub. Auf dem anderen Rechner:
+```
+cd C:/Users/<du>/roelz-plugins
+git pull
+claude plugin marketplace update roelz-plugins
+```
+Danach VS Code neu starten.
 
-## 3. Terminal oder VS Code?
+## 8. Gut zu wissen
 
-Beides nutzt dieselben Einstellungen aus deinem Benutzerordner (`~/.claude`). Was du einmal installierst, ist in beiden da – auch die Befehle mit `/`. Falls ein Befehl in VS Code einmal nicht auftaucht: im eingebauten Terminal `claude` starten, dort geht alles.
-
----
-
-## 4. So läuft ein Kundenprojekt
-
-1. **Vor dem Termin:** `/firma:erstgespraech vorbereiten` → Gesprächsleitfaden.
-2. **Termin:** Aufnahme nur mit Zustimmung des Kunden.
-3. **Danach:** `/firma:erstgespraech auswerten` + Notizen/Transkript → Lastenheft.
-4. **Projekt anlegen:** im Ordner für deine Projekte `/dev-team:neues-projekt <name>`.
-5. **Lösungsweg:** „Wie setzen wir das um?“ → Architekt, inkl. Stundenschätzung.
-6. **Preis:** `/firma:preisberater vorher` → Preisspanne mit Begründung.
-7. **Angebot:** `/firma:angebot`.
-8. **Nach Auftrag:** `/dev-team:auftrag <was gebaut werden soll>` → Plan → Kritiker → du entscheidest → Bau → Tester → Reviewer → Produktprüfer.
-9. **Übergabe:** `/dev-team:uebergabe` → Anleitung, Abnahmeprotokoll, Wartungsangebot.
-10. **Nachkalkulation:** `/firma:preisberater nachher` → die nächste Schätzung wird genauer.
-
-Kleinigkeiten (Fehler beheben, kleine Änderung) gehen ohne Pipeline – einfach Claude fragen.
-
----
-
-## 5. Lernen aus Fehlern
-
-- Tester und Reviewer schlagen Lektionen vor. Du bestätigst, dann: `/dev-team:lektion <was schiefging>`.
-- Claude sortiert sie richtig ein: **allgemein** (Dev-Team), **Firma** oder **nur dieses Projekt**.
-- Jeder Code-Fehler bekommt zusätzlich einen Test – so kommt er nicht zurück.
-- Ab und zu aufräumen: `/dev-team:lektion aufraeumen`.
-- **Danach ins Repo übernehmen:** `git add .`, `git commit -m "Lektion: …"`, `git push` (Claude macht das auch für dich). Auf dem anderen Rechner `git pull` – fertig, kein Neuinstallieren nötig.
-
----
-
-## 6. Neuer Rechner oder neues Geschäftskonto
-
-Die Plugins hängen am **Rechner**, nicht an deinem Claude-Account. Ein Accountwechsel (z. B. auf ein Geschäftskonto) ändert nichts.
-Auf einem neuen Rechner: Repo klonen (`git clone https://github.com/<dein-name>/roelz-plugins.git`), dann Schritte 4–6 aus Abschnitt 2.
-
----
-
-## 7. In der Arbeit (nur Dev-Team)
-
-**Vorher mit deinem Arbeitgeber klären**, ob eigene Plugins und GitHub erlaubt sind.
-
-Damit kein Firmenwissen (Preise, Kunden) auf den Arbeitsrechner kommt, wird dort **nur der Ordner `plugins/dev-team`** verwendet – er ist auch allein installierbar:
-1. Ordner `plugins/dev-team` auf den Arbeitsrechner kopieren (z. B. `C:/Tools/dev-team`).
-2. Installieren:
-   ```
-   claude plugin marketplace add C:/Tools/dev-team
-   claude plugin install dev-team@roelz-dev-team
-   ```
-3. Einrichten: `/dev-team:einrichten arbeit`
-
-Im Modus **arbeit** bleiben Lektionen auf dem Arbeitsrechner und fließen nicht in dein privates Repo zurück. Code aus der Arbeit gehört in der Regel dem Arbeitgeber – nichts davon in deinen privaten Baukasten übernehmen.
-
----
-
-## 8. Claude-App (Handy, Browser)
-
-Die Plugins laufen in **Claude Code**. In der Claude-App kannst du trotzdem über Preise, Angebote oder Lernthemen sprechen: Lege dort z. B. ein Projekt „Preise“ an und lade `plugins/firma/wissen/preis-kriterien.md` und `kalkulationen.md` als Projektwissen hoch. Die verbindliche Fassung bleibt immer im Repo – Ergebnisse danach in Claude Code übernehmen.
-
----
-
-## 9. Tokens sparen
-
-- **Eine Aufgabe pro Sitzung**, danach `/clear`. Lange Sitzung: `/compact`.
-- Die Pipeline (`/dev-team:auftrag`) nur für echte Features – sie ruft mehrere Agenten und kostet entsprechend mehr.
-- Routine: Sonnet. Planen und schwierige Probleme: Opus (`/model`).
-- Lessons-Datei schlank halten (unter 40 Einträgen) – sie wird bei jedem Start geladen.
-
----
-
-## 10. Deine ersten Schritte
-
-1. Einrichtung (Abschnitt 2).
-2. In `plugins/firma/wissen/preis-kriterien.md` deinen **Stundensatz** und Mindestauftragswert eintragen – oder `/firma:preisberater` fragen, wie du ihn festlegst.
-3. `/firma:buero eintragen` – deine aktuellen Abos aufnehmen.
-4. `/firma:coach plan` – Lernplan erstellen.
-5. Mit einem **kleinen Testprojekt** die Pipeline einmal durchspielen (`/dev-team:neues-projekt test` → `/dev-team:auftrag …`). Was hakt, sagst du Claude – das ist der schnellste Weg, das Team auf dich einzustellen.
-6. Optional: Baukasten-Repo anlegen (Skill `baukasten` erklärt es).
-
----
-
-## 11. Gut zu wissen
-
-- **Version 1:** Das Gerüst ist geprüft und installierbar. Feinschliff kommt mit echten Projekten – passe die Dateien an, wenn etwas nicht zu deiner Arbeitsweise passt. Alles sind normale Textdateien.
-- **Keine Geheimnisse ins Repo:** Passwörter, Schlüssel, Kontonummern gehören nie in diese Dateien.
-- **Fremde Plugins** erst nach Prüfung durch den Tool-Scout installieren.
-- **Steuern & Recht:** Die Firma-Skills geben Orientierung, ersetzen aber weder Steuerberater noch Anwalt. Angebots- und Abnahmevorlage einmal anwaltlich prüfen lassen.
+- **Arbeit:** Code, den du für deinen Arbeitgeber baust, gehört in der Regel dem Arbeitgeber. Nichts davon in deinen privaten Baukasten übernehmen.
+- **Fremde Plugins** nie direkt aus Videos installieren. Erst `/tool-scout:scout check`.
+- **Tokens:** Abwägungsrunde und Recherche kosten spürbar mehr. Deshalb die Stufen nutzen und nach jeder Aufgabe `/clear`.
+- **Grenzen:** Alle Agenten sind Claude. Mehrere Instanzen haben ähnliche blinde Flecken. Die stärkste Absicherung bleiben deine Referenzfälle und die von dir bestätigten Fachregeln.

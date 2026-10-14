@@ -1,10 +1,16 @@
 {
   "name": "dev-team",
   "displayName": "Dev-Team",
-  "version": "1.0.0",
-  "description": "Programmierabteilung mit Projektleitung, Architekt, Kritiker, Tester, Reviewer und Produktprüfer. Enthält kein Firmen- oder Kundenwissen.",
+  "version": "2.0.0",
+  "description": "Programmierabteilung: Projektleitung mit ausführlicher Planung, Kritiker, Fachprüfer mit Recherche-Team, Abwägungsrunde, Tester, Reviewer und Produktprüfer. Kann nach Freigabe eigenständig bauen. Enthält kein Firmen- oder Kundenwissen.",
   "author": {
     "name": "Simon Rölz"
   },
-  "keywords": ["dev-team", "review", "testing", "workflow"]
+  "keywords": [
+    "dev-team",
+    "review",
+    "testing",
+    "workflow",
+    "fachregeln"
+  ]
 }

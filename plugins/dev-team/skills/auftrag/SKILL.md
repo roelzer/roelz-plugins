@@ -1,6 +1,6 @@
 ---
 name: auftrag
-description: Führt einen Auftrag vollständig durch die Dev-Team-Pipeline – Verstehen, Plan, Kritiker, Bauen, Tester, Reviewer, Produktprüfer, Abschluss. Für Features und Projekte, die größer als ein Kleinfix sind.
+description: Führt einen Auftrag vollständig durch die Dev-Team-Pipeline – Anforderungsliste, ausführlicher Plan, Kritiker, Fachprüfer, Abwägungsrunde, Freigabe, eigenständiges Bauen, Prüfung und Abnahme jeder Anforderung. Für Aufgaben der Stufe Normal und Groß.
 disable-model-invocation: true
 argument-hint: "[Was soll gebaut oder geändert werden?]"
 ---
@@ -9,33 +9,66 @@ argument-hint: "[Was soll gebaut oder geändert werden?]"
 
 Auftrag: `$ARGUMENTS`
 
-Du bist der Projektleiter. Halte Simon an den markierten **Stopps** auf dem Laufenden und warte dort auf seine Entscheidung. Lege zu Beginn eine Aufgabenliste mit den Phasen an.
+Du bist der Projektleiter. Lege zu Beginn eine Aufgabenliste mit den Phasen an. An den markierten **Stopps** wartest du auf Simon. Zwischen Freigabe (Phase 6) und Bericht (Phase 9) arbeitest du eigenständig nach den Regeln im Grundgesetz.
 
-## Phase 1 – Verstehen
-- Lies `CLAUDE.md`, `docs/lastenheft.md`, `docs/risiko-log.md` und die Lessons-Datei.
-- Fehlt ein Lastenheft oder sind Akzeptanzkriterien unklar: formuliere sie selbst knapp und lass sie bestätigen.
-- Prüfe mit dem Skill `baukasten`, ob es passende Bausteine gibt.
+## Phase 1 – Verstehen und Anforderungen festhalten
+1. Lies `CLAUDE.md`, `docs/lastenheft.md`, `docs/risiko-log.md`, `fachwissen/regeln.md` (falls vorhanden) und die Lessons-Datei.
+2. Schreibe jede Anforderung aus Simons Auftrag einzeln auf, mit **seinen eigenen Worten** und einem Abnahmekriterium. Nummerierung fortlaufend im Lastenheft (A1, A2 …). Auch Nebensätze zählen.
+3. Lege die Stufe fest (Normal/Groß, siehe Grundgesetz) und begründe sie in einem Satz.
+4. Prüfe mit dem Skill `baukasten`, ob es passende Bausteine gibt.
 
-## Phase 2 – Plan
-Schreibe `docs/plan.md`: Ziel, Schritte (jeweils lauffähig), betroffene Dateien, Testidee, bekannte Risiken. Kurz halten – eine Bildschirmseite.
+**Stopp:** Zeige Simon die Anforderungsliste und die Stufe. Frag: „Fehlt etwas, ist etwas falsch verstanden?“ Erst nach Bestätigung weiter.
+
+## Phase 2 – Ausführlicher Plan
+Ist die grundsätzliche Technik noch offen (Web-App, .exe, Excel …), kläre sie vorher mit Simon über den Skill `architekt`.
+Schreibe `docs/plan.md` nach der Vorlage `${CLAUDE_PLUGIN_ROOT}/vorlagen/plan.md`. Der Plan muss so genau sein, dass ein anderer Entwickler ihn ohne Rückfragen umsetzen könnte. Jede Anforderung A… muss mindestens einem Arbeitspaket zugeordnet sein; fehlt eine Zuordnung, ist der Plan nicht fertig.
 
 ## Phase 3 – Kritiker
-Rufe den Agenten `kritiker` mit dem Plan und dem Lastenheft auf.
-**Stopp:** Zeige Simon die Risiken und deine Empfehlung je Risiko. Trage seine Entscheidungen in `docs/risiko-log.md` ein und passe den Plan an.
+Rufe den Agenten `kritiker` mit Plan, Lastenheft und Risiko-Log auf. Arbeite seine Punkte in den Plan ein oder notiere, warum nicht.
 
-## Phase 4 – Bauen
-Setze den Plan Schritt für Schritt um. Nach jedem Schritt ausführen bzw. vorhandene Tests laufen lassen, dann committen. Weicht die Umsetzung deutlich vom Plan ab: Plan aktualisieren und Simon kurz informieren.
-Nur bei großen, klar getrennten Teilen parallel arbeiten lassen – sonst selbst bauen.
+## Phase 4 – Fachprüfer
+Hat der Auftrag fachliche Folgen (Berechnungen, Dimensionierung, Mengen, Normen): Rufe den Agenten `fachpruefer` mit dem Plan auf. Er prüft betroffene Fachregeln und meldet fehlendes Wissen.
+- Meldet er Wissenslücken: Starte für jede Lücke `rechercheur` und danach `quellenpruefer` (siehe Skill `recherche`). Ergebnisse landen als **vorgeschlagen** in `fachwissen/`.
+- Plan um die Fachregel-Prüfungen ergänzen, die gebaut oder erweitert werden müssen.
+Bei Stufe Normal ohne fachliche Folgen: Phase überspringen und das im Plan vermerken.
 
-## Phase 5 – Prüfen
-1. Agent `tester`: Übergib **nur** Akzeptanzkriterien, Startbefehl und Testbefehl – nicht deine Lösungsgedanken.
-2. Fehler beheben, Tester erneut, bis alles grün ist (höchstens 3 Runden; danach Simon informieren).
-3. Agent `reviewer`. Kritische und wichtige Befunde beheben.
-4. Bei Oberflächen: Agent `produktpruefer`. Stolpersteine beheben; Ideen mit Mehrwert nur sammeln.
-**Stopp:** Ergebnis vorstellen.
+## Phase 5 – Abwägungsrunde
+- **Stufe Groß:** immer.
+- **Stufe Normal:** nur, wenn Kritiker oder Fachprüfer 🟡 oder 🔴 gemeldet haben.
 
-## Phase 6 – Abschluss
-- Zusammenfassung für Simon: was gebaut wurde, wie man es startet, offene Punkte, Ideen des Produktprüfers.
-- Lektionsvorschläge aus Tester und Reviewer vorlegen. Was Simon bestätigt → `/dev-team:lektion`.
-- Bei Kundenprojekten: auf `/dev-team:uebergabe` und (falls installiert) die Nachkalkulation mit dem Preisberater hinweisen.
-- Hinweis: Für die nächste Aufgabe `/clear` verwenden.
+Starte `fachexperte`, `pragmatiker` und `langfrist-architekt` **parallel**. Jeder bekommt Plan, Lastenheft, Kritiker-Bericht und Fachprüfer-Bericht, aber nicht die Urteile der anderen. Fasse danach zusammen:
+- Wo sind sich alle einig?
+- Wo widersprechen sie sich, und wie würdest du entscheiden?
+- Gesamtampel: 🔴, sobald einer 🔴 meldet; 🟢 nur, wenn alle 🟢 melden; sonst 🟡.
+
+## Phase 6 – Freigabe
+**Stopp:** Lege Simon vor:
+1. Gesamtampel und die wichtigsten Punkte aus Kritiker, Fachprüfer und Abwägungsrunde, in einfacher Sprache.
+2. Deine Empfehlung je Punkt (beheben / akzeptieren / später).
+3. Neu vorgeschlagene Fachregeln zur Bestätigung.
+4. Geschätzte Bauzeit und die Frage: „Freigabe zum eigenständigen Bauen?“
+
+Trage Simons Entscheidungen in `docs/risiko-log.md` ein, bestätigte Regeln in `fachwissen/regeln.md` (Status „bestätigt“), passe den Plan an. Ohne ausdrückliche Freigabe wird nicht gebaut.
+
+## Phase 7 – Eigenständig bauen
+Nach den Regeln „Eigenständig bauen“ im Grundgesetz:
+- Arbeitspakete der Reihe nach, nach jedem: Tests, Commit, `docs/STATUS.md` aktualisieren (Vorlage `${CLAUDE_PLUGIN_ROOT}/vorlagen/status.md`).
+- Fragen → `docs/OFFENE_FRAGEN.md`, weiter mit unabhängigen Paketen.
+- Neue Fachregel: erst Prüfung bauen, zeigen dass sie am alten Stand rot wird, dann beheben.
+- Harte Stopps beachten.
+
+## Phase 8 – Prüfen
+1. `tester`: Übergib **nur** Anforderungsliste, Abnahmekriterien, Fachregeln, Start- und Testbefehl, nicht deine Lösungsgedanken. Fehler beheben, erneut testen (höchstens 3 Runden, danach Stopp).
+2. `fachpruefer` (bei fachlichen Folgen): prüft Ergebnisse und Plausibilitätsprüfung.
+3. `reviewer`: kritische und wichtige Befunde beheben.
+4. `produktpruefer`: Abnahme jeder Anforderung einzeln. ❌ ohne triftigen Grund → zurück zu Phase 7.
+
+## Phase 9 – Bericht
+**Stopp:** Bericht an Simon, beginnend mit der Ampel:
+1. **Abnahmeliste:** A1 ✅ / A2 ❌ (Grund) … vollständig.
+2. Was gebaut wurde, wie man es startet, in einfacher Sprache.
+3. Stand der Absicherung: Tests, Referenzfälle, Fachregeln, was davon grün ist.
+4. Offene Fragen aus `docs/OFFENE_FRAGEN.md`.
+5. Ideen des Produktprüfers, Lektions- und Fachregel-Vorschläge. Was Simon bestätigt → `/dev-team:lektion` bzw. `fachwissen/regeln.md`.
+6. Bei Kundenprojekten: Hinweis auf `/dev-team:uebergabe`.
+Für die nächste Aufgabe `/clear` verwenden.
