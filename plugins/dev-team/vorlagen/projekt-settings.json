@@ -1,0 +1,14 @@
+{
+  "extraKnownMarketplaces": {
+    "roelz-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "roelzer/roelz-plugins"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "dev-team@roelz-plugins": true,
+    "tool-scout@roelz-plugins": true
+  }
+}

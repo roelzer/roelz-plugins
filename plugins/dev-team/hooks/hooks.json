@@ -1,6 +1,28 @@
 {
-  "description": "Dev-Team: schreibt jeden Agenten-Start und jedes Agenten-Ende in docs/AGENTEN_LOG.md des Projekts.",
+  "description": "Dev-Team: Grundgesetz in jeder Sitzung (auch Cloud), Pfade für jeden Agenten, automatisches Agenten-Protokoll in docs/AGENTEN_LOG.md.",
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/sitzungsstart.sh\"",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/agent-kontext.sh\"",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Agent|Task",

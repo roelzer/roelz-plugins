@@ -19,6 +19,8 @@ Projektname: `$ARGUMENTS` (fehlt er, frag danach). Ordnername: Kleinbuchstaben m
      CLAUDE.md          ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/projekt-CLAUDE.md
      .gitignore         ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/gitignore.txt
      .env.example       ← leer, mit Kommentar „Hier nur Variablennamen, keine echten Werte“
+     .claude/
+       settings.json    ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/projekt-settings.json (Dev-Team gilt damit auch in Cloud-Sitzungen)
      docs/
        lastenheft.md    ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/lastenheft.md
        risiko-log.md    ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/risiko-log.md

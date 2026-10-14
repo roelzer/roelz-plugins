@@ -1,6 +1,6 @@
 # Dev-Team – Anleitung
 
-Stand: Oktober 2026 · Version 2.1
+Stand: Oktober 2026 · Version 2.2
 
 Dieses Repo enthält zwei Plugins für Claude Code: **`dev-team`** und **`tool-scout`**. Beide enthalten kein Firmen- oder Kundenwissen und dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
 
@@ -75,7 +75,14 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
 - **Bleibt im Projekt:** interne Werte und Unterlagen eines Arbeitgebers oder Kunden.
 - Auf dem Arbeitsrechner bleiben Lessons lokal. Die Fachwissen-Bibliothek ist allgemein und wird über GitHub auf beiden Rechnern aktuell gehalten.
 
-## 7. Befehle
+## 7. Gilt automatisch: jedes Projekt, auch in der Cloud
+
+- **Auf deinen Rechnern:** Das Plugin ist für deinen ganzen Benutzer installiert. Agenten und Grundgesetz gelten damit in **jedem** Projekt, auch in neuen, ohne dass du etwas tun musst.
+- **Neues oder noch nicht aufgenommenes Projekt:** Beim Start merkt der Projektleiter das und bietet dir `/dev-team:neues-projekt` bzw. `/dev-team:projekt-aufnehmen` an.
+- **Cloud-Sitzungen** (z. B. wenn ein Projekt auf GitHub in der Cloud weiterbaut, während dein Laptop aus ist): Dort gibt es deine Laptop-Einstellungen nicht. Deshalb legen `neues-projekt` und `projekt-aufnehmen` in jedes Repo die Datei `.claude/settings.json`. Sie sagt jeder Sitzung dieses Repos: „Lade das Dev-Team von GitHub.“ Das Grundgesetz kommt dann über das Plugin selbst mit.
+- Lektionen aus Cloud-Sitzungen landen als Vorschlag in `docs/LEKTIONEN_VORSCHLAEGE.md` des Projekts. Übernommen werden sie später, wenn du dabei bist.
+
+## 8. Befehle
 
 | Befehl | Wofür |
 |---|---|
@@ -92,7 +99,7 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
 
 ---
 
-## 8. Einrichtung auf einem Rechner
+## 9. Einrichtung auf einem Rechner
 
 **Voraussetzungen:** Git für Windows, VS Code mit der Claude-Code-Erweiterung, Zugriff auf dein GitHub-Konto.
 
@@ -114,7 +121,7 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
 5. **Noch einmal neu starten.** Fragt Claude, ob verknüpfte Dateien geladen werden dürfen: zustimmen.
 6. Prüfen: `/agents` zeigt die Dev-Team-Agenten mit `dev-team:` davor.
 
-## 9. Updates
+## 10. Updates
 
 Wird am Dev-Team etwas geändert (neue Regel, neuer Agent), landet es auf GitHub. Auf dem anderen Rechner:
 ```
@@ -124,7 +131,7 @@ claude plugin marketplace update roelz-plugins
 ```
 Danach VS Code neu starten.
 
-## 10. Gut zu wissen
+## 11. Gut zu wissen
 
 - **Arbeit:** Code, den du für deinen Arbeitgeber baust, gehört in der Regel dem Arbeitgeber. Nichts davon in deinen privaten Baukasten übernehmen.
 - **Fremde Plugins** nie direkt aus Videos installieren. Erst `/tool-scout:scout check`.
