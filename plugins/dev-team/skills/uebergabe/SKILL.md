@@ -30,4 +30,4 @@ Hinweis an Simon: Die Abnahme ist rechtlich wichtig (u. a. Beginn der Gewährlei
 ## 5. Wartung
 Kurzer Vorschlag für einen Wartungsvertrag: was enthalten ist (Updates, Fehlerbehebung, Reaktionszeit), was nicht. Keinen Preis festlegen – das macht der Preisberater.
 
-Danach: Simon an die Nachkalkulation erinnern (Skill `preisberater`, Plugin „firma“), damit die nächste Schätzung genauer wird.
+Danach: Simon an die Nachkalkulation erinnern (geschätzte gegen tatsächliche Stunden), damit die nächste Schätzung genauer wird.

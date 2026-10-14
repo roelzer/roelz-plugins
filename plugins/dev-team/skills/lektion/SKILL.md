@@ -13,7 +13,7 @@ Eingabe: `$ARGUMENTS`
 1. **Formulieren:** eine Regel, die den Fehler künftig verhindert. Aktiv, konkret, eine Zeile. Gut: „Excel-Zellwerte vor dem Rechnen auf leere Zellen prüfen.“ Schlecht: „Besser aufpassen.“
 2. **Ort wählen:**
    - *Allgemein* (gilt in jedem Projekt) → Lessons-Datei aus `~/.claude/CLAUDE.md`, Block „dev-team“. **Keine Kunden-, Firmen- oder Projektnamen, keine echten Werte** – sonst umformulieren.
-   - *Firma* (Preise, Angebote, Abläufe der eigenen Firma) → `lessons-firma.md` im Plugin „firma“, falls installiert.
+   - *Firma* (Preise, Angebote, Abläufe der eigenen Firma) → gehört nicht in dieses öffentliche Plugin; Simon sagen, wo er es privat ablegen soll.
    - *Nur dieses Projekt* → Abschnitt „Projekt-Lektionen“ in der Projekt-`CLAUDE.md`.
 3. **Doppelt?** Gibt es schon eine ähnliche Lektion: zusammenführen statt neu anlegen. Taucht dasselbe Thema zum zweiten Mal auf: Simon vorschlagen, es ins Grundgesetz zu übernehmen.
 4. **Test:** Ist es ein Code-Fehler, stelle sicher, dass ein Test genau diesen Fehler prüft. Fehlt er, schreibe ihn.

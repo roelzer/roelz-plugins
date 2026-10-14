@@ -38,7 +38,7 @@ Projektname: `$ARGUMENTS` (fehlt er, frag danach). Ordnername: Kleinbuchstaben m
        referenz/        ← nur bei fachlichen Ergebnissen: echte Fälle mit bekanntem Ergebnis
    ```
 2. Projektname in CLAUDE.md und Lastenheft eintragen. Fachgebiet erfragen und eintragen. Gibt es dazu eine Datei in `${CLAUDE_PLUGIN_ROOT}/wissen/fachwissen/`, übernimm deren bestätigte Regeln in `fachwissen/regeln.md` (Quelle: „aus Bibliothek“).
-3. Liegt ein Lastenheft aus dem Erstgespräch vor (z. B. vom Plugin „firma“), übernimm es nach `docs/lastenheft.md`.
+3. Liegt ein Lastenheft aus dem Erstgespräch vor (falls Simon eines mitbringt), übernimm es nach `docs/lastenheft.md`.
 4. `git init` und ersten Commit „Projekt angelegt“ erstellen.
 5. Kurz mitteilen: Projekt steht. Nächster Schritt: Lastenheft prüfen, dann Lösungsweg mit dem Skill `architekt` klären oder direkt `/dev-team:auftrag`.
 

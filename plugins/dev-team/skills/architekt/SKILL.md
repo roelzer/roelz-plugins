@@ -35,7 +35,7 @@ Für jede Option: Aufwand, laufende Kosten (Hosting, Lizenzen), Sicherheit & Dat
 
 ## 4. Aufwandsschätzung
 Zerlege in Arbeitspakete und schätze je Paket Stunden als Spanne (optimistisch / realistisch / pessimistisch). Plane Testen, Abstimmung und Übergabe ein (zusammen meist 25–40 % zusätzlich).
-Ist das Plugin „firma“ installiert, gib die Schätzung an den Skill `preisberater` weiter; dort liegen auch die Korrekturfaktoren aus früheren Projekten.
+Gibt es auf diesem Rechner ein separates Preis-/Angebots-Werkzeug von Simon, gib die Schätzung dorthin weiter; sonst bleibt es bei der Spanne in Stunden.
 
 ## 5. Ergebnis
 - Empfehlung in 2–3 Sätzen mit Begründung.

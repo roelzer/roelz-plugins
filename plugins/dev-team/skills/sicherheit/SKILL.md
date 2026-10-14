@@ -62,5 +62,13 @@ Wende die Punkte risikobasiert an. Markiere nicht relevante Punkte ausdrücklich
 - [ ] KI-Agenten erhalten nur notwendige Werkzeuge und Rechte; destruktive/produktive Aktionen benötigen Freigabe.
 - [ ] DSGVO-/AVV-/Aufbewahrungsfragen bei personenbezogenen Daten mit zuständiger Stelle geklärt.
 
+## 9. Mehrbenutzer, Datenintegrität und Migration
+- [ ] Gleichzeitige Änderung derselben Daten führt nicht unbemerkt zu Überschreiben (Versionsprüfung/Optimistic Locking, Transaktionen); mit einem Test mit zwei gleichzeitigen Schreibern belegt.
+- [ ] Teilweise Schreibvorgänge (Abbruch, Netzausfall) hinterlassen keinen halben Zustand.
+- [ ] Datenbankmigration: Backup vorher, Probelauf auf einer Kopie, Rückweg beschrieben, nie automatisch auf Produktivdaten.
+- [ ] Wiederherstellung aus dem Backup wurde einmal praktisch getestet und das Datum dokumentiert.
+- [ ] Wichtige Änderungen und sicherheitsrelevante Aktionen werden mit Benutzer und Zeit protokolliert, ohne vertrauliche Inhalte.
+- [ ] Verhalten bei Serverausfall: klare Meldung statt stiller Datenverlust; lokale Zwischenstände gehen nicht verloren.
+
 ## Bericht
 Jeder relevante Befund enthält Schweregrad, Beleg, konkretes Szenario, Auswirkung und Abhilfe. Ungeprüfte Punkte als „nicht geprüft“ markieren. Kein pauschales „sicher“ allein aufgrund grüner Tests.

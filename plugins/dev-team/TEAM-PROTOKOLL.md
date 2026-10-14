@@ -14,10 +14,13 @@
 | `langfrist-architekt` | Wartbarkeit, Struktur, Datenmodell, Migrationen und technische Schulden | Ohne Evidenz kompletten Neubau verlangen |
 | `tester` | Reproduzierbare Testfälle und tatsächliche Testausführung | Produktivlogik oder erwartete Referenzwerte ändern |
 | `reviewer` | Unabhängige Code-/Diff-Prüfung und technisches Qualitätsurteil | Eigene Befunde selbst implementieren oder ungeprüfte Tests als grün melden |
+| `auditor` | Unabhängiges Audit des Dev-Teams oder eines Projekts mit Bewertung und Maßnahmenplan | Befunde selbst beheben oder die eigene Behebung bewerten |
 | `sicherheitspruefer` | Angriffswege, Zugriffskontrollen, Datenflüsse, Update-/Betriebssicherheit | Vollständigen Penetrationstest behaupten, wenn nur Quellcode geprüft wurde |
 | `produktpruefer` | Anforderungsabnahme und Nutzbarkeit | Technische oder Sicherheitsfreigabe ersetzen |
 
 ## Regeln der Orchestrierung
+
+Grenzen der Autonomie, Belegpflicht und Schleifenlimits stehen im Grundgesetz und gelten vor dieser Liste. Diese Liste erläutert sie.
 
 1. **Unabhängigkeit vor Konsens:** Prüfer erstellen zunächst eigene Urteile, ohne die Bewertungen anderer zu sehen.
 2. **Evidenzpflicht:** Jeder wichtige Befund nennt Datei/Zeile oder reproduzierbares Szenario, Auswirkung und Abhilfe.
@@ -32,9 +35,7 @@
 
 ## Qualitätsstufen
 
-- **Klein:** gezielte Prüfung und relevanter Test; Reviewer bei Änderungen mit breiter Wirkung.
-- **Normal:** Plan, Test, Reviewer, Produktabnahme; Kritiker bei Risiken oder mehreren Komponenten.
-- **Groß / sicherheitskritisch:** Kritiker, Fachprüfer wo relevant, unabhängige Architektur-/Aufwandsrunde, Tester, Reviewer, Sicherheitsprüfer und Produktprüfer. Für produktive Änderungen zusätzlich menschliche Freigabe.
+Verbindlich ist die Tabelle im Grundgesetz (`wissen/grundgesetz.md`, Abschnitt „Stufen“) inklusive der Risiko-Auslöser. Hier steht bewusst keine zweite Definition.
 
 ## Definition eines belastbaren Abschlusses
 

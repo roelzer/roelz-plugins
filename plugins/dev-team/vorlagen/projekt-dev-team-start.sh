@@ -15,16 +15,26 @@ for f in "$HOME/.claude/plugins/installed_plugins.json" "$HOME/.claude/settings.
   grep -q 'dev-team@roelz-plugins' "$f" 2>/dev/null && exit 0
 done
 
-repo_url="https://github.com/roelzer/roelz-plugins.git"
+# Lieferkette: Wer das Dev-Team auf einen geprüften Stand festnageln will, setzt DEV_TEAM_REF (Tag oder Commit)
+# in der Cloud-Umgebung. Ohne Angabe wird der aktuelle Stand von main geholt.
+repo_url="${DEV_TEAM_REPO:-https://github.com/roelzer/roelz-plugins.git}"
+ref="${DEV_TEAM_REF:-}"
 cache="${XDG_CACHE_HOME:-$HOME/.cache}/roelz-plugins"
 plugin="$cache/plugins/dev-team"
 
 holen() {
   if [ -d "$cache/.git" ]; then
-    timeout 60 git -C "$cache" pull -q --ff-only >/dev/null 2>&1 || true
+    if [ -n "$ref" ]; then
+      timeout 60 git -C "$cache" fetch -q --depth 1 origin "$ref" >/dev/null 2>&1 && git -C "$cache" checkout -q FETCH_HEAD >/dev/null 2>&1 || true
+    else
+      timeout 60 git -C "$cache" pull -q --ff-only >/dev/null 2>&1 || true
+    fi
   else
     mkdir -p "$(dirname "$cache")" 2>/dev/null
-    timeout 90 git clone -q --depth 1 "$repo_url" "$cache" >/dev/null 2>&1 || return 1
+    timeout 90 git clone -q "$repo_url" "$cache" >/dev/null 2>&1 || return 1
+    if [ -n "$ref" ]; then
+      git -C "$cache" fetch -q origin "$ref" >/dev/null 2>&1; git -C "$cache" checkout -q "$ref" >/dev/null 2>&1 || { echo "⚠ DEV_TEAM_REF=$ref nicht gefunden."; return 1; }
+    fi
   fi
   [ -f "$plugin/wissen/grundgesetz.md" ]
 }
