@@ -45,7 +45,8 @@ case "$modus" in
       name="$(basename "$s")"
       ziel="$projekt/.claude/skills/dev-team-$name"
       mkdir -p "$ziel" 2>/dev/null
-      sed "s#\${CLAUDE_PLUGIN_ROOT}#$plugin#g" "$s/SKILL.md" > "$ziel/SKILL.md" 2>/dev/null
+      # Pfade einsetzen; in der Cloud darf der Projektleiter alle Abläufe selbst starten.
+      sed -e "s#\${CLAUDE_PLUGIN_ROOT}#$plugin#g" -e '/^disable-model-invocation:/d' "$s/SKILL.md" > "$ziel/SKILL.md" 2>/dev/null
     done
     # Sicherstellen, dass die Kopien nie ins Repo gelangen.
     gi="$projekt/.gitignore"
@@ -54,7 +55,7 @@ case "$modus" in
     done
     printf '%s' "$eingabe" | CLAUDE_PLUGIN_ROOT="$plugin" CLAUDE_PROJECT_DIR="$projekt" bash "$plugin/scripts/sitzungsstart.sh"
     echo
-    echo "Hinweis Cloud-Sitzung: Die Dev-Team-Befehle heißen hier ohne Präfix, z. B. /auftrag statt /dev-team:auftrag, die Agenten z. B. kritiker statt dev-team:kritiker."
+    echo "Hinweis Cloud-Sitzung: Die Dev-Team-Befehle heißen hier mit Bindestrich, z. B. /dev-team-auftrag statt /dev-team:auftrag; die Agenten ohne Präfix, z. B. kritiker statt dev-team:kritiker. Für Aufgaben der Stufe Normal/Groß den Skill dev-team-auftrag verwenden."
     ;;
   agent)
     [ -d "$plugin" ] || exit 0
