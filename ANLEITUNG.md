@@ -1,6 +1,6 @@
 # Dev-Team – Anleitung
 
-Stand: Oktober 2026 · Version 2.0
+Stand: Oktober 2026 · Version 2.1
 
 Dieses Repo enthält zwei Plugins für Claude Code: **`dev-team`** und **`tool-scout`**. Beide enthalten kein Firmen- oder Kundenwissen und dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
 
@@ -60,7 +60,22 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
 - Eigene Unterlagen (Handbücher, Datenblätter, Rohrtabellen) in `fachwissen/quellen/` legen. Die sind die beste Quelle.
 - Recherche gezielt starten: `/dev-team:recherche <Thema>`
 
-## 5. Befehle
+## 5. Sehen, wer gerade was macht
+
+- **Im Chat:** Der Projektleiter kündigt jeden Agenten an („→ Kritiker prüft den Plan“) und meldet das Ergebnis mit Ampel („← Kritiker: 🟡 …“). In VS Code kannst du jeden Agenten-Block aufklappen.
+- **`docs/STATUS.md`:** oben steht immer, welche Phase und welcher Agent gerade läuft.
+- **`docs/AGENTEN_LOG.md`:** wird automatisch mitgeschrieben, auch wenn du nicht da bist. Jede Zeile: Uhrzeit, ▶ Start / ■ Ende mit Ampel, Agent, Auftrag bzw. Ergebnis.
+
+## 6. Mehrere Projekte und gemeinsames Lernen
+
+- **Getrennt arbeiten:** Jedes Projekt hat seinen eigenen Ordner und sein eigenes VS-Code-Fenster. Mehrere können gleichzeitig laufen, ohne sich zu sehen.
+- **Gemeinsam lernen:** Geteilt werden nur zwei Dinge, beide ohne Projekt-, Kunden- oder Firmennamen:
+  - **Lessons** – Erfahrungen zu Arbeitsweise und Code. Beim eigenständigen Bauen sammelt jedes Projekt Vorschläge in `docs/LEKTIONEN_VORSCHLAEGE.md`. Im Abschlussbericht bestätigst du sie, dann übernimmt `/dev-team:lektion vorschlaege` sie für alle Projekte.
+  - **Fachwissen-Bibliothek** (`plugins/dev-team/wissen/fachwissen/`) – allgemeine Regeln je Fachgebiet, z. B. `waermenetz.md`. Nach jeder bestätigten Fachregel fragt der Projektleiter, ob sie allgemein gilt. Neue Projekte im selben Fachgebiet starten mit allen Regeln von dort.
+- **Bleibt im Projekt:** interne Werte und Unterlagen eines Arbeitgebers oder Kunden.
+- Auf dem Arbeitsrechner bleiben Lessons lokal. Die Fachwissen-Bibliothek ist allgemein und wird über GitHub auf beiden Rechnern aktuell gehalten.
+
+## 7. Befehle
 
 | Befehl | Wofür |
 |---|---|
@@ -69,6 +84,7 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
 | `/dev-team:projekt-aufnehmen` | bestehendes Projekt (z. B. SiRo) ins Dev-Team holen |
 | `/dev-team:recherche <Thema>` | Fachgrundlagen recherchieren |
 | `/dev-team:lektion <…>` | Lektion aus einem Fehler festhalten |
+| `/dev-team:lektion vorschlaege` | gesammelte Lektionsvorschläge eines Projekts übernehmen |
 | `/dev-team:uebergabe` | Übergabe an Kunden vorbereiten |
 | `/dev-team:einrichten privat\|arbeit` | einmalige Einrichtung pro Rechner |
 | `/tool-scout:scout <wofür>` | fremde Plugins/Skills suchen und prüfen |
@@ -76,7 +92,7 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
 
 ---
 
-## 6. Einrichtung auf einem Rechner
+## 8. Einrichtung auf einem Rechner
 
 **Voraussetzungen:** Git für Windows, VS Code mit der Claude-Code-Erweiterung, Zugriff auf dein GitHub-Konto.
 
@@ -98,7 +114,7 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
 5. **Noch einmal neu starten.** Fragt Claude, ob verknüpfte Dateien geladen werden dürfen: zustimmen.
 6. Prüfen: `/agents` zeigt die Dev-Team-Agenten mit `dev-team:` davor.
 
-## 7. Updates
+## 9. Updates
 
 Wird am Dev-Team etwas geändert (neue Regel, neuer Agent), landet es auf GitHub. Auf dem anderen Rechner:
 ```
@@ -108,7 +124,7 @@ claude plugin marketplace update roelz-plugins
 ```
 Danach VS Code neu starten.
 
-## 8. Gut zu wissen
+## 10. Gut zu wissen
 
 - **Arbeit:** Code, den du für deinen Arbeitgeber baust, gehört in der Regel dem Arbeitgeber. Nichts davon in deinen privaten Baukasten übernehmen.
 - **Fremde Plugins** nie direkt aus Videos installieren. Erst `/tool-scout:scout check`.

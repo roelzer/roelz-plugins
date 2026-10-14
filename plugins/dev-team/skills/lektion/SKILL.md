@@ -2,7 +2,7 @@
 name: lektion
 description: Hält eine Lektion aus einem Fehler fest, damit er nie wieder passiert – an der richtigen Stelle (allgemein, Firma oder Projekt) und mit Regressionstest. Auch zum Aufräumen der Lessons-Datei („aufraeumen“).
 disable-model-invocation: true
-argument-hint: "[Was ist schiefgelaufen? | aufraeumen]"
+argument-hint: "[Was ist schiefgelaufen? | vorschlaege | aufraeumen]"
 ---
 
 # Lektion festhalten
@@ -20,7 +20,13 @@ Eingabe: `$ARGUMENTS`
 5. Simon die Zeile zeigen, nach Bestätigung eintragen.
 6. Im Modus „privat“: Simon erinnern, die Änderung im Plugin-Repo zu committen und zu pushen (`git add`, `git commit -m "Lektion: …"`, `git push`) – oder anbieten, das zu tun.
 
-## B) Aufräumen (`aufraeumen`)
+## B) Gesammelte Vorschläge übernehmen (`vorschlaege`)
+1. Lies `docs/LEKTIONEN_VORSCHLAEGE.md` im aktuellen Projekt.
+2. Zeige Simon alle noch nicht übernommenen Vorschläge als nummerierte Liste, je mit deiner Empfehlung (übernehmen / nur Projekt / verwerfen) und dem vorgeschlagenen Ort.
+3. Für jeden bestätigten Vorschlag die Schritte aus A) ausführen.
+4. In `docs/LEKTIONEN_VORSCHLAEGE.md` jede Zeile markieren: `✅ übernommen`, `📁 nur Projekt` oder `✗ verworfen`.
+
+## C) Aufräumen (`aufraeumen`)
 - Doppelte und verwandte Lektionen zusammenfassen, veraltete markieren.
 - Ziel: höchstens 40 Einträge, jede Zeile kurz.
 - Wiederkehrende Themen als Vorschlag fürs Grundgesetz sammeln.

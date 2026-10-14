@@ -9,10 +9,10 @@ argument-hint: "[Was soll gebaut oder geändert werden?]"
 
 Auftrag: `$ARGUMENTS`
 
-Du bist der Projektleiter. Lege zu Beginn eine Aufgabenliste mit den Phasen an. An den markierten **Stopps** wartest du auf Simon. Zwischen Freigabe (Phase 6) und Bericht (Phase 9) arbeitest du eigenständig nach den Regeln im Grundgesetz.
+Du bist der Projektleiter. Lege zu Beginn eine Aufgabenliste mit den Phasen an. Kündige jeden Agenten-Aufruf mit einer Zeile an („→ Kritiker prüft den Plan“) und melde das Ergebnis mit Ampel („← Kritiker: 🟡 …“). Halte in `docs/STATUS.md` oben fest, welche Phase gerade läuft. An den markierten **Stopps** wartest du auf Simon. Zwischen Freigabe (Phase 6) und Bericht (Phase 9) arbeitest du eigenständig nach den Regeln im Grundgesetz.
 
 ## Phase 1 – Verstehen und Anforderungen festhalten
-1. Lies `CLAUDE.md`, `docs/lastenheft.md`, `docs/risiko-log.md`, `fachwissen/regeln.md` (falls vorhanden) und die Lessons-Datei.
+1. Lies `CLAUDE.md`, `docs/lastenheft.md`, `docs/risiko-log.md`, `fachwissen/regeln.md` (falls vorhanden), die Lessons-Datei und die Fachwissen-Bibliothek zum Fachgebiet des Projekts (`<Plugin-Ordner>/wissen/fachwissen/`).
 2. Schreibe jede Anforderung aus Simons Auftrag einzeln auf, mit **seinen eigenen Worten** und einem Abnahmekriterium. Nummerierung fortlaufend im Lastenheft (A1, A2 …). Auch Nebensätze zählen.
 3. Lege die Stufe fest (Normal/Groß, siehe Grundgesetz) und begründe sie in einem Satz.
 4. Prüfe mit dem Skill `baukasten`, ob es passende Bausteine gibt.
@@ -48,12 +48,13 @@ Starte `fachexperte`, `pragmatiker` und `langfrist-architekt` **parallel**. Jede
 3. Neu vorgeschlagene Fachregeln zur Bestätigung.
 4. Geschätzte Bauzeit und die Frage: „Freigabe zum eigenständigen Bauen?“
 
-Trage Simons Entscheidungen in `docs/risiko-log.md` ein, bestätigte Regeln in `fachwissen/regeln.md` (Status „bestätigt“), passe den Plan an. Ohne ausdrückliche Freigabe wird nicht gebaut.
+Trage Simons Entscheidungen in `docs/risiko-log.md` ein, bestätigte Regeln in `fachwissen/regeln.md` (Status „bestätigt“), passe den Plan an. Frag bei jeder neu bestätigten Regel, ob sie allgemein fürs Fachgebiet gilt; wenn ja, in die Fachwissen-Bibliothek übernehmen (Regeln im Grundgesetz). Ohne ausdrückliche Freigabe wird nicht gebaut.
 
 ## Phase 7 – Eigenständig bauen
 Nach den Regeln „Eigenständig bauen“ im Grundgesetz:
 - Arbeitspakete der Reihe nach, nach jedem: Tests, Commit, `docs/STATUS.md` aktualisieren (Vorlage `${CLAUDE_PLUGIN_ROOT}/vorlagen/status.md`).
 - Fragen → `docs/OFFENE_FRAGEN.md`, weiter mit unabhängigen Paketen.
+- Lektionsvorschläge → `docs/LEKTIONEN_VORSCHLAEGE.md`, nie direkt in die gemeinsame Lessons-Datei.
 - Neue Fachregel: erst Prüfung bauen, zeigen dass sie am alten Stand rot wird, dann beheben.
 - Harte Stopps beachten.
 
@@ -69,6 +70,8 @@ Nach den Regeln „Eigenständig bauen“ im Grundgesetz:
 2. Was gebaut wurde, wie man es startet, in einfacher Sprache.
 3. Stand der Absicherung: Tests, Referenzfälle, Fachregeln, was davon grün ist.
 4. Offene Fragen aus `docs/OFFENE_FRAGEN.md`.
-5. Ideen des Produktprüfers, Lektions- und Fachregel-Vorschläge. Was Simon bestätigt → `/dev-team:lektion` bzw. `fachwissen/regeln.md`.
-6. Bei Kundenprojekten: Hinweis auf `/dev-team:uebergabe`.
+5. Ideen des Produktprüfers und Fachregel-Vorschläge. Was Simon bestätigt → `fachwissen/regeln.md`.
+6. Alle Lektionsvorschläge aus `docs/LEKTIONEN_VORSCHLAEGE.md` gesammelt, mit Empfehlung. Was Simon bestätigt → `/dev-team:lektion vorschlaege`.
+7. Hinweis auf `docs/AGENTEN_LOG.md` für den genauen Ablauf.
+8. Bei Kundenprojekten: Hinweis auf `/dev-team:uebergabe`.
 Für die nächste Aufgabe `/clear` verwenden.

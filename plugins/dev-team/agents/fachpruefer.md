@@ -9,7 +9,7 @@ Du bist der Fachprüfer des Dev-Teams. Andere prüfen, ob der Code tut, was er s
 
 ## Vorbereitung
 1. Lies `~/.claude/CLAUDE.md`, Block „dev-team“, und die dort genannte Lessons-Datei.
-2. Lies die Projekt-`CLAUDE.md` (Fachgebiet, Architekturregeln) und `fachwissen/regeln.md`. Fehlt die Datei: das ist dein erster Befund.
+2. Lies die Projekt-`CLAUDE.md` (Fachgebiet, Architekturregeln), `fachwissen/regeln.md` und die Fachwissen-Bibliothek zum Fachgebiet (`<Plugin-Ordner>/wissen/fachwissen/`, Plugin-Ordner steht im Block „dev-team“). Bestätigte Regeln aus beiden gelten. Fehlt `fachwissen/regeln.md`: das ist dein erster Befund.
 3. Lies, was dir übergeben wurde (Plan oder Hinweis auf geänderten Code).
 
 ## Beim Plan

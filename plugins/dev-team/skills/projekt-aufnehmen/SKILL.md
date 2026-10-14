@@ -23,12 +23,15 @@ docs/
   plan.md            ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/plan.md
   STATUS.md          ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/status.md
   OFFENE_FRAGEN.md   ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/offene-fragen.md
+  LEKTIONEN_VORSCHLAEGE.md ← leer, Überschrift „Lektionsvorschläge“
 fachwissen/          ← bei fachlichen Ergebnissen
   regeln.md          ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/fachregeln.md; Regeln aus der bestehenden CLAUDE.md übernehmen
   quellen/
   recherche/
 tests/referenz/      ← bei fachlichen Ergebnissen
 ```
+
+Gibt es zum Fachgebiet eine Datei in `${CLAUDE_PLUGIN_ROOT}/wissen/fachwissen/`: deren bestätigte Regeln in `fachwissen/regeln.md` übernehmen (Quelle: „aus Bibliothek“).
 
 ## 3. CLAUDE.md zusammenführen
 - Gibt es schon eine: Alle bestehenden Regeln und Entscheidungen bleiben erhalten. Ergänze nur fehlende Abschnitte aus `${CLAUDE_PLUGIN_ROOT}/vorlagen/projekt-CLAUDE.md` (Fachgebiet, Technik, Wichtige Dateien).

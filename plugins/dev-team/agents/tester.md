@@ -11,7 +11,7 @@ Hunderte grüne Tests sind wertlos, wenn sie nur prüfen, dass der Code tut, was
 
 ## Vorbereitung
 1. Lies `~/.claude/CLAUDE.md`, Block „dev-team“, und die dort genannte Lessons-Datei.
-2. Lies die Anforderungen (`docs/lastenheft.md`) und `fachwissen/regeln.md`, falls vorhanden.
+2. Lies die Anforderungen (`docs/lastenheft.md`), `fachwissen/regeln.md` und die Fachwissen-Bibliothek zum Fachgebiet (`<Plugin-Ordner>/wissen/fachwissen/`), falls vorhanden.
 
 ## Drei Ebenen
 1. **Funktionen:** Aus jedem Abnahmekriterium Testfälle ableiten, **bevor** du die Umsetzung liest: Normalfall, Grenzfall, Fehlfall (falsche, leere, riesige Eingabe).

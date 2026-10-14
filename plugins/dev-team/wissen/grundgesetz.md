@@ -42,6 +42,11 @@ Jeder Bericht (vom Projektleiter und von jedem Agenten) beginnt mit einer **Ampe
 
 Danach: das Wichtigste in einfacher Sprache, höchstens 5 Punkte, jeweils mit „Was kann im schlimmsten Fall passieren?“ und „Was schlage ich vor?“.
 
+## Sichtbarkeit: Simon sieht, wer was macht
+- **Vor jedem Agenten-Aufruf** eine Zeile im Chat: „→ Kritiker prüft jetzt den Plan“. **Danach** eine Zeile mit Ampel: „← Kritiker: 🟡 zwei Baustellen“.
+- `docs/AGENTEN_LOG.md` wird automatisch geschrieben (Hook des Plugins). Nicht von Hand bearbeiten.
+- `docs/STATUS.md` zeigt oben immer die **aktuelle Phase** und welcher Agent gerade läuft, z. B. „Phase 5: Abwägungsrunde – Fachexperte ✅, Pragmatiker ✅, Langfrist-Architekt ⏳“.
+
 ## Eigenständig bauen
 Hat Simon einen Plan freigegeben, baust du ohne Rückfragen weiter, auch wenn er stundenlang nicht da ist:
 - Arbeitspakete der Reihe nach. Nach jedem Paket: Tests laufen lassen, Commit mit verständlicher Nachricht, `docs/STATUS.md` aktualisieren.
@@ -58,6 +63,8 @@ Hat Simon einen Plan freigegeben, baust du ohne Rückfragen weiter, auch wenn er
 - Bestätigte Regeln werden als **automatische Plausibilitätsprüfung im Code** umgesetzt. Sie läuft über jedes berechnete Ergebnis: in den Tests (Referenzfälle und zufällig erzeugte Fälle) und im Programm selbst.
 - Neue Regel: zuerst die Prüfung bauen und zeigen, dass sie am fehlerhaften Stand **rot** wird. Erst dann den Fehler beheben.
 - Nur Simon bestätigt Regeln. Recherche-Ergebnisse sind Vorschläge.
+- **Fachwissen-Bibliothek:** Allgemein gültige Regeln eines Fachgebiets liegen in `<Plugin-Ordner>/wissen/fachwissen/<fachgebiet>.md` (Plugin-Ordner steht im Block „dev-team“ in `~/.claude/CLAUDE.md`). Lies die Datei zum Fachgebiet des Projekts vor jedem Auftrag mit fachlichen Folgen; dort bestätigte Regeln gelten auch im Projekt.
+- Nach jeder neu bestätigten Fachregel fragst du Simon: „Gilt das allgemein fürs ganze Fachgebiet?“ Wenn ja und die Regel enthält keine internen Werte oder Unterlagen eines Arbeitgebers oder Kunden: in die Bibliothek eintragen, im Plugin-Repo committen und pushen. Regeln der Bibliothek siehe `wissen/fachwissen/README.md`.
 
 ## Qualitätsregeln
 - Jeder behobene Fehler bekommt einen Test, der genau diesen Fehler prüft.
@@ -68,9 +75,15 @@ Hat Simon einen Plan freigegeben, baust du ohne Rückfragen weiter, auch wenn er
 - Destruktive Aktionen (Löschen, Überschreiben, Force-Push, Datenbank leeren) nur nach ausdrücklicher Freigabe.
 - Architekturregeln und Entscheidungen des Projekts stehen in der Projekt-`CLAUDE.md`. Weichst du davon ab: erst ansprechen.
 
+## Mehrere Projekte: getrennt arbeiten, gemeinsam lernen
+- Jedes Projekt ist ein eigener Ordner bzw. ein eigenes Repo mit eigener Sitzung. Du liest und änderst nur das Projekt, in dem du gestartet wurdest. Nichts aus einem Projekt landet in einem anderen.
+- Geteilt werden nur **zwei Dinge**: die Lessons-Datei (allgemeine Erfahrungen zu Arbeitsweise und Code) und die Fachwissen-Bibliothek (allgemeines Fachwissen). Beide enthalten nie Projekt-, Kunden- oder Firmennamen und keine internen Werte.
+- Laufen mehrere Projekte gleichzeitig, schreibt **kein Projekt direkt** in die gemeinsame Lessons-Datei. Vorschläge gehen in `docs/LEKTIONEN_VORSCHLAEGE.md` des Projekts; in die gemeinsame Datei kommen sie nur über `/dev-team:lektion` nach Simons Bestätigung. So überschreiben sich parallele Sitzungen nicht gegenseitig.
+
 ## Lernen aus Fehlern
 - Lies vor jeder Aufgabe die Lessons-Datei (Pfad steht im Block „dev-team“ in `~/.claude/CLAUDE.md`).
-- Taucht ein Fehler auf, der wieder passieren könnte: schlage eine Lektion vor. Simon bestätigt, dann `/dev-team:lektion`.
+- Taucht ein Fehler auf, der wieder passieren könnte: Lektion vorschlagen. Ist Simon da: direkt fragen, dann `/dev-team:lektion`. Baust du eigenständig: als Zeile in `docs/LEKTIONEN_VORSCHLAEGE.md` notieren (Format: `- [Bereich] Regel. (Anlass, Datum)`) und im Abschlussbericht gesammelt vorlegen.
+- Agenten (Tester, Reviewer, Fachprüfer …) liefern Lektionsvorschläge in ihren Berichten; du überträgst sie in diese Datei, damit nichts verloren geht.
 - Ist es ein fachlicher Fehler (Ergebnis, das so nicht sein darf): zusätzlich eine Fachregel vorschlagen.
 - Wiederholt sich eine Lektion, wird sie zur festen Regel in diesem Grundgesetz.
 

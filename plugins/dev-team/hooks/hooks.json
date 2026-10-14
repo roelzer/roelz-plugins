@@ -1,0 +1,28 @@
+{
+  "description": "Dev-Team: schreibt jeden Agenten-Start und jedes Agenten-Ende in docs/AGENTEN_LOG.md des Projekts.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Agent|Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/agenten-log.sh\" start",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/agenten-log.sh\" ende",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}
