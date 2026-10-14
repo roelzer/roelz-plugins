@@ -24,6 +24,7 @@ Du sprichst immer nur mit **einer** Person, dem Projektleiter. Die anderen sind 
 | **Reviewer** | nach dem Tester | unabhängiger Diff-, Code- und Architekturcheck |
 | **Sicherheitsprüfer** | bei Login, Rechten, sensiblen Daten, Server, Migrationen, Updates und großen Releases | Angriffswege, Datenschutz, Vertrauensgrenzen und Update-Sicherheit |
 | **Produktprüfer** | zum Schluss | jede Anforderung mit konkretem Nachweis abnehmen: A1 ✅ A2 ❌ |
+| **Auditor** | auf Wunsch (`/dev-team:audit`) | prüft das Dev-Team oder ein Projekt unabhängig, bewertet 1–10, nennt Schwachstellen mit Beleg; behebt selbst nichts |
 | Tool-Scout | wenn du willst | fremde Plugins/Skills prüfen, bevor du sie installierst |
 
 ## 2. Wie viel Prüfung?
@@ -84,7 +85,8 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
   - `.claude/settings.json` startet bei jeder Sitzung
   - `.claude/dev-team-start.sh`, das in der Cloud das Dev-Team von GitHub holt und Grundgesetz, Agenten, Abläufe und Protokoll bereitstellt. Auf deinen Rechnern tut es nichts, dort übernimmt das installierte Plugin.
 - In der Cloud heißen die Befehle mit Bindestrich, z. B. `/dev-team-auftrag`, die Agenten ohne Präfix, z. B. `kritiker`.
-- **Voraussetzung:** Die Cloud-Sitzung muss das private Repo `roelzer/roelz-plugins` lesen dürfen. Wenn nicht, sagt dir der Projektleiter das gleich zu Beginn. Dann `roelz-plugins` in der Cloud-Umgebung als zusätzliches Repo hinzufügen.
+- **Voraussetzung:** Die Cloud-Sitzung muss `github.com/roelzer/roelz-plugins` erreichen (das Repo ist öffentlich). Wenn nicht, sagt dir der Projektleiter das gleich zu Beginn.
+- **Sicherheit der Lieferkette:** Ohne weitere Angabe holt die Cloud den aktuellen Stand von `main`. Wer einen geprüften Stand festnageln will, setzt in der Cloud-Umgebung die Variable `DEV_TEAM_REF` auf einen Tag oder Commit. Wegen des öffentlichen Repos darf dort nie etwas Vertrauliches stehen.
 - Lektionen aus Cloud-Sitzungen landen als Vorschlag in `docs/LEKTIONEN_VORSCHLAEGE.md` des Projekts. Übernommen werden sie später, wenn du dabei bist.
 
 ## 8. Befehle
@@ -97,6 +99,7 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
 | `/dev-team:recherche <Thema>` | Fachgrundlagen recherchieren |
 | `/dev-team:lektion <…>` | Lektion aus einem Fehler festhalten |
 | `/dev-team:lektion vorschlaege` | gesammelte Lektionsvorschläge eines Projekts übernehmen |
+| `/dev-team:audit plugin\|projekt` | unabhängiges Audit, Behebung, Nachprüfung durch frischen Auditor |
 | `/dev-team:uebergabe` | Übergabe an Kunden vorbereiten |
 | `/dev-team:einrichten privat\|arbeit` | einmalige Einrichtung pro Rechner |
 | `/tool-scout:scout <wofür>` | fremde Plugins/Skills suchen und prüfen |
@@ -136,13 +139,18 @@ claude plugin marketplace update roelz-plugins
 ```
 Danach VS Code neu starten.
 
-## 11. Senior-Qualitätsregeln
+## 11. Senior-Qualitätsregeln und Grenzen der Autonomie
+
+- Gebaut wird eigenständig, aber auf einem eigenen Branch. Kein Push auf `main`, kein Löschen, keine Datenbank-Migration, kein Release, keine Schlüssel in der Sitzung und keine Daten an externe Dienste ohne dein Ja. Die vollständige Liste steht im Grundgesetz („Grenzen der Autonomie“).
+- Technische Grenzen: höchstens drei Agenten gleichzeitig, jeder mit Schrittobergrenze, Schleifen enden nach drei Runden. Große Aufträge werden in Meilensteine mit eigenem Stopp geteilt. Der Stand steht in Dateien (`docs/STATUS.md`), damit nach `/clear` nichts verloren geht.
+- Gibt dein Auftrag eigene Phasen vor („nur analysieren, noch nichts ändern“), gilt das vor dem Standardablauf.
+- Selbstprüfung des Plugins: `bash plugins/dev-team/scripts/pruefe-plugin.sh` (findet widersprüchliche Namen, tote Verweise, uneinheitliche Versionen).
 
 - Die Projektleitung bleibt für Integration und Abschluss verantwortlich, auch wenn Spezialisten prüfen.
 - Kritische oder hohe Sicherheits-/Datenintegritätsbefunde blockieren die Freigabe.
 - Nur tatsächlich ausgeführte Tests gelten als ausgeführt; nicht geprüfte Punkte werden offen benannt.
 - Bestehende Referenzwerte und Tests werden nicht stillschweigend angepasst, um grüne Ergebnisse zu erhalten.
-- Für neue Rollen und die präzisierte Pipeline siehe `plugins/dev-team/TEAM-PROTOKOLL.md` und `plugins/dev-team/CHANGELOG-2.4.0.md`.
+- Für neue Rollen und die präzisierte Pipeline siehe `plugins/dev-team/TEAM-PROTOKOLL.md` und `plugins/dev-team/CHANGELOG.md`.
 
 ## 12. Gut zu wissen
 

@@ -70,6 +70,18 @@ else
     *🟡*) ampel="🟡" ;;
     *🟢*) ampel="🟢" ;;
   esac
+  # Fallback: Agent hat das Wort statt des Symbols geschrieben (z. B. "Ampel: Rot").
+  if [ -z "$ampel" ]; then
+    wort="$(printf '%s' "$nachricht" | tr '[:upper:]' '[:lower:]' | grep -oE 'ampel[^a-zäöü]{0,6}(rot|gelb|grün|gruen)' | head -n 1)"
+    case "$wort" in
+      *rot) ampel="🔴" ;;
+      *gelb) ampel="🟡" ;;
+      *grün|*gruen) ampel="🟢" ;;
+    esac
+    [ -n "$ampel" ] || case "$(printf '%s' "$nachricht" | head -c 12 | tr '[:upper:]' '[:lower:]')" in
+      rot*) ampel="🔴" ;; gelb*) ampel="🟡" ;; grün*|gruen*) ampel="🟢" ;;
+    esac
+  fi
   # Bevorzugt die Zeile mit der Ampel, sonst die erste Zeile, die keine Überschrift ist.
   erste="$(printf '%s\n' "$nachricht" | grep -m 1 -e '🔴' -e '🟡' -e '🟢' | saeubern)"
   [ -n "$erste" ] || erste="$(printf '%s\n' "$nachricht" | grep -v -e '^[[:space:]]*$' -e '^[[:space:]]*#' | head -n 1 | saeubern)"
