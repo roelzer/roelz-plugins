@@ -1,6 +1,6 @@
 # Dev-Team – Anleitung
 
-Stand: Oktober 2026 · Version 2.3
+Stand: Oktober 2026 · Version 2.4
 
 Dieses Repo enthält zwei Plugins für Claude Code: **`dev-team`** und **`tool-scout`**. Beide enthalten kein Firmen- oder Kundenwissen und dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
 
@@ -21,8 +21,9 @@ Du sprichst immer nur mit **einer** Person, dem Projektleiter. Die anderen sind 
 | ↳ **Quellenprüfer** | nach dem Rechercheur | jede Aussage gegen eine zweite Quelle prüfen |
 | **Abwägungsrunde** | vor der Freigabe | drei unabhängige Urteile: **Fachexperte** (praxistauglich?), **Pragmatiker** (Aufwand/Nutzen?), **Langfrist-Architekt** (rächt sich das später?) |
 | **Tester** | nach dem Bauen | Funktionen, Referenzfälle, Fachregeln über viele erzeugte Fälle |
-| **Reviewer** | nach dem Tester | Code-Qualität, Sicherheit, Architekturregeln |
-| **Produktprüfer** | zum Schluss | jede Anforderung einzeln abnehmen: A1 ✅ A2 ❌ |
+| **Reviewer** | nach dem Tester | unabhängiger Diff-, Code- und Architekturcheck |
+| **Sicherheitsprüfer** | bei Login, Rechten, sensiblen Daten, Server, Migrationen, Updates und großen Releases | Angriffswege, Datenschutz, Vertrauensgrenzen und Update-Sicherheit |
+| **Produktprüfer** | zum Schluss | jede Anforderung mit konkretem Nachweis abnehmen: A1 ✅ A2 ❌ |
 | Tool-Scout | wenn du willst | fremde Plugins/Skills prüfen, bevor du sie installierst |
 
 ## 2. Wie viel Prüfung?
@@ -47,7 +48,7 @@ Start mit: `/dev-team:auftrag <was gebaut werden soll>`
    - Stand jederzeit in `docs/STATUS.md`
    - Fragen landen in `docs/OFFENE_FRAGEN.md`, es wird nicht geraten
    - Harter Stopp bei roten Referenzfällen, verletzten Fachregeln oder Änderungen außerhalb des Plans
-8. **Prüfen** – Tester → Fachprüfer → Reviewer → Produktprüfer
+8. **Prüfen** – Tester → Fachprüfer (falls fachlich relevant) → Reviewer → Sicherheitsprüfer (falls sicherheitsrelevant) → Produktprüfer
 9. ⏸ **Bericht** – mit vollständiger Abnahmeliste
 
 ## 4. Fachregeln – damit offensichtliche Fehler nicht durchrutschen
@@ -135,7 +136,15 @@ claude plugin marketplace update roelz-plugins
 ```
 Danach VS Code neu starten.
 
-## 11. Gut zu wissen
+## 11. Senior-Qualitätsregeln
+
+- Die Projektleitung bleibt für Integration und Abschluss verantwortlich, auch wenn Spezialisten prüfen.
+- Kritische oder hohe Sicherheits-/Datenintegritätsbefunde blockieren die Freigabe.
+- Nur tatsächlich ausgeführte Tests gelten als ausgeführt; nicht geprüfte Punkte werden offen benannt.
+- Bestehende Referenzwerte und Tests werden nicht stillschweigend angepasst, um grüne Ergebnisse zu erhalten.
+- Für neue Rollen und die präzisierte Pipeline siehe `plugins/dev-team/TEAM-PROTOKOLL.md` und `plugins/dev-team/CHANGELOG-2.4.0.md`.
+
+## 12. Gut zu wissen
 
 - **Arbeit:** Code, den du für deinen Arbeitgeber baust, gehört in der Regel dem Arbeitgeber. Nichts davon in deinen privaten Baukasten übernehmen.
 - **Fremde Plugins** nie direkt aus Videos installieren. Erst `/tool-scout:scout check`.

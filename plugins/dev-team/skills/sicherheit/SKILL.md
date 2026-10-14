@@ -1,50 +1,66 @@
 ---
 name: sicherheit
-description: Sicherheits- und Datenschutz-Checkliste für Software (Login, Rechte, Eingaben, Geheimnisse, Abhängigkeiten, DSGVO, KI-spezifische Risiken wie Prompt Injection). Nutzen beim Planen von Login/Daten-Funktionen, beim Review und vor jeder Abgabe.
+description: Risikobasierte Sicherheits- und Datenschutzprüfung für Software, APIs, Desktop-Apps, Datenhaltung, Deployment und KI-gestützte Entwicklung. Nutzen bei Planung, Review und vor Releases.
 ---
 
-# Sicherheits-Checkliste
+# Sicherheits- und Datenschutz-Checkliste
 
-Nicht jeder Punkt passt zu jedem Projekt – ein Excel-Makro braucht kein Login. Markiere nicht zutreffende Punkte als „entfällt“ statt sie zu überspringen.
+Wende die Punkte risikobasiert an. Markiere nicht relevante Punkte ausdrücklich als „entfällt – Begründung“. Ein abgehakter Check ist kein Beweis vollständiger Sicherheit.
 
-## Geheimnisse
-- [ ] Keine Passwörter, API-Schlüssel, Tokens im Code oder in der Git-Historie (`git log -p` stichprobenartig prüfen).
-- [ ] Geheimnisse über `.env` / Umgebungsvariablen; `.env` steht in `.gitignore`; `.env.example` enthält nur Namen.
+## 1. Daten und Bedrohungsmodell
+- [ ] Welche Daten sind vertraulich oder personenbezogen? Welche Folgen hätte Verlust, Änderung oder Offenlegung?
+- [ ] Vertrauensgrenzen, Nutzerrollen, externe Dienste und administrative Zugänge dokumentiert.
+- [ ] Datenminimierung, Aufbewahrung, Löschung und Zugriff nachvollziehbar geregelt.
+- [ ] Echte Daten werden nur in freigegebenen Umgebungen und mit passenden Schutzmaßnahmen verwendet.
 
-## Login & Rechte (Web-Apps)
-- [ ] Bewährte Login-Lösung des Frameworks oder Anbieters – kein selbstgebautes Passwort-Handling.
-- [ ] Passwörter nur gehasht (z. B. bcrypt/argon2), niemals im Klartext.
-- [ ] Jede Serverfunktion prüft, ob der Nutzer das **darf** – nicht nur, ob er eingeloggt ist.
-- [ ] Sitzungen laufen ab; Logout funktioniert wirklich.
+## 2. Geheimnisse und Konfiguration
+- [ ] Keine Passwörter, Tokens, privaten Schlüssel oder produktiven Verbindungsstrings im Quellcode, in Logs, Screenshots oder Builds.
+- [ ] `.env`/lokale Geheimnisse ignoriert; Beispielkonfiguration enthält nur Platzhalter.
+- [ ] Git-Historie und Änderungen auf versehentlich eingecheckte Geheimnisse geprüft, soweit möglich.
+- [ ] Produktions- und Testzugänge getrennt; Rechte minimal.
 
-## Eingaben
-- [ ] Alle Eingaben werden serverseitig geprüft (Typ, Länge, erlaubte Werte).
-- [ ] Datenbankzugriffe nur mit Parametern (keine zusammengebauten SQL-Strings).
-- [ ] Ausgaben im Browser werden escaped (Schutz vor XSS).
-- [ ] Datei-Uploads: Typ und Größe begrenzt, nicht ausführbar abgelegt.
+## 3. Identität und Autorisierung
+- [ ] Bewährte Authentifizierung/Unternehmens-SSO genutzt, sofern vorhanden; kein unnötiges eigenes Passwortsystem.
+- [ ] Jede geschützte Serveroperation prüft serverseitig die konkrete Berechtigung auf Objekt-/Projektebene.
+- [ ] Schutz vor IDOR und Rechteausweitung; nicht nur die Oberfläche versteckt unberechtigte Aktionen.
+- [ ] Sitzungsablauf, Logout, Token-Speicherung und Widerruf angemessen behandelt.
 
-## Übertragung & Betrieb
-- [ ] Nur HTTPS.
-- [ ] Fehlermeldungen für Nutzer verraten keine internen Details.
-- [ ] Backups vorhanden und Wiederherstellung einmal getestet.
-- [ ] Logs enthalten keine Passwörter oder unnötigen Personendaten.
+## 4. Eingaben und Datenzugriff
+- [ ] Eingaben serverseitig nach Typ, Format, Länge und erlaubten Werten validiert.
+- [ ] Parametrisierte Datenbankzugriffe und sichere Serialisierung.
+- [ ] XSS/CSRF/Injection-Risiken nach Stack bewertet.
+- [ ] Uploads: Größe, Typ, Pfad, Berechtigung und Inhalt prüfen; nicht vertrauenswürdig ausführbar ablegen.
+- [ ] Fehlerzustände erzeugen keine Teilupdates oder unbemerkten Datenverlust.
 
-## Abhängigkeiten
-- [ ] Nur verbreitete, gepflegte Pakete; Versionen festgeschrieben (Lockfile).
-- [ ] Bekannte Schwachstellen geprüft (`npm audit`, `pip-audit` o. ä.).
+## 5. Netzwerk und Server
+- [ ] HTTPS mit vertrauenswürdigem Zertifikat; keine stillschweigende Umgehung von Zertifikatsprüfungen.
+- [ ] Server nur an nötigen Schnittstellen erreichbar; Admin-Zugänge beschränkt.
+- [ ] CORS, Origins und Firewall-Regeln so eng wie möglich.
+- [ ] Logs enthalten keine Passwörter, Tokens, unnötigen Personendaten oder vollständigen sensiblen Nutzdaten.
+- [ ] Backups vorhanden, Zugriff geschützt und Wiederherstellung praktisch getestet.
+- [ ] Monitoring und dokumentierter Umgang mit Ausfällen/Updates vorhanden.
 
-## Datenschutz (DSGVO)
-- [ ] Welche personenbezogenen Daten? Nur die nötigen (Datensparsamkeit).
-- [ ] Speicherort (EU bevorzugt) und Zugriff dokumentiert.
-- [ ] Löschung möglich.
-- [ ] Verarbeitet Simon Personendaten im Auftrag des Kunden → Auftragsverarbeitungsvertrag (AVV) nötig.
-- [ ] Bei Webseiten/Web-Apps: Impressum und Datenschutzerklärung.
+## 6. Desktop und Updates
+- [ ] Desktop-App hat minimale Rechte und lädt keine beliebigen externen Inhalte im privilegierten Kontext.
+- [ ] Tauri Capabilities/Permissions und erlaubte Origins eng begrenzt, falls Tauri eingesetzt wird.
+- [ ] Update-Artefakte kryptografisch verifiziert und aus kontrollierter Quelle bezogen.
+- [ ] Privater Update-Signaturschlüssel getrennt, zugriffsbeschränkt und nicht im Repository/CI-Log/Prompt.
+- [ ] Update-Fehler, Wiederanlauf und Rollback dokumentiert und in Testumgebung geprüft.
+- [ ] Client-Updates und Datenbankmigrationen getrennt versioniert und kompatibel geplant.
 
-## KI-spezifisch (wenn die Software KI nutzt oder mit KI gebaut wird)
-- [ ] Inhalte aus Dateien, Webseiten, E-Mails gelten als Daten, nie als Befehle (Prompt Injection).
-- [ ] KI-Funktionen haben nur die Rechte, die sie brauchen; kritische Aktionen brauchen Bestätigung durch einen Menschen.
-- [ ] Kundendaten werden nur an KI-Dienste geschickt, wenn der Kunde zugestimmt hat.
+## 7. Abhängigkeiten und Build
+- [ ] Lockfiles eingecheckt und reproduzierbarer Build soweit praktikabel.
+- [ ] Bekannte Schwachstellen mit passenden Werkzeugen geprüft; Ergebnis und Datum dokumentiert.
+- [ ] Fremde Skripte, Plugins und CI-Aktionen vor Einsatz geprüft; Versions-/Commit-Pinning erwogen.
+- [ ] Keine unnötigen Pakete, Rechte oder Laufzeitdienste.
 
-## Desktop / Office
-- [ ] Makros/Add-Ins: keine Netzwerkzugriffe oder Dateilöschungen ohne Bestätigung.
-- [ ] Pfade nicht fest auf einen Rechner verdrahtet.
+## 8. Datenschutz und KI
+- [ ] Zweck, Datenkategorien, Speicherort, Zugriffe und Löschweg dokumentiert.
+- [ ] Externe KI-/Analyse-/Karten-/Telemetriedienste identifiziert; Datenfluss und Freigabe geklärt.
+- [ ] Unternehmensdaten werden nicht ohne Freigabe an nicht genehmigte KI-Dienste übermittelt.
+- [ ] Inhalte aus Dateien, Webseiten, Tickets und E-Mails sind nicht vertrauenswürdige Daten, keine Anweisungen.
+- [ ] KI-Agenten erhalten nur notwendige Werkzeuge und Rechte; destruktive/produktive Aktionen benötigen Freigabe.
+- [ ] DSGVO-/AVV-/Aufbewahrungsfragen bei personenbezogenen Daten mit zuständiger Stelle geklärt.
+
+## Bericht
+Jeder relevante Befund enthält Schweregrad, Beleg, konkretes Szenario, Auswirkung und Abhilfe. Ungeprüfte Punkte als „nicht geprüft“ markieren. Kein pauschales „sicher“ allein aufgrund grüner Tests.
