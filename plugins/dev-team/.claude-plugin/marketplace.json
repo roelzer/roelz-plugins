@@ -1,0 +1,14 @@
+{
+  "name": "roelz-dev-team",
+  "description": "Nur das Dev-Team – für Rechner, auf denen kein Firmenwissen liegen soll (z. B. Arbeitgeber).",
+  "owner": {
+    "name": "Simon Rölz"
+  },
+  "plugins": [
+    {
+      "name": "dev-team",
+      "source": ".",
+      "description": "Programmierabteilung ohne Firmen- oder Kundenwissen."
+    }
+  ]
+}

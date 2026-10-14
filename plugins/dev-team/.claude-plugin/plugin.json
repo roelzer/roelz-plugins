@@ -1,0 +1,10 @@
+{
+  "name": "dev-team",
+  "displayName": "Dev-Team",
+  "version": "1.0.0",
+  "description": "Programmierabteilung mit Projektleitung, Architekt, Kritiker, Tester, Reviewer und Produktprüfer. Enthält kein Firmen- oder Kundenwissen.",
+  "author": {
+    "name": "Simon Rölz"
+  },
+  "keywords": ["dev-team", "review", "testing", "workflow"]
+}

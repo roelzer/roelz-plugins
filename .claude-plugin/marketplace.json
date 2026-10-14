@@ -1,0 +1,27 @@
+{
+  "name": "roelz-plugins",
+  "description": "Simons digitale Firma: Dev-Team, Firmen-Backoffice und Tool-Scout als Claude-Code-Plugins.",
+  "owner": {
+    "name": "Simon Rölz"
+  },
+  "plugins": [
+    {
+      "name": "dev-team",
+      "source": "./plugins/dev-team",
+      "description": "Programmierabteilung: Projektleitung, Architekt, Kritiker, Tester, Reviewer, Produktprüfer. Ohne Firmenwissen – überall nutzbar.",
+      "category": "development"
+    },
+    {
+      "name": "firma",
+      "source": "./plugins/firma",
+      "description": "Privates Backoffice: Erstgespräch, Preisberater, Angebot, Büro/Abos, Weiterbildungscoach. Nur auf eigenen Geschäftsrechnern installieren.",
+      "category": "business"
+    },
+    {
+      "name": "tool-scout",
+      "source": "./plugins/tool-scout",
+      "description": "Sucht und prüft fertige Skills, Agenten und Plugins von GitHub und empfiehlt, was sich lohnt. Installiert nie selbst.",
+      "category": "productivity"
+    }
+  ]
+}
