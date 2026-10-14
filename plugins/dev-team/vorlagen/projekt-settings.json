@@ -10,5 +10,36 @@
   "enabledPlugins": {
     "dev-team@roelz-plugins": true,
     "tool-scout@roelz-plugins": true
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" start", "timeout": 120 }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" agent", "timeout": 15 }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Agent|Task",
+        "hooks": [
+          { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" log-start", "timeout": 15 }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" log-ende", "timeout": 15 }
+        ]
+      }
+    ]
   }
 }
