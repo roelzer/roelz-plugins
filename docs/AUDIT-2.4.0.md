@@ -45,3 +45,23 @@ Gute Grundlage (klare Rollen, Evidenzpflicht, Sicherheitsprüfer, brauchbare Che
 | Windows (Git Bash) Hooks | **nicht geprüft** (Prüfumgebung ist Linux) |
 | Mehrstündiger autonomer Lauf eines echten Projekts | **nicht geprüft** |
 | Fachliche Richtigkeit der Wärmenetz-Regeln | **nicht geprüft** (nur W1 von dir bestätigt) |
+
+## 5. Was geändert wurde (Version 2.4.1)
+
+Siehe `plugins/dev-team/CHANGELOG.md`, Abschnitt 2.4.1. Kurz: `auftrag` mit allen Stopps und neuen Meilensteinen, „nur analysieren“ und Wiederaufnahme; eine einzige Stufen-Definition im Grundgesetz; „Fertig heißt belegt“ und „Grenzen der Autonomie“; alle Agenten lesen Lessons und Fachwissen und haben `maxTurns`; neuer Agent `auditor` mit Skill `audit`; Selbstprüfskript `scripts/pruefe-plugin.sh`; Cloud-Start mit `DEV_TEAM_REF`; tote Verweise entfernt.
+
+Nach den Änderungen ausgeführt: `scripts/pruefe-plugin.sh` (ohne Befund), `claude plugin validate --strict` (bestanden).
+
+## 6. Eignung für ein Projekt wie SiRo (Windows-App, zentrale Daten, signierte Updates)
+
+**Bedingt geeignet, mit Aufsicht.** Für Phase 1 (nur analysieren) und das Planen: ja. Für das stundenlange, eigenständige Bauen: nur in kleinen Meilensteinen, mit deinem Stopp nach jedem.
+
+Warum nicht uneingeschränkt:
+- „Nur lesen“-Rollen sind Anweisungen, keine technische Sperre (Plugin-Agenten können laut Doku keine Hooks und keinen `permissionMode` setzen). Gegenmaßnahme: Nachkontrolle per Git-Vergleich nach jedem Prüfer.
+- Alle Agenten sind Claude und haben ähnliche blinde Flecken. Echte Absicherung geben nur deine Referenzfälle und bestätigten Fachregeln.
+- Update-Signierung, Datenbank-Migration und Zugangsdaten bleiben Handarbeit der IT bzw. von dir. Der private Signierschlüssel darf nie in die KI-Sitzung.
+
+## 7. Offen
+
+- **Nachprüfung durch eine frische Sitzung steht aus.** Dieses Audit hat der Projektleiter selbst gemacht. Ablauf: neue Sitzung, `/dev-team:audit`, der `auditor` prüft Stand 2.4.1 ohne Vorwissen.
+- Nicht geprüft: Windows/Git Bash, mehrstündiger Echtlauf, `shellcheck`, Fachinhalt W2–W7.
