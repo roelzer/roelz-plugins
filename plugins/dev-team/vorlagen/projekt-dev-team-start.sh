@@ -71,6 +71,20 @@ case "$modus" in
     [ -d "$plugin" ] || exit 0
     printf '%s' "$eingabe" | CLAUDE_PLUGIN_ROOT="$plugin" bash "$plugin/scripts/agent-kontext.sh"
     ;;
+  waechter)
+    if [ -d "$plugin" ] && [ -f "$plugin/scripts/waechter.sh" ]; then
+      printf '%s' "$eingabe" | CLAUDE_PLUGIN_ROOT="$plugin" CLAUDE_PROJECT_DIR="$projekt" bash "$plugin/scripts/waechter.sh"
+      exit $?
+    fi
+    # Dev-Team nicht geladen: keine Agenten und keine Schreibvorgänge ohne Wächter.
+    case "$eingabe" in
+      *'"tool_name":"Agent"'*|*'"tool_name": "Agent"'*|*'"tool_name":"Task"'*|*'"tool_name": "Task"'*|\
+      *'"tool_name":"Write"'*|*'"tool_name": "Write"'*|*'"tool_name":"Edit"'*|*'"tool_name": "Edit"'*|\
+      *'"tool_name":"MultiEdit"'*|*'"tool_name": "MultiEdit"'*|*'"tool_name":"NotebookEdit"'*|*'"tool_name": "NotebookEdit"'*)
+        echo "⛔ Dev-Team-Wächter: Das Dev-Team ist in dieser Sitzung nicht geladen (Repo roelzer/roelz-plugins nicht erreichbar). Ohne Team wird nicht gebaut. Simon Bescheid geben." >&2
+        exit 2 ;;
+    esac
+    ;;
   log-start|log-ende)
     [ -d "$plugin" ] || exit 0
     printf '%s' "$eingabe" | CLAUDE_PROJECT_DIR="$projekt" bash "$plugin/scripts/agenten-log.sh" "${modus#log-}"

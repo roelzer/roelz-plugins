@@ -1,5 +1,5 @@
 {
-  "description": "Dev-Team: Grundgesetz in jeder Sitzung (auch Cloud), Pfade für jeden Agenten, automatisches Agenten-Protokoll in docs/AGENTEN_LOG.md.",
+  "description": "Dev-Team: Grundgesetz in jeder Sitzung (auch Cloud), Pfade für jeden Agenten, Wächter (Teamzwang, Schreibrechte, verdeckte Abnahmetests) und automatisches Agenten-Protokoll in docs/AGENTEN_LOG.md.",
   "hooks": {
     "SessionStart": [
       {
@@ -25,11 +25,11 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Agent|Task",
+        "matcher": "Agent|Task|Write|Edit|MultiEdit|NotebookEdit|Read|Grep|Glob|Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/agenten-log.sh\" start",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/waechter.sh\"",
             "timeout": 15
           }
         ]
