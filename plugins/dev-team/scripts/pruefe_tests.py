@@ -234,6 +234,10 @@ def main():
         e.f("Keine .claude/dev-team.json gefunden (Projekt nicht im Dev-Team aufgenommen).")
 
     pruefe_diff(e, wurzel, basis, arg.rolle, team, arg.freigabe)
+    wt_ordner = os.path.join(wurzel, ".claude", "worktrees")
+    if not ist_worktree and os.path.isdir(wt_ordner) and os.listdir(wt_ordner):
+        e.w("Im Hauptordner liegen Entwickler-Worktrees (.claude/worktrees/). Der Testbefehl darf sie "
+            "nicht mit erfassen, sonst laufen fremde oder doppelte Tests (z. B. Testpfad auf tests/ begrenzen).")
     zahl = None
     if arg.ohne_lauf:
         e.w("Tests wurden in diesem Aufruf NICHT ausgeführt (--ohne-lauf) – kein Grün-Nachweis.")

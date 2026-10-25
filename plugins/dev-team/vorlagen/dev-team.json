@@ -3,12 +3,15 @@
   "setup": "npm ci",
   "testbefehl": "npm test",
   "testzahl_muster": "Tests\\s+(\\d+) passed",
-  "zusatzbefehle": ["npm run lint", "npm run build"],
+  "zusatzbefehle": [
+    "npm run lint",
+    "npm run build"
+  ],
   "sicherheitsbefehl": "npm audit --audit-level=high",
   "_hilfe": {
     "profil": "web (Websites, Web-Apps, Automatisierungen) oder fachsoftware (Berechnungs-/Planungstools)",
     "setup": "Befehl, mit dem ein frischer Worktree lauffähig wird (Abhängigkeiten installieren)",
-    "testbefehl": "führt ALLE Tests aus, inkl. tests/abnahme und tests/architektur. Exit 0 = grün",
+    "testbefehl": "führt ALLE Tests aus, inkl. tests/abnahme und tests/architektur. Exit 0 = grün. Muss .claude/worktrees/ und .dev-team/ AUSSCHLIESSEN (z. B. Testpfad auf tests/ begrenzen), sonst laufen Tests paralleler Entwickler mit",
     "testzahl_muster": "regulärer Ausdruck, der die Zahl der bestandenen Tests aus der Ausgabe holt. Beispiele: Vitest 'Tests\\s+(\\d+) passed', Jest 'Tests:\\s+(\\d+) passed', pytest '(\\d+) passed', Playwright '(\\d+) passed', Python unittest 'Ran (\\d+) tests?'",
     "zusatzbefehle": "müssen ebenfalls mit Exit 0 enden (Lint, Build, Typprüfung, Architekturtests, falls nicht im Testbefehl)",
     "sicherheitsbefehl": "Scanner für bekannte Lücken in Abhängigkeiten; führt der Sicherheitsprüfer aus"

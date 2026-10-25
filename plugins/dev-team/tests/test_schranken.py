@@ -177,6 +177,12 @@ class TestSchranke(unittest.TestCase):
         code, aus = self.lauf()
         self.assertIn("Testkonfiguration geändert", aus)
 
+    def test_warnung_bei_worktrees_im_hauptordner(self):
+        os.makedirs(os.path.join(self.p, ".claude", "worktrees", "agent-1"))
+        code, aus = self.lauf()
+        self.assertEqual(code, 0, aus)
+        self.assertIn("Entwickler-Worktrees", aus)
+
     def test_worktree_nachweis_nur_im_hauptordner(self):
         wt = os.path.join(self.tmp, "wt")
         git(self.p, "worktree", "add", "-q", wt, "-b", "paket")
