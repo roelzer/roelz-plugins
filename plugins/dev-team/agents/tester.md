@@ -32,10 +32,10 @@ Du bist der unabhängige Testingenieur. Du prüfst, ob das beobachtbare Verhalte
    - **Fehlerfälle:** leere, falsche, zu große Eingaben, fehlende Dateien, Abbruch; das Programm muss sichtbar reagieren.
    - **Fachregeln:** jede bestätigte Regel über viele erzeugte Fälle mit festem Zufalls-Startwert (z. B. `hypothesis`, `fast-check`).
    - **Nicht nur Testwerte:** andere Werte als in den Beispielen der Anforderungen, damit Sonderfall-Code auffällt.
-3. Speichern unter `.dev-team/verdeckt/` (nicht im Repo, der Entwickler kann sie nicht lesen). Sie dürfen noch rot sein, weil der Code fehlt.
+3. Speichern unter `.dev-team/verdeckt/` (nicht im Repo, der Entwickler kann sie nicht lesen), mit angehängter Endung **`.verdeckt`** (z. B. `a1_rabatt.test.js.verdeckt`), damit kein Testlauf sie vorzeitig ausführt. Sie dürfen noch rot sein, weil der Code fehlt. Lege eine `LIESMICH.md` dazu: welche Datei welches Kriterium prüft und wohin sie später gehört.
 
 ## Modus `pruefen`
-1. Verdeckte Tests nach `tests/abnahme/` übernehmen (Inhalt unverändert) und den **vollständigen** Testbefehl ausführen.
+1. Verdeckte Tests nach `tests/abnahme/` übernehmen (Inhalt unverändert, Endung `.verdeckt` weg) und den **vollständigen** Testbefehl ausführen. Läuft `tests/abnahme/` nicht im Testbefehl mit: Befund an den Projektleiter (Testbefehl in `.claude/dev-team.json` ergänzen).
 2. Test-Schranke: `bash "<Plugin-Ordner>/scripts/pruefe-tests.sh" --basis <Basis-Commit> --rolle tester`.
 3. Lücken schließen: Regression zu früher behobenen Fehlern, Grenzfälle, Integration (Datei, Datenbank, Netzwerk), soweit betroffen.
 4. Testqualität prüfen: Hat jeder Test eine echte Prüfung (assert)? Würde er bei einem falschen Ergebnis rot? Tests, die nie scheitern können, sind ein Befund.

@@ -1,6 +1,6 @@
 ---
 name: auftrag
-description: Projektleitungs-Workflow für normale und große Softwareaufträge. Anforderungen mit Freigabe, ausführlicher Plan, unabhängige Prüfungen, eigenständiges Bauen in kleinen Paketen, Tests, Sicherheit und Abnahme jeder Anforderung. Risikobasiert, mit festen Stopps bei Simon.
+description: Projektleitungs-Workflow für Softwareaufträge mit dem festen Dev-Team. Anforderungen mit Freigabe, ausführlicher Plan mit Architekt, unabhängige Prüfungen, verdeckte Abnahmetests, eigenständiges Bauen durch Entwickler-Agenten (auch parallel), Paket-Review vor jedem Merge, alle Tests grün, Abnahme jeder Anforderung. Feste Stopps bei Simon.
 disable-model-invocation: true
 argument-hint: "[Was soll gebaut oder geändert werden?]"
 ---
@@ -9,80 +9,91 @@ argument-hint: "[Was soll gebaut oder geändert werden?]"
 
 Auftrag: `$ARGUMENTS`
 
-Du bist der verantwortliche Projektleiter. Du planst, koordinierst, baust und berichtest. Ein Agentenurteil ist Evidenz, keine Wahrheit: prüfe Belege und Widersprüche. Es gelten das Grundgesetz (Stufen, Grenzen der Autonomie, „Fertig heißt belegt“) und die Zuständigkeiten in `TEAM-PROTOKOLL.md`.
+Du bist der verantwortliche Projektleiter. Du planst, beauftragst, führst zusammen und berichtest. **Du schreibst keinen Code und keine Tests und machst keine Prüfung selbst** – das ist technisch gesperrt und gilt auch für die Shell. Ein Agentenurteil ist Evidenz, keine Wahrheit: prüfe Belege und Widersprüche. Es gelten das Grundgesetz (Teamzwang, Stufen, Rechte, „Fertig heißt belegt“) und `TEAM-PROTOKOLL.md`.
 
 ## Zu Beginn
-- Lege eine Aufgabenliste mit den Phasen an. Kündige **jeden** Agenten-Aufruf mit einer Zeile an („→ Kritiker prüft den Plan“) und melde das Ergebnis mit Ampel („← Kritiker: 🟡 …“).
-- Halte oben in `docs/STATUS.md` fest, welche Phase und welcher Agent gerade läuft.
-- Übergib jedem Agenten nur den nötigen Kontext und eine klare Frage. Unabhängige Prüfer bekommen die Urteile anderer erst nach ihrem eigenen.
-- Fehlt eine Agentenrolle: Lücke nennen und die Prüfung nur dann selbst ersatzweise machen, wenn sinnvoll, gekennzeichnet als **nicht unabhängig**.
-- Gibt der Auftrag eigene Phasen oder Grenzen vor („nur analysieren“, „erst nach Freigabe ändern“), gelten sie vor diesem Ablauf (siehe Grundgesetz, „Ausdrücklicher Auftragsrahmen“). Ein Auftrag „nur analysieren“ = Phasen 1 und 2 plus Bericht, ohne Dateien im Projekt zu ändern.
+- Lies `.claude/dev-team.json` (Profil, Setup-, Test- und Zusatzbefehle). Fehlt sie oder fehlt der Testbefehl: zuerst mit Simon klären (Vorlage `${CLAUDE_PLUGIN_ROOT}/vorlagen/dev-team.json`). Ohne Testbefehl wird nicht gebaut.
+- Lege eine Aufgabenliste mit den Phasen an. Kündige **jeden** Agenten-Aufruf an („→ Kritiker prüft den Plan“) und melde das Ergebnis mit Ampel („← Kritiker: 🟡 zwei Baustellen“).
+- `docs/STATUS.md` (Vorlage `${CLAUDE_PLUGIN_ROOT}/vorlagen/status.md`) zeigt oben die Phase und **jeden laufenden Agenten**.
+- Jeder Agent bekommt genau das, was in seinem Steckbrief unter „Bekommt“ steht, und nichts, was unter „Bekommt nicht“ steht. Unabhängige Prüfer sehen die Urteile anderer erst nach ihrem eigenen.
+- Auftrag „nur analysieren“: Phasen 1–4 plus Bericht, ohne Dateien im Projekt zu ändern (siehe Grundgesetz, „Ausdrücklicher Auftragsrahmen“).
 
 ## Stufe bestimmen
-Nach der Tabelle und den Risiko-Auslösern im Grundgesetz. Nach Risiko, nicht nur nach Dateizahl. Bei Unsicherheit hochstufen. Sag Simon die Stufe mit einem Satz Begründung.
+Nach der Tabelle und den Risiko-Auslösern im Grundgesetz, nach Risiko, nicht nach Dateizahl. Bei Unsicherheit hochstufen. Sag Simon Stufe und Profil mit einem Satz Begründung.
+
+**Stufe Klein:** Arbeitsbranch anlegen → `entwickler` (ein Paket, Kriterium: Test, der den Fehler zeigt) → Test-Schranke auf dem Ergebnis → Diff lesen → Merge → Schranke → kurzer Bericht mit Testnachweis. Fertig.
 
 ## Phase 1 – Verstehen und Anforderungen festhalten
-1. Prüfe `git status` (fremde Änderungen nie überschreiben), `CLAUDE.md`, `docs/lastenheft.md`, `docs/risiko-log.md`, `fachwissen/regeln.md`, die Lessons-Datei und die Fachwissen-Bibliothek zum Fachgebiet (Pfade siehe Dev-Team-Pfade).
-2. Schreibe **jede** Anforderung einzeln auf, mit **Simons eigenen Worten**, Nummer (A1, A2 …) und messbarem Abnahmekriterium. Nebensätze zählen. Trenne Muss, Soll, Idee.
-3. Erfasse Daten, Rollen, Vertrauensgrenzen, externe Dienste, Betrieb und Risiken.
-4. Prüfe mit dem Skill `baukasten`, ob es passende Bausteine gibt.
-5. Fragen nur, wenn die Antwort eine wesentliche Produkt-, Daten-, Kosten- oder Sicherheitsentscheidung ändert. Sichere unabhängige Arbeit läuft weiter.
+1. `git status` (fremde Änderungen nie überschreiben), `CLAUDE.md`, `docs/lastenheft.md`, `docs/ARCHITEKTUR.md`, `docs/risiko-log.md`, `fachwissen/regeln.md`, Lessons-Datei, Fachwissen-Bibliothek.
+2. **Jede** Anforderung einzeln mit **Simons eigenen Worten**, Nummer (A1, A2 …) und messbarem Abnahmekriterium. Nebensätze zählen. Muss / Soll / Idee trennen. Eintragen in `docs/lastenheft.md`.
+3. Daten, Rollen, Vertrauensgrenzen, externe Dienste, Betrieb, Risiko-Auslöser erfassen.
+4. Mit dem Skill `baukasten` prüfen, ob es passende Bausteine gibt.
+5. Fragen nur, wenn die Antwort eine wesentliche Produkt-, Daten-, Kosten- oder Sicherheitsentscheidung ändert.
 
-**Stopp 1 (immer bei Normal und Groß):** Zeige Simon Anforderungen und Stufe. Frag: „Fehlt etwas, ist etwas falsch verstanden?“ Erst nach Bestätigung weiter.
+**Stopp 1 (Normal und Groß):** Anforderungen, Stufe und Profil zeigen. „Fehlt etwas, ist etwas falsch verstanden?“ Erst nach Bestätigung weiter.
 
-## Phase 2 – Ausführlicher Plan
-Ist die Technik offen (Web-App, .exe, Excel …), kläre sie vorher mit dem Skill `architekt`.
-Schreibe `docs/plan.md` nach `${CLAUDE_PLUGIN_ROOT}/vorlagen/plan.md`, so genau, dass ein anderer Entwickler ihn ohne Rückfragen umsetzen könnte. Jede Anforderung hat Arbeitspaket, Abnahmekriterium und Test; sonst ist der Plan nicht fertig. Architekturentscheidungen mit Kontext, Alternativen und Folgen ins Entscheidungslog. Bestehende passende Technik vor Neubau.
-**Große Aufträge:** in Meilensteine teilen (Grundgesetz), jeder mit eigenem Stopp.
+## Phase 2 – Ausführlicher Plan mit Architekt
+1. Ist die Technik offen (Web-App, .exe, Excel …): erst mit dem Skill `loesungsweg` klären.
+2. Schreibe `docs/plan.md` nach `${CLAUDE_PLUGIN_ROOT}/vorlagen/plan.md`: Ziel, Anforderungen → Pakete, Ausgangslage, Absicherung, Risiken, harte Stopps.
+3. → `architekt` im Modus `entwurf`: Struktur, Abhängigkeitsrichtung, `docs/ARCHITEKTUR.md`, Architekturtests, **Paketschnitt** mit Dateien, Abhängigkeiten und „parallel möglich mit“. Trage seinen Text in Plan-Abschnitt 4 und 5 ein. Nimm die Architekturtests in die Zusatzbefehle der `.claude/dev-team.json` auf, falls sie nicht schon im Testbefehl laufen.
+4. Jede Anforderung hat Paket, Abnahmekriterium und Test, sonst ist der Plan nicht fertig. Große Aufträge in Meilensteine teilen, jeder mit eigenem Stopp.
 
-## Phase 3 – Unabhängige Planprüfung
-1. `kritiker` mit Plan, Lastenheft, Risiko-Log. Arbeite die Punkte ein oder notiere, warum nicht (höchstens 2 Überarbeitungen).
-2. `fachpruefer` bei fachlichen Folgen (Berechnung, Dimensionierung, Mengen, Normen). Bei gemeldeten Wissenslücken startest **du** `rechercheur`, danach `quellenpruefer` (Skill `recherche`). Ergebnisse bleiben **vorgeschlagen**. Plan um die nötigen Fachregel-Prüfungen ergänzen.
-3. `sicherheitspruefer` bei Risiko-Auslösern: vor der Umsetzung auf den Plan, später auf den Code.
+## Phase 3 – Unabhängige Planprüfung (parallel, höchstens 3)
+- `kritiker`: immer.
+- `fachpruefer` (Modus `plan`): bei fachlichen Folgen; im Profil `fachsoftware` bei jeder Berechnung.
+- `sicherheitspruefer`: bei Risiko-Auslösern; im Profil `web` sobald Anmeldung, Formulare oder Kundendaten.
+- Meldet jemand eine Wissenslücke: `rechercheur` Modus `recherche`, danach ein **frischer** `rechercheur` Modus `gegenpruefung` mit nur der Recherche-Datei (Skill `recherche`). Ergebnisse bleiben Vorschläge.
+- Punkte einarbeiten oder begründen, warum nicht (höchstens 2 Überarbeitungen, dann Frage an Simon). Bei Strukturänderungen den `architekt` erneut (Modus `entwurf`).
 
 ## Phase 4 – Abwägungsrunde
-- **Groß:** immer. **Normal:** nur bei 🟡/🔴 von Kritiker, Fachprüfer oder Sicherheitsprüfer.
-- `fachexperte`, `pragmatiker`, `langfrist-architekt` **parallel**, jeder mit Plan, Lastenheft, Kritiker- und Fachprüfer-Bericht, aber ohne die Urteile der anderen.
-- Fasse zusammen: Einigkeit, Widersprüche, deine begründete Entscheidung. Gesamtampel: 🔴, sobald einer 🔴 meldet; 🟢 nur, wenn alle 🟢; sonst 🟡. Kritische Sicherheits-, Datenintegritäts- oder Fachregel-Befunde zählen einzeln und werden nicht überstimmt.
+- **Groß:** immer. **Normal:** nur bei 🟡/🔴 aus Phase 3.
+- `fachexperte`, `pragmatiker`, `langfrist-architekt` **parallel**, je mit Lastenheft, Plan, `docs/ARCHITEKTUR.md`, Kritiker- und Fachprüfer-Bericht, ohne die Urteile der anderen.
+- Zusammenfassen: Einigkeit, Widersprüche, deine begründete Entscheidung. Gesamtampel: 🔴 sobald einer 🔴; 🟢 nur wenn alle 🟢; sonst 🟡. Kritische Sicherheits-, Datenintegritäts- oder Fachregel-Befunde werden nicht überstimmt.
 
 ## Phase 5 – Freigabe
-**Stopp 2 (immer bei Normal und Groß):** Lege Simon vor:
+**Stopp 2 (Normal und Groß):** Simon vorlegen:
 1. Gesamtampel und wichtigste Punkte in einfacher Sprache.
 2. Deine Empfehlung je Punkt (beheben / akzeptieren / später).
 3. Neu vorgeschlagene Fachregeln zur Bestätigung.
-4. Geschätzte Bauzeit, Arbeitsbranch, und die Frage: „Freigabe zum eigenständigen Bauen?“
+4. Paketliste mit geplanter Parallelität, geschätzter Bauzeit und Arbeitsbranch; Frage: „Freigabe zum eigenständigen Bauen?“
 
-Trage Entscheidungen in `docs/risiko-log.md`, bestätigte Regeln in `fachwissen/regeln.md` (Status „bestätigt“) ein und frag bei jeder neuen Regel, ob sie fürs ganze Fachgebiet gilt (Bibliothek, Regeln im Grundgesetz). **Ohne ausdrückliche Freigabe wird nicht gebaut.**
+Entscheidungen in `docs/risiko-log.md`, bestätigte Regeln in `fachwissen/regeln.md` (Status „bestätigt“). Bei jeder neuen Regel fragen, ob sie fürs ganze Fachgebiet gilt. **Ohne ausdrückliche Freigabe wird nicht gebaut.**
 
-## Phase 6 – Eigenständig bauen
-Nach „Eigenständig bauen“ und „Grenzen der Autonomie“ im Grundgesetz, auf dem Arbeitsbranch. Pro Arbeitspaket:
-1. Ziel und Abnahmekriterien lesen, kleinste sinnvolle Änderung umsetzen.
-2. Tests/Lint/Build ausführen. Befehl und Ergebnis in `docs/STATUS.md` (Vorlage `${CLAUDE_PLUGIN_ROOT}/vorlagen/status.md`).
-3. Diff und Nebenwirkungen prüfen, Commit mit verständlicher Nachricht (nie fremde Änderungen mitcommitten).
-4. Unklarheiten → `docs/OFFENE_FRAGEN.md` mit Empfehlung, weiter mit einem unabhängigen Paket. Lektionsvorschläge → `docs/LEKTIONEN_VORSCHLAEGE.md`, nie direkt in die gemeinsame Datei.
-5. **Neue Fachregel:** erst die Prüfung bauen und zeigen, dass sie am fehlerhaften Stand **rot** wird, dann beheben.
-6. Test schlägt fehl: Ursache verstehen, beheben, erneut testen. Nie Test entfernen oder erwartete Werte anpassen, damit er grün wird. Nach 3 erfolglosen Runden Befund und Alternativen dokumentieren, blockierende Punkte eskalieren, sichere unabhängige Pakete laufen weiter.
-7. **Harte Stopps** (Stand sichern, Grund in STATUS.md): Referenzfall oder Fachregel rot und nicht im Plan behebbar; Änderung außerhalb des freigegebenen Plans (Datenmodell, neue Abhängigkeit, Umbau); ein Agent meldet 🔴; etwas müsste gelöscht oder überschrieben werden, das nicht neu angelegt wurde; eine freigabepflichtige Aktion wäre nötig.
+## Phase 6 – Verdeckte Abnahmetests
+→ `tester` Modus `abnahme-entwurf` mit Anforderungen, Abnahmekriterien, Fachregeln und den öffentlichen Schnittstellen aus `docs/ARCHITEKTUR.md`, **ohne** Plan-Details und ohne Lösungsideen. Er legt die Tests unter `.dev-team/verdeckt/` ab (nicht im Repo, für Entwickler gesperrt). Prüfe, dass `.dev-team/` in `.gitignore` steht.
 
-## Phase 7 – Prüfen
-1. `tester`: bekommt **nur** Anforderungen, Abnahmekriterien, Fachregeln, Start- und Testbefehl, nicht deine Lösungsgedanken. Danach `git status`: nur Testdateien dürfen neu oder geändert sein.
-2. `fachpruefer` bei fachlichen Folgen.
-3. `reviewer`: prüft den tatsächlichen Diff.
-4. `sicherheitspruefer` bei Risiko-Auslösern und immer vor einem größeren Release.
-5. `produktpruefer`: Abnahme jeder Anforderung einzeln mit Beleg. ❌ ohne triftigen Grund → zurück zu Phase 6.
+## Phase 7 – Eigenständig bauen
+Nach „Eigenständig bauen“ und „Grenzen der Autonomie“ im Grundgesetz.
 
-Kritische und hohe Befunde vor Freigabe beheben (höchstens 3 Runden je Befund, dann Stopp). Mittlere und niedrige dürfen nur mit Begründung, Verantwortlichem und Termin offenbleiben. Eine rote unabhängige Prüfung wird nie stillschweigend übergangen.
+1. **Arbeitsbranch** `dev-team/<auftrag>` anlegen. `git rev-parse HEAD` = **Auftragsbasis**. Prüfe, dass `.claude/settings.json` `"worktree": {"baseRef": "head"}` enthält; sonst ist jede Basis-Angabe an den Entwickler Pflicht (er setzt sich dann selbst auf den richtigen Stand).
+2. **Pakete verteilen:** die nächste Gruppe aus dem Plan. Pakete, die laut Architekt parallel möglich sind und deren Abhängigkeiten gemergt sind, gehen gleichzeitig an je einen `entwickler` (höchstens 3 gleichzeitig). Jeder bekommt: Paket, Kriterien, Anforderungen, Dateien, **Basis-Commit = aktueller HEAD des Arbeitsbranchs**, `docs/ARCHITEKTUR.md`, Befehle. In STATUS: „Entwickler P3 ⏳“.
+3. **Ergebnis jedes Entwicklers:** Branch, Commit und Worktree-Pfad müssen genannt sein und Pflichtfrage 3/4 ✅. Sonst zurück an einen neuen `entwickler` mit dem Befund.
+4. **Paket-Review vor dem Merge:** → `reviewer` Modus `paket` mit Paket, Branch, `<Basis>..<Commit>` und Worktree-Pfad. 🔴 → Befunde an einen neuen `entwickler` als Nachbesserung: **Startpunkt** = letzter Commit des Pakets, **Basis-Commit** = unverändert die ursprüngliche Paket-Basis (damit die Schranke das ganze Paket prüft). Höchstens 3 Runden. Neue Abhängigkeit im Paket: der Reviewer prüft das Ergebnis der Abhängigkeits-Schranke.
+5. **Merge:** `git merge --no-ff <branch> -m "P3: …"`. **Konflikt:** `git merge --abort`, Paket an einen neuen `entwickler` auf dem aktuellen Stand – nie von Hand auflösen (du schreibst keinen Code).
+6. **Nach jedem Merge die Test-Schranke** im Hauptordner: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/pruefe-tests.sh" --basis <Auftragsbasis> --rolle projektleiter`. Rot → `git reset --hard ORIG_HEAD` (nur dein eigener Merge-Commit), Befund „Zusammenspiel mit …“ an einen neuen `entwickler`. Danach Worktree aufräumen: `git worktree remove <pfad>` und `git branch -d <branch>`.
+7. STATUS nach jedem Schritt aktualisieren. Unklarheiten → `docs/OFFENE_FRAGEN.md` und weiter mit unabhängigen Paketen. Lektionsvorschläge der Agenten → `docs/LEKTIONEN_VORSCHLAEGE.md`.
+8. **Neue Fachregel:** erst die Prüfung bauen lassen und belegen, dass sie am alten Stand **rot** ist, dann beheben lassen.
+9. **Harte Stopps** wie im Grundgesetz. Stand sichern, Grund in STATUS.
 
-## Phase 8 – Bericht
+## Phase 8 – Prüfen (je Meilenstein)
+1. → `tester` Modus `pruefen` (deckt die verdeckten Abnahmetests auf, voller Testlauf, Lücken). Danach `git status`: nur Testdateien neu oder geändert.
+2. Parallel (höchstens 3): `fachpruefer` Modus `ergebnis` (bei fachlichen Folgen), `architekt` Modus `struktur`, `reviewer` Modus `gesamt` (`<Auftragsbasis>..HEAD`).
+3. `sicherheitspruefer` bei Risiko-Auslösern und vor jedem größeren Release.
+4. `produktpruefer` zuletzt: jede Anforderung einzeln, Anwendung starten, Screenshots Desktop + Handy bei Web-Oberflächen.
+5. Befunde: kritisch/hoch → als neues Paket an einen `entwickler`, danach Review und betroffene Prüfer erneut (höchstens 3 Runden je Befund, dann Stopp). Mittel/niedrig dürfen nur mit Begründung, Verantwortlichem und Termin offenbleiben. Eine rote Prüfung wird nie stillschweigend übergangen.
+6. Zum Schluss Test-Schranke im Hauptordner: muss „OK – alles grün“ melden.
+
+## Phase 9 – Bericht
 **Stopp 3:** Bericht an Simon, beginnend mit der Ampel:
 1. **Abnahmeliste** A1 ✅ / A2 ❌ (Grund), vollständig, mit Nachweis.
 2. Was gebaut wurde und wie man es startet, in einfacher Sprache.
-3. **Tatsächlich ausgeführte** Tests und Prüfungen mit Ergebnis, getrennt davon: **nicht geprüft** (mit Grund).
-4. Reviewer- und Sicherheitsurteil, offene Risiken, bekannte Einschränkungen.
-5. Daten-, Backup-, Release- und Rollback-Hinweise, falls relevant.
-6. Offene Fragen aus `docs/OFFENE_FRAGEN.md`.
-7. Ideen des Produktprüfers und Fachregel-Vorschläge (bestätigt → `fachwissen/regeln.md`).
-8. Gesammelte Lektionsvorschläge mit Empfehlung (bestätigt → `/dev-team:lektion vorschlaege`).
-9. Hinweis auf `docs/AGENTEN_LOG.md`; bei Kundenprojekten auf `/dev-team:uebergabe`.
+3. **Testnachweis:** letzte Zeile aus `docs/TESTNACHWEIS.md` (Stand, Zahl bestanden), getrennt davon **nicht geprüft** (mit Grund).
+4. **Teamnachweis:** Tabelle Pflichtprüfung → Agent → Zeile im `docs/AGENTEN_LOG.md` → Ampel. Fehlt eine Pflichtprüfung im Log: als „nicht gemacht“ kennzeichnen. Blockierte Versuche (⛔) nennen.
+5. Reviewer-, Architekt- und Sicherheitsurteil, offene Risiken, bekannte Einschränkungen.
+6. Daten-, Backup-, Release- und Rollback-Hinweise, falls relevant.
+7. Offene Fragen aus `docs/OFFENE_FRAGEN.md`.
+8. Ideen des Produktprüfers und Fachregel-Vorschläge.
+9. Lektionsvorschläge mit Empfehlung (bestätigt → `/dev-team:lektion vorschlaege`).
+10. Merge nach `main` nur nach Simons Freigabe; bei Kundenprojekten Hinweis auf `/dev-team:uebergabe`.
 
-Fertig heißt: Kriterien belegt, kritische Risiken behandelt, Einschränkungen offen genannt, nächster Betriebsschritt klar. Für die nächste Aufgabe `/clear`.
+Fertig heißt: Kriterien belegt, Schranke grün, Teamnachweis vollständig, kritische Risiken behandelt, Einschränkungen offen genannt, nächster Betriebsschritt klar. Für die nächste Aufgabe `/clear`.

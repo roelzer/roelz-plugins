@@ -9,6 +9,10 @@ argument-hint: "[privat|arbeit]"
 
 Führe die Schritte der Reihe nach aus. Zeige Simon vor jeder Änderung an einer Datei kurz, was du ändern wirst.
 
+## 0. Voraussetzungen prüfen
+- **Python 3** muss als `python3`, `python` oder `py` aufrufbar sein (`python --version`). Ohne Python blockiert der Wächter in Dev-Team-Projekten jede Arbeit – mit Absicht, damit das Team nie ohne Schutz arbeitet. Fehlt es: Simon bitten, Python von python.org zu installieren (Haken bei „Add python.exe to PATH“), dann Claude Code neu starten.
+- **Git** ab Version 2.31 (`git --version`), wegen der Worktrees.
+
 ## 1. Modus klären
 Modus aus dem Argument (`$ARGUMENTS`) übernehmen; fehlt er, frag:
 - **privat** – eigener Rechner. Lektionen werden direkt im Plugin-Repo gespeichert und per Git auf alle Rechner verteilt.

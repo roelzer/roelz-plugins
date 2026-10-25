@@ -283,6 +283,29 @@ class Schreibrechte(Basis):
         self.assertEqual(self.lauf(self.schreiben(self.p("Tests/Referenz/Fall9.json"), "entwickler"))[0], 2)
 
 
+class Schutzschalter(Basis):
+    def test_wartungsschalter_nicht_setzbar(self):
+        ziel = os.path.expanduser("~/.claude/settings.json")
+        for inhalt in ('{"env": {"DEV_TEAM_WARTUNG": "1"}}', '{"disableAllHooks": true}',
+                       '{"env": {"CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "3"}}'):
+            e = {"tool_name": "Write", "tool_input": {"file_path": ziel, "content": inhalt}}
+            for proj in (self.projekt, self.leer):
+                self.assertEqual(self.lauf(e, projekt=proj)[0], 2, inhalt)
+        e = {"tool_name": "Edit", "tool_input": {"file_path": ziel, "old_string": "x",
+                                                 "new_string": '"DEV_TEAM_WARTUNG": "1"'}}
+        self.assertEqual(self.lauf(e)[0], 2)
+
+    def test_normale_benutzereinstellung_erlaubt(self):
+        e = {"tool_name": "Edit", "tool_input": {"file_path": os.path.join(self.leer, "settings.json"),
+                                                 "old_string": "x", "new_string": '"Read(**/.env)"'}}
+        self.assertEqual(self.lauf(e)[0], 0)
+
+    def test_shell_schalter_blockiert(self):
+        for befehl in ("export DEV_TEAM_WARTUNG=1 && claude", "echo '{\"disableAllHooks\": true}' > ~/.claude/settings.json"):
+            e = {"tool_name": "Bash", "tool_input": {"command": befehl}}
+            self.assertEqual(self.lauf(e)[0], 2, befehl)
+
+
 class Verdeckt(Basis):
     def test_entwickler_liest_verdeckte_tests_nicht(self):
         for e in ({"tool_name": "Read", "tool_input": {"file_path": self.projekt + "/.dev-team/verdeckt/a1.test.js"}},

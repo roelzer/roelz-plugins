@@ -34,9 +34,21 @@ else
   sed -n '/^## Lektionen/,$p' "$plugin/wissen/lessons.md" 2>/dev/null | tail -n +2
 fi
 
+# Festes Team immer nennen (Teamzwang).
+team="$(sed -n 's/^    "\([a-z-]*\)":[[:space:]]*{ "phase".*/\1/p' "$plugin/team.json" 2>/dev/null | tr '\n' ' ')"
+if [ -n "$team" ]; then
+  echo
+  echo "Festes Dev-Team (nur diese Agenten, sonst blockiert der Wächter): $team"
+  echo "Projektleiter: Du baust und prüfst nicht selbst. Code = entwickler, Tests = tester, Struktur = architekt."
+fi
+
 # Hinweis, wenn das Projekt noch nicht im Dev-Team aufgenommen ist.
 if [ -d "$projekt/.git" ] || [ -n "$(ls -A "$projekt" 2>/dev/null)" ]; then
-  if [ ! -f "$projekt/docs/STATUS.md" ] && [ ! -f "$projekt/docs/lastenheft.md" ]; then
+  if [ ! -f "$projekt/.claude/dev-team.json" ] && [ -f "$projekt/docs/STATUS.md" ]; then
+    echo
+    echo "Hinweis an den Projektleiter: Projekt aus Dev-Team 2 erkannt (keine .claude/dev-team.json). Teamzwang gilt schon. Biete Simon an, mit /dev-team:projekt-aufnehmen auf Version 3 umzustellen (Profil, Testbefehl, Einstellungen)."
+  fi
+  if [ ! -f "$projekt/docs/STATUS.md" ] && [ ! -f "$projekt/docs/lastenheft.md" ] && [ ! -f "$projekt/.claude/dev-team.json" ]; then
     echo
     echo "Hinweis an den Projektleiter: Dieses Projekt ist noch nicht im Dev-Team aufgenommen (keine docs/STATUS.md, kein docs/lastenheft.md). Biete Simon bei der ersten größeren Aufgabe an: bestehendes Projekt → /dev-team:projekt-aufnehmen, leerer Ordner → /dev-team:neues-projekt. Kleine Fragen ohne Nachfrage beantworten."
   fi

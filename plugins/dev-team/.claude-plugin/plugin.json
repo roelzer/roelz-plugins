@@ -1,16 +1,19 @@
 {
   "name": "dev-team",
   "displayName": "Dev-Team",
-  "version": "2.4.1",
-  "description": "Programmierabteilung: Projektleitung mit risikobasierter Planung, unabhängigen Fach- und Architekturprüfungen, Tester, Senior-Reviewer, Sicherheitsprüfer, Auditor und Produktabnahme. Kann innerhalb klarer Freigabegrenzen eigenständig arbeiten. Enthält kein Firmen- oder Kundenwissen.",
+  "version": "3.0.0",
+  "description": "Festes Senior-Entwicklungsteam: Projektleitung, Architekt, Entwickler (auch parallel in eigenen Worktrees), Kritiker, Fachprüfer, Rechercheur, Abwägungsrunde, Tester mit verdeckten Abnahmetests, Reviewer, Sicherheitsprüfer, Produktprüfer, Auditor. Teamzwang und Schreibrechte technisch erzwungen, Test- und Abhängigkeits-Schranke. Enthält kein Firmen- oder Kundenwissen.",
   "author": {
     "name": "Simon Rölz"
   },
   "keywords": [
     "dev-team",
+    "fachregeln",
     "review",
+    "tdd",
+    "teamzwang",
     "testing",
     "workflow",
-    "fachregeln"
+    "worktree"
   ]
 }

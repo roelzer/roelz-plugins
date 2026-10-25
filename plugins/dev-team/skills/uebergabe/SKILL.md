@@ -6,7 +6,9 @@ disable-model-invocation: true
 
 # Übergabe an den Kunden
 
-Voraussetzung: Reviewer hat freigegeben. Wenn nicht: zuerst `/dev-team:auftrag` abschließen.
+Voraussetzung: Reviewer, Produktprüfer und (bei Risiko-Auslösern) Sicherheitsprüfer haben freigegeben, die Test-Schranke ist grün. Wenn nicht: zuerst `/dev-team:auftrag` abschließen.
+
+Du bist der Projektleiter und schreibst die Unterlagen in `docs/uebergabe/` selbst (Prozessunterlagen, kein Code).
 
 Lege im Projekt den Ordner `docs/uebergabe/` an mit:
 
@@ -27,7 +29,21 @@ Version, Datum, was enthalten ist. Bekannte Einschränkungen ehrlich nennen.
 - Unterschriftsfelder Auftraggeber und Auftragnehmer
 Hinweis an Simon: Die Abnahme ist rechtlich wichtig (u. a. Beginn der Gewährleistung und Fälligkeit der Rechnung). Die Vorlage einmal von einem Anwalt prüfen lassen.
 
-## 5. Wartung
-Kurzer Vorschlag für einen Wartungsvertrag: was enthalten ist (Updates, Fehlerbehebung, Reaktionszeit), was nicht. Keinen Preis festlegen – das macht der Preisberater.
+## 5. `betrieb.md` – Betriebs-Checkliste (Pflicht im Profil `web`)
+Jeden Punkt mit ✅ / ❌ / entfällt (Grund). Offene ❌ gehen als Risiko an Simon, die Auslieferung entscheidet er.
+- [ ] Domain und DNS auf ein Konto des Kunden (oder dokumentiert, wem sie gehören)
+- [ ] HTTPS aktiv, Zertifikat erneuert sich automatisch
+- [ ] Hosting-Standort (EU bei personenbezogenen Daten) und Vertrag/AV-Vertrag geklärt
+- [ ] Backups automatisch, Wiederherstellung **einmal ausprobiert** (Datum)
+- [ ] Überwachung: Benachrichtigung, wenn die Anwendung ausfällt (an wen?)
+- [ ] Zugänge: Admin-Konten mit starkem Passwort/2FA, keine geteilten Zugänge, Liste wer Zugriff hat
+- [ ] Geheimnisse nur in der Umgebung des Hosters, nicht im Repo
+- [ ] Impressum und Datenschutzerklärung vorhanden und passend (Formulare, Cookies, eingebundene Dienste)
+- [ ] Cookie-Einwilligung, falls nicht notwendige Cookies oder Drittdienste
+- [ ] Update-Weg beschrieben: wer spielt Updates ein, wie wird zurückgerollt
+- [ ] Abhängigkeiten auf bekannte Lücken geprüft (Sicherheitsbefehl aus `.claude/dev-team.json`, Datum)
+
+## 6. Wartung
+Kurzer Vorschlag für einen Wartungsvertrag: was enthalten ist (Updates, Fehlerbehebung, Reaktionszeit), was nicht. Keinen Preis festlegen – das entscheidet Simon.
 
 Danach: Simon an die Nachkalkulation erinnern (geschätzte gegen tatsächliche Stunden), damit die nächste Schätzung genauer wird.

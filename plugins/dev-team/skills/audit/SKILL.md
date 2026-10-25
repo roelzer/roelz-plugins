@@ -20,7 +20,7 @@ Starte den Agenten `auditor` mit dem Gegenstand, dem Pfad und, falls vorhanden, 
 **Stopp 1:** Zeige Simon Note, Ampel, die zehn Schwachstellen in einfacher Sprache und deinen Maßnahmenplan. Frag, ob alles wie vorgeschlagen behoben werden soll. Solange nichts entschieden ist, wird nichts geändert.
 
 ## 3. Beheben
-Nach Freigabe, jeweils ein Commit pro Maßnahme, nach den Regeln im Grundgesetz (Arbeitsbranch, keine stillen Lockerungen, Belegpflicht). Nach jeder Änderung die Prüfungen erneut ausführen, die der Auditor genannt hat (`claude plugin validate --strict`, Selbstprüfskript, Tests). Dokumentiere Änderungen in der Changelog-Datei des Plugins. Was du nicht sicher beheben kannst, steht als offen im Bericht.
+Nach Freigabe, jeweils ein Commit pro Maßnahme, nach den Regeln im Grundgesetz (Arbeitsbranch, keine stillen Lockerungen, Belegpflicht). Nach jeder Änderung die Prüfungen erneut ausführen, die der Auditor genannt hat (`claude plugin validate --strict`, `scripts/pruefe-plugin.sh`, die Plugin-Tests `python3 -m unittest discover -s plugins/dev-team/tests`). Änderungen am Plugin selbst brauchen den Wartungsmodus: Simon startet Claude Code mit `DEV_TEAM_WARTUNG=1`. Dokumentiere Änderungen in der Changelog-Datei des Plugins. Was du nicht sicher beheben kannst, steht als offen im Bericht.
 
 ## 4. Nachprüfung
 Starte einen **neuen** `auditor` (frischer Kontext) mit dem Auftrag, den Stand nach den Änderungen zu prüfen und für jeden früheren Befund zu sagen: behoben / teilweise / offen / neu verursacht. Hänge sein Ergebnis an den Bericht an.

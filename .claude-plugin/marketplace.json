@@ -8,7 +8,7 @@
     {
       "name": "dev-team",
       "source": "./plugins/dev-team",
-      "description": "Programmierabteilung: Planung, Kritiker, Fachprüfer mit Recherche, Abwägungsrunde, Tester, Reviewer, Produktprüfer. Ohne Firmenwissen – überall nutzbar.",
+      "description": "Festes Senior-Entwicklungsteam mit Teamzwang: Architekt, Entwickler (parallel), Prüfer, verdeckte Abnahmetests, Test-Schranke „alle Tests grün“. Ohne Firmenwissen – überall nutzbar.",
       "category": "development"
     },
     {

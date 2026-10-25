@@ -234,6 +234,16 @@ def pruefe_schreiben(eingabe, team, projekt, plugin, rolle):
     absolut = os.path.abspath(os.path.join(cwd, os.path.expanduser(pfad)))
     np = norm(absolut)
 
+    # Überall: niemand schaltet den Schutz über Einstellungen ab.
+    inhalt = " ".join(str(ti.get(k) or "") for k in ("content", "new_string", "new_source"))
+    for e in ti.get("edits") or []:
+        if isinstance(e, dict):
+            inhalt += " " + str(e.get("new_string") or "")
+    if "DEV_TEAM_WARTUNG" in inhalt or re.search(r'"disableAllHooks"\s*:\s*true', inhalt) \
+            or re.search(r"CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH\"?\s*:\s*\"?([2-9]|\d\d)", inhalt):
+        blockieren("Schutzschalter des Dev-Teams (Wartungsmodus, Hooks aus, Agenten-Verschachtelung) "
+                   "werden nicht von Claude gesetzt. Das macht nur Simon von Hand.", projekt, rolle)
+
     # Überall: keine neuen Agenten, Skills oder Hooks über die Werkzeuge.
     if re.search(r"/\.claude/(agents|skills|hooks|commands)/", np, re.IGNORECASE):
         blockieren("Agenten-, Skill- und Hook-Dateien werden nicht von Claude angelegt oder "
@@ -346,6 +356,12 @@ def main():
 
     if werkzeug in SCHREIB_WERKZEUGE:
         pruefe_schreiben(eingabe, team, projekt, plugin, rolle)
+
+    if projekt and werkzeug == "Bash":
+        befehl = str((eingabe.get("tool_input") or {}).get("command") or "")
+        if "DEV_TEAM_WARTUNG" in befehl or "disableAllHooks" in befehl:
+            blockieren("Schutzschalter des Dev-Teams werden nicht von Claude gesetzt, auch nicht über "
+                       "die Shell. Das macht nur Simon von Hand.", projekt, rolle)
 
     if projekt and (werkzeug in LESE_WERKZEUGE or werkzeug == "Bash"):
         pruefe_lesen(eingabe, team, projekt, rolle, werkzeug)

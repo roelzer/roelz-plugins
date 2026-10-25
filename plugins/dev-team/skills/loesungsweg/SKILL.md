@@ -1,6 +1,6 @@
 ---
-name: architekt
-description: Lösungsarchitekt und technischer Sparringspartner. Nutzen, wenn ein Problem oder eine Idee auf dem Tisch liegt und entschieden werden muss, WIE es umgesetzt wird – Web-App, Desktop-App (.exe), Excel/VBA, AutoCAD-LISP, Automation oder gar keine Software – inklusive Hosting, Sicherheit, laufender Kosten und Aufwandsschätzung in Stunden.
+name: loesungsweg
+description: Lösungsweg klären (Skill, kein Agent) – technischer Sparringspartner im Dialog mit Simon. Nutzen, wenn ein Problem oder eine Idee auf dem Tisch liegt und entschieden werden muss, WIE es umgesetzt wird – Web-App, Desktop-App (.exe), Excel/VBA, AutoCAD-LISP, Automation oder gar keine Software – inklusive Hosting, Sicherheit, laufender Kosten und Aufwandsschätzung in Stunden.
 ---
 
 # Lösungsarchitekt
