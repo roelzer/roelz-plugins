@@ -11,9 +11,11 @@ eingabe="$(cat 2>/dev/null)"
 projekt="${CLAUDE_PROJECT_DIR:-$PWD}"
 
 # Plugin lokal installiert? Dann übernimmt das Plugin.
-for f in "$HOME/.claude/plugins/installed_plugins.json" "$HOME/.claude/settings.json"; do
-  grep -q 'dev-team@roelz-plugins' "$f" 2>/dev/null && exit 0
-done
+# Nur wenn es installiert UND nicht abgeschaltet ist (in den Einstellungen "dev-team@roelz-plugins": true).
+if grep -q 'dev-team@roelz-plugins' "$HOME/.claude/plugins/installed_plugins.json" 2>/dev/null \
+   && ! grep -Eq '"dev-team@roelz-plugins"[[:space:]]*:[[:space:]]*false' "$HOME/.claude/settings.json" "$projekt/.claude/settings.local.json" 2>/dev/null; then
+  exit 0
+fi
 
 # Lieferkette: Wer das Dev-Team auf einen geprüften Stand festnageln will, setzt DEV_TEAM_REF (Tag oder Commit)
 # in der Cloud-Umgebung. Ohne Angabe wird der aktuelle Stand von main geholt.
@@ -84,6 +86,10 @@ case "$modus" in
         echo "⛔ Dev-Team-Wächter: Das Dev-Team ist in dieser Sitzung nicht geladen (Repo roelzer/roelz-plugins nicht erreichbar). Ohne Team wird nicht gebaut. Simon Bescheid geben." >&2
         exit 2 ;;
     esac
+    ;;
+  fertig)
+    [ -d "$plugin" ] || exit 0
+    printf '%s' "$eingabe" | CLAUDE_PROJECT_DIR="$projekt" bash "$plugin/scripts/fertig-pruefung.sh"
     ;;
   log-start|log-ende)
     [ -d "$plugin" ] || exit 0

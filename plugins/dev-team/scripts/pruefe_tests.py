@@ -38,17 +38,24 @@ waechter = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(waechter)
 
 SKIP_MUSTER = [
-    r"\b(?:it|test|describe|context|suite|bench)\.(?:skip|only|todo|fixme)\s*\(",
-    r"\b(?:xit|xdescribe|xtest|fit|fdescribe)\s*\(",
-    r"@pytest\.mark\.(?:skip|skipif|xfail)\b",
-    r"\bpytest\.(?:skip|xfail)\s*\(",
-    r"@unittest\.(?:skip|skipIf|skipUnless|expectedFailure)\b",
-    r"\bself\.skipTest\s*\(",
-    r"\[(?:Ignore|Skip)\b",              # NUnit/xUnit-Attribute
-    r"@(?:Disabled|Ignore)\b",            # JUnit
-    r"\bt\.Skip(?:Now|f)?\s*\(",          # Go
-    r"\btest\.describe\.(?:skip|only|fixme)\s*\(",
+    # JavaScript/TypeScript (Jest, Vitest, Mocha, Playwright, node:test) inkl. Ketten wie it.skip.each
+    r"\b(?:it|test|describe|context|suite|bench|specify)(?:\.\w+)*\.(?:skip|only|todo|fixme|skipIf|runIf|failing)\b",
+    r"\b(?:xit|xdescribe|xtest|xcontext|xspecify|fit|fdescribe)\s*\(",
+    r"\{\s*(?:skip|todo|only)\s*:\s*(?:true|['\"])",          # node:test Optionen
+    # Python
+    r"@pytest\.mark\.(?:skip|skipif|xfail)\b", r"\bpytest\.(?:skip|xfail|importorskip)\s*\(",
+    r"@unittest\.(?:skip|skipIf|skipUnless|expectedFailure)\b", r"\bself\.skipTest\s*\(",
+    r"\braise\s+(?:unittest\.)?SkipTest\b", r"\b__test__\s*=\s*False",
+    r"from\s+(?:unittest|pytest)(?:\.\w+)*\s+import[^\n]*\b(?:skip\w*|xfail|SkipTest|expectedFailure)\b",
+    # .NET, Java, Go
+    r"\[(?:Ignore|Skip)\b", r"Skip\s*=\s*\"", r"@(?:Disabled|Ignore)\b", r"\bt\.Skip(?:Now|f)?\s*\(",
 ]
+PRUEF_WORTE = re.compile(
+    r"\bassert|\bexpect\s*\(|\.should\b|\bAssert\.|assertThat|\bt\.(?:Error|Fatal|Fail)|\brequire\.|"
+    r"\bcheck\s*\(|toBe|toEqual|toThrow|\braises\s*\(", re.IGNORECASE)
+TEST_FUNKTION = re.compile(r"\bdef\s+test_|\b(?:it|test)\s*\(|\[(?:Test|Fact|TestMethod)\]|@Test\b|func\s+Test")
+UEBERSPRUNGEN_STANDARD = [r"(\d+)\s+skipped", r"#\s*skipped\s+(\d+)", r"skipped[=:]\s*(\d+)",
+                          r"(\d+)\s+(?:todo|pending)\b", r"#\s*todo\s+(\d+)", r"(\d+)\s+xfailed"]
 TESTKONFIG = re.compile(
     r"(^|/)(vitest|jest|playwright|karma|cypress|mocha|ava)\.config\.[a-z]+$|(^|/)\.mocharc|"
     r"(^|/)(pytest\.ini|tox\.ini|setup\.cfg|conftest\.py|pyproject\.toml|package\.json|\.github/workflows/.*)$",
@@ -121,6 +128,7 @@ def ist_testdatei(bereich):
 
 
 def pruefe_diff(e, wurzel, basis, rolle, team, freigabe):
+    """freigabe: geprüfter Freigabetext oder ''."""
     liste = aenderungen(wurzel, basis)
     if not liste:
         e.o("Keine Dateiänderungen gegenüber %s." % basis[:10])
@@ -142,6 +150,19 @@ def pruefe_diff(e, wurzel, basis, rolle, team, freigabe):
                     if re.search(muster, zeile):
                         e.f("Test übersprungen/exklusiv in %s: %s" % (p, zeile.strip()[:120]))
                         break
+        if ist_testdatei(bereich) and status == "A" and bereich != "referenz":
+            pfad_abs = os.path.join(wurzel, p)
+            try:
+                with open(pfad_abs, encoding="utf-8", errors="replace") as f:
+                    inhalt = f.read()
+            except OSError:
+                inhalt = ""
+            if TEST_FUNKTION.search(inhalt) and not PRUEF_WORTE.search(inhalt):
+                e.f("Neue Testdatei ohne eine einzige Prüfung (assert/expect …): %s" % p)
+        if bereich == "teamkonfig" and status in "AMD":
+            (e.w if freigabe else e.f)("Dev-Team-Einstellungen (.claude/dev-team.json) geändert%s." % (
+                " – Freigabe: " + freigabe if freigabe else
+                " – Testbefehl und Prüfregeln dürfen sich nur mit Simons Freigabe ändern (--freigabe)"))
         if TESTKONFIG.search(p) and status in "AMD":
             e.w("Testkonfiguration geändert (%s): Reviewer prüft, dass keine Tests ausgeschlossen werden." % p)
         if rolle == "entwickler":
@@ -154,6 +175,23 @@ def pruefe_diff(e, wurzel, basis, rolle, team, freigabe):
         if rolle == "tester" and bereich == "code":
             e.f("Tester hat Programmcode geändert: %s" % p)
     return liste
+
+
+def pruefe_freigabe(e, hauptordner, stichwort):
+    """Eine Freigabe zählt nur, wenn Simon sie von Hand in .claude/freigaben.md eingetragen hat."""
+    datei = os.path.join(hauptordner, ".claude", "freigaben.md")
+    try:
+        with open(datei, encoding="utf-8") as f:
+            zeilen = [z.strip() for z in f if z.strip() and not z.lstrip().startswith("#")]
+    except OSError:
+        zeilen = []
+    for z in zeilen:
+        if stichwort.strip() and stichwort.strip().lower() in z.lower():
+            e.w("Freigabe verwendet: %s" % z)
+            return z
+    e.f("Freigabe '%s' steht nicht in .claude/freigaben.md. Freigaben trägt nur Simon von Hand ein "
+        "(eine Zeile: Datum | Stichwort | Grund)." % stichwort)
+    return ""
 
 
 def letzter_lauf_pfad(hauptordner):
@@ -196,6 +234,18 @@ def lauf(e, wurzel, hauptordner, konfig, ist_worktree, freigabe, rolle):
             e.f("Zählmuster '%s' passt nicht auf die Testausgabe – Anzahl unbekannt." % muster)
     else:
         e.w("Kein 'testzahl_muster' in .claude/dev-team.json: Es wird nicht geprüft, ob Tests verschwunden sind.")
+    uebersprungen = 0
+    for m in [(konfig or {}).get("uebersprungen_muster")] + UEBERSPRUNGEN_STANDARD:
+        if not m:
+            continue
+        for wert in re.findall(m, ausgabe, re.IGNORECASE):
+            try:
+                uebersprungen = max(uebersprungen, int(wert[0] if isinstance(wert, tuple) else wert))
+            except ValueError:
+                pass
+    if uebersprungen:
+        (e.w if freigabe else e.f)("Der Testlauf meldet %d übersprungene/offene Tests%s." % (
+            uebersprungen, " – Freigabe: " + freigabe if freigabe else " (übersprungene Tests sind nicht grün)"))
     for zusatz in (konfig or {}).get("zusatzbefehle", []):
         print("→ Zusatzbefehl: %s" % zusatz, flush=True)
         z = sh(zusatz, wurzel)
@@ -230,10 +280,13 @@ def main():
 
     team = lade_team()
     konfig, _ = lade_konfig(wurzel, hauptordner)
+    freigabe = ""
+    if arg.freigabe:
+        freigabe = pruefe_freigabe(e, hauptordner, arg.freigabe)
     if konfig is None:
         e.f("Keine .claude/dev-team.json gefunden (Projekt nicht im Dev-Team aufgenommen).")
 
-    pruefe_diff(e, wurzel, basis, arg.rolle, team, arg.freigabe)
+    pruefe_diff(e, wurzel, basis, arg.rolle, team, freigabe)
     wt_ordner = os.path.join(wurzel, ".claude", "worktrees")
     if not ist_worktree and os.path.isdir(wt_ordner) and os.listdir(wt_ordner):
         e.w("Im Hauptordner liegen Entwickler-Worktrees (.claude/worktrees/). Der Testbefehl darf sie "
@@ -242,7 +295,7 @@ def main():
     if arg.ohne_lauf:
         e.w("Tests wurden in diesem Aufruf NICHT ausgeführt (--ohne-lauf) – kein Grün-Nachweis.")
     else:
-        zahl = lauf(e, wurzel, hauptordner, konfig, ist_worktree, arg.freigabe, arg.rolle)
+        zahl = lauf(e, wurzel, hauptordner, konfig, ist_worktree, freigabe, arg.rolle)
 
     commit = git(wurzel, "rev-parse", "--short", "HEAD").strip()
     for t in e.ok:
@@ -256,6 +309,22 @@ def main():
         "OK – alles grün" if gruen else ("OK – Diff-Prüfung ohne Testlauf" if not e.fehler else "NICHT OK"),
         arg.rolle, basis[:10], commit, ", Worktree" if ist_worktree else ""))
 
+    if gruen and ist_worktree and arg.rolle == "entwickler":
+        sauber = not git(wurzel, "status", "--porcelain").strip()
+        if sauber:
+            try:
+                ordner = os.path.join(hauptordner, ".dev-team", "schranke-ok")
+                os.makedirs(ordner, exist_ok=True)
+                voll = git(wurzel, "rev-parse", "HEAD").strip()
+                with open(os.path.join(ordner, voll), "w", encoding="utf-8") as f:
+                    f.write("%s basis=%s\n" % (datetime.now().isoformat(timespec="minutes"), basis))
+                print("Nachweis für Commit %s hinterlegt." % voll[:10])
+            except OSError:
+                pass
+        else:
+            print("Hinweis: Worktree hat nicht committete Änderungen – erst committen, dann Schranke erneut, "
+                  "sonst gilt das Paket nicht als fertig.")
+
     if not ist_worktree and not arg.ohne_lauf:
         try:
             docs = os.path.join(hauptordner, "docs")
@@ -265,10 +334,11 @@ def main():
                 with open(nachweis, "a", encoding="utf-8") as f:
                     if neu:
                         f.write("# Testnachweis\n\nAutomatisch von der Test-Schranke geschrieben.\n\n"
-                                "| Zeit | Stand | Rolle | Ergebnis | bestanden | Fehler |\n|---|---|---|---|---|---|\n")
-                    f.write("| %s | %s | %s | %s | %s | %d |\n" % (
+                                "| Zeit | Stand | Rolle | Ergebnis | bestanden | Fehler | Freigabe |\n|---|---|---|---|---|---|---|\n")
+                    f.write("| %s | %s | %s | %s | %s | %d | %s |\n" % (
                         datetime.now().strftime("%Y-%m-%d %H:%M"), commit, arg.rolle,
-                        "🟢" if gruen else "🔴", zahl if zahl is not None else "?", len(e.fehler)))
+                        "🟢" if gruen else "🔴", zahl if zahl is not None else "?", len(e.fehler),
+                        freigabe.replace("|", "/")[:80] if freigabe else "–"))
             if gruen and zahl is not None:
                 os.makedirs(os.path.dirname(letzter_lauf_pfad(hauptordner)), exist_ok=True)
                 with open(letzter_lauf_pfad(hauptordner), "w", encoding="utf-8") as f:

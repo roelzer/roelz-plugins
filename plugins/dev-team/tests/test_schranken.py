@@ -116,9 +116,13 @@ class TestSchranke(unittest.TestCase):
         code, aus = self.lauf()
         self.assertEqual(code, 1)
         self.assertIn("Referenzfall", aus)
-        code, aus = self.lauf("--freigabe", "Simon 2026-10-26: Tabelle korrigiert")
+        code, aus = self.lauf("--freigabe", "Simon hat zugestimmt")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("steht nicht in .claude/freigaben.md", aus)
+        self.schreibe(".claude/freigaben.md", "# Freigaben\n2026-10-26 | tabelle-korr | Rohrtabelle korrigiert\n")
+        code, aus = self.lauf("--freigabe", "tabelle-korr")
         self.assertEqual(code, 0, aus)
-        self.assertIn("WARNUNG", aus)
+        self.assertIn("Freigabe verwendet", aus)
 
     def test_rote_tests(self):
         self.schreibe("src/rechnung.py", "def summe(w):\n    return 0\n")
@@ -176,6 +180,51 @@ class TestSchranke(unittest.TestCase):
         self.schreibe("pytest.ini", "[pytest]\naddopts = --ignore=tests\n")
         code, aus = self.lauf()
         self.assertIn("Testkonfiguration geändert", aus)
+
+    def test_skip_varianten_aus_dem_audit(self):
+        faelle = ["from unittest import skip as nicht_jetzt\n", "it.skip.each([1])('x', () => {})\n",
+                  "it.skipIf(true)('x', () => {})\n", "describe.only.each([1])('x', () => {})\n",
+                  "test.concurrent.skip('x', async () => {})\n", "test('x', { skip: true }, () => {})\n",
+                  "    raise unittest.SkipTest('x')\n"]
+        for zeile in faelle:
+            self.schreibe("tests/test_neu.py", zeile + "def test_a():\n    assert 1\n")
+            code, aus = self.lauf("--ohne-lauf", "--rolle", "entwickler")
+            self.assertEqual(code, 1, zeile)
+
+    def test_uebersprungene_im_testlauf(self):
+        self.schreibe("tests/test_neu.py", "import unittest\nclass N(unittest.TestCase):\n"
+                      "    def test_n(self):\n        self.skipTest('x')\n")
+        code, aus = self.lauf("--rolle", "tester")
+        self.assertEqual(code, 1)
+        self.assertIn("übersprungen", aus)
+
+    def test_test_ohne_pruefung(self):
+        self.schreibe("tests/test_leer.py", "def test_nichts():\n    pass\n")
+        code, aus = self.lauf("--ohne-lauf", "--rolle", "entwickler")
+        self.assertEqual(code, 1)
+        self.assertIn("ohne eine einzige Prüfung", aus)
+
+    def test_teamkonfig_aenderung_braucht_freigabe(self):
+        self.konfig({"testbefehl": "true", "testzahl_muster": "x"})
+        code, aus = self.lauf("--ohne-lauf")
+        self.assertEqual(code, 1)
+        self.assertIn("dev-team.json", aus)
+
+    def test_nachweis_fuer_fertig_pruefung(self):
+        wt = os.path.join(self.tmp, "wt2")
+        git(self.p, "worktree", "add", "-q", wt, "-b", "paket2")
+        self.schreibe("src/neu.py", "def f():\n    return 1\n", ordner=wt)
+        self.schreibe("tests/test_neu.py", "import unittest\nfrom src.neu import f\nclass N(unittest.TestCase):\n"
+                      "    def test_f(self):\n        self.assertEqual(f(), 1)\n", ordner=wt)
+        code, aus = self.lauf("--rolle", "entwickler", ordner=wt)
+        self.assertEqual(code, 0, aus)
+        self.assertIn("erst committen", aus)
+        git(wt, "add", "-A")
+        git(wt, "commit", "-qm", "P2")
+        code, aus = self.lauf("--rolle", "entwickler", ordner=wt)
+        self.assertEqual(code, 0, aus)
+        kopf = git(wt, "rev-parse", "HEAD").strip()
+        self.assertTrue(os.path.isfile(os.path.join(self.p, ".dev-team", "schranke-ok", kopf)))
 
     def test_warnung_bei_worktrees_im_hauptordner(self):
         os.makedirs(os.path.join(self.p, ".claude", "worktrees", "agent-1"))
@@ -294,6 +343,44 @@ class TestAbhaengigkeiten(unittest.TestCase):
         self.assertIn("existiert nicht", aus)
         self.assertIn("ohne feste Version", aus)
 
+    def test_direkte_quellen_python(self):
+        self.schreibe("requirements.txt", "requests==2.32.3\ngit+https://github.com/angreifer/boese.git\n"
+                      "paket @ https://example.com/p.whl\n")
+        code, aus = self.lauf({})
+        self.assertEqual(code, 1)
+        self.assertEqual(aus.count("direkte Quelle"), 2)
+
+    def test_pyproject_mit_extras_und_optional(self):
+        self.schreibe("pyproject.toml", '[project]\nname="x"\ndependencies = ["requests[socks]==2.31.0", "erfunden-xyz==1.0"]\n'
+                      '[project.optional-dependencies]\ndev = ["auch-erfunden-abc"]\n')
+        code, aus = self.lauf({"pypi.org/pypi/requests": {"releases": {"1": [{"upload_time_iso_8601": "2015-01-01T00:00:00Z"}],
+                                                                         "2": [{}], "3": [{}]}}})
+        self.assertEqual(code, 1)
+        self.assertIn("erfunden-xyz", aus)
+        self.assertIn("auch-erfunden-abc", aus)
+
+    def test_npm_alias_und_github(self):
+        self.schreibe("package.json", json.dumps({"dependencies": {"react": "18.3.1", "lodash": "npm:boeses-paket@1.0.0",
+                                                                    "helfer": "github:angreifer/helfer"}}))
+        self.schreibe("package-lock.json", '{"x":2}')
+        code, aus = self.lauf({})
+        self.assertEqual(code, 1)
+        self.assertIn("boeses-paket", aus)
+        self.assertIn("direkter Quelle", aus)
+
+    def test_nuget(self):
+        self.schreibe("App.csproj", '<Project><ItemGroup><PackageReference Include="Erfunden.Paket" Version="1.0" />'
+                      '<PackageReference Include="Newtonsoft.Json" Version="13.0.3" /></ItemGroup></Project>')
+        code, aus = self.lauf({"newtonsoft.json/index.json": {"versions": ["1", "2", "13.0.3"]}})
+        self.assertEqual(code, 1)
+        self.assertIn("erfunden.paket", aus)
+        self.assertIn("NuGet 'newtonsoft.json'", aus)
+
+    def test_andere_paketsysteme_warnung(self):
+        self.schreibe("Cargo.toml", "[dependencies]\nserde = '1'\n")
+        code, aus = self.lauf({})
+        self.assertIn("prüft die Schranke nicht", aus)
+
     def test_pypi_echt(self):
         self.schreibe("requirements.txt", "requests==2.32.3\nhttpx==0.27.0\n")
         rel = {"upload_time_iso_8601": "2019-01-01T00:00:00Z"}
@@ -303,3 +390,42 @@ class TestAbhaengigkeiten(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class FertigPruefung(unittest.TestCase):
+    SKRIPT = os.path.join(PLUGIN, "scripts", "fertig_pruefung.py")
+
+    def setUp(self):
+        self.p = tempfile.mkdtemp(prefix="fertig-")
+        os.makedirs(os.path.join(self.p, ".claude"))
+        os.makedirs(os.path.join(self.p, "docs"))
+        open(os.path.join(self.p, ".claude", "dev-team.json"), "w").write("{}")
+
+    def tearDown(self):
+        shutil.rmtree(self.p, ignore_errors=True)
+
+    def lauf(self, nachricht, aktiv=False, agent="dev-team:entwickler"):
+        e = {"agent_type": agent, "last_assistant_message": nachricht, "stop_hook_active": aktiv, "cwd": self.p}
+        r = subprocess.run([sys.executable, self.SKRIPT], input=json.dumps(e), capture_output=True, text=True,
+                           env=dict(os.environ, CLAUDE_PROJECT_DIR=self.p))
+        return r.stdout
+
+    def test_fertig_ohne_nachweis_wird_zurueckgewiesen(self):
+        aus = self.lauf("**Status:** FERTIG 🟢\nCommit " + "a" * 40)
+        self.assertIn('"decision": "block"', aus)
+
+    def test_fertig_mit_nachweis(self):
+        os.makedirs(os.path.join(self.p, ".dev-team", "schranke-ok"))
+        open(os.path.join(self.p, ".dev-team", "schranke-ok", "b" * 40), "w").close()
+        self.assertEqual(self.lauf("Status: FERTIG\nCommit " + "b" * 40).strip(), "")
+
+    def test_ehrlich_blockiert_wird_nie_aufgehalten(self):
+        self.assertEqual(self.lauf("Status: BLOCKIERT 🔴 – Ausgangslage rot").strip(), "")
+
+    def test_zweiter_versuch_wird_protokolliert(self):
+        self.assertEqual(self.lauf("Status: FERTIG 🟢", aktiv=True).strip(), "")
+        with open(os.path.join(self.p, "docs", "AGENTEN_LOG.md"), encoding="utf-8") as f:
+            self.assertIn("NICHT belegt", f.read())
+
+    def test_andere_agenten_unberuehrt(self):
+        self.assertEqual(self.lauf("🟢 alles gut", agent="dev-team:reviewer").strip(), "")
