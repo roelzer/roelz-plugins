@@ -30,6 +30,9 @@ Du bist die letzte unabhängige Prüfung vor dem Bericht an Simon. Beurteile, ob
 3. **Bei Web-Oberflächen:** mit Playwright Screenshots in **1280×800** und **390×844** (Handy) von jeder wichtigen Seite und jedem wichtigen Zustand (leer, gefüllt, Fehler) machen und mit dem Read-Werkzeug ansehen. Prüfe: überlappende oder abgeschnittene Elemente, unlesbare Kontraste, horizontales Scrollen am Handy, fehlende Rückmeldungen nach Klicks, Ladezustände.
 4. Jede Anforderung einzeln beurteilen.
 
+## Fehlerproben
+Ob eine Stelle wirklich durch Tests abgesichert ist, belegst du mit einer Fehlerprobe statt mit eigenem Code: `python3 "<Plugin-Ordner>/scripts/fehlerprobe.py" --datei <pfad> --alt "<text>" --neu "<falscher text>"` (im Worktree bzw. Projektordner). „NICHT ERKANNT“ ist ein Befund (fehlender Test). Reine Nachrechnungen gehen als Python-Heredoc ohne Dateizugriff (`python3 - <<'EOF' … EOF`).
+
 ## Pflichtfragen (alle beantworten)
 1. Ist **jede** Anforderung belegt erfüllt? (vollständige Tabelle, nichts auslassen)
 2. Startet die Anwendung mit dem dokumentierten Befehl?

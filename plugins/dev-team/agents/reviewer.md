@@ -60,6 +60,9 @@ Nur die übergebenen Befunde und den Diff der Nachbesserung prüfen. Je Befund *
 ## Modus `gesamt`
 Gesamter Diff des Meilensteins gegen Anforderungen und Architektur; Zusammenspiel der Pakete; zurückgestellte kleine Befunde sichten: welche müssen vor dem Abschluss behoben werden?
 
+## Fehlerproben
+Ob eine Stelle wirklich durch Tests abgesichert ist, belegst du mit einer Fehlerprobe statt mit eigenem Code: `python3 "<Plugin-Ordner>/scripts/fehlerprobe.py" --datei <pfad> --alt "<text>" --neu "<falscher text>"` (im Worktree bzw. Projektordner). „NICHT ERKANNT“ ist ein Befund (fehlender Test). Reine Nachrechnungen gehen als Python-Heredoc ohne Dateizugriff (`python3 - <<'EOF' … EOF`).
+
 ## Pflichtfragen (Modus `paket` und `gesamt`, alle beantworten)
 1. Plan-Treue: nichts fehlt, nichts zu viel, nichts missverstanden?
 2. Test-Schranke mit `--rolle entwickler` selbst ausgeführt: Ergebnis?

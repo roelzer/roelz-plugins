@@ -1056,6 +1056,41 @@ class Audit35(Basis):
     def p(self, rel):
         return os.path.join(self.projekt, rel)
 
+class PilotReibung3(Basis):
+    def bash(self, befehl, rolle=None, cwd=None):
+        e = {"tool_name": "Bash", "tool_input": {"command": befehl}}
+        if cwd:
+            e["cwd"] = cwd
+        if rolle:
+            e["agent_type"] = "dev-team:" + rolle
+            e["agent_id"] = "a"
+        return self.lauf(e)[0]
+
+    def test_backticks_im_gequoteten_heredoc(self):
+        befehl = "cat >> docs/ENTSCHEIDUNGEN.md <<'E'\n- 2026 | `math.isclose` und `_pruefe_r4` | weil `x` |\nE"
+        self.assertEqual(self.bash(befehl), 0)
+        befehl2 = "cat >> docs/ENTSCHEIDUNGEN.md <<E\n- `rm src/rechnung.js`\nE"
+        self.assertEqual(self.bash(befehl2), 2)  # ungequotet: Shell führt das aus
+
+    def test_reine_rechnung_als_heredoc(self):
+        befehl = "python3 - <<'EOF'\nimport math\nprint(math.log10(2))\nEOF"
+        for rolle in ("reviewer", "fachpruefer", "architekt"):
+            self.assertEqual(self.bash(befehl, rolle), 0, rolle)
+        self.assertEqual(self.bash("python3 - <<'EOF'\nopen('src/a.py','w').write('x')\nEOF", "reviewer"), 2)
+
+    def test_bash_heredoc_wird_inhaltlich_geprueft(self):
+        self.assertEqual(self.bash("bash <<'EOF'\necho x > src/a.js\nEOF"), 2)
+        self.assertEqual(self.bash("bash <<'EOF'\ngit status\nEOF"), 0)
+
+    def test_entwickler_liest_im_temp(self):
+        wt = os.path.join(self.projekt, ".claude", "worktrees", "p1")
+        git(self.projekt, "worktree", "add", "-q", wt, "-b", "p1")
+        self.assertEqual(self.bash("python3 -I %s/mut.py" % self.temp, "entwickler", cwd=wt), 0)
+        self.assertEqual(self.bash("cp src/rechnung.js %s/r.bak" % self.temp, "entwickler", cwd=wt), 0)
+
+    def test_dev_full_ist_kein_ziel(self):
+        self.assertEqual(self.bash("python3 -c 'print(1)' > /dev/full", "reviewer"), 0)
+
 
 if __name__ == "__main__":
     unittest.main()

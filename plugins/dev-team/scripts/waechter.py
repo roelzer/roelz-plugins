@@ -586,7 +586,12 @@ def ohne_heredocs(befehl):
                 pos = z_ende + 1
             if ende_marke is None:
                 return befehl + "\n<<UNVOLLSTAENDIG"  # Heredoc ohne Ende: nicht sicher prüfbar
-            aus.append("<<HEREDOC" + kopf_rest + "\n")
+            zusatz = ""
+            if not m.group(2):
+                # Ohne Anführungszeichen führt die Shell $( … ) und ` … ` im Inhalt aus – die zählen mit.
+                inhalt = befehl[body_start:pos]
+                zusatz = "".join(' "$(%s)"' % f.replace('"', "'") for f in substitutionen(inhalt))
+            aus.append("<<HEREDOC" + kopf_rest + zusatz + "\n")
             i = ende_marke
             continue
         aus.append(c); i += 1
@@ -777,7 +782,7 @@ def shell_analyse(befehl, cwd=None, rolle="projektleiter", projekt=None, plugin=
     ziele, opak, verboten = [], False, None
     if tiefe > 3:
         return ziele, True, None
-    for inneres in substitutionen(befehl):
+    for inneres in substitutionen(ohne_heredocs(befehl)):
         z2, o2, v2 = shell_analyse(inneres, cwd, rolle, projekt, plugin, tiefe + 1)
         ziele += z2
         opak = opak or o2
@@ -791,10 +796,23 @@ def shell_analyse(befehl, cwd=None, rolle="projektleiter", projekt=None, plugin=
         if NETZ_PROZESS.search(inhalt):
             return ziele, True, ("Skript-Heredoc mit Netz- oder Prozesszugriff (subprocess, urllib, fetch …) ist "
                                  "gesperrt. Tests über den Testbefehl ausführen.")
-    # Heredoc oder Pipe direkt in einen Interpreter / eine Shell
-    if re.search(r"(?:^|[\s;&|(])(?:\S*/)?(?:%s)(?:\.exe)?(?=\s)[^\n|;&]*<<" % "|".join(
-            sorted(map(re.escape, SHELLS | INTERPRETER))), befehl, re.M):
-        opak = True
+    # Heredoc direkt in einen Interpreter / eine Shell: Inhalt prüfen statt pauschal sperren
+    erkannt = 0
+    for m in re.finditer(r"(?:^|[\s;&|(])(?:\S*/)?(%s)(?:\.exe)?\b[^\n]*<<-?\s*(['\"]?)(\w+)\2[^\n]*\n(.*?)\n\s*\3\b"
+                         % "|".join(sorted(map(re.escape, SHELLS | INTERPRETER))), befehl, re.S):
+        erkannt += 1
+        prog, inhalt = m.group(1), m.group(4)
+        if prog.lower() in SHELLS:
+            z2, o2, v2 = shell_analyse(inhalt, cwd, rolle, projekt, plugin, tiefe + 1)
+            ziele += z2
+            opak = opak or o2
+            if v2:
+                return ziele, opak, v2
+        elif SCHREIB_INDIZIEN.search(inhalt):
+            opak = True
+    if len(re.findall(r"(?:^|[\s;&|(])(?:\S*/)?(?:%s)(?:\.exe)?(?=\s)[^\n|;&]*<<" % "|".join(
+            sorted(map(re.escape, SHELLS | INTERPRETER))), befehl, re.M)) > erkannt:
+        opak = True  # Heredoc an Interpreter, dessen Inhalt nicht sicher erkannt wurde
     variablen = {}
     cwd_start = cwd
     for seg, nach_pipe in segmente(befehl):
@@ -806,6 +824,7 @@ def shell_analyse(befehl, cwd=None, rolle="projektleiter", projekt=None, plugin=
                     variablen[name] = wert
             continue
         vorher_ziele = len(ziele)
+        hat_heredoc = False
         i, rest = 0, []
         while i < len(seg):
             t = seg[i]
@@ -815,14 +834,14 @@ def shell_analyse(befehl, cwd=None, rolle="projektleiter", projekt=None, plugin=
             if t in (">&", "<&", ">>&"):
                 if i + 1 < len(seg):
                     ziel = seg[i + 1]
-                    if not re.fullmatch(r"\d+|-", ziel) and ziel not in ("/dev/null", "NUL", "nul"):
+                    if not re.fullmatch(r"\d+|-", ziel) and ziel not in ("/dev/null", "/dev/full", "/dev/stdout", "/dev/stderr", "/dev/tty", "NUL", "nul"):
                         ziele.append((ziel, "schreiben"))
                     i += 2
                     continue
             if t in (">", ">>", ">|", "&>", "&>>") or re.fullmatch(r"\d?>>?", t):
                 if i + 1 < len(seg):
                     ziel = seg[i + 1]
-                    if not ziel.startswith("&") and ziel not in ("/dev/null", "NUL", "nul", "$null"):
+                    if not ziel.startswith("&") and ziel not in ("/dev/null", "/dev/full", "/dev/stdout", "/dev/stderr", "/dev/tty", "NUL", "nul", "$null"):
                         ziele.append((ziel, "schreiben"))
                     i += 2
                     continue
@@ -831,6 +850,7 @@ def shell_analyse(befehl, cwd=None, rolle="projektleiter", projekt=None, plugin=
                 i += 2
                 continue
             if t in ("<", "<<", "<<<"):
+                hat_heredoc = hat_heredoc or (t == "<<")
                 i += 2
                 continue
             rest.append(t)
@@ -861,7 +881,8 @@ def shell_analyse(befehl, cwd=None, rolle="projektleiter", projekt=None, plugin=
         if cmd.endswith(".exe"):
             cmd = cmd[:-4]
 
-        if rolle == "projektleiter" and projekt and not pl_erlaubt(cmd, rest, cwd, projekt, plugin):
+        if rolle == "projektleiter" and projekt and not pl_erlaubt(cmd, rest, cwd, projekt, plugin) and \
+                not (cmd in SHELLS and hat_heredoc and not ohne_optionen(rest[1:])):
             return ziele, opak, (
                 "'%s' steht nicht auf der Erlaubnisliste des Projektleiters. Er nutzt in der Shell nur Git, "
                 "Lese- und Dateibefehle, die Plugin-Skripte und die Befehle aus .claude/dev-team.json "
@@ -909,6 +930,8 @@ def shell_analyse(befehl, cwd=None, rolle="projektleiter", projekt=None, plugin=
                     ziele += z2
                     opak = opak or o2
                     verboten = verboten or v2
+            elif hat_heredoc and not ohne_optionen(args):
+                pass  # Inhalt des Heredocs wurde oben als Shell-Code geprüft
             elif nach_pipe or not ohne_optionen(args):
                 verboten = UNPRUEFBAR  # z. B. curl … | bash
             else:
@@ -1356,8 +1379,7 @@ def ausserhalb_revier(absolut, revier, plugin):
         return False
     if innerhalb(revier, absolut) or innerhalb(heimat(), absolut):
         return True  # Elternordner (z. B. "/" oder über HOME): würde den Hauptordner mit durchsuchen
-    return innerhalb(absolut, heimat()) or innerhalb(absolut, _KONTEXT["projekt"] or revier) or \
-        innerhalb(absolut, tempfile.gettempdir())
+    return innerhalb(absolut, heimat()) or innerhalb(absolut, _KONTEXT["projekt"] or revier)
 
 
 def pruefe_lesen(eingabe, team, projekt, plugin, rolle, werkzeug):
@@ -1367,7 +1389,7 @@ def pruefe_lesen(eingabe, team, projekt, plugin, rolle, werkzeug):
     if not isinstance(ti, dict):
         blockieren("Werkzeugaufruf mit unlesbaren Angaben.")
     revier = eigenes_revier(eingabe, projekt)
-    marken = ("verdeckt", ".dev-team", ".verd")
+    marken = ("verdeckt", ".dev-team", ".verd", "dev-team-blind")
     sperre = "Der Entwickler arbeitet und liest nur in seinem eigenen Worktree. Verdeckte Tests und der Hauptordner sind gesperrt."
     punkt_platzhalter = re.compile(r"(^|[/\\\s'\"])\.[^/\\\s]*[*?\[]")
     if werkzeug in SHELL_WERKZEUGE:

@@ -1,5 +1,14 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.6.1 – Reibung aus dem Pilotlauf (Meilenstein-Ende)
+
+- Heredocs: Inhalt mit Anführungszeichen (`<<'E'`) wird nicht mehr als Befehl gelesen (Backticks in Notizen lösten Sperren aus); ungequotete Heredocs werden auf `$( … )`/Backticks geprüft.
+- Python-Heredocs nur zum Rechnen (ohne Datei-, Netz- oder Prozesszugriff) sind für alle Prüfer erlaubt; Shell-Heredocs werden inhaltlich geprüft statt pauschal gesperrt.
+- Neues Skript `scripts/fehlerprobe.py`: Prüfer bauen einen Fehler in eine Kopie ein und sehen, ob die Tests ihn finden – ohne selbst Code zu schreiben (Reviewer, Fachprüfer, Tester, Produktprüfer).
+- Entwickler dürfen im System-Temp lesen (Sicherungskopien, Hilfsskripte); Temp-Kopien des blinden Laufs bleiben gesperrt.
+- `/dev/full`, `/dev/stdout` u. ä. zählen nicht als Schreibziel.
+- 221 automatische Tests.
+
 ## 3.6.0 – Befunde der Nachprüfung 3.5.0 (Umsetzung von P0/P1 nachgeschärft)
 
 ### Warum

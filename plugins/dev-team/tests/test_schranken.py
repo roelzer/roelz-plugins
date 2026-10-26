@@ -439,6 +439,16 @@ class TestSchranke(unittest.TestCase):
         self.assertEqual(code, 1, aus)
         self.assertIn("NICHT MITGELAUFEN", aus)
 
+    def test_fehlerprobe(self):
+        code, aus = self.skript("fehlerprobe.py", "--datei", "src/rechnung.py", "--alt", "sum(w)", "--neu", "sum(w) + 1")
+        self.assertEqual(code, 0, aus)
+        self.assertIn("ERKANNT", aus)
+        self.schreibe("src/extra.py", "def g(x):\n    return x * 2\n")
+        code, aus = self.skript("fehlerprobe.py", "--datei", "src/extra.py", "--alt", "x * 2", "--neu", "x * 3")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("NICHT ERKANNT", aus)
+        self.assertEqual(open(os.path.join(self.p, "src", "extra.py")).read(), "def g(x):\n    return x * 2\n")
+
     def test_rote_tests(self):
         self.schreibe("src/rechnung.py", "def summe(w):\n    return 0\n")
         code, aus = self.lauf()
