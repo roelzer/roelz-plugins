@@ -1,5 +1,30 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.5.0 – Maßnahmen P0 und P1 aus dem Systemaudit (von Simon freigegeben)
+
+### Warum
+Systemaudit nach Simons Auftrag (`docs/AUDIT-SYSTEM-3.4.0.md`, 6/10): Schutz-Hooks per Programm abschaltbar, Merge-Prüfung bei Fast-Forward blind, Abnahmetests ohne Spur änderbar, Außenwirkung (Push, Veröffentlichen, Hochladen) nicht gesperrt, Prüfberichte nicht gespeichert, Wirksamkeit nicht gemessen. Simon hat P0 1–6, P1 1–4 und „3 parallele Entwickler“ freigegeben; Verschlankung der Rollen erst nach Messung. Dazu Reibung aus dem Pilotlauf.
+
+### P0
+1. **Einstellungsschutz:** neuer Hook `ConfigChange` (`scripts/einstellungs_schutz.py`) blockiert Änderungen, die Hooks, Plugin, Workflows oder Freigaben abschalten, und vermerkt ⛔ im Log. Stolperdraht im Grundgesetz: Einstellungsdateien zu Sitzungsbeginn prüfen.
+2. **Merge nur mit `--no-ff` und Nachweis:** Der Wächter lässt `git merge` nur mit `--no-ff` zu, nur wenn für den Branch-Kopf ein grüner Schranken-Nachweis vorliegt, nie auf main/master, kein `--continue`. Die Schranke (`--rolle merge`) ist rot, wenn HEAD kein Merge-Commit ist.
+3. **Prüfsummen der Abnahmetests** (`scripts/abnahme_pruefsummen.py` → `docs/ABNAHME_PRUEFSUMMEN.txt`, versioniert mit dem Plan). Jede Abweichung ist in der Schranke rot; Neuschreiben nur mit Simons Freigabe.
+4. **Keine Außenwirkung:** Nur der Projektleiter pusht, nur `dev-team/…` mit ausdrücklichem Ziel. Gesperrt für alle: Veröffentlichen (npm/pnpm/yarn publish, twine, cargo, nuget), Hochladen/Senden (`curl -d/-F/-T/-X POST`, `wget --post-*`, scp, rsync host:), Cloud- und Server-Werkzeuge (gh, vercel, docker push, ssh …). Zusatz-Werkzeuge (MCP) nur lesend (Erlaubnisliste).
+5. **Cloud ehrlich:** ANLEITUNG Abschnitt 7 – in claude.ai-Projekt-Threads gilt das Team nur mit Plugin-Eintrag in den Projekteinstellungen. `.claude/dev-team-start.sh` darf nur einmal angelegt werden.
+6. **Testbefehl und Referenzfälle nur von Simon:** `.claude/dev-team.json` darf der Projektleiter nur ausfüllen, solange sie unversioniert ist; Referenzfälle gar nicht. Beides danach nur über `scripts/geschuetzt_schreiben.py` mit Freigabe (Geltung = Zielpfad), protokolliert mit Prüfsumme in `docs/FREIGABEN_LOG.md`.
+
+### P1
+1. **Vollständige Prüfberichte** je Agent in `docs/pruefberichte/` (Link im Agenten-Log), Kennzahl je Lauf in `.dev-team/kennzahlen.jsonl`; beides für Agenten gesperrt.
+2. **Blinder Lauf der verdeckten Tests nach jedem Merge** (`scripts/verdeckt_blind.py`): meldet nur grün/rot und betroffene Anforderungsnummern, nie Testnamen oder Werte.
+3. **Anforderungs-Abdeckung:** Am Meilenstein-Ende ist die Schranke rot, wenn eine Anforderung (A-Nummer) ohne Test ist.
+4. **Fachsoftware:** jede bestätigte Fachregel (R-Nummer) braucht einen Test (Eigenschaftstest über viele Eingaben); Mutationstest in `meilensteinbefehle` ist Pflicht. Neues Skript `scripts/mutationstest.py` ohne Zusatzpakete (Python). Erwartete Rechenwerte nur aus Referenzfällen oder unabhängiger Herleitung.
+
+### Weitere
+- **Höchstens 3 parallele Entwickler** (vorher 4).
+- Reibung aus dem Pilot: `for`/`if`-Schleifen für den Projektleiter, `ReadNotifications` u. a. als harmlos, bauende Rollen (Entwickler, Tester, Architekt) dürfen Hilfsskripte ausführen (Sicherung über Nachweise), Heredoc-Inhalt zählt nicht als Lesezugriff, `cd` in den eigenen Worktree, `git worktree remove --force` für schon zusammengeführte Worktrees.
+- Doku ehrlich: „eigenes Skript kann die Shell-Sperren der bauenden Rollen umgehen – Sicherung über Nachweise“.
+- 197 automatische Tests.
+
 ## 3.4.0 – Befunde der Nachprüfung 3.3.0, Modellwahl
 
 ### Warum

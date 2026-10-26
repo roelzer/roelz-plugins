@@ -57,13 +57,22 @@ saeubern() { tr '\n\r|' '   ' | sed 's/[[:space:]]\+/ /g; s/^ //' | cut -c1-160;
 
 if [ "$ereignis" = "start" ]; then
   agent="$(feld tool_input.subagent_type)"
+  agent="${agent#dev-team:}"
   [ -n "$agent" ] || agent="general-purpose"
   auftrag="$(feld tool_input.description | saeubern)"
   echo "| $zeit | ▶ | $agent | $auftrag |" >> "$log" 2>/dev/null
 else
   agent="$(feld agent_type)"
+  agent="${agent#dev-team:}"
   [ -n "$agent" ] || agent="?"
   nachricht="$(feld last_assistant_message)"
+  # Vollständigen Bericht aufbewahren (Nachweis: welcher Agent hat was geprüft und gefunden).
+  kennung="$(feld agent_id | tr -cd 'A-Za-z0-9_-' | cut -c1-24)"
+  berichte="$projekt/docs/pruefberichte"
+  mkdir -p "$berichte" 2>/dev/null
+  datei="$berichte/$(date '+%Y%m%d-%H%M%S')-$(printf '%s' "$agent" | tr -cd 'a-z-')-${kennung:-x}.md"
+  { echo "# Bericht $agent – $zeit"; echo; printf '%s\n' "$nachricht"; } > "$datei" 2>/dev/null
+  bericht_rel="docs/pruefberichte/$(basename "$datei")"
   ampel=""
   case "$nachricht" in
     *🔴*) ampel="🔴" ;;
@@ -85,6 +94,10 @@ else
   # Bevorzugt die Zeile mit der Ampel, sonst die erste Zeile, die keine Überschrift ist.
   erste="$(printf '%s\n' "$nachricht" | grep -m 1 -e '🔴' -e '🟡' -e '🟢' | saeubern)"
   [ -n "$erste" ] || erste="$(printf '%s\n' "$nachricht" | grep -v -e '^[[:space:]]*$' -e '^[[:space:]]*#' | head -n 1 | saeubern)"
-  echo "| $zeit | ■ $ampel | $agent | $erste |" >> "$log" 2>/dev/null
+  echo "| $zeit | ■ $ampel | $agent | $erste ([Bericht]($bericht_rel)) |" >> "$log" 2>/dev/null
+  # Kennzahl je Agentenlauf (für die Messung von Nutzen und Kosten je Rolle)
+  mkdir -p "$projekt/.dev-team" 2>/dev/null
+  printf '{"zeit":"%s","agent":"%s","id":"%s","ampel":"%s","zeichen":%s}\n' "$zeit" "$agent" "${kennung:-x}" "$ampel" \
+    "$(printf '%s' "$nachricht" | wc -c | tr -d ' ')" >> "$projekt/.dev-team/kennzahlen.jsonl" 2>/dev/null
 fi
 exit 0

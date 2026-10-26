@@ -51,6 +51,18 @@
           }
         ]
       }
+    ],
+    "ConfigChange": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/einstellungs-schutz.sh\"",
+            "timeout": 15
+          }
+        ]
+      }
     ]
   }
 }

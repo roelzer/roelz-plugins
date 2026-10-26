@@ -46,12 +46,21 @@ LESE_WERKZEUGE = {"Read", "Grep", "Glob", "NotebookRead", "LS"}
 AGENT_WERKZEUGE = {"Agent", "Task"}
 SHELL_WERKZEUGE = {"Bash", "PowerShell", "Monitor"}
 IMMER_GESPERRT = {"Workflow"}
+# Bauende Rollen müssen beliebigen Code ausführen (Tests, eigene Hilfsskripte). Für sie wird nicht prüfbarer
+# Code nicht blockiert: Muster helfen dort kaum, die Sicherung liegt in Schranke, Prüfsummen und Review.
+BAUENDE_ROLLEN = {"entwickler", "tester", "architekt"}
 HARMLOS_STANDARD = {
     "TodoWrite", "TodoRead", "TaskCreate", "TaskUpdate", "TaskList", "TaskGet", "TaskStop", "TaskOutput",
     "AskUserQuestion", "SendUserMessage", "SendUserFile", "ToolSearch", "EnterPlanMode", "ExitPlanMode",
     "WebSearch", "WebFetch", "BashOutput", "KillShell", "KillBash", "ListMcpResourcesTool",
     "ReadMcpResourceTool", "SendMessage", "ListAgents", "PushNotification", "ReportFindings",
+    "ReadNotifications", "ListPlugins", "ListSkills", "SearchSkills", "ListConnectors", "SearchMcpRegistry",
+    "CronList", "TaskGet", "ReadMcpResourceDirTool", "EnterWorktree", "ExitWorktree",
 }
+MCP_LESEND = re.compile(r"(^|_)(get|list|search|read|fetch|find|query|view|describe|show|lookup|current|recent|"
+                        r"approximate|conversation|count|check|status|preview|inspect|browse|resolve)(_|$|[A-Z])")
+MCP_SCHREIBEND = re.compile(r"(write|create|update|delete|remove|push|merge|publish|send|post|upload|edit|set|"
+                            r"replace|append|move|commit|deploy|run|exec|fire|trigger|install)", re.I)
 MCP_AUSFUEHREND = re.compile(r"(exec|execute|run_?code|run_?command|bash|shell|terminal|powershell|"
                              r"write_?file|edit_?file|create_?file|delete_?file|move_?file|notebook|computer)",
                              re.IGNORECASE)
@@ -179,6 +188,11 @@ def git(cwd, *args):
         return 1, ""
 
 
+def git_out(cwd, *args):
+    code, aus = git(cwd, *args)
+    return aus if code == 0 else ""
+
+
 def log_zeile(projekt, zeichen, agent, text):
     docs = os.path.join(projekt, "docs")
     if not os.path.isdir(docs):
@@ -299,13 +313,14 @@ def neu_im_paket(absolut, wurzel, projekt):
 
 BEREICH_TEXT = {
     "gesperrt": "Agenten-, Skill-, Hook-, Freigabe- und Git-Dateien",
-    "nachweis": "Nachweise (Agenten-Log, Testnachweis, Schranken-Nachweise)",
+    "nachweis": "Nachweise (Agenten-Log, Prüfberichte, Testnachweis, Prüfsummen, Schranken-Nachweise)",
+    "startskript": "das Startskript .claude/dev-team-start.sh (anlegen beim Einrichten, danach nur Simon)",
+    "teamkonfig": "die Dev-Team-Einstellungen .claude/dev-team.json (ändern nur über scripts/geschuetzt_schreiben.py mit Simons Freigabe)",
     "testkonfig": "Testkonfiguration (bestehende ändert nur der Tester)",
     "konfig": "Projekteinstellungen (.claude/settings*.json)",
-    "teamkonfig": "die Dev-Team-Einstellungen (.claude/dev-team.json)",
     "architektur": "Architekturregeln (nur der Architekt)",
     "abnahme": "Abnahmetests (nur der Tester)",
-    "referenz": "Referenzfälle (Werte ändert nur Simon)",
+    "referenz": "Referenzfälle (nur Simon, neue über scripts/geschuetzt_schreiben.py mit seiner Freigabe)",
     "regeln": "Fachregeln (nur nach Simons Bestätigung, durch den Projektleiter)",
     "lastenheft": "Lastenheft (nur der Projektleiter)",
     "recherche": "Recherche",
@@ -413,6 +428,9 @@ def pruefe_ziel(absolut, team, projekt, plugin, rolle, art="schreiben", ueber_sh
     erlaubt = rechte(rolle, team)
     if bereich in erlaubt:
         return
+    if bereich == "teamkonfig" and rolle == "projektleiter" and art != "loeschen" and \
+            git(basis, "ls-files", "--error-unmatch", "--", rel)[0] != 0:
+        return  # noch nicht versioniert: beim Einrichten darf der Projektleiter sie ausfüllen
     if (bereich + "-neu") in erlaubt and art != "loeschen":
         if not existiert:
             return
@@ -759,6 +777,11 @@ def shell_analyse(befehl, cwd=None, rolle="projektleiter", projekt=None, plugin=
             rest.append(t)
             i += 1
         mit_xargs = False
+        while rest and rest[0] in ("do", "then", "else", "elif", "if", "while", "until", "!", "{", "}", "time"):
+            rest = rest[1:]
+        if not rest or rest[0] in ("for", "case", "select", "function", "done", "fi", "esac", "in") or \
+                re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*\(\)", rest[0]):
+            continue
         while rest and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*=.*", rest[0]):
             rest = rest[1:]
         while rest and rest[0] in ("sudo", "command", "env", "nohup", "time", "exec", "xargs", "nice", "timeout",
@@ -803,6 +826,9 @@ def shell_analyse(befehl, cwd=None, rolle="projektleiter", projekt=None, plugin=
             if cmd == "curl" and any(a in ("-O", "--remote-name", "-J") for a in args):
                 opak = True
 
+        aussen = aussenwirkung(cmd, args)
+        if aussen:
+            return ziele, opak, aussen
         if cmd in ("claude", "claude-code") or any("@anthropic-ai/claude-code" in a for a in rest):
             verboten = "Neue Claude-Sitzungen über die Shell sind Helfer außerhalb des Teams und nicht erlaubt."
         elif cmd in ("eval", "source", ".") :
@@ -960,6 +986,48 @@ def shell_analyse(befehl, cwd=None, rolle="projektleiter", projekt=None, plugin=
     return ziele, opak, verboten
 
 
+def worktree_gemergt(pfad, cwd):
+    kopf = git_out(pfad, "rev-parse", "HEAD")
+    if not kopf:
+        return False
+    offen = git_out(pfad, "status", "--porcelain", "--untracked-files=no")
+    if offen:
+        return False
+    r = subprocess.run(["git", "merge-base", "--is-ancestor", kopf, "HEAD"], cwd=cwd, capture_output=True)
+    return r.returncode == 0
+
+
+def aussenwirkung(cmd, args):
+    """Veröffentlichen, Hochladen, Senden: unumkehrbar und ohne Simons Freigabe verboten."""
+    if cmd in ("npm", "pnpm", "yarn", "bun") and args[:1] in (["publish"], ["unpublish"], ["deprecate"], ["dist-tag"]):
+        return "'%s %s' veröffentlicht – nur Simon." % (cmd, args[0])
+    if (cmd == "twine" and args[:1] == ["upload"]) or (cmd in ("poetry", "uv", "pdm", "hatch", "flit", "cargo")
+                                                         and args[:1] == ["publish"]):
+        return "Veröffentlichen von Paketen macht nur Simon."
+    if cmd == "dotnet" and args[:2] == ["nuget", "push"]:
+        return "Veröffentlichen von Paketen macht nur Simon."
+    if cmd in ("gh", "glab", "hub", "vercel", "netlify", "firebase", "fly", "flyctl", "heroku", "wrangler",
+               "aws", "az", "gcloud", "gsutil", "docker", "kubectl", "terraform", "ssh", "scp", "sftp", "ftp",
+               "nc", "ncat", "netcat", "telnet", "rclone", "s3cmd"):
+        if not (args[:1] in (["--version"], ["version"], ["--help"]) or (cmd == "docker" and args[:1] in (
+                ["ps"], ["images"], ["build"], ["compose"]) and "push" not in args)):
+            return ("'%s' wirkt nach außen (Server, Cloud, fremde Rechner) und ist im Dev-Team ohne Simons "
+                    "Freigabe gesperrt." % cmd)
+    if cmd in ("curl", "wget", "http", "xh", "httpie"):
+        for j, a in enumerate(args):
+            nxt = args[j + 1].upper() if j + 1 < len(args) else ""
+            if a in ("-d", "--data", "--data-raw", "--data-binary", "--data-urlencode", "-F", "--form", "-T",
+                     "--upload-file", "--json", "--post-data", "--post-file", "--body-data", "--body-file") or \
+                    a.startswith(("--data", "--form", "--json", "--post-", "--upload-file", "-d", "-F")) and len(a) > 2 \
+                    and not a.startswith("--dump") or \
+                    (a in ("-X", "--request", "--method") and nxt in ("POST", "PUT", "PATCH", "DELETE")) or \
+                    re.match(r"--(request|method)=(POST|PUT|PATCH|DELETE)", a, re.I) or re.fullmatch(r"-X(POST|PUT|PATCH|DELETE)", a):
+                return "Daten senden oder hochladen ('%s %s') ist im Dev-Team ohne Simons Freigabe gesperrt." % (cmd, a)
+    if cmd == "rsync" and any(re.match(r"^[^/]*[^\\/]:", a) for a in args if not a.startswith("-")):
+        return "Übertragen auf fremde Rechner (rsync host:…) ist gesperrt."
+    return None
+
+
 def git_global_verboten(args, rolle):
     """git -c alias.x='!…', core.hooksPath, core.pager … führen beliebige Befehle aus. Der Entwickler
     darf mit -C/--git-dir/--work-tree nicht auf andere Repositories (z. B. den Hauptordner) wirken."""
@@ -1029,15 +1097,57 @@ def pruefe_git(args, rolle, cwd, projekt):
     if sub == "stash" and rest[:1] and rest[0] in ("drop", "clear"):
         return "'git stash %s' löscht gesicherte Arbeit und ist gesperrt." % rest[0]
     if sub == "worktree" and rest[:1] == ["remove"] and any(a in ("-f", "--force") for a in rest):
-        return "'git worktree remove --force' löscht nicht committete Arbeit und ist gesperrt."
+        pfad = [a for a in rest[1:] if not a.startswith("-")]
+        if not (rolle == "projektleiter" and pfad and worktree_gemergt(absolut_aus(cwd or ".", pfad[0]), cwd or projekt)):
+            return ("'git worktree remove --force' ist nur für Worktrees erlaubt, deren Stand schon zusammengeführt "
+                    "ist und die keine Änderungen an versionierten Dateien haben.")
     if sub == "gc" and any(a.startswith("--prune") for a in rest):
         return "'git gc --prune' kann Sicherungspunkte endgültig löschen und ist gesperrt."
     if sub == "push":
-        if any(a in ("-f", "--force", "--force-with-lease", "--mirror", "--delete", "-d", "--all", "--prune")
-               or a.startswith("--force") or a.startswith("+") for a in rest):
-            return "Erzwungenes Pushen, Löschen oder Pushen aller Branches ist gesperrt."
-        if any(GIT_HAUPTZWEIG.search(a) for a in ohne_optionen(rest)[1:]):
-            return "Push auf main/master macht nur Simon."
+        if rolle != "projektleiter":
+            return "Nur der Projektleiter pusht (und nur Dev-Team-Branches). Agenten senden nichts nach außen."
+        if any(a in ("-f", "--force", "--force-with-lease", "--mirror", "--delete", "-d", "--all", "--prune",
+                     "--tags") or a.startswith("--force") or a.startswith("+") for a in rest):
+            return "Erzwungenes Pushen, Löschen oder Pushen aller Branches/Tags ist gesperrt."
+        frei = [a for a in rest if not a.startswith("-")]
+        ziele_push = frei[1:]
+        if not ziele_push:
+            return ("Push nur mit ausdrücklichem Ziel: 'git push origin dev-team/<auftrag>'. Ein bloßes 'git push' "
+                    "könnte main treffen.")
+        for z in ziele_push:
+            ziel = z.split(":")[-1]
+            ziel = re.sub(r"^refs/heads/", "", ziel)
+            if GIT_HAUPTZWEIG.search(z) or not ziel.startswith("dev-team/"):
+                return "Der Projektleiter pusht nur Dev-Team-Branches (dev-team/…). main/master und alles andere macht Simon."
+    if sub == "merge":
+        if any(a in ("--abort", "--quit") for a in rest):
+            return None
+        if "--continue" in rest:
+            return "Konflikte werden nie von Hand aufgelöst: 'git merge --abort' und das Paket neu bauen lassen."
+        aktueller = git_out(cwd or projekt or ".", "rev-parse", "--abbrev-ref", "HEAD") if (cwd or projekt) else ""
+        if GIT_HAUPTZWEIG.search(aktueller or ""):
+            return "Auf main/master wird nicht zusammengeführt. Das macht nur Simon."
+        if "--no-ff" not in rest or any(a in ("--ff", "--ff-only", "--squash") for a in rest):
+            return ("Zusammenführen nur mit 'git merge --no-ff <branch>' (eigener Merge-Commit, sonst prüft die "
+                    "Schranke das Paket nicht vollständig).")
+        werte = {"-m", "--message", "-F", "--file", "-s", "--strategy", "-X", "--strategy-option", "--into-name"}
+        branches, j = [], 0
+        while j < len(rest):
+            a = rest[j]
+            if a in werte:
+                j += 2
+                continue
+            if not a.startswith("-"):
+                branches.append(a)
+            j += 1
+        for b in branches:
+            kopf = git_out(cwd or projekt, "rev-parse", "--verify", b + "^{commit}")
+            if not kopf:
+                return "Branch '%s' nicht gefunden." % b
+            marke = os.path.join(projekt or "", ".dev-team", "schranke-ok", kopf)
+            if projekt and not os.path.isfile(marke):
+                return ("Für '%s' (%s) gibt es keinen grünen Schranken-Nachweis. Erst muss der Entwickler für genau "
+                        "diesen Stand 'OK – alles grün' haben, dann Review, dann Merge." % (b, kopf[:10]))
     if sub == "checkout" and "-B" in rest:
         return None
     return None
@@ -1058,7 +1168,7 @@ def pruefe_shell(eingabe, team, projekt, plugin, rolle):
     ziele, opak, verboten = shell_analyse(befehl, cwd, rolle, projekt, plugin)
     if verboten:
         blockieren(verboten)
-    if opak and not plugin_skript(befehl, plugin):
+    if opak and not plugin_skript(befehl, plugin) and rolle not in BAUENDE_ROLLEN:
         blockieren(UNPRUEFBAR)
     for ziel, art in ziele:
         ziel = ziel.strip("'\"")
@@ -1164,7 +1274,9 @@ def pruefe_lesen(eingabe, team, projekt, plugin, rolle, werkzeug):
     sperre = "Der Entwickler arbeitet und liest nur in seinem eigenen Worktree. Verdeckte Tests und der Hauptordner sind gesperrt."
     punkt_platzhalter = re.compile(r"(^|[/\\\s'\"])\.[^/\\\s]*[*?\[]")
     if werkzeug in SHELL_WERKZEUGE:
-        text = str(ti.get("command") or "")
+        text = ohne_heredocs(str(ti.get("command") or ""))
+        r_eigen = norm(revier).rstrip("/")
+        text = re.sub(r"\bcd\s+['\"]?%s(/[^\s'\";|&]*)?['\"]?" % re.escape(r_eigen), "cd .", text)
         tief = norm(text)
         if any(m in tief.lower() for m in marken) or "CLAUDE_PROJECT_DIR" in text or "../.." in tief \
                 or re.search(r"\bcd\s+(\.\.|/|~|\$HOME|[A-Za-z]:)", tief) or punkt_platzhalter.search(tief) \
@@ -1266,10 +1378,13 @@ def pruefe_unbekannt(werkzeug, team, rolle):
     if werkzeug.startswith("mcp__"):
         if rolle != "projektleiter":
             blockieren("Agenten des Teams nutzen keine Zusatz-Werkzeuge (%s)." % werkzeug)
-        if MCP_AUSFUEHREND.search(werkzeug.split("__")[-1]):
-            blockieren("Das Zusatz-Werkzeug '%s' kann Befehle ausführen oder Dateien schreiben und ist im "
-                       "Dev-Team-Projekt gesperrt (am Wächter vorbei). Arbeit über das feste Team." % werkzeug)
-        return
+        kurz = werkzeug.split("__")[-1]
+        if MCP_LESEND.search(kurz) and not MCP_AUSFUEHREND.search(kurz) and not MCP_SCHREIBEND.search(kurz):
+            return
+        blockieren("Das Zusatz-Werkzeug '%s' ist in Dev-Team-Projekten nicht freigegeben: Erlaubt sind nur "
+                   "lesende Zusatz-Werkzeuge (get/list/search/read …). Schreiben, Pushen, Veröffentlichen oder "
+                   "Ausführen über Zusatz-Werkzeuge läuft am Team vorbei. Ist es harmlos, kann Simon es in team.json "
+                   "unter 'harmlose_werkzeuge' aufnehmen." % werkzeug)
     blockieren("Das Werkzeug '%s' kennt der Wächter nicht. In Dev-Team-Projekten ist es deshalb gesperrt. "
                "Ist es harmlos (führt nichts aus, schreibt keine Dateien, startet keine Agenten), kann Simon es "
                "in team.json unter 'harmlose_werkzeuge' aufnehmen." % werkzeug)

@@ -1,6 +1,6 @@
 # Dev-Team – Anleitung
 
-Stand: Oktober 2026 · Version 3.4
+Stand: Oktober 2026 · Version 3.5
 
 Dieses Repo enthält zwei Plugins für Claude Code: **`dev-team`** und **`tool-scout`**. Beide enthalten kein Firmen- oder Kundenwissen und dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
 
@@ -76,7 +76,7 @@ Start mit: `/dev-team:auftrag <was gebaut werden soll>`
 4. ⏸ **Freigabe durch dich**: Ampel, wichtigste Punkte, neue Fachregeln, Paketliste mit Parallelität, „Freigabe zum eigenständigen Bauen?“
 5. **Verdeckte Abnahmetests** vom Tester, bevor gebaut wird.
 6. **Eigenständig bauen**, auch wenn du stundenlang weg bist:
-   - je Paket ein Entwickler in eigenem Arbeitsordner (Git-Worktree), bis zu vier parallel
+   - je Paket ein Entwickler in eigenem Arbeitsordner (Git-Worktree), bis zu drei parallel
    - jedes Paket geht durch den Reviewer, bevor es zusammengeführt wird; Nachbesserung höchstens 5 Runden
    - nach jedem Zusammenführen müssen **alle Tests grün** sein
    - kleine Entscheidungen trifft der Projektleiter selbst und schreibt sie mit Begründung auf; im Bericht stehen **alle** („Entscheidungen, die ich für dich getroffen habe“)
@@ -100,6 +100,16 @@ Die **Test-Schranke** (`scripts/pruefe-tests.sh`) entscheidet, nicht die Selbsta
 Meldet ein Entwickler „FERTIG“, prüft ein Hook, ob sein Worktree sauber committet ist und ob es für genau diesen Stand einen grünen Schranken-Nachweis gibt. Ohne Nachweis muss er nacharbeiten oder ehrlich „BLOCKIERT“ melden.
 
 Jeder Lauf steht automatisch in `docs/TESTNACHWEIS.md`. Neue Bibliotheken prüft die **Abhängigkeits-Schranke** (`scripts/pruefe-abhaengigkeiten.sh`): Gibt es das Paket wirklich, ist es alt und verbreitet genug, ist die Version festgeschrieben? KI erfindet sonst gern Paketnamen. Namen, die wie ein Tippfehler eines bekannten Pakets aussehen (`reqeusts`), sind ebenfalls rot.
+
+**Weitere Sicherungen (ab Version 3.5):**
+- **Prüfsummen der Abnahmetests:** Sobald der Tester die verdeckten Tests fertig hat, hält ein Skript ihre Prüfsummen fest (`docs/ABNAHME_PRUEFSUMMEN.txt`, wird mit dem Plan committet). Wird ein Abnahmetest später verändert, ist die Schranke rot.
+- **Blinder Lauf nach jedem Merge:** Die verdeckten Tests laufen nach jedem Zusammenführen in einer Kopie mit. Gemeldet wird nur „grün“ oder „rot bei Anforderung A3“ – der Entwickler erfährt nie den Test selbst.
+- **Jede Anforderung hat einen Test:** Tests tragen die Nummer der Anforderung (A3) bzw. Fachregel (R2). Am Meilenstein-Ende ist die Schranke rot, wenn eine Nummer ohne Test ist.
+- **Berechnungssoftware:** Fachregeln werden über viele erzeugte Eingaben geprüft, und ein **Mutationstest** baut absichtlich kleine Fehler in den Rechenkern ein (z. B. `<` statt `<=`). Die Tests müssen die meisten davon finden (Schwelle, z. B. 70 %), sonst ist der Meilenstein rot. Eintrag in `.claude/dev-team.json` unter `meilensteinbefehle`.
+- **Vollständige Prüfberichte** jedes Agenten liegen in `docs/pruefberichte/`, je Lauf eine Kennzahl in `.dev-team/kennzahlen.jsonl` (für die spätere Messung, welche Rolle wie viel bringt).
+- **Referenzfälle und Testbefehl ändert nur du:** Neue Referenzdaten oder einen anderen Testbefehl gibst du per Zeile in `.claude/freigaben.md` frei (Geltung = Zielpfad, z. B. `tests/referenz/fall5.json`). Der Projektleiter übernimmt die Datei dann mit `scripts/geschuetzt_schreiben.py`; jede Übernahme steht mit Prüfsumme in `docs/FREIGABEN_LOG.md`.
+- **Wer startet die Schranke?** Der Projektleiter startet sie nach jedem Merge. Die Schranke ist ein Programm ohne KI; er prüft dabei nichts selbst, er liest nur „grün“ oder „rot“.
+- **Einstellungsschutz:** Versucht ein Programm, die Schutz-Hooks in einer Einstellungsdatei abzuschalten, blockiert Claude Code die Änderung (Hook `ConfigChange`), und es steht ein ⛔ im Log. Zusätzlich prüft der Projektleiter laut Grundgesetz zu Beginn jeder Sitzung die Einstellungsdateien.
 
 ## 4. Fachregeln – damit offensichtliche Fehler nicht durchrutschen
 
@@ -127,13 +137,15 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
 - **Bleibt im Projekt:** interne Werte und Unterlagen eines Arbeitgebers oder Kunden.
 - Auf dem Arbeitsrechner bleiben Lessons lokal. Die Fachwissen-Bibliothek ist allgemein und wird über GitHub auf beiden Rechnern aktuell gehalten.
 
-## 7. Gilt automatisch: jedes Projekt, auch in der Cloud
+## 7. Wo das Dev-Team gilt (Rechner und Cloud)
 
 - **Auf deinen Rechnern:** Das Plugin ist für deinen ganzen Benutzer installiert. Agenten und Grundgesetz gelten damit in **jedem** Projekt, auch in neuen, ohne dass du etwas tun musst.
 - **Neues oder noch nicht aufgenommenes Projekt:** Beim Start merkt der Projektleiter das und bietet dir `/dev-team:neues-projekt` bzw. `/dev-team:projekt-aufnehmen` an.
 - **Cloud-Sitzungen** (ein Projekt baut auf GitHub in der Cloud weiter, während dein Laptop aus ist): Dort gibt es keine installierten Plugins. Deshalb legen `neues-projekt` und `projekt-aufnehmen` in jedes Repo zwei kleine Dateien:
   - `.claude/settings.json` startet bei jeder Sitzung
   - `.claude/dev-team-start.sh`, das in der Cloud das Dev-Team von GitHub holt und Grundgesetz, Agenten, Abläufe und Protokoll bereitstellt. Auf deinen Rechnern tut es nichts, dort übernimmt das installierte Plugin.
+- **Wichtig – claude.ai-Projekte:** In Cloud-Threads eines claude.ai-Projekts laufen laut Claude-Code-Doku die Hooks und Plugins aus `.claude/settings.json` des Repos **nicht**. Dort gilt das Dev-Team nur, wenn du es in den Projekteinstellungen unter „Project settings → Plugins“ einträgst. Ohne diesen Eintrag gibt es dort **keinen** Teamzwang – dann nicht eigenständig bauen lassen.
+- `.claude/dev-team-start.sh` legt das Einrichten einmal an; danach kann es kein Agent mehr ändern (sonst könnte er den Wächter in der Cloud abschalten).
 - In der Cloud heißen die Befehle mit Bindestrich, z. B. `/dev-team-auftrag`, die Agenten ohne Präfix, z. B. `kritiker`.
 - **Voraussetzung:** Die Cloud-Sitzung muss `github.com/roelzer/roelz-plugins` erreichen (das Repo ist öffentlich). Wenn nicht, sagt dir der Projektleiter das gleich zu Beginn.
 - **Sicherheit der Lieferkette:** Ohne weitere Angabe holt die Cloud den aktuellen Stand von `main`. Wer einen geprüften Stand festnageln will, trägt in `.claude/dev-team.json` unter `plugin_stand` einen Tag oder Commit ein (oder setzt in der Cloud-Umgebung `DEV_TEAM_REF`). Ohne Angabe meldet der Start eine Warnung. Wegen des öffentlichen Repos darf dort nie etwas Vertrauliches stehen.
@@ -212,7 +224,7 @@ Damit der Lauf nicht bei der ersten Rückfrage stehen bleibt, braucht Claude Cod
 ## 11. Senior-Qualitätsregeln und Grenzen der Autonomie
 
 - Gebaut wird eigenständig, aber auf einem eigenen Branch. Kein Push auf `main`, kein Löschen, keine Datenbank-Migration, kein Release, keine Schlüssel in der Sitzung und keine Daten an externe Dienste ohne dein Ja. Die vollständige Liste steht im Grundgesetz („Grenzen der Autonomie“).
-- Technische Grenzen: höchstens vier Entwickler und drei Prüfer gleichzeitig, jeder mit Schrittobergrenze, Nachbesserung höchstens fünf Runden. Große Aufträge werden in Meilensteine mit eigenem Stopp geteilt. Der Stand steht in Dateien (`docs/STATUS.md`), damit nach `/clear` nichts verloren geht.
+- Technische Grenzen: höchstens drei Entwickler und drei Prüfer gleichzeitig, jeder mit Schrittobergrenze, Nachbesserung höchstens fünf Runden. Große Aufträge werden in Meilensteine mit eigenem Stopp geteilt. Der Stand steht in Dateien (`docs/STATUS.md`), damit nach `/clear` nichts verloren geht.
 - Gibt dein Auftrag eigene Phasen vor („nur analysieren, noch nichts ändern“), gilt das vor dem Standardablauf.
 - Selbstprüfung des Plugins: `bash plugins/dev-team/scripts/pruefe-plugin.sh` (findet widersprüchliche Namen, tote Verweise, uneinheitliche Versionen, Abweichungen zwischen `team.json` und den Agentendateien und führt die Plugin-Tests aus).
 
@@ -228,4 +240,4 @@ Damit der Lauf nicht bei der ersten Rückfrage stehen bleibt, braucht Claude Cod
 - **Fremde Plugins** nie direkt aus Videos installieren. Erst `/tool-scout:scout check`.
 - **Tokens:** Abwägungsrunde und Recherche kosten spürbar mehr. Deshalb die Stufen nutzen und nach jeder Aufgabe `/clear`.
 - **Grenzen:** Alle Agenten sind Claude. Mehrere Instanzen haben ähnliche blinde Flecken. Das Team mildert das mit unterschiedlichen Modellen, Werkzeugen ohne KI (Tests, Linter, Scanner) und verdeckten Tests. Die stärkste Absicherung bleiben deine Referenzfälle, die von dir bestätigten Fachregeln und eure gegenseitige Abnahme vor Kundenauslieferungen.
-- **Parallele Entwickler** sparen Zeit nur bei wirklich unabhängigen Paketen. Eine Studie von 2026 (CAID) fand das beste Ergebnis bei etwa vier parallelen Entwicklern; mit mehr wurde es wieder schlechter. Kollidieren zwei beim Zusammenführen, wird das Paket neu gebaut, nicht von Hand geflickt. Das kostet Tokens; der Pragmatiker prüft vorher, ob sich die Parallelität lohnt.
+- **Parallele Entwickler** sparen Zeit nur bei wirklich unabhängigen Paketen. Eine Studie von 2026 (CAID) fand das beste Ergebnis bei etwa vier parallelen Entwicklern; mit mehr wurde es wieder schlechter. Wir starten vorsichtig mit **höchstens drei** und erhöhen erst, wenn die eigenen Messwerte (`.dev-team/kennzahlen.jsonl`) es rechtfertigen. Kollidieren zwei beim Zusammenführen, wird das Paket neu gebaut, nicht von Hand geflickt. Das kostet Tokens; der Pragmatiker prüft vorher, ob sich die Parallelität lohnt.

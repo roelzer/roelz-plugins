@@ -97,6 +97,18 @@
           }
         ]
       }
+    ],
+    "ConfigChange": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" einstellungen",
+            "timeout": 20
+          }
+        ]
+      }
     ]
   },
   "disableWorkflows": true

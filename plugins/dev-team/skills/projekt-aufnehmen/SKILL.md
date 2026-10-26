@@ -33,7 +33,7 @@ tests/referenz/      ← bei fachlichen Ergebnissen
 
 **Dev-Team-Dateien:**
 - `.claude/dev-team-start.sh` aus `${CLAUDE_PLUGIN_ROOT}/vorlagen/projekt-dev-team-start.sh` (holt das Team in Cloud-Sitzungen, tut lokal nichts).
-- `.claude/dev-team.json` aus `${CLAUDE_PLUGIN_ROOT}/vorlagen/dev-team.json`: Profil, Setup-, Test- und Zusatzbefehle aus der Bestandsaufnahme eintragen und Simon zeigen. Den Testbefehl einmal ausführen: Er muss laufen, bevor gebaut wird.
+- `.claude/dev-team.json` aus `${CLAUDE_PLUGIN_ROOT}/vorlagen/dev-team.json`: Profil, Setup-, Test- und Zusatzbefehle aus der Bestandsaufnahme eintragen und Simon zeigen. Den Testbefehl einmal ausführen: Er muss laufen, bevor gebaut wird. Erst committen, wenn alles stimmt – danach ändert sie nur noch `scripts/geschuetzt_schreiben.py` mit Simons Freigabe.
 - `.worktreeinclude` mit einer Zeile `.env`, falls das Projekt eine `.env` nutzt.
 - `.gitignore`: die Zeilen `.dev-team/` und `.claude/worktrees/` ergänzen.
 - `.gitattributes`: fehlt sie, aus `${CLAUDE_PLUGIN_ROOT}/vorlagen/gitattributes.txt`; gibt es sie, die Zeilen für `*.sh` und `*.py` ergänzen.

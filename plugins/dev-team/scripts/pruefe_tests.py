@@ -282,6 +282,65 @@ def testkonfig_teile(pfad, text):
     return None
 
 
+def pruefsummen_pruefen(e, hauptordner, wurzel, fg):
+    spec = importlib.util.spec_from_file_location("abnahme_pruefsummen",
+                                                  os.path.join(PLUGIN, "scripts", "abnahme_pruefsummen.py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    if not os.path.isfile(os.path.join(hauptordner, mod.DATEI)):
+        return
+    funde = mod.pruefen(hauptordner, wurzel)
+    for t in funde:
+        (e.w if fg.deckt("docs/ABNAHME_PRUEFSUMMEN.txt") else e.f)(t + (fg.text("docs/ABNAHME_PRUEFSUMMEN.txt") or
+                                                                         " Abnahmetests werden nie passend gemacht."))
+    if not funde:
+        e.o("Abnahmetests stimmen mit den festgehaltenen Prüfsummen überein.")
+
+
+def _testtexte(wurzel, hauptordner):
+    texte = []
+    for basis, unter in ((wurzel, "tests"), (wurzel, "test"), (wurzel, "e2e"), (hauptordner, ".dev-team/verdeckt")):
+        for ordner, _, dateien in os.walk(os.path.join(basis, unter)):
+            for d in dateien:
+                try:
+                    with open(os.path.join(ordner, d), encoding="utf-8", errors="replace") as f:
+                        texte.append(f.read())
+                except OSError:
+                    pass
+    return "\n".join(texte)
+
+
+def abdeckung_pruefen(e, wurzel, hauptordner, konfig, fg):
+    """Jede Anforderung (A1 …) im Lastenheft und bei Fachsoftware jede bestätigte Fachregel (R1 …) braucht
+    mindestens einen Test, der die Nummer im Namen oder Kommentar trägt."""
+    texte = None
+    lh = datei_text(wurzel, "docs/lastenheft.md") or ""
+    anf = sorted(set(re.findall(r"^\s*[-*|]?\s*\**(A\d+)\**\s*[:.)|]", lh, re.M)), key=lambda x: int(x[1:]))
+    regeln_text = datei_text(wurzel, "fachwissen/regeln.md") or ""
+    regeln = []
+    if (konfig or {}).get("profil") == "fachsoftware":
+        for zeile in regeln_text.splitlines():
+            m = re.match(r"^\s*\|?\s*(R\d+)\s*\|", zeile)
+            if m and re.search(r"bestätigt|bestaetigt", zeile, re.I):
+                regeln.append(m.group(1))
+    if not anf and not regeln:
+        return
+    texte = _testtexte(wurzel, hauptordner)
+    def vorhanden(nr):
+        return re.search(r"(?<![A-Za-z0-9])%s%s(?![0-9])" % (nr[0], nr[1:]), texte, re.I) is not None
+    fehlt_a = [a for a in anf if not vorhanden(a)]
+    fehlt_r = [r for r in regeln if not vorhanden(r)]
+    if fehlt_a:
+        (e.w if fg.deckt("abdeckung") else e.f)("Anforderungen ohne Test (Nummer im Testnamen oder Kommentar): %s"
+                                                % ", ".join(fehlt_a))
+    else:
+        e.o("Jede Anforderung (%d) hat mindestens einen Test." % len(anf))
+    if fehlt_r:
+        (e.w if fg.deckt("abdeckung") else e.f)("Bestätigte Fachregeln ohne automatische Prüfung: %s" % ", ".join(fehlt_r))
+    elif regeln:
+        e.o("Jede bestätigte Fachregel (%d) hat eine automatische Prüfung." % len(regeln))
+
+
 def ist_testdatei(bereich):
     return bereich in ("tests", "abnahme", "architektur", "referenz", "testkonfig")
 
@@ -462,7 +521,11 @@ def lauf(e, wurzel, hauptordner, konfig, ist_worktree, fg, rolle):
     if uebersprungen:
         (e.w if fg.deckt("uebersprungen") else e.f)("Der Testlauf meldet %d übersprungene/offene Tests%s." % (
             uebersprungen, fg.text("uebersprungen") or " (übersprungene Tests sind nicht grün)"))
-    for zusatz in (konfig or {}).get("zusatzbefehle", []):
+    befehle = list((konfig or {}).get("zusatzbefehle", []))
+    if rolle == "projektleiter":
+        befehle += list((konfig or {}).get("meilensteinbefehle", []))
+    for zusatz in befehle:
+        zusatz = str(zusatz).replace("${DEV_TEAM_PLUGIN}", PLUGIN).replace("$DEV_TEAM_PLUGIN", PLUGIN)
         print("→ Zusatzbefehl: %s" % zusatz, flush=True)
         z = sh(zusatz, wurzel)
         if z.returncode != 0:
@@ -522,9 +585,19 @@ def main():
         e.w("Basis = aktueller Stand: Es werden keine Änderungen geprüft, nur der Testlauf.")
     if (konfig or {}).get("profil") == "fachsoftware" and arg.rolle == "projektleiter" and not any(
             re.search(r"mutmut|stryker|mutation|cosmic-ray|pitest", str(z), re.I)
-            for z in (konfig or {}).get("zusatzbefehle") or []):
-        e.w("Profil fachsoftware ohne Mutationstests in den Zusatzbefehlen: Die Testqualität wird nicht "
-            "mechanisch gemessen (empfohlen: mutmut bzw. Stryker mit Schwelle).")
+            for z in list((konfig or {}).get("zusatzbefehle") or []) + list((konfig or {}).get("meilensteinbefehle") or [])):
+        (e.w if fg.deckt("mutation") else e.f)(
+            "Profil fachsoftware ohne Mutationstest in 'meilensteinbefehle': Die Testqualität des Berechnungskerns "
+            "wird nicht gemessen. Eintragen (z. B. python3 ${DEV_TEAM_PLUGIN}/scripts/mutationstest.py --dateien "
+            "<Kern> --schwelle 70) – über scripts/geschuetzt_schreiben.py mit Simons Freigabe.%s" % fg.text("mutation"))
+    if arg.rolle == "merge":
+        eltern = git(wurzel, "rev-list", "--parents", "-n", "1", "HEAD").split()
+        if len(eltern) < 3:
+            e.f("HEAD ist kein Merge-Commit. Zusammenführen nur mit 'git merge --no-ff', sonst prüft --basis HEAD^1 "
+                "nur den letzten Commit des Pakets.")
+    pruefsummen_pruefen(e, hauptordner, wurzel, fg)
+    if arg.rolle == "projektleiter":
+        abdeckung_pruefen(e, wurzel, hauptordner, konfig, fg)
     wt_ordner = os.path.join(wurzel, ".claude", "worktrees")
     if not ist_worktree and os.path.isdir(wt_ordner) and os.listdir(wt_ordner):
         e.w("Im Hauptordner liegen Entwickler-Worktrees (.claude/worktrees/). Der Testbefehl darf sie "
