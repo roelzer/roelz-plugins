@@ -14,6 +14,8 @@
     "testbefehl": "führt ALLE Tests aus, inkl. tests/abnahme und tests/architektur. Exit 0 = grün. Muss .claude/worktrees/ und .dev-team/ AUSSCHLIESSEN (z. B. Testpfad auf tests/ begrenzen), sonst laufen Tests paralleler Entwickler mit",
     "testzahl_muster": "regulärer Ausdruck, der die Zahl der bestandenen Tests aus der Ausgabe holt. Beispiele: Vitest 'Tests\\s+(\\d+) passed', Jest 'Tests:\\s+(\\d+) passed', pytest '(\\d+) passed', Playwright '(\\d+) passed', Python unittest 'Ran (\\d+) tests?'",
     "zusatzbefehle": "müssen ebenfalls mit Exit 0 enden (Lint, Build, Typprüfung, Architekturtests, falls nicht im Testbefehl)",
-    "sicherheitsbefehl": "Scanner für bekannte Lücken in Abhängigkeiten; führt der Sicherheitsprüfer aus"
+    "sicherheitsbefehl": "Scanner für bekannte Lücken in Abhängigkeiten; führt der Sicherheitsprüfer aus",
+    "uebersprungen_muster": "optional: regulärer Ausdruck für die Zahl übersprungener Tests, falls dein Testwerkzeug sie anders ausgibt. Üblich (pytest, Vitest, Jest, node:test, unittest) erkennt die Schranke selbst. Mehr als 0 = rot.",
+    "aenderungen": "Diese Datei ändert der Projektleiter nur mit Simons Freigabe (Eintrag in .claude/freigaben.md), sonst meldet die Test-Schranke einen Fehler."
   }
 }

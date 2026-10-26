@@ -45,11 +45,9 @@ Baukasten: <absoluter Pfad zum Baukasten-Repo – Zeile weglassen, wenn es noch 
 ```
 
 ## 4. Schutzregeln für Geheimnisse
-In `~/.claude/settings.json` unter `permissions.deny` diese Regeln ergänzen (bestehende Einträge behalten, gültiges JSON sicherstellen):
-```
-"Read(**/.env)", "Read(**/.env.*)", "Read(**/secrets/**)", "Read(**/*.pem)", "Read(**/*.key)"
-```
-Zeige Simon das Ergebnis, bevor du speicherst.
+Benutzereinstellungen schreibt Claude nicht direkt. Zeige Simon die Änderung mit
+`python3 "${CLAUDE_PLUGIN_ROOT}/scripts/settings_zusammenfuehren.py" --vorlage "${CLAUDE_PLUGIN_ROOT}/vorlagen/benutzer-settings.json" --ziel ~/.claude/settings.json`
+(ergänzt nur Lese-Sperren für Geheimnisse, bestehende Einträge bleiben) und führe nach seinem OK denselben Befehl mit `--schreiben` aus.
 
 ## 5. Abschluss
 Sag Simon in drei Zeilen:

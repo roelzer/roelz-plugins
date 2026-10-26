@@ -1,5 +1,40 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.1.0 – Vorbilder übernommen, Audit-Befunde behoben
+
+### Warum
+Audit 3.0.0 (unabhängiger Auditor, 6/10) und Simons Wunsch: die Agententexte mit den besten Ideen aus öffentlichen Agenten-Projekten bauen, mehrere Entwickler für mehr Tempo, ein Architekt, der den Code vorher plant. Vergleich und Herkunft: `docs/VORBILDER.md`.
+
+### Agenten
+- **Architekt** plant jetzt konkret: Architektur-Rückgrat mit Festlegungen „bindet / verhindert / Regel“ (Idee BMAD), Bauplan je Paket mit exakten Schnittstellen „nutzt / liefert“ und Prüf-Schwerpunkt (Idee Superpowers), tragende Entscheidungen mit Alternativen für Simon, Websuche für aktuelle Versionen.
+- **Entwickler**: fester Status FERTIG / FERTIG_MIT_BEDENKEN / BLOCKIERT / BRAUCHT_KONTEXT, ausdrückliche Abbruchgründe, strenges „erst roter Test“, Regeln für gute Tests, Ursache vor Behebung, keine KI-Notizen im Code, Schranke nach dem Commit.
+- **Reviewer**: „Glaub dem Bericht nicht“, fehlt / zu viel / missverstanden, Prüffragen für verschluckte Fehler (Idee Anthropic), Kalibrierung der Schwere, Stärken zuerst, neuer Modus `nachpruefung` (behoben / nicht behoben), führt die Schranke mit `--rolle entwickler` selbst aus.
+- **Tester**: Standardfälle in jedem Auftrag (Idee wshobson), Testlücken nach Wichtigkeit 1–10, Hinweis auf Sonderfall-Code beim Aufdecken.
+- Kritiker prüft Baupläne und still getroffene Entscheidungen; Produktprüfer prüft Grundlagen der Barrierefreiheit.
+
+### Ablauf
+- Stufe Klein mit Reviewer und kurzer Bestätigung durch Simon; Abwägungsrunde bei Normal immer.
+- Bis zu 4 parallele Entwickler (CAID-Studie), Fix-Schleife bis 5 Runden mit frischem Entwickler ab Runde 4, kleine Befunde gesammelt.
+- „Entscheiden statt stehen bleiben“ mit `docs/ENTSCHEIDUNGEN.md`; im Bericht vollständige Liste „Entscheidungen, die ich für dich getroffen habe“.
+- Nach jedem Merge Schranke mit `--rolle entwickler` gegen die Meilenstein-Basis (unabhängige Prüfung, dass kein Entwickler Tests geändert hat).
+
+### Technik (Audit-Befunde)
+- Wächter v2: UTF-8 erzwungen (Windows), interner Fehler oder unlesbare Eingabe blockiert, `onFailure: block`, PowerShell überwacht.
+- Shell-Prüfung: Umleitungen, `tee`, `sed -i`, `cp`, `mv`, `rm`, `touch`, `git checkout/restore/rm/mv/apply`, Skript-Einzeiler mit Schreibzugriff, `claude`-Aufrufe, Paket-Installationen per Befehl, Schutzschalter.
+- Identität: lokal nur `dev-team:`-Agenten; ohne Präfix nur mit Cloud-Kopie. Isolation des Entwicklers nicht abschaltbar.
+- Entwickler liest nur in seinem eigenen Worktree; darf seine im Paket neuen Tests weiter bearbeiten.
+- Einstellungsdateien nur über `settings_zusammenfuehren.py` (nur mit Plugin-Vorlagen), `.claude/dev-team.json` nicht löschbar, Freigaben nur aus `.claude/freigaben.md` (nur Simon).
+- Test-Schranke: weitere Skip-Varianten, übersprungene Tests im Lauf, Tests ohne Prüfung, Änderung der Teamkonfiguration, Nachweis je Commit.
+- SubagentStop-Hook `fertig_pruefung.py`: „FERTIG“ ohne Schranken-Nachweis wird zurückgewiesen.
+- Abhängigkeits-Schranke: direkte Quellen (git, URL, github:, npm-Alias), pyproject mit `tomllib` inkl. Extras und optionaler Gruppen, NuGet, Warnung bei ungeprüften Paketsystemen.
+- `.gitattributes` (LF für Skripte), `.pyc` entfernt.
+- Plugin-Tests: 120+.
+
+### Ehrliche Grenzen
+- Shell-Umgehungen sind stark erschwert, nicht unmöglich (z. B. eigene Skripte). Erkannt werden veränderte Tests, Referenzwerte und Einstellungen nachträglich; Projektleiter-Code per Skript nicht.
+- Windows ist nachgestellt getestet (Kodierung), nicht auf echtem Windows.
+- Alle Agenten nutzen Claude-Modelle und teilen blinde Flecken.
+
 ## 3.0.0 – Festes Team, Teamzwang, Entwickler und Architekt
 
 ### Warum

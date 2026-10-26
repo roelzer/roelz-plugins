@@ -36,7 +36,9 @@ tests/referenz/      ← bei fachlichen Ergebnissen
 - `.claude/dev-team.json` aus `${CLAUDE_PLUGIN_ROOT}/vorlagen/dev-team.json`: Profil, Setup-, Test- und Zusatzbefehle aus der Bestandsaufnahme eintragen und Simon zeigen. Den Testbefehl einmal ausführen: Er muss laufen, bevor gebaut wird.
 - `.worktreeinclude` mit einer Zeile `.env`, falls das Projekt eine `.env` nutzt.
 - `.gitignore`: die Zeilen `.dev-team/` und `.claude/worktrees/` ergänzen.
-- `.claude/settings.json`: Gibt es sie noch nicht, aus `${CLAUDE_PLUGIN_ROOT}/vorlagen/projekt-settings.json` anlegen. **Gibt es sie schon** (bestehende Dateien darfst du nicht direkt bearbeiten), dann:
+- `.gitattributes`: fehlt sie, aus `${CLAUDE_PLUGIN_ROOT}/vorlagen/gitattributes.txt`; gibt es sie, die Zeilen für `*.sh` und `*.py` ergänzen.
+- `docs/ENTSCHEIDUNGEN.md` aus `${CLAUDE_PLUGIN_ROOT}/vorlagen/entscheidungen.md`, falls nicht vorhanden.
+- `.claude/settings.json` (Claude schreibt Einstellungsdateien nie direkt, ob neu oder bestehend):
   `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/settings_zusammenfuehren.py" --vorlage "${CLAUDE_PLUGIN_ROOT}/vorlagen/projekt-settings.json" --ziel .claude/settings.json`
   zeigt den Unterschied. Simon zeigen, nach seinem OK denselben Befehl mit `--schreiben`. Fremde Einstellungen und Hooks bleiben erhalten.
 Diese Dateien werden mit committet, damit Teamzwang und Dev-Team in jeder Sitzung dieses Repos gelten, auch in der Cloud.

@@ -69,6 +69,28 @@ class Einstellungen(unittest.TestCase):
         self.assertIn("schon aktuell", r.stdout)
 
 
+    def test_fremde_vorlage_abgelehnt(self):
+        d = tempfile.mkdtemp()
+        boese = os.path.join(d, "boese.json")
+        with open(boese, "w") as f:
+            json.dump({"permissions": {"allow": ["Bash(*)"]}}, f)
+        r = subprocess.run([sys.executable, SKRIPT, "--vorlage", boese, "--ziel", os.path.join(d, "s.json"),
+                            "--schreiben"], capture_output=True, text=True)
+        self.assertEqual(r.returncode, 1)
+        self.assertFalse(os.path.exists(os.path.join(d, "s.json")))
+
+    def test_benutzer_vorlage_aendert_nur_sperren(self):
+        d = tempfile.mkdtemp()
+        ziel = os.path.join(d, "s.json")
+        with open(ziel, "w") as f:
+            json.dump({"model": "opus"}, f)
+        subprocess.run([sys.executable, SKRIPT, "--vorlage", os.path.join(PLUGIN, "vorlagen", "benutzer-settings.json"),
+                        "--ziel", ziel, "--schreiben"], capture_output=True)
+        with open(ziel) as f:
+            neu = json.load(f)
+        self.assertEqual(set(neu), {"model", "permissions"})
+
+
 class Vorlagen(unittest.TestCase):
     def test_json_vorlagen_gueltig(self):
         for n in ("projekt-settings.json", "dev-team.json"):

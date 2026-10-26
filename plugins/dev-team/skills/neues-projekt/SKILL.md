@@ -22,8 +22,9 @@ Ordner und leere Unterordner legst du mit `mkdir -p` an; Dateien aus Vorlagen mi
      .gitignore         ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/gitignore.txt
      .env.example       ← leer, mit Kommentar „Hier nur Variablennamen, keine echten Werte“
      .worktreeinclude   ← eine Zeile `.env` (damit Entwickler-Worktrees lokale Einstellungen bekommen)
+     .gitattributes     ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/gitattributes.txt (Windows-Zeilenenden für Skripte)
      .claude/
-       settings.json    ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/projekt-settings.json (Teamzwang, Worktrees, Dev-Team auch in Cloud-Sitzungen)
+       settings.json    ← mit dem Skript, siehe Schritt 1b (Teamzwang, Worktrees, Dev-Team auch in Cloud-Sitzungen)
        dev-team.json    ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/dev-team.json (Profil, Setup-, Test- und Zusatzbefehle – mit Simon ausfüllen)
        dev-team-start.sh ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/projekt-dev-team-start.sh (holt das Dev-Team in Cloud-Sitzungen, tut lokal nichts)
      docs/
@@ -34,6 +35,7 @@ Ordner und leere Unterordner legst du mit `mkdir -p` an; Dateien aus Vorlagen mi
        STATUS.md        ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/status.md
        OFFENE_FRAGEN.md ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/offene-fragen.md
        LEKTIONEN_VORSCHLAEGE.md ← leer, Überschrift „Lektionsvorschläge“
+       ENTSCHEIDUNGEN.md ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/entscheidungen.md
      fachwissen/        ← nur bei Projekten mit fachlichen Ergebnissen (Berechnung, Dimensionierung …)
        regeln.md        ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/fachregeln.md
        quellen/         ← eigene Unterlagen (Handbücher, Datenblätter, Tabellen)
@@ -44,6 +46,9 @@ Ordner und leere Unterordner legst du mit `mkdir -p` an; Dateien aus Vorlagen mi
        abnahme/         ← Abnahmetests (nur der Tester)
        architektur/     ← Architekturtests (nur der Architekt)
    ```
+1b. **Einstellungen:** `.claude/settings.json` schreibt Claude nicht direkt. Zeige Simon den Inhalt mit
+   `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/settings_zusammenfuehren.py" --vorlage "${CLAUDE_PLUGIN_ROOT}/vorlagen/projekt-settings.json" --ziel .claude/settings.json`
+   und schreibe nach seinem OK mit demselben Befehl plus `--schreiben`. Die Freigabedatei `.claude/freigaben.md` legt Simon bei Bedarf selbst an (Beispiel: `${CLAUDE_PLUGIN_ROOT}/vorlagen/freigaben-beispiel.md`).
 2. Profil (`web` oder `fachsoftware`) mit Simon festlegen und in `.claude/dev-team.json` eintragen; Setup-, Test- und Zusatzbefehle erst eintragen, wenn die Technik entschieden ist – bis dahin wird nicht gebaut. Projektname in CLAUDE.md und Lastenheft eintragen. Fachgebiet erfragen und eintragen. Gibt es dazu eine Datei in `${CLAUDE_PLUGIN_ROOT}/wissen/fachwissen/`, übernimm deren bestätigte Regeln in `fachwissen/regeln.md` (Quelle: „aus Bibliothek“).
 3. Liegt ein Lastenheft aus dem Erstgespräch vor (falls Simon eines mitbringt), übernimm es nach `docs/lastenheft.md`.
 4. `git init` und ersten Commit „Projekt angelegt“ erstellen.

@@ -21,5 +21,9 @@ Wer wann was gemacht hat: `docs/AGENTEN_LOG.md`
 ## Angehalten wegen
 (nur bei 🔴) Was ist passiert, was schlage ich vor, was brauche ich von Simon.
 
+## Zurückgestellte kleine Befunde
+Werden im Gesamt-Review des Meilensteins gesichtet.
+- P…: <Befund> (Reviewer, Datum)
+
 ## Offene Fragen
 Siehe `docs/OFFENE_FRAGEN.md` ([Anzahl] offen).

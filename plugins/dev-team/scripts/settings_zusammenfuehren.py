@@ -30,16 +30,20 @@ def ist_dev_team_hook(eintrag):
 def zusammenfuehren(alt, vorlage):
     neu = copy.deepcopy(alt)
     for schluessel in ("extraKnownMarketplaces", "enabledPlugins"):
-        neu.setdefault(schluessel, {}).update(vorlage.get(schluessel, {}))
-    neu["disableAllHooks"] = False
-    neu.setdefault("worktree", {})["baseRef"] = vorlage.get("worktree", {}).get("baseRef", "head")
-    neu.setdefault("env", {}).update(vorlage.get("env", {}))
+        if vorlage.get(schluessel):
+            neu.setdefault(schluessel, {}).update(vorlage[schluessel])
+    if "disableAllHooks" in vorlage:
+        neu["disableAllHooks"] = False
+    if "worktree" in vorlage:
+        neu.setdefault("worktree", {}).update(vorlage["worktree"])
+    if vorlage.get("env"):
+        neu.setdefault("env", {}).update(vorlage["env"])
     perm = neu.setdefault("permissions", {})
     deny = perm.setdefault("deny", [])
     for regel in vorlage.get("permissions", {}).get("deny", []):
         if regel not in deny:
             deny.append(regel)
-    hooks = neu.setdefault("hooks", {})
+    hooks = neu.setdefault("hooks", {}) if vorlage.get("hooks") else {}
     for ereignis, eintraege in vorlage.get("hooks", {}).items():
         bestehend = [e for e in hooks.get(ereignis, []) if not ist_dev_team_hook(e)]
         hooks[ereignis] = bestehend + copy.deepcopy(eintraege)
@@ -52,6 +56,10 @@ def main():
     a.add_argument("--ziel", required=True)
     a.add_argument("--schreiben", action="store_true")
     arg = a.parse_args()
+    erlaubt = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "vorlagen")
+    if os.path.dirname(os.path.abspath(arg.vorlage)) != erlaubt:
+        print("FEHLER: Als Vorlage sind nur Dateien aus %s erlaubt. Nichts geändert." % erlaubt)
+        sys.exit(1)
     with open(arg.vorlage, encoding="utf-8") as f:
         vorlage = json.load(f)
     alt = {}

@@ -1,6 +1,6 @@
 # Dev-Team – Anleitung
 
-Stand: Oktober 2026 · Version 3.0
+Stand: Oktober 2026 · Version 3.1
 
 Dieses Repo enthält zwei Plugins für Claude Code: **`dev-team`** und **`tool-scout`**. Beide enthalten kein Firmen- oder Kundenwissen und dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
 
@@ -15,18 +15,20 @@ Du sprichst immer nur mit **einer** Person, dem Projektleiter. Er **baut nicht s
 | Rolle | Wann | Aufgabe |
 |---|---|---|
 | **Projektleiter** | immer | Anforderungen festhalten, planen, Agenten beauftragen, Pakete zusammenführen, dir berichten |
-| **Architekt** | beim Planen und am Ende jedes Meilensteins | sauberer Aufbau: Module, Abhängigkeitsrichtung, Paketschnitt, Architekturregeln als automatische Tests, Prüfung auf Wildwuchs und Duplikate |
+| **Architekt** | beim Planen und am Ende jedes Meilensteins | **plant den Code, bevor gebaut wird**: Architektur-Rückgrat, Abhängigkeitsrichtung, Paketschnitt und pro Paket einen **Bauplan** mit exakten Schnittstellen, damit parallel gebaute Teile zusammenpassen. Tragende Entscheidungen legt er dir mit Alternativen vor. Regeln als automatische Tests, Prüfung auf Wildwuchs und Duplikate |
 | **Kritiker** | nach dem Plan | Lücken, Risiken, fehlende Anforderungen, Tests die den Fehler nicht finden würden |
 | **Fachprüfer** | Plan und Ergebnis | Kann das Ergebnis in der Praxis so sein? Fachregeln, Referenzfälle |
 | ↳ **Rechercheur** | bei Wissenslücken | erst Recherche mit Quellen, dann in einem frischen Aufruf Gegenprüfung gegen zweite Quellen |
 | **Abwägungsrunde** | vor der Freigabe | drei unabhängige Urteile: **Fachexperte** (praxistauglich?), **Pragmatiker** (Aufwand/Nutzen?), **Langfrist-Architekt** (rächt sich das später?) |
 | **Tester** | vor dem Bauen und nach dem Bauen | schreibt **verdeckte Abnahmetests**, die der Entwickler nie sieht; danach voller Testlauf und Lücken schließen |
-| **Entwickler** | beim Bauen, einer pro Arbeitspaket | baut genau ein Paket in eigenem Arbeitsordner, testgetrieben, bis alles grün ist. **Bis zu drei parallel**, wenn der Architekt die Pakete als unabhängig markiert hat |
-| **Reviewer** | nach jedem Paket und am Meilenstein-Ende | erst „tut der Code genau das Paket?“, dann „ist der Code gut?“ |
+| **Entwickler** | beim Bauen, einer pro Arbeitspaket | baut genau ein Paket nach Bauplan in eigenem Arbeitsordner, streng testgetrieben, bis alles grün ist, und meldet einen festen Status (FERTIG / FERTIG_MIT_BEDENKEN / BLOCKIERT / BRAUCHT_KONTEXT). **Bis zu vier parallel**, wenn der Architekt die Pakete als unabhängig markiert hat |
+| **Reviewer** | nach jedem Paket, nach jeder Nachbesserung und am Meilenstein-Ende | glaubt dem Bericht des Entwicklers nicht: erst „fehlt etwas, zu viel, missverstanden?“, dann „ist der Code gut?“ (verschluckte Fehler, Duplikate, Testtricks, Sicherheit); bei Nachbesserungen je Befund „behoben / nicht behoben“ |
 | **Sicherheitsprüfer** | bei Login, Rechten, sensiblen Daten, Server, Updates, großen Releases | Angriffswege, Datenschutz, Scanner, typische KI-Schwächen |
 | **Produktprüfer** | zum Schluss | jede Anforderung mit Nachweis abnehmen, Anwendung starten, Screenshots Desktop und Handy |
 | **Auditor** | auf Wunsch (`/dev-team:audit`) | prüft das Team oder ein Projekt unabhängig, bewertet 1–10; behebt selbst nichts |
 | Tool-Scout | wenn du willst | fremde Plugins/Skills prüfen, bevor du sie installierst |
+
+**Woher die Regeln kommen:** Die Agententexte bauen auf den stärksten öffentlichen Vorbildern auf (vor allem Superpowers und BMAD, dazu Ideen aus Anthropics Plugins). Was übernommen wurde und was bewusst nicht: [docs/VORBILDER.md](docs/VORBILDER.md).
 
 **Warum so geschnitten:** Eigenständig ist, wer einen eigenen Blickwinkel hat, andere Rechte braucht oder vom Ersteller unabhängig sein muss. Rechercheur und Quellenprüfer waren dieselbe Sicht und sind jetzt ein Agent mit zwei Modi. Übergabe und Betrieb sind eine Checkliste, kein Agent.
 
@@ -39,7 +41,13 @@ Damit sich der Aufbau lohnt, ist das **technisch** abgesichert, nicht nur als Bi
 - **Neue Agenten** kann Claude nicht anlegen. Neue Rollen entstehen nur hier im Repo, mit deinem OK.
 - Zusätzlich sperren die Projekteinstellungen (`.claude/settings.json`) die eingebauten Helfer.
 
-**Ehrliche Grenzen:** Über die Shell könnte der Projektleiter theoretisch trotzdem Dateien ändern. Das ist verboten, und die Test-Schranke und der Reviewer erkennen geänderte Tests und Referenzwerte. Der Abschlussbericht enthält einen **Teamnachweis** aus dem Agenten-Log: Fehlt eine Pflichtprüfung dort, gilt sie als nicht gemacht. Die Sperre muss auf deinem Windows-Rechner einmal ausprobiert werden (siehe Abschnitt 9, Schritt 7).
+- Auch **Shell-Befehle** prüft der Wächter: Umleitungen, `sed -i`, `cp`, `mv`, `rm`, `git checkout`, Skript-Einzeiler mit Schreibzugriff, neue Claude-Sitzungen (`claude -p`) und Paket-Installationen per Befehl werden blockiert. Der Entwickler kann außerhalb seines Arbeitsordners nichts lesen (verdeckte Tests).
+- **Schutzschalter** (Hooks aus, Plugin aus, Freigaben umgehen) kann Claude weder in Dateien noch über die Shell setzen. Einstellungsdateien schreibt nur ein Plugin-Skript nach deinem OK.
+
+**Ehrliche Grenzen:**
+- Shell-Befehle werden nach Mustern geprüft. Ein selbst geschriebenes Skript, das Dateien ändert, erkennt der Wächter nicht sicher. Das ist verboten und wird nachträglich erkannt: Nach jedem Zusammenführen prüft die Test-Schranke, dass kein Entwickler bestehende Tests, Referenzwerte oder Einstellungen geändert hat. Code, den der Projektleiter verbotenerweise per Skript schreiben würde, wäre nicht von Entwickler-Code unterscheidbar. Ganz dicht ginge es nur mit der Sandbox von Claude Code.
+- Der Abschlussbericht enthält einen **Teamnachweis** aus dem Agenten-Log: Fehlt eine Pflichtprüfung dort, gilt sie als nicht gemacht.
+- Die Sperre muss auf deinem Windows-Rechner einmal ausprobiert werden (siehe Abschnitt 9, Schritt 7).
 
 ## 3. Wie viel Prüfung? Stufen und Profile
 
@@ -47,8 +55,8 @@ Der Projektleiter sagt dir vor dem Start, welche Stufe er wählt. Du kannst hoch
 
 | Stufe | Beispiel | Ablauf |
 |---|---|---|
-| **Klein** | Tippfehler, Farbe, klarer Einzelfehler | ein Entwickler mit Test, Test-Schranke, Merge |
-| **Normal** | neues Feature über mehrere Dateien | voller Ablauf, Abwägungsrunde nur bei 🟡/🔴 |
+| **Klein** | Tippfehler, Farbe, klarer Einzelfehler | du bestätigst kurz, ein Entwickler mit Test, Reviewer, Merge, Test-Schranke |
+| **Normal** | neues Feature über mehrere Dateien | voller Ablauf inklusive Abwägungsrunde |
 | **Groß** | Berechnung, Datenmodell, neues Modul | voller Ablauf mit allen Instanzen, Meilensteine |
 
 Jedes Projekt hat ein **Profil** in `.claude/dev-team.json`:
@@ -65,9 +73,10 @@ Start mit: `/dev-team:auftrag <was gebaut werden soll>`
 4. ⏸ **Freigabe durch dich**: Ampel, wichtigste Punkte, neue Fachregeln, Paketliste mit Parallelität, „Freigabe zum eigenständigen Bauen?“
 5. **Verdeckte Abnahmetests** vom Tester, bevor gebaut wird.
 6. **Eigenständig bauen**, auch wenn du stundenlang weg bist:
-   - je Paket ein Entwickler in eigenem Arbeitsordner (Git-Worktree), mehrere parallel
-   - jedes Paket geht durch den Reviewer, bevor es zusammengeführt wird
+   - je Paket ein Entwickler in eigenem Arbeitsordner (Git-Worktree), bis zu vier parallel
+   - jedes Paket geht durch den Reviewer, bevor es zusammengeführt wird; Nachbesserung höchstens 5 Runden
    - nach jedem Zusammenführen müssen **alle Tests grün** sein
+   - kleine Entscheidungen trifft der Projektleiter selbst und schreibt sie mit Begründung auf; im Bericht stehen **alle** („Entscheidungen, die ich für dich getroffen habe“)
    - Stand jederzeit in `docs/STATUS.md`, Fragen in `docs/OFFENE_FRAGEN.md`
 7. **Prüfen** je Meilenstein: Tester (deckt Abnahmetests auf) → Fachprüfer → Architekt → Reviewer → Sicherheitsprüfer → Produktprüfer.
 8. ⏸ **Bericht** mit Abnahmeliste, Testnachweis und Teamnachweis.
@@ -79,7 +88,13 @@ Die **Test-Schranke** (`scripts/pruefe-tests.sh`) entscheidet, nicht die Selbsta
 - ein Test übersprungen oder exklusiv gestellt wurde (`skip`, `only` …),
 - weniger Tests bestehen als beim letzten grünen Lauf,
 - Referenzfälle geändert oder Testdateien gelöscht wurden (nur mit deiner Freigabe),
-- der Entwickler bestehende Tests angefasst hat.
+- der Entwickler bestehende Tests angefasst hat,
+- neue Tests gar nichts prüfen oder Tests im Lauf übersprungen wurden,
+- sich der Testbefehl in `.claude/dev-team.json` geändert hat.
+
+**Ausnahmen genehmigst nur du:** Muss sich ein Referenzwert oder der Testbefehl ändern, trägst du in VS Code eine Zeile in `.claude/freigaben.md` ein, z. B. `2026-10-26 | rohrtabelle-2026 | neue Herstellertabelle`. Claude kann diese Datei nicht schreiben; die Schranke akzeptiert nur Freigaben, die dort stehen.
+
+Meldet ein Entwickler „FERTIG“, prüft ein Hook, ob es für genau seinen Commit einen grünen Schranken-Nachweis gibt. Ohne Nachweis muss er nacharbeiten oder ehrlich „BLOCKIERT“ melden.
 
 Jeder Lauf steht automatisch in `docs/TESTNACHWEIS.md`. Neue Bibliotheken prüft die **Abhängigkeits-Schranke** (`scripts/pruefe-abhaengigkeiten.sh`): Gibt es das Paket wirklich, ist es alt und verbreitet genug, ist die Version festgeschrieben? KI erfindet sonst gern Paketnamen.
 
@@ -141,7 +156,7 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
 
 ## 9. Einrichtung auf einem Rechner
 
-**Voraussetzungen:** Git für Windows (ab 2.31), **Python 3** im PATH (python.org, Haken bei „Add python.exe to PATH“ – ohne Python blockiert der Wächter mit Absicht jede Arbeit in Dev-Team-Projekten), VS Code mit der Claude-Code-Erweiterung, Zugriff auf dein GitHub-Konto.
+**Voraussetzungen:** Claude Code ab Version 2.1.295, Git für Windows (ab 2.31, mit Git Bash – ohne Git Bash laufen die Hooks nicht, und der Wächter blockiert dann mit Absicht alles), **Python 3** im PATH (python.org, Haken bei „Add python.exe to PATH“ – ohne Python blockiert der Wächter mit Absicht jede Arbeit in Dev-Team-Projekten), VS Code mit der Claude-Code-Erweiterung, Zugriff auf dein GitHub-Konto.
 
 1. **Repo klonen** (VS-Code-Terminal):
    ```
@@ -180,10 +195,17 @@ Danach VS Code neu starten.
 
 **Am Team selbst arbeiten** (Agenten, `team.json`, Hooks ändern): Der Wächter sperrt das in normalen Sitzungen. Für Wartung Claude Code mit gesetzter Variable starten, z. B. in Git Bash: `DEV_TEAM_WARTUNG=1 claude`. Danach die Plugin-Tests laufen lassen: `python3 -m unittest discover -s plugins/dev-team/tests`.
 
+## 10a. Freigaben für stundenlanges eigenständiges Bauen
+
+Damit der Lauf nicht bei der ersten Rückfrage stehen bleibt, braucht Claude Code die Erlaubnis für die üblichen Befehle. Empfehlung:
+- **Auto-Modus** von Claude Code (ein Prüfmodell entscheidet über Rückfragen) oder eine **Erlaubnisliste** in deinen Benutzereinstellungen für die Befehle, die das Projekt braucht (z. B. `Bash(npm test)`, `Bash(npm ci)`, `Bash(git status)`, `Bash(git merge *)`, `Bash(git worktree *)`).
+- **Nicht** `bypassPermissions`: Dann gelten nur noch Wächter und Sperrregeln, alle anderen Rückfragen fallen weg.
+- Optional später die **Sandbox** von Claude Code: Sie sperrt auf Betriebssystemebene und schließt die Shell-Lücke, macht aber manche Befehle umständlicher. Wir prüfen das nach dem ersten Pilotprojekt.
+
 ## 11. Senior-Qualitätsregeln und Grenzen der Autonomie
 
 - Gebaut wird eigenständig, aber auf einem eigenen Branch. Kein Push auf `main`, kein Löschen, keine Datenbank-Migration, kein Release, keine Schlüssel in der Sitzung und keine Daten an externe Dienste ohne dein Ja. Die vollständige Liste steht im Grundgesetz („Grenzen der Autonomie“).
-- Technische Grenzen: höchstens drei Agenten gleichzeitig, jeder mit Schrittobergrenze, Schleifen enden nach drei Runden. Große Aufträge werden in Meilensteine mit eigenem Stopp geteilt. Der Stand steht in Dateien (`docs/STATUS.md`), damit nach `/clear` nichts verloren geht.
+- Technische Grenzen: höchstens vier Entwickler und drei Prüfer gleichzeitig, jeder mit Schrittobergrenze, Nachbesserung höchstens fünf Runden. Große Aufträge werden in Meilensteine mit eigenem Stopp geteilt. Der Stand steht in Dateien (`docs/STATUS.md`), damit nach `/clear` nichts verloren geht.
 - Gibt dein Auftrag eigene Phasen vor („nur analysieren, noch nichts ändern“), gilt das vor dem Standardablauf.
 - Selbstprüfung des Plugins: `bash plugins/dev-team/scripts/pruefe-plugin.sh` (findet widersprüchliche Namen, tote Verweise, uneinheitliche Versionen, Abweichungen zwischen `team.json` und den Agentendateien und führt die Plugin-Tests aus).
 
@@ -199,4 +221,4 @@ Danach VS Code neu starten.
 - **Fremde Plugins** nie direkt aus Videos installieren. Erst `/tool-scout:scout check`.
 - **Tokens:** Abwägungsrunde und Recherche kosten spürbar mehr. Deshalb die Stufen nutzen und nach jeder Aufgabe `/clear`.
 - **Grenzen:** Alle Agenten sind Claude. Mehrere Instanzen haben ähnliche blinde Flecken. Das Team mildert das mit unterschiedlichen Modellen, Werkzeugen ohne KI (Tests, Linter, Scanner) und verdeckten Tests. Die stärkste Absicherung bleiben deine Referenzfälle, die von dir bestätigten Fachregeln und eure gegenseitige Abnahme vor Kundenauslieferungen.
-- **Parallele Entwickler** sparen Zeit nur bei wirklich unabhängigen Paketen. Kollidieren zwei beim Zusammenführen, wird das Paket neu gebaut, nicht von Hand geflickt. Das kostet Tokens; der Pragmatiker prüft vorher, ob sich die Parallelität lohnt.
+- **Parallele Entwickler** sparen Zeit nur bei wirklich unabhängigen Paketen. Eine Studie von 2026 (CAID) fand das beste Ergebnis bei etwa vier parallelen Entwicklern; mit mehr wurde es wieder schlechter. Kollidieren zwei beim Zusammenführen, wird das Paket neu gebaut, nicht von Hand geflickt. Das kostet Tokens; der Pragmatiker prüft vorher, ob sich die Parallelität lohnt.
