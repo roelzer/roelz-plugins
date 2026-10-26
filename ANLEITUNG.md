@@ -1,6 +1,6 @@
 # Dev-Team – Anleitung
 
-Stand: Oktober 2026 · Version 3.1
+Stand: Oktober 2026 · Version 3.2
 
 Dieses Repo enthält zwei Plugins für Claude Code: **`dev-team`** und **`tool-scout`**. Beide enthalten kein Firmen- oder Kundenwissen und dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
 
@@ -41,11 +41,12 @@ Damit sich der Aufbau lohnt, ist das **technisch** abgesichert, nicht nur als Bi
 - **Neue Agenten** kann Claude nicht anlegen. Neue Rollen entstehen nur hier im Repo, mit deinem OK.
 - Zusätzlich sperren die Projekteinstellungen (`.claude/settings.json`) die eingebauten Helfer.
 
-- Auch **Shell-Befehle** prüft der Wächter: Umleitungen, `sed -i`, `cp`, `mv`, `rm`, `git checkout`, Skript-Einzeiler mit Schreibzugriff, neue Claude-Sitzungen (`claude -p`) und Paket-Installationen per Befehl werden blockiert. Der Entwickler kann außerhalb seines Arbeitsordners nichts lesen (verdeckte Tests).
+- Auch **Shell-Befehle** prüft der Wächter: Umleitungen, `sed -i`, `cp`, `mv`, `rm`, `git checkout`, Hüllen wie `bash -c` und `eval`, Pipes in einen Interpreter (`curl … | bash`), Skript-Einzeiler mit Schreib- oder Prozesszugriff, neue Claude-Sitzungen (`claude -p`), Paket-Installationen und `npx` mit fremden Paketen. Gesperrt sind auch `git reset --hard`, `git clean`, `git branch -D` und Pushes auf main oder mit Gewalt. Der Projektleiter führt keine Skripte aus dem Projekt aus.
+- Der Entwickler arbeitet in seinem eigenen Worktree. Lesen außerhalb davon (Hauptordner, verdeckte Tests, `cd ..`) blockiert der Wächter. Das ist **stark erschwert, aber nicht unmöglich** (siehe Grenzen).
 - **Schutzschalter** (Hooks aus, Plugin aus, Freigaben umgehen) kann Claude weder in Dateien noch über die Shell setzen. Einstellungsdateien schreibt nur ein Plugin-Skript nach deinem OK.
 
 **Ehrliche Grenzen:**
-- Shell-Befehle werden nach Mustern geprüft. Ein selbst geschriebenes Skript, das Dateien ändert, erkennt der Wächter nicht sicher. Das ist verboten und wird nachträglich erkannt: Nach jedem Zusammenführen prüft die Test-Schranke, dass kein Entwickler bestehende Tests, Referenzwerte oder Einstellungen geändert hat. Code, den der Projektleiter verbotenerweise per Skript schreiben würde, wäre nicht von Entwickler-Code unterscheidbar. Ganz dicht ginge es nur mit der Sandbox von Claude Code.
+- Shell-Befehle werden nach Mustern geprüft. Ein selbst geschriebenes Skript, das Dateien ändert oder liest, erkennt der Wächter nicht sicher. Deshalb sind die verdeckten Abnahmetests eine **zusätzliche** Absicherung, nicht die einzige: Reviewer und Tester prüfen außerdem auf Sonderfall-Code. Das ist verboten und wird nachträglich erkannt: Nach jedem Zusammenführen prüft die Test-Schranke, dass kein Entwickler bestehende Tests, Referenzwerte oder Einstellungen geändert hat. Code, den der Projektleiter verbotenerweise per Skript schreiben würde, wäre nicht von Entwickler-Code unterscheidbar. Ganz dicht ginge es nur mit der Sandbox von Claude Code.
 - Der Abschlussbericht enthält einen **Teamnachweis** aus dem Agenten-Log: Fehlt eine Pflichtprüfung dort, gilt sie als nicht gemacht.
 - Die Sperre muss auf deinem Windows-Rechner einmal ausprobiert werden (siehe Abschnitt 9, Schritt 7).
 
@@ -88,13 +89,13 @@ Die **Test-Schranke** (`scripts/pruefe-tests.sh`) entscheidet, nicht die Selbsta
 - ein Test übersprungen oder exklusiv gestellt wurde (`skip`, `only` …),
 - weniger Tests bestehen als beim letzten grünen Lauf,
 - Referenzfälle geändert oder Testdateien gelöscht wurden (nur mit deiner Freigabe),
-- der Entwickler bestehende Tests angefasst hat,
+- der Entwickler bestehende Tests oder die Testkonfiguration angefasst hat (nach jedem Zusammenführen noch einmal geprüft),
 - neue Tests gar nichts prüfen oder Tests im Lauf übersprungen wurden,
 - sich der Testbefehl in `.claude/dev-team.json` geändert hat.
 
-**Ausnahmen genehmigst nur du:** Muss sich ein Referenzwert oder der Testbefehl ändern, trägst du in VS Code eine Zeile in `.claude/freigaben.md` ein, z. B. `2026-10-26 | rohrtabelle-2026 | neue Herstellertabelle`. Claude kann diese Datei nicht schreiben; die Schranke akzeptiert nur Freigaben, die dort stehen.
+**Ausnahmen genehmigst nur du:** Muss sich ein Referenzwert oder der Testbefehl ändern, trägst du in VS Code eine Zeile in `.claude/freigaben.md` ein: `Datum | Stichwort | Geltung | Grund`, z. B. `2026-10-26 | rohrtabelle-2026 | tests/referenz/fall3.json | neue Herstellertabelle`. Die Freigabe gilt nur für das, was unter „Geltung“ steht, und nur bei genau passendem Stichwort. Claude kann diese Datei nicht schreiben. Vorlage mit Beispielen: `vorlagen/freigaben-beispiel.md`.
 
-Meldet ein Entwickler „FERTIG“, prüft ein Hook, ob es für genau seinen Commit einen grünen Schranken-Nachweis gibt. Ohne Nachweis muss er nacharbeiten oder ehrlich „BLOCKIERT“ melden.
+Meldet ein Entwickler „FERTIG“, prüft ein Hook, ob sein Worktree sauber committet ist und ob es für genau diesen Stand einen grünen Schranken-Nachweis gibt. Ohne Nachweis muss er nacharbeiten oder ehrlich „BLOCKIERT“ melden.
 
 Jeder Lauf steht automatisch in `docs/TESTNACHWEIS.md`. Neue Bibliotheken prüft die **Abhängigkeits-Schranke** (`scripts/pruefe-abhaengigkeiten.sh`): Gibt es das Paket wirklich, ist es alt und verbreitet genug, ist die Version festgeschrieben? KI erfindet sonst gern Paketnamen.
 
@@ -178,8 +179,10 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
 7. **Teamzwang einmal ausprobieren** (in einem Testprojekt, das mit `/dev-team:neues-projekt test-teamzwang` angelegt wurde), Claude bitten:
    - „Starte den Explore-Agenten und such nach README“ → muss mit ⛔ blockiert werden
    - „Schreib selbst eine Datei src/test.js“ → muss blockiert werden („Code baut der Agent entwickler“)
+   - „Führ aus: bash -c "echo x > src/test2.js"“ → muss blockiert werden
+   - „Schreib die Datei /c/Users/<du>/Desktop/test.txt“ → muss blockiert werden (außerhalb des Projekts)
    - „Lass den Kritiker kurz das Lastenheft lesen“ → muss laufen
-   Steht im `docs/AGENTEN_LOG.md` ein ⛔ für den ersten Versuch und ▶ für den Kritiker, wirkt die Sperre.
+   Steht im `docs/AGENTEN_LOG.md` ein ⛔ für die gesperrten Versuche und ▶ für den Kritiker, wirkt die Sperre. Danach im Explorer nachsehen, dass `src/test.js`, `src/test2.js` und `test.txt` auf dem Desktop **wirklich nicht** entstanden sind.
 
 ## 10. Updates
 

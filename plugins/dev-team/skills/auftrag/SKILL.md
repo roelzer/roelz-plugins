@@ -61,7 +61,7 @@ Nach der Tabelle und den Risiko-Auslösern im Grundgesetz, nach Risiko, nicht na
 Entscheidungen in `docs/risiko-log.md`, bestätigte Regeln in `fachwissen/regeln.md`. Bei jeder neuen Regel fragen, ob sie fürs ganze Fachgebiet gilt. **Ohne ausdrückliche Freigabe wird nicht gebaut.**
 
 ## Phase 6 – Verdeckte Abnahmetests
-→ `tester` Modus `abnahme-entwurf` mit Anforderungen, Abnahmekriterien, Fachregeln, Prüf-Schwerpunkt und den Schnittstellen (Namen und Typen) aus den Bauplänen – **ohne** Lösungsideen. Ablageort: `.dev-team/verdeckt/` im Hauptordner (nicht im Repo; Entwickler arbeiten in Worktrees und können ihn nicht lesen). Prüfe, dass `.dev-team/` in `.gitignore` steht.
+→ `tester` Modus `abnahme-entwurf` mit Anforderungen, Abnahmekriterien, Fachregeln, Prüf-Schwerpunkt und den Schnittstellen (Namen und Typen) aus den Bauplänen – **ohne** Lösungsideen. Ablageort: `.dev-team/verdeckt/` im Hauptordner (nicht im Repo; Entwickler arbeiten in Worktrees, der Wächter sperrt den Zugriff – das ist stark erschwert, aber nicht unmöglich, deshalb zählen die verdeckten Tests als zusätzliche Absicherung, nicht als einzige). Prüfe, dass `.dev-team/` in `.gitignore` steht.
 
 ## Phase 7 – Eigenständig bauen
 Nach „Eigenständig bauen“ und „Grenzen der Autonomie“ im Grundgesetz.
@@ -79,7 +79,7 @@ Nach „Eigenständig bauen“ und „Grenzen der Autonomie“ im Grundgesetz.
    - Runde 4–5: neuer `entwickler` mit allen bisherigen Befunden und dem Satz „Vorgänger haben das N-mal versucht; du übernimmst“.
    - Danach: **Entscheidung** je offenem Befund (siehe „Entscheiden statt stehen bleiben“) – zurückstellen mit Begründung, oder als tragend einstufen und Simon vorlegen. Nie still verwerfen.
 6. **Merge:** `git merge --no-ff <branch> -m "P3: …"`. **Konflikt:** `git merge --abort`, Paket neu an einen `entwickler` auf dem aktuellen Stand – nie von Hand auflösen.
-7. **Nach jedem Merge die Schranke** im Hauptordner: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/pruefe-tests.sh" --basis <Meilenstein-Basis> --rolle entwickler`. So wird mechanisch geprüft, dass **kein** Entwickler bestehende Tests, Referenzwerte oder Einstellungen geändert hat. Rot → `git reset --hard ORIG_HEAD` (nur dein eigener Merge-Commit), Befund „Zusammenspiel mit …“ an einen `entwickler`. Danach Worktree aufräumen: `git worktree remove <pfad>` und `git branch -d <branch>`.
+7. **Nach jedem Merge die Schranke** im Hauptordner: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/pruefe-tests.sh" --basis <Meilenstein-Basis> --rolle merge`. Die Rolle `merge` prüft mit den Entwickler-Regeln, dass **kein** Entwickler bestehende Tests, Testkonfiguration, Referenzwerte oder Einstellungen geändert hat; deine eigenen Prozessdateien (`docs/STATUS.md` usw.) zählen dabei nicht. Rot → `git reset --keep ORIG_HEAD` (nimmt nur deinen eigenen Merge-Commit zurück; `--hard` ist gesperrt), Befund „Zusammenspiel mit …“ an einen `entwickler`. Danach Worktree aufräumen: `git worktree remove <pfad>` und `git branch -d <branch>`.
 8. STATUS nach jedem Schritt aktualisieren. Lektionsvorschläge der Agenten → `docs/LEKTIONEN_VORSCHLAEGE.md`.
 9. **Neue Fachregel:** erst die Prüfung bauen lassen und belegen, dass sie am alten Stand **rot** ist, dann beheben lassen.
 

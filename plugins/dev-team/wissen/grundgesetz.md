@@ -75,9 +75,9 @@ Steht in `.claude/dev-team.json` (`"profil"`):
 9. **Bericht** an Simon → **Stopp 3**.
 
 ## Alle Tests grün – mechanisch belegt
-- „Grün“ heißt: Die **Test-Schranke** (`scripts/pruefe-tests.sh`) meldet „OK – alles grün“. Sie führt den Testbefehl und die Zusatzbefehle aus `.claude/dev-team.json` aus und prüft außerdem: keine übersprungenen oder exklusiven Tests, keine geänderten Referenzfälle, keine gelöschten Tests, nicht weniger Tests als beim letzten grünen Lauf, keine 0-Tests-Läufe, Entwickler hat keine bestehenden Tests angefasst.
+- „Grün“ heißt: Die **Test-Schranke** (`scripts/pruefe-tests.sh`) meldet „OK – alles grün“. Sie führt den Testbefehl und die Zusatzbefehle aus `.claude/dev-team.json` aus und prüft außerdem: keine übersprungenen oder exklusiven Tests, keine geänderten Referenzfälle, keine gelöschten Tests, nicht weniger Tests als beim letzten grünen Lauf, keine 0-Tests-Läufe, Entwickler hat keine bestehenden Tests oder Testkonfiguration angefasst. Nach jedem Merge prüft der Projektleiter das mit `--rolle merge`.
 - Übersprungene oder offene Tests im Testlauf, neue Tests ohne eine einzige Prüfung und Änderungen an `.claude/dev-team.json` sind ebenfalls rot.
-- Ausnahmen (`--freigabe <Stichwort>`) gelten nur, wenn Simon die Freigabe **von Hand** in `.claude/freigaben.md` eingetragen hat (`Datum | Stichwort | Grund`). Claude kann diese Datei nicht schreiben.
+- Ausnahmen (`--freigabe <Stichwort>`) gelten nur, wenn Simon die Freigabe **von Hand** in `.claude/freigaben.md` eingetragen hat (`Datum | Stichwort | Geltung | Grund`). Das Stichwort muss genau passen, und die Freigabe gilt nur für die Pfade oder Prüfungen in „Geltung“ (z. B. `tests/referenz/fall3.json` oder `testzahl`). Claude kann diese Datei nicht schreiben.
 - Kein Merge, kein Meilenstein-Abschluss, kein Bericht „fertig“ ohne grüne Schranke. Ergebnisse stehen automatisch in `docs/TESTNACHWEIS.md`.
 - Erwartete Testwerte (besonders Referenzfälle) werden **nie** angepasst, damit ein Test grün wird. Ändert sich ein Referenzergebnis: Stopp, Simon entscheidet (`--freigabe`).
 - Grüne Tests beweisen weder Sicherheit noch fachliche Richtigkeit noch gutes Aussehen. Dafür gibt es die anderen Prüfer.

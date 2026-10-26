@@ -137,5 +137,19 @@ class Agenten(unittest.TestCase):
             self.assertIn("isolation: worktree", f.read().split("---")[1])
 
 
+
+class Sitzungsstart(unittest.TestCase):
+    def test_nennt_ganzes_team(self):
+        with open(os.path.join(PLUGIN, "team.json"), encoding="utf-8") as f:
+            team = list(json.load(f)["agenten"])
+        r = subprocess.run(["bash", os.path.join(PLUGIN, "scripts", "sitzungsstart.sh")], input="{}",
+                           capture_output=True, text=True,
+                           env=dict(os.environ, CLAUDE_PLUGIN_ROOT=PLUGIN, CLAUDE_PROJECT_DIR=tempfile.mkdtemp()))
+        zeile = [z for z in r.stdout.splitlines() if z.startswith("Festes Dev-Team")]
+        self.assertTrue(zeile, r.stdout[-500:])
+        for name in team:
+            self.assertIn(name, zeile[0])
+
+
 if __name__ == "__main__":
     unittest.main()

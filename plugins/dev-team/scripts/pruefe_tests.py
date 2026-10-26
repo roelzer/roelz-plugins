@@ -124,11 +124,30 @@ def neue_zeilen(wurzel, basis, pfad):
 
 
 def ist_testdatei(bereich):
-    return bereich in ("tests", "abnahme", "architektur", "referenz")
+    return bereich in ("tests", "abnahme", "architektur", "referenz", "testkonfig")
 
 
-def pruefe_diff(e, wurzel, basis, rolle, team, freigabe):
-    """freigabe: geprüfter Freigabetext oder ''."""
+class Freigabe:
+    """Eine Freigabe aus .claude/freigaben.md: gilt nur für die genannten Pfade bzw. Prüfungen."""
+
+    def __init__(self, zeile="", geltung=()):
+        self.zeile = zeile
+        self.geltung = [g for g in geltung if g]
+
+    def deckt(self, ziel):
+        if not self.zeile:
+            return False
+        z = waechter.norm(ziel)
+        return any(g.lower() == z.lower() or waechter.passt(z, [g]) for g in self.geltung)
+
+    def text(self, ziel):
+        return " – Freigabe: " + self.zeile if self.deckt(ziel) else ""
+
+
+def pruefe_diff(e, wurzel, basis, rolle, team, fg):
+    """fg: Freigabe (gilt nur für ihre Pfade/Prüfungen). Rolle 'merge' = Entwickler-Regeln
+    für den zusammengeführten Stand im Hauptordner, ohne die Unterlagen des Projektleiters."""
+    entwicklerregeln = rolle in ("entwickler", "merge")
     liste = aenderungen(wurzel, basis)
     if not liste:
         e.o("Keine Dateiänderungen gegenüber %s." % basis[:10])
@@ -137,13 +156,14 @@ def pruefe_diff(e, wurzel, basis, rolle, team, freigabe):
         bereich = waechter.bereich_von(p, team)
         if p.startswith(".dev-team/"):
             continue
+        if bereich in ("nachweis",) or (rolle == "merge" and bereich == "prozess"):
+            continue
         if bereich == "referenz" and status in "MD":
-            (e.w if freigabe else e.f)("Referenzfall %s %s%s" % (
+            (e.w if fg.deckt(p) else e.f)("Referenzfall %s %s%s" % (
                 p, "geändert" if status == "M" else "gelöscht",
-                " – Freigabe: " + freigabe if freigabe else " (nur mit Simons Freigabe, --freigabe)"))
+                fg.text(p) or " (nur mit Simons Freigabe für genau diesen Pfad)"))
         if ist_testdatei(bereich) and status == "D" and bereich != "referenz":
-            (e.w if freigabe else e.f)("Testdatei gelöscht: %s%s" % (
-                p, " – Freigabe: " + freigabe if freigabe else ""))
+            (e.w if fg.deckt(p) else e.f)("Testdatei gelöscht: %s%s" % (p, fg.text(p)))
         if ist_testdatei(bereich) and status in "AM":
             for zeile in neue_zeilen(wurzel, basis, p):
                 for muster in SKIP_MUSTER:
@@ -160,12 +180,16 @@ def pruefe_diff(e, wurzel, basis, rolle, team, freigabe):
             if TEST_FUNKTION.search(inhalt) and not PRUEF_WORTE.search(inhalt):
                 e.f("Neue Testdatei ohne eine einzige Prüfung (assert/expect …): %s" % p)
         if bereich == "teamkonfig" and status in "AMD":
-            (e.w if freigabe else e.f)("Dev-Team-Einstellungen (.claude/dev-team.json) geändert%s." % (
-                " – Freigabe: " + freigabe if freigabe else
-                " – Testbefehl und Prüfregeln dürfen sich nur mit Simons Freigabe ändern (--freigabe)"))
+            (e.w if fg.deckt(".claude/dev-team.json") else e.f)(
+                "Dev-Team-Einstellungen (.claude/dev-team.json) geändert%s." % (
+                    fg.text(".claude/dev-team.json") or
+                    " – Testbefehl und Prüfregeln dürfen sich nur mit Simons Freigabe ändern"))
         if TESTKONFIG.search(p) and status in "AMD":
             e.w("Testkonfiguration geändert (%s): Reviewer prüft, dass keine Tests ausgeschlossen werden." % p)
-        if rolle == "entwickler":
+        if entwicklerregeln and bereich == "testkonfig" and status in "MD":
+            e.f("Testkonfiguration %s %s (bestehende Testkonfiguration ändert nur der Tester)." % (
+                p, "geändert" if status == "M" else "gelöscht"))
+        if entwicklerregeln:
             if ist_testdatei(bereich) and status in "MD":
                 e.f("Entwickler hat bestehende Testdatei %s %s." % (p, "geändert" if status == "M" else "gelöscht"))
             if bereich in ("architektur", "abnahme", "referenz") and status == "A":
@@ -178,7 +202,9 @@ def pruefe_diff(e, wurzel, basis, rolle, team, freigabe):
 
 
 def pruefe_freigabe(e, hauptordner, stichwort):
-    """Eine Freigabe zählt nur, wenn Simon sie von Hand in .claude/freigaben.md eingetragen hat."""
+    """Freigaben zählen nur, wenn Simon sie von Hand in .claude/freigaben.md eingetragen hat.
+    Zeilenformat: Datum | Stichwort | Geltung (Pfade/Muster oder testzahl, uebersprungen, durch Komma) | Grund
+    Das Stichwort muss genau der zweiten Spalte entsprechen."""
     datei = os.path.join(hauptordner, ".claude", "freigaben.md")
     try:
         with open(datei, encoding="utf-8") as f:
@@ -186,19 +212,24 @@ def pruefe_freigabe(e, hauptordner, stichwort):
     except OSError:
         zeilen = []
     for z in zeilen:
-        if stichwort.strip() and stichwort.strip().lower() in z.lower():
-            e.w("Freigabe verwendet: %s" % z)
-            return z
+        teile = [t.strip() for t in z.strip("|").split("|")]
+        if len(teile) >= 2 and teile[1].lower() == stichwort.strip().lower():
+            if len(teile) < 4 or not teile[2]:
+                e.f("Freigabe '%s' hat keine Geltung (Spalte 3: welche Pfade oder Prüfungen)." % stichwort)
+                return Freigabe()
+            geltung = [g.strip() for g in teile[2].split(",")]
+            e.w("Freigabe verwendet: %s (gilt für: %s)" % (z, ", ".join(geltung)))
+            return Freigabe(z, geltung)
     e.f("Freigabe '%s' steht nicht in .claude/freigaben.md. Freigaben trägt nur Simon von Hand ein "
-        "(eine Zeile: Datum | Stichwort | Grund)." % stichwort)
-    return ""
+        "(Datum | Stichwort | Geltung | Grund)." % stichwort)
+    return Freigabe()
 
 
 def letzter_lauf_pfad(hauptordner):
     return os.path.join(hauptordner, ".dev-team", "letzter-gruener-lauf.json")
 
 
-def lauf(e, wurzel, hauptordner, konfig, ist_worktree, freigabe, rolle):
+def lauf(e, wurzel, hauptordner, konfig, ist_worktree, fg, rolle):
     befehl = (konfig or {}).get("testbefehl")
     if not befehl:
         e.f("Kein Testbefehl in .claude/dev-team.json (Feld 'testbefehl'). Ohne Tests ist nichts grün.")
@@ -225,9 +256,9 @@ def lauf(e, wurzel, hauptordner, konfig, ist_worktree, freigabe, rolle):
                 with open(letzter_lauf_pfad(hauptordner), encoding="utf-8") as f:
                     vorher = json.load(f).get("bestanden")
                 if vorher is not None and zahl < vorher:
-                    (e.w if freigabe else e.f)(
+                    (e.w if fg.deckt("testzahl") else e.f)(
                         "Weniger bestandene Tests als beim letzten grünen Lauf (%d statt %d)%s." % (
-                            zahl, vorher, " – Freigabe: " + freigabe if freigabe else ""))
+                            zahl, vorher, fg.text("testzahl")))
             except (OSError, ValueError):
                 pass
         else:
@@ -244,8 +275,8 @@ def lauf(e, wurzel, hauptordner, konfig, ist_worktree, freigabe, rolle):
             except ValueError:
                 pass
     if uebersprungen:
-        (e.w if freigabe else e.f)("Der Testlauf meldet %d übersprungene/offene Tests%s." % (
-            uebersprungen, " – Freigabe: " + freigabe if freigabe else " (übersprungene Tests sind nicht grün)"))
+        (e.w if fg.deckt("uebersprungen") else e.f)("Der Testlauf meldet %d übersprungene/offene Tests%s." % (
+            uebersprungen, fg.text("uebersprungen") or " (übersprungene Tests sind nicht grün)"))
     for zusatz in (konfig or {}).get("zusatzbefehle", []):
         print("→ Zusatzbefehl: %s" % zusatz, flush=True)
         z = sh(zusatz, wurzel)
@@ -261,7 +292,7 @@ def main():
     a = argparse.ArgumentParser()
     a.add_argument("--basis", required=True)
     a.add_argument("--rolle", default="projektleiter",
-                   choices=["entwickler", "tester", "reviewer", "projektleiter", "architekt"])
+                   choices=["entwickler", "merge", "tester", "reviewer", "projektleiter", "architekt"])
     a.add_argument("--ohne-lauf", action="store_true")
     a.add_argument("--freigabe", default="")
     arg = a.parse_args()
@@ -280,13 +311,20 @@ def main():
 
     team = lade_team()
     konfig, _ = lade_konfig(wurzel, hauptordner)
-    freigabe = ""
+    fg = Freigabe()
     if arg.freigabe:
-        freigabe = pruefe_freigabe(e, hauptordner, arg.freigabe)
+        fg = pruefe_freigabe(e, hauptordner, arg.freigabe)
+    freigabe = fg.zeile
+    if ist_worktree and arg.rolle == "entwickler":
+        haupt_kopf = git(hauptordner, "rev-parse", "HEAD").strip()
+        abzweig = sh(["git", "merge-base", "HEAD", haupt_kopf], wurzel).stdout.strip()
+        if abzweig and basis != abzweig:
+            e.f("Basis %s ist nicht der Abzweigpunkt dieses Pakets (%s). Die Schranke prüft immer das "
+                "ganze Paket ab dem Abzweigpunkt." % (basis[:10], abzweig[:10]))
     if konfig is None:
         e.f("Keine .claude/dev-team.json gefunden (Projekt nicht im Dev-Team aufgenommen).")
 
-    pruefe_diff(e, wurzel, basis, arg.rolle, team, freigabe)
+    pruefe_diff(e, wurzel, basis, arg.rolle, team, fg)
     wt_ordner = os.path.join(wurzel, ".claude", "worktrees")
     if not ist_worktree and os.path.isdir(wt_ordner) and os.listdir(wt_ordner):
         e.w("Im Hauptordner liegen Entwickler-Worktrees (.claude/worktrees/). Der Testbefehl darf sie "
@@ -295,7 +333,7 @@ def main():
     if arg.ohne_lauf:
         e.w("Tests wurden in diesem Aufruf NICHT ausgeführt (--ohne-lauf) – kein Grün-Nachweis.")
     else:
-        zahl = lauf(e, wurzel, hauptordner, konfig, ist_worktree, freigabe, arg.rolle)
+        zahl = lauf(e, wurzel, hauptordner, konfig, ist_worktree, fg, arg.rolle)
 
     commit = git(wurzel, "rev-parse", "--short", "HEAD").strip()
     for t in e.ok:

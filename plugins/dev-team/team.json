@@ -1,6 +1,6 @@
 {
   "_zweck": "Einzige Quelle für das feste Team und die Schreibrechte. Wird vom Wächter-Hook (scripts/waechter.py) gelesen. Änderungen nur mit Simons Freigabe im Plugin-Repo.",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "agenten": {
     "kritiker": {
       "phase": "Planprüfung",
@@ -38,14 +38,16 @@
       "phase": "Bauen (ein Paket)",
       "schreibt": [
         "code",
-        "tests-neu"
+        "tests-neu",
+        "testkonfig-neu"
       ]
     },
     "tester": {
       "phase": "Testen",
       "schreibt": [
         "tests",
-        "abnahme"
+        "abnahme",
+        "testkonfig"
       ]
     },
     "reviewer": {
@@ -79,6 +81,7 @@
     "_erklaerung": "Reihenfolge zählt: der erste passende Bereich gilt. Muster relativ zum Projektordner (bzw. Worktree), '**' = beliebig tief.",
     "reihenfolge": [
       "gesperrt",
+      "nachweis",
       "konfig",
       "teamkonfig",
       "architektur",
@@ -90,6 +93,7 @@
       "quellen",
       "projektdateien",
       "prozess",
+      "testkonfig",
       "tests",
       "code"
     ],
@@ -158,6 +162,26 @@
     ],
     "teamkonfig": [
       ".claude/dev-team.json"
+    ],
+    "nachweis": [
+      ".dev-team/schranke-ok/**",
+      ".dev-team/letzter-gruener-lauf.json",
+      "docs/AGENTEN_LOG.md",
+      "docs/TESTNACHWEIS.md"
+    ],
+    "testkonfig": [
+      "**/conftest.py",
+      "**/sitecustomize.py",
+      "pytest.ini",
+      "tox.ini",
+      "setup.cfg",
+      "**/vitest.config.*",
+      "**/vitest.workspace.*",
+      "**/jest.config.*",
+      "**/playwright.config.*",
+      "**/karma.conf.*",
+      "**/.mocharc*",
+      "**/cypress.config.*"
     ]
   },
   "verdeckt_lesen_verboten_fuer": [

@@ -1,5 +1,34 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.2.0 – Befunde der Nachprüfung 3.1.0 behoben
+
+### Warum
+Nachprüfung durch einen frischen Auditor (7/10, `docs/AUDIT-3.1.0.md`): zwei von mir in 3.1 neu verursachte Fehler (Merge-Schranke immer rot, Freigabe per Teilwort) und weitere Umgehungswege.
+
+### Schranken
+- Neue Rolle `merge` für die Prüfung nach jedem Zusammenführen: Entwickler-Regeln, aber die Prozessdateien des Projektleiters zählen nicht. Rücknahme mit `git reset --keep ORIG_HEAD`.
+- Freigaben: Format `Datum | Stichwort | Geltung | Grund`, Stichwort muss genau passen, Freigabe gilt nur für die genannten Pfade bzw. Prüfungen (`testzahl`, `uebersprungen`). Vorlage auskommentiert.
+- Testkonfiguration (conftest.py, pytest.ini, vitest/jest/playwright-Konfiguration …) ist ein eigener Bereich: bestehende ändert nur der Tester.
+- Nachweise (Agenten-Log, Testnachweis, Schranken-Nachweise) kann kein Agent schreiben.
+- Im Worktree muss die Basis der Abzweigpunkt sein (das ganze Paket wird geprüft, nicht nur der letzte Commit).
+- Fertig-Prüfung: Worktree-Pfad muss im Bericht stehen, der Worktree sauber committet sein und der Nachweis zu dessen aktuellem Stand passen. Höchstens zwei Zurückweisungen, dann „NICHT belegt“ im Log.
+- Abhängigkeits-Schranke: umgelenkte Paketquellen (`.npmrc`, `pip.conf`, `uv`-/`poetry`-Index in `pyproject.toml` …) sind rot; aufgeweichte feste Versionen eine Warnung.
+
+### Wächter
+- Hüllen werden geprüft oder gesperrt: `bash -c` (Inhalt wird mitgeprüft), `eval`, `source`, Befehl aus Variable, Pipe oder Heredoc in einen Interpreter, `find -delete`, `xargs rm`, `tar x`, `unzip`, `patch`, `awk -i inplace`, `cp -t`, `git checkout <ref> <pfad>`.
+- Plugin-Skripte gelten nur als erlaubt, wenn sie der einzige Befehl sind. Der Projektleiter führt keine Skripte aus dem Projekt aus.
+- `python -m pip install`, `npx`/`bunx`/`uvx`/`pnpm dlx`/`npm exec`/`pipx run` nur mit Paketen aus `package.json`.
+- Gesperrt: `git clean`, `git reset --hard` (außer Entwickler im eigenen Worktree), `git branch -D`, Push auf main/master, `--force`, `+branch`, `:branch`.
+- Windows-Pfade im Git-Bash-Format (`/c/…`) werden erkannt. Der Projektleiter schreibt außerhalb des Projekts nur `~/.claude/CLAUDE.md`, `~/.claude/dev-team/`, das Baukasten-Repo und das System-Temp.
+- Im Plugin-Ordner sind nur `wissen/lessons.md` und `wissen/fachwissen/` beschreibbar.
+- Entwickler-Lesesperre: auch Grep/Glob außerhalb des Worktrees, absolute Muster, `cd ..`, Platzhalter in versteckten Ordnern und das Home-Verzeichnis.
+
+### Sonstiges
+- Sitzungsstart nennt das feste Team wieder (liest `team.json` per Python).
+- Reviewer prüft die Projektregeln aus `CLAUDE.md` (Pflichtfrage 11). Entwickler hat eine Liste „Ausreden, die nicht zählen“ (Idee Superpowers).
+- ANLEITUNG ehrlich: Lesesperre „stark erschwert, nicht unmöglich“; Schritt 7 um `bash -c` und `/c/…`-Pfad ergänzt.
+- 145 automatische Tests.
+
 ## 3.1.0 – Vorbilder übernommen, Audit-Befunde behoben
 
 ### Warum

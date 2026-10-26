@@ -35,7 +35,13 @@ else
 fi
 
 # Festes Team immer nennen (Teamzwang).
-team="$(sed -n 's/^    "\([a-z-]*\)":[[:space:]]*{ "phase".*/\1/p' "$plugin/team.json" 2>/dev/null | tr '\n' ' ')"
+team=""
+for py in python3 python py; do
+  if command -v "$py" >/dev/null 2>&1; then
+    team="$("$py" -X utf8 -c 'import json,sys; print(" ".join(json.load(open(sys.argv[1], encoding="utf-8"))["agenten"]))' "$plugin/team.json" 2>/dev/null)"
+    [ -n "$team" ] && break
+  fi
+done
 if [ -n "$team" ]; then
   echo
   echo "Festes Dev-Team (nur diese Agenten, sonst blockiert der Wächter): $team"

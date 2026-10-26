@@ -49,7 +49,7 @@ class TestSchranke(unittest.TestCase):
         self.schreibe("tests/test_rechnung.py", TEST_GRUEN)
         self.schreibe("tests/referenz/fall1.json", '{"ein": [1,2], "aus": 3}')
         self.schreibe("fachwissen/regeln.md", "# Regeln\n")
-        self.schreibe(".gitignore", ".dev-team/\n")
+        self.schreibe(".gitignore", ".dev-team/\n__pycache__/\n.claude/worktrees/\n")
         self.konfig({"testbefehl": "%s -m unittest discover -s tests -t . -v" % sys.executable,
                      "testzahl_muster": r"Ran (\d+) tests?"})
         git(self.p, "init", "-q")
@@ -121,8 +121,61 @@ class TestSchranke(unittest.TestCase):
         self.assertIn("steht nicht in .claude/freigaben.md", aus)
         self.schreibe(".claude/freigaben.md", "# Freigaben\n2026-10-26 | tabelle-korr | Rohrtabelle korrigiert\n")
         code, aus = self.lauf("--freigabe", "tabelle-korr")
+        self.assertEqual(code, 1, aus)  # ohne Geltung ungültig
+        self.assertIn("keine Geltung", aus)
+        self.schreibe(".claude/freigaben.md", "# Freigaben\n2026-10-26 | tabelle-korr | tests/referenz/andere.json"
+                      " | falscher Pfad\n")
+        code, aus = self.lauf("--freigabe", "tabelle-korr")
+        self.assertEqual(code, 1, aus)  # Geltung deckt den Pfad nicht
+        self.schreibe(".claude/freigaben.md", "# Freigaben\n2026-10-26 | tabelle-korr | tests/referenz/fall1.json"
+                      " | Rohrtabelle korrigiert\n")
+        code, aus = self.lauf("--freigabe", "tabelle")
+        self.assertEqual(code, 1, aus)  # Teilwort reicht nicht
+        code, aus = self.lauf("--freigabe", "tabelle-korr")
         self.assertEqual(code, 0, aus)
         self.assertIn("Freigabe verwendet", aus)
+
+    def test_merge_rolle_erlaubt_prozessdateien(self):
+        self.schreibe("docs/STATUS.md", "# Status\nP1 gemergt\n")
+        self.schreibe("src/rabatt.py", "def rabatt(x):\n    return x\n")
+        git(self.p, "add", "-A")
+        git(self.p, "commit", "-qm", "merge")
+        self.assertEqual(self.lauf("--rolle", "entwickler")[0], 1)  # Entwickler darf docs nicht
+        code, aus = self.lauf("--rolle", "merge")
+        self.assertEqual(code, 0, aus)
+
+    def test_merge_rolle_sperrt_bestehende_tests(self):
+        self.schreibe("tests/test_rechnung.py", TEST_GRUEN + "\n# still geändert\n")
+        self.assertEqual(self.lauf("--rolle", "merge")[0], 1)
+
+    def test_testkonfig_durch_entwickler_rot(self):
+        self.schreibe("conftest.py", "# neu\n")
+        git(self.p, "add", "-A")
+        git(self.p, "commit", "-qm", "conf")
+        self.basis = git(self.p, "rev-parse", "HEAD").strip()
+        self.schreibe("conftest.py", "import pytest\n")
+        code, aus = self.lauf("--rolle", "entwickler")
+        self.assertEqual(code, 1, aus)
+
+    def test_worktree_basis_muss_abzweigpunkt_sein(self):
+        wt = os.path.join(self.p, ".claude", "worktrees", "p1")
+        git(self.p, "worktree", "add", "-q", wt, "-b", "p1")
+        self.schreibe("src/rabatt.py", "def rabatt(x):\n    return x\n", ordner=wt)
+        git(wt, "add", "-A")
+        git(wt, "commit", "-qm", "a")
+        zwischen = git(wt, "rev-parse", "HEAD").strip()
+        self.schreibe("src/rabatt2.py", "def r2(x):\n    return x\n", ordner=wt)
+        git(wt, "add", "-A")
+        git(wt, "commit", "-qm", "b")
+        r = subprocess.run(["bash", TESTS_SKRIPT, "--basis", zwischen, "--rolle", "entwickler"],
+                           cwd=wt, capture_output=True, text=True)
+        self.assertEqual(r.returncode, 1, r.stdout)
+        self.assertIn("Abzweigpunkt", r.stdout)
+        r = subprocess.run(["bash", TESTS_SKRIPT, "--basis", self.basis, "--rolle", "entwickler"],
+                           cwd=wt, capture_output=True, text=True)
+        self.assertEqual(r.returncode, 0, r.stdout)
+        kopf = git(wt, "rev-parse", "HEAD").strip()
+        self.assertTrue(os.path.isfile(os.path.join(self.p, ".dev-team", "schranke-ok", kopf)))
 
     def test_rote_tests(self):
         self.schreibe("src/rechnung.py", "def summe(w):\n    return 0\n")
@@ -381,15 +434,25 @@ class TestAbhaengigkeiten(unittest.TestCase):
         code, aus = self.lauf({})
         self.assertIn("prüft die Schranke nicht", aus)
 
+    def test_paketquelle_umgelenkt(self):
+        self.schreibe(".npmrc", "registry=https://boese.example/\n")
+        code, aus = self.lauf({})
+        self.assertEqual(code, 1, aus)
+        self.assertIn(".npmrc", aus)
+
+    def test_uv_index_in_pyproject(self):
+        self.schreibe("pyproject.toml", "[project]\nname='x'\ndependencies=[]\n\n[[tool.uv.index]]\n"
+                      "url='https://boese.example/simple'\n")
+        code, aus = self.lauf({})
+        self.assertEqual(code, 1, aus)
+        self.assertIn("Paketquelle", aus)
+
     def test_pypi_echt(self):
         self.schreibe("requirements.txt", "requests==2.32.3\nhttpx==0.27.0\n")
         rel = {"upload_time_iso_8601": "2019-01-01T00:00:00Z"}
         code, aus = self.lauf({"pypi.org/pypi/httpx": {"releases": {"0.1": [rel], "0.2": [rel], "0.27.0": [rel]}}})
         self.assertEqual(code, 0, aus)
 
-
-if __name__ == "__main__":
-    unittest.main()
 
 
 class FertigPruefung(unittest.TestCase):
@@ -400,24 +463,60 @@ class FertigPruefung(unittest.TestCase):
         os.makedirs(os.path.join(self.p, ".claude"))
         os.makedirs(os.path.join(self.p, "docs"))
         open(os.path.join(self.p, ".claude", "dev-team.json"), "w").write("{}")
+        open(os.path.join(self.p, ".gitignore"), "w").write(".dev-team/\n.claude/worktrees/\ndocs/\n")
+        git(self.p, "init", "-q")
+        git(self.p, "add", "-A")
+        git(self.p, "commit", "-qm", "start")
+        self.wt = os.path.join(self.p, ".claude", "worktrees", "p1")
+        git(self.p, "worktree", "add", "-q", self.wt, "-b", "p1")
+        open(os.path.join(self.wt, "a.txt"), "w").write("1")
+        git(self.wt, "add", "-A")
+        git(self.wt, "commit", "-qm", "p1")
+        self.kopf = git(self.wt, "rev-parse", "HEAD").strip()
 
     def tearDown(self):
         shutil.rmtree(self.p, ignore_errors=True)
 
     def lauf(self, nachricht, aktiv=False, agent="dev-team:entwickler"):
-        e = {"agent_type": agent, "last_assistant_message": nachricht, "stop_hook_active": aktiv, "cwd": self.p}
+        e = {"agent_type": agent, "last_assistant_message": nachricht, "stop_hook_active": aktiv, "cwd": self.p,
+             "agent_id": "x1"}
         r = subprocess.run([sys.executable, self.SKRIPT], input=json.dumps(e), capture_output=True, text=True,
                            env=dict(os.environ, CLAUDE_PROJECT_DIR=self.p))
         return r.stdout
 
+    def marker(self, kopf):
+        os.makedirs(os.path.join(self.p, ".dev-team", "schranke-ok"), exist_ok=True)
+        open(os.path.join(self.p, ".dev-team", "schranke-ok", kopf), "w").close()
+
     def test_fertig_ohne_nachweis_wird_zurueckgewiesen(self):
-        aus = self.lauf("**Status:** FERTIG 🟢\nCommit " + "a" * 40)
+        aus = self.lauf("**Status:** FERTIG 🟢\nWorktree %s\nCommit %s" % (self.wt, self.kopf))
         self.assertIn('"decision": "block"', aus)
 
     def test_fertig_mit_nachweis(self):
-        os.makedirs(os.path.join(self.p, ".dev-team", "schranke-ok"))
-        open(os.path.join(self.p, ".dev-team", "schranke-ok", "b" * 40), "w").close()
-        self.assertEqual(self.lauf("Status: FERTIG\nCommit " + "b" * 40).strip(), "")
+        self.marker(self.kopf)
+        self.assertEqual(self.lauf("Status: FERTIG\nWorktree %s\nCommit %s" % (self.wt, self.kopf)).strip(), "")
+
+    def test_kleingeschrieben_und_ohne_worktree(self):
+        self.marker(self.kopf)
+        self.assertIn('"decision": "block"', self.lauf("status: fertig\nCommit " + self.kopf))
+
+    def test_fremder_marker_reicht_nicht(self):
+        self.marker("b" * 40)
+        aus = self.lauf("Status: FERTIG\nWorktree %s\nCommit %s" % (self.wt, "b" * 40))
+        self.assertIn('"decision": "block"', aus)
+
+    def test_nicht_committet_reicht_nicht(self):
+        self.marker(self.kopf)
+        open(os.path.join(self.wt, "b.txt"), "w").write("offen")
+        aus = self.lauf("Status: FERTIG\nWorktree %s\nCommit %s" % (self.wt, self.kopf))
+        self.assertIn("nicht committete", aus)
+
+    def test_hoechstens_zwei_zurueckweisungen(self):
+        for _ in range(2):
+            self.assertIn('"decision": "block"', self.lauf("Status: FERTIG 🟢"))
+        self.assertEqual(self.lauf("Status: FERTIG 🟢").strip(), "")
+        with open(os.path.join(self.p, "docs", "AGENTEN_LOG.md"), encoding="utf-8") as f:
+            self.assertIn("NICHT belegt", f.read())
 
     def test_ehrlich_blockiert_wird_nie_aufgehalten(self):
         self.assertEqual(self.lauf("Status: BLOCKIERT 🔴 – Ausgangslage rot").strip(), "")
@@ -429,3 +528,7 @@ class FertigPruefung(unittest.TestCase):
 
     def test_andere_agenten_unberuehrt(self):
         self.assertEqual(self.lauf("🟢 alles gut", agent="dev-team:reviewer").strip(), "")
+
+
+if __name__ == "__main__":
+    unittest.main()

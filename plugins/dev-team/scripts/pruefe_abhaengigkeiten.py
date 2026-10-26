@@ -287,10 +287,33 @@ def main():
             if eintrag not in alt_text:
                 fehler.append("%s: direkte Quelle '%s' (nicht aus PyPI) – nur mit Simons Freigabe und Prüfung "
                               "durch den Sicherheitsprüfer." % (datei, eintrag[:120]))
+        for name in sorted(n for n in set(neu) & set(alt) if neu[n] != alt[n]):
+            if "==" in alt[name] and "==" not in neu[name]:
+                warn.append("Python '%s' in %s: feste Version aufgeweicht (%s → %s)." % (name, pfad, alt[name] or "-",
+                                                                                   neu[name] or "beliebig"))
         for name in sorted(set(neu) - set(alt)):
             pruefe_pypi(name, fehler, ok)
             if "==" not in neu[name] and basis_name != "pyproject.toml":
                 warn.append("Python '%s' in %s ohne feste Version (==)." % (name, pfad))
+
+    # Paketquellen umgelenkt? (eigener Index/Registry = alle Prüfungen oben wären wertlos)
+    for pfad in alle:
+        name = os.path.basename(pfad)
+        jetzt, vorher = lies(wurzel, pfad) or "", git_datei(wurzel, arg.basis, pfad) or ""
+        if jetzt == vorher:
+            continue
+        if name in (".npmrc", ".yarnrc", ".yarnrc.yml", "pip.conf", "pip.ini", "uv.toml", ".pypirc",
+                    "nuget.config", "NuGet.Config", "NuGet.config", "bunfig.toml"):
+            fehler.append("%s geändert: legt fest, woher Pakete geladen werden. Nur mit Simons Freigabe und "
+                          "Prüfung durch den Sicherheitsprüfer." % pfad)
+        elif name == "pyproject.toml":
+            quellen = re.compile(r"^\s*\[\[?tool\.(uv\.index|uv\.sources|poetry\.source|pdm\.source)|"
+                                 r"^\s*(extra-)?index-url\s*=", re.M)
+            neu_q = {m.group(0).strip() for m in quellen.finditer(jetzt)}
+            alt_q = {m.group(0).strip() for m in quellen.finditer(vorher)}
+            if neu_q - alt_q or (neu_q and jetzt.count("[[tool.uv.index]]") > vorher.count("[[tool.uv.index]]")):
+                fehler.append("%s: eigene Paketquelle/Index eingetragen (%s). Nur mit Simons Freigabe und "
+                              "Prüfung durch den Sicherheitsprüfer." % (pfad, ", ".join(sorted(neu_q - alt_q) or neu_q)))
 
     # NuGet (.NET)
     for pfad in alle:

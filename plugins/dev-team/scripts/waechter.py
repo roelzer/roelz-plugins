@@ -279,6 +279,8 @@ def neu_im_paket(absolut, wurzel, projekt):
 
 BEREICH_TEXT = {
     "gesperrt": "Agenten-, Skill-, Hook-, Freigabe- und Git-Dateien",
+    "nachweis": "Nachweise (Agenten-Log, Testnachweis, Schranken-Nachweise)",
+    "testkonfig": "Testkonfiguration (bestehende ändert nur der Tester)",
     "konfig": "Projekteinstellungen (.claude/settings*.json)",
     "teamkonfig": "die Dev-Team-Einstellungen (.claude/dev-team.json)",
     "architektur": "Architekturregeln (nur der Architekt)",
@@ -295,6 +297,31 @@ BEREICH_TEXT = {
 }
 
 
+def win_pfad(pfad, nt=None):
+    """Git-Bash-Pfade (/c/Users/...) unter Windows in C:/Users/... umwandeln."""
+    nt = (os.name == "nt") if nt is None else nt
+    m = re.match(r"^/([A-Za-z])(/.*)?$", pfad or "")
+    if nt and m:
+        return "%s:%s" % (m.group(1).upper(), m.group(2) or "/")
+    return pfad
+
+
+def absolut_aus(cwd, pfad):
+    pfad = win_pfad(os.path.expanduser(pfad))
+    return os.path.abspath(os.path.join(cwd, pfad))
+
+
+def baukasten_pfad():
+    try:
+        with open(os.path.join(heimat(), ".claude", "CLAUDE.md"), encoding="utf-8") as f:
+            for zeile in f:
+                if zeile.startswith("Baukasten:"):
+                    return os.path.abspath(os.path.expanduser(win_pfad(zeile.split(":", 1)[1].strip())))
+    except OSError:
+        pass
+    return None
+
+
 def pruefe_ziel(absolut, team, projekt, plugin, rolle, art="schreiben", ueber_shell=False):
     """Prüft einen einzelnen Schreib- oder Löschzugriff auf einen Pfad."""
     np = norm(absolut)
@@ -309,10 +336,14 @@ def pruefe_ziel(absolut, team, projekt, plugin, rolle, art="schreiben", ueber_sh
         blockieren("Einstellungsdateien schreibt Claude nicht direkt%s. Neue Projekteinstellungen "
                    "über scripts/settings_zusammenfuehren.py nach Simons OK." % weg)
     if plugin and innerhalb(absolut, plugin) and not wartung:
-        if not norm(os.path.relpath(absolut, plugin)).startswith("wissen/"):
-            blockieren("Das installierte Dev-Team (Agenten, team.json, Hooks, Skripte) wird nicht aus "
-                       "einer Arbeitssitzung heraus geändert%s. Wartung nur mit DEV_TEAM_WARTUNG=1, "
-                       "das Simon selbst setzt." % weg)
+        rel_p = norm(os.path.relpath(absolut, plugin))
+        if not (rel_p.startswith("wissen/fachwissen/") or rel_p == "wissen/lessons.md"):
+            blockieren("Das installierte Dev-Team (Grundgesetz, Agenten, team.json, Hooks, Skripte) wird nicht "
+                       "aus einer Arbeitssitzung heraus geändert%s. Erlaubt sind nur Lessons und die "
+                       "Fachwissen-Bibliothek. Wartung nur mit DEV_TEAM_WARTUNG=1, das Simon selbst setzt." % weg)
+        if rolle != "projektleiter":
+            blockieren("Lessons und Fachwissen-Bibliothek pflegt nur der Projektleiter nach Simons Bestätigung.")
+        return
     claude_heim = os.path.join(heimat(), ".claude")
     if innerhalb(absolut, claude_heim) and not wartung:
         rel_heim = norm(os.path.relpath(absolut, claude_heim))
@@ -329,10 +360,17 @@ def pruefe_ziel(absolut, team, projekt, plugin, rolle, art="schreiben", ueber_sh
     elif innerhalb(absolut, projekt):
         basis = projekt
     else:
-        if rolle == "projektleiter":
-            return  # z. B. Baukasten-Repo, ~/.claude/CLAUDE.md beim Einrichten
         if innerhalb(absolut, tempfile.gettempdir()) and not wurzel:
             return  # Wegwerf-Dateien im System-Temp (nicht in einem Repo)
+        if rolle == "projektleiter" and wartung:
+            return
+        if rolle == "projektleiter":
+            bk = baukasten_pfad()
+            if innerhalb(absolut, claude_heim) or (bk and innerhalb(absolut, bk)):
+                return
+            blockieren("Außerhalb des Projekts schreibt der Projektleiter nur ~/.claude/CLAUDE.md, "
+                       "~/.claude/dev-team/ und das Baukasten-Repo (nicht %s)%s. Für ein anderes Projekt "
+                       "eine eigene Sitzung dort starten." % (np, weg))
         blockieren("Agent '%s' darf nur im Projekt bzw. seinem Worktree schreiben, nicht in %s%s."
                    % (rolle, np, weg))
 
@@ -350,16 +388,18 @@ def pruefe_ziel(absolut, team, projekt, plugin, rolle, art="schreiben", ueber_sh
     if (bereich + "-neu") in erlaubt and art != "loeschen":
         if not existiert:
             return
-        if rolle == "entwickler" and bereich == "tests" and neu_im_paket(absolut, basis, projekt):
+        if rolle == "entwickler" and bereich in ("tests", "testkonfig") and neu_im_paket(absolut, basis, projekt):
             return
     wer = "Der Projektleiter" if rolle == "projektleiter" else "Agent '%s'" % rolle
     zusatz = ""
-    if rolle == "projektleiter" and bereich in ("code", "tests"):
+    if rolle == "projektleiter" and bereich in ("code", "tests", "testkonfig"):
         zusatz = " Code baut der Agent 'entwickler', Tests schreibt der 'tester'."
-    if rolle == "entwickler" and bereich == "tests":
+    if rolle == "entwickler" and bereich in ("tests", "testkonfig"):
         zusatz = (" Der Entwickler darf Tests anlegen und seine eigenen neuen Tests bearbeiten, "
                   "bestehende aber nicht ändern oder löschen. Ist ein bestehender Test falsch: im "
                   "Bericht melden, der Tester entscheidet.")
+    if bereich == "nachweis":
+        zusatz = " Nachweise schreiben nur die Prüfskripte und Hooks."
     wort = {"loeschen": "löschen"}.get(art, "ändern" if existiert else "anlegen")
     blockieren("%s darf %s nicht %s (Datei: %s)%s.%s" % (wer, BEREICH_TEXT.get(bereich, bereich),
                                                          wort, rel, weg, zusatz))
@@ -375,7 +415,7 @@ def pruefe_schreiben(eingabe, team, projekt, plugin, rolle):
             blockieren("Schreibvorgang ohne lesbaren Dateipfad kann nicht geprüft werden.")
         return
     cwd = eingabe.get("cwd") or projekt or os.getcwd()
-    absolut = os.path.abspath(os.path.join(cwd, os.path.expanduser(pfad)))
+    absolut = absolut_aus(cwd, pfad)
 
     inhalt = " ".join(str(ti.get(k) or "") for k in ("content", "new_string", "new_source"))
     for e in ti.get("edits") or []:
@@ -400,7 +440,14 @@ TRENNER = {";", "&&", "||", "|", "&", "\n", "(", ")", "|&"}
 SCHREIB_INDIZIEN = re.compile(
     r"open\s*\([^)]*,\s*(?:mode\s*=\s*)?['\"][^'\"]*[wax+]|write_text|write_bytes|writeFile|appendFile|createWriteStream|"
     r"os\.remove|os\.unlink|unlink\s*\(|shutil\.|\.rename\s*\(|os\.replace|rmSync|rmdirSync|"
-    r"Set-Content|Out-File|Add-Content", re.IGNORECASE)
+    r"Set-Content|Out-File|Add-Content|subprocess|os\.system|child_process|execSync|spawn|exec\s*\(|eval\s*\(|"
+    r"__import__|base64|compile\s*\(", re.IGNORECASE)
+SHELLS = {"bash", "sh", "zsh", "dash", "ksh", "fish", "pwsh", "powershell", "cmd", "busybox"}
+INTERPRETER = {"python", "python3", "py", "node", "deno", "bun", "ruby", "perl", "php", "tclsh", "lua", "Rscript"}
+PAKET_AUSFUEHRER = {"npx", "bunx", "uvx", "pnpx"}
+UNPRUEFBAR = ("Dieser Befehl ist für den Wächter nicht prüfbar (Befehl in einer Hülle wie bash -c/eval, aus einer "
+              "Variable, per Pipe an einen Interpreter oder ein Skript-Einzeiler mit Datei- oder Prozesszugriff). "
+              "Dateien mit Write/Edit schreiben, Befehle direkt ausführen.")
 
 
 def ohne_heredocs(befehl):
@@ -416,34 +463,60 @@ def segmente(befehl):
         tokens = list(lex)
     except ValueError:
         tokens = text.split()
-    teil = []
+    teil, vorher_pipe = [], False
     for t in tokens:
         if t in TRENNER or (t and set(t) <= set(";&|()")):
             if teil:
-                yield teil
+                yield teil, vorher_pipe
             teil = []
+            vorher_pipe = t in ("|", "|&")
         else:
             teil.append(t)
     if teil:
-        yield teil
+        yield teil, vorher_pipe
 
 
 def ohne_optionen(args):
     return [a for a in args if not a.startswith("-")]
 
 
-def shell_analyse(befehl):
+def paket_bekannt(name, cwd):
+    """npx/bunx-Paket steht in package.json (dann ist es durch die Abhängigkeits-Schranke gegangen)."""
+    wurzel = repo_wurzel(cwd) if cwd else None
+    try:
+        with open(os.path.join(wurzel or cwd or ".", "package.json"), encoding="utf-8") as f:
+            d = json.load(f)
+    except (OSError, ValueError, TypeError):
+        return False
+    basis = re.sub(r"(?<!^)@.*$", "", name)
+    for feld in ("dependencies", "devDependencies", "optionalDependencies"):
+        if basis in (d.get(feld) or {}):
+            return True
+    return basis in {os.path.basename(b) for b in (d.get("bin") or {})} if isinstance(d.get("bin"), dict) else False
+
+
+def shell_analyse(befehl, cwd=None, rolle="projektleiter", projekt=None, plugin="", tiefe=0):
     """-> (ziele: Liste (pfad, art)), opak: bool, verbotenes: str|None"""
     ziele, opak, verboten = [], False, None
-    for seg in segmente(befehl):
-        # Umleitungen
-        i = 0
-        rest = []
+    if tiefe > 3:
+        return ziele, True, None
+    # Heredoc oder Pipe direkt in einen Interpreter / eine Shell
+    if re.search(r"\b(?:%s)\b[^\n|;&]*<<" % "|".join(sorted(SHELLS | INTERPRETER)), befehl):
+        opak = True
+    for seg, nach_pipe in segmente(befehl):
+        i, rest = 0, []
         while i < len(seg):
             t = seg[i]
             if re.fullmatch(r"\d", t) and i + 1 < len(seg) and seg[i + 1].startswith((">", "<")):
                 i += 1
                 continue
+            if t in (">&", "<&", ">>&"):
+                if i + 1 < len(seg):
+                    ziel = seg[i + 1]
+                    if not re.fullmatch(r"\d+|-", ziel) and ziel not in ("/dev/null", "NUL", "nul"):
+                        ziele.append((ziel, "schreiben"))
+                    i += 2
+                    continue
             if t in (">", ">>", ">|", "&>", "&>>") or re.fullmatch(r"\d?>>?", t):
                 if i + 1 < len(seg):
                     ziel = seg[i + 1]
@@ -456,19 +529,91 @@ def shell_analyse(befehl):
                 continue
             rest.append(t)
             i += 1
+        mit_xargs = False
         while rest and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*=.*", rest[0]):
             rest = rest[1:]
-        while rest and rest[0] in ("sudo", "command", "env", "nohup", "time", "exec", "xargs"):
+        while rest and rest[0] in ("sudo", "command", "env", "nohup", "time", "exec", "xargs", "nice", "timeout"):
+            mit_xargs = mit_xargs or rest[0] == "xargs"
+            if rest[0] == "timeout" and len(rest) > 1:
+                rest = rest[1:]
             rest = rest[1:]
+            while rest and rest[0].startswith("-"):
+                rest = rest[1:]
         if not rest:
             continue
-        cmd = os.path.basename(rest[0]).lower()
+        roh_cmd = rest[0]
+        if "$" in roh_cmd or "`" in roh_cmd:
+            return ziele, opak, UNPRUEFBAR
+        cmd = os.path.basename(win_pfad(roh_cmd)).lower()
         args = rest[1:]
         if cmd.endswith(".exe"):
             cmd = cmd[:-4]
 
         if cmd in ("claude", "claude-code") or any("@anthropic-ai/claude-code" in a for a in rest):
             verboten = "Neue Claude-Sitzungen über die Shell sind Helfer außerhalb des Teams und nicht erlaubt."
+        elif cmd in ("eval", "source", ".") :
+            verboten = UNPRUEFBAR
+        elif cmd in SHELLS:
+            inneres = None
+            for j, a in enumerate(args):
+                if a in ("-c", "/c", "/C", "-Command", "-command", "-EncodedCommand", "-e"):
+                    inneres = " ".join(args[j + 1:])
+                    break
+                if re.fullmatch(r"-[a-z]*c", a):
+                    inneres = " ".join(args[j + 1:])
+                    break
+            if inneres is not None:
+                if "EncodedCommand" in " ".join(args):
+                    verboten = UNPRUEFBAR
+                else:
+                    z2, o2, v2 = shell_analyse(inneres, cwd, rolle, projekt, plugin, tiefe + 1)
+                    ziele += z2
+                    opak = opak or o2
+                    verboten = verboten or v2
+            elif nach_pipe or not ohne_optionen(args):
+                verboten = UNPRUEFBAR  # z. B. curl … | bash
+            else:
+                skript = absolut_aus(cwd or ".", ohne_optionen(args)[0])
+                if not (plugin and innerhalb(skript, plugin)):
+                    if rolle == "projektleiter" and projekt and innerhalb(skript, projekt):
+                        verboten = "Der Projektleiter führt keine Skripte aus dem Projekt aus."
+        elif cmd in INTERPRETER:
+            code = None
+            for j, a in enumerate(args):
+                if a in ("-c", "-e", "--eval", "-p", "--print", "-r"):
+                    code = " ".join(args[j + 1:])
+                    break
+                if re.fullmatch(r"-[ce].+", a):
+                    code = a[2:] + " " + " ".join(args[j + 1:])
+                    break
+            if code is not None:
+                if "claude" in code:
+                    verboten = "Neue Claude-Sitzungen sind auch aus Skripten heraus nicht erlaubt."
+                elif SCHREIB_INDIZIEN.search(code):
+                    opak = True
+            elif "-m" in args:
+                modul = args[args.index("-m") + 1:]
+                if modul[:1] == ["pip"] and "install" in modul:
+                    pakete = [a for a in ohne_optionen(modul[1:]) if a != "install" and not a.startswith((".", "/"))
+                              and not a.endswith((".txt", ".toml"))]
+                    if pakete and not any(a in ("-r", "--requirement", "-e", "--editable") for a in modul):
+                        verboten = ("Pakete werden nicht per Befehl installiert. Abhängigkeit in den Bauplan, "
+                                    "dann requirements/pyproject ändern und Abhängigkeits-Schranke laufen lassen.")
+            else:
+                frei = ohne_optionen(args)
+                if (nach_pipe or not args or (frei and frei[0] == "-")) and not any(
+                        a in ("--version", "-V", "--help", "-h") for a in args):
+                    opak = True  # liest Programm von der Eingabe
+                elif frei and rolle == "projektleiter" and projekt:
+                    skript = absolut_aus(cwd or ".", frei[0])
+                    if innerhalb(skript, projekt) and not (plugin and innerhalb(skript, plugin)):
+                        verboten = "Der Projektleiter führt keine Skripte aus dem Projekt aus."
+        elif cmd in PAKET_AUSFUEHRER or (cmd in ("npm", "pnpm", "yarn") and args[:1] in (["exec"], ["dlx"])) \
+                or (cmd == "pipx" and args[:1] == ["run"]):
+            frei = ohne_optionen(args[1:] if cmd in ("npm", "pnpm", "yarn", "pipx") else args)
+            if frei and not paket_bekannt(frei[0], cwd):
+                verboten = ("'%s' würde ein Paket ausführen, das nicht in package.json steht. Erst über Bauplan "
+                            "und Abhängigkeits-Schranke aufnehmen." % frei[0])
         elif cmd in ("npm", "pnpm", "yarn", "bun") and args and args[0] in ("install", "i", "add") \
                 and ohne_optionen(args[1:]):
             verboten = ("Pakete werden nicht per Befehl hinzugefügt. Abhängigkeit in den Bauplan, dann "
@@ -481,49 +626,91 @@ def shell_analyse(befehl):
                             "requirements/pyproject ändern und Abhängigkeits-Schranke laufen lassen.")
         elif cmd in ("poetry", "uv", "pdm", "cargo", "dotnet") and args[:1] == ["add"]:
             verboten = "Pakete werden nicht per Befehl hinzugefügt (Bauplan + Abhängigkeits-Schranke)."
+        elif mit_xargs and cmd in ("rm", "mv", "cp", "sed", "tee", "touch", "truncate", "unlink", "chmod"):
+            opak = True
+        elif cmd == "find" and any(a in ("-delete", "-exec", "-execdir", "-ok", "-fprint") for a in args):
+            opak = True
+        elif cmd in ("patch", "unzip", "7z", "ed", "ex") or (cmd == "tar" and any("x" in a.lstrip("-") for a in args[:1])) \
+                or (cmd in ("awk", "gawk") and "inplace" in " ".join(args)):
+            opak = True
         elif cmd == "tee":
             ziele += [(a, "schreiben") for a in ohne_optionen(args)]
         elif cmd in ("sed", "gsed", "perl") and any(a == "-i" or a.startswith("-i") or a == "--in-place" or
                                                      a.startswith("--in-place") or a == "-pi" for a in args):
             frei = ohne_optionen(args)
-            if "-e" in args or cmd == "perl":
-                kandidaten = frei[1:] if cmd == "perl" else frei
-            else:
-                kandidaten = frei[1:]
+            kandidaten = frei if ("-e" in args and cmd == "sed") else frei[1:]
             ziele += [(a, "schreiben") for a in kandidaten]
         elif cmd in ("cp", "mv", "install", "ln", "rsync", "copy", "move", "copy-item", "move-item"):
             frei = ohne_optionen(args)
-            if frei:
+            ziel_dir = None
+            for j, a in enumerate(args):
+                if a in ("-t", "--target-directory") and j + 1 < len(args):
+                    ziel_dir = args[j + 1]
+                elif a.startswith("--target-directory="):
+                    ziel_dir = a.split("=", 1)[1]
+            if ziel_dir:
+                ziele.append((ziel_dir.rstrip("/") + "/x", "schreiben"))
+            elif frei:
                 ziele.append((frei[-1], "schreiben"))
             if cmd in ("mv", "move", "move-item"):
-                ziele += [(a, "loeschen") for a in frei[:-1]]
+                ziele += [(a, "loeschen") for a in (frei if ziel_dir else frei[:-1])]
         elif cmd in ("rm", "rmdir", "unlink", "del", "erase", "remove-item", "rd", "shred"):
             ziele += [(a, "loeschen") for a in ohne_optionen(args)]
-        elif cmd in ("touch", "truncate", "new-item", "set-content", "add-content", "out-file"):
+        elif cmd in ("touch", "truncate", "new-item", "set-content", "add-content", "out-file", "mkfifo"):
             ziele += [(a, "schreiben") for a in ohne_optionen(args) if not re.fullmatch(r"\d+[kmgKMG]?", a)]
         elif cmd == "dd":
             ziele += [(a[3:], "schreiben") for a in args if a.startswith("of=")]
         elif cmd == "git" and args:
+            v = pruefe_git(args, rolle, cwd, projekt)
+            if v:
+                verboten = v
             sub = args[0]
-            if sub in ("checkout", "restore") and ("--" in args or sub == "restore"):
-                pfade = args[args.index("--") + 1:] if "--" in args else ohne_optionen(args[1:])
+            if sub in ("checkout", "restore"):
+                if "--" in args:
+                    pfade = args[args.index("--") + 1:]
+                elif sub == "restore":
+                    pfade = ohne_optionen(args[1:])
+                else:
+                    frei = ohne_optionen(args[1:])
+                    pfade = frei[1:] if len(frei) > 1 else [a for a in frei if os.path.exists(absolut_aus(cwd or ".", a))]
                 ziele += [(a, "schreiben") for a in pfade]
-            elif sub in ("rm",):
+            elif sub == "rm":
                 ziele += [(a, "loeschen") for a in ohne_optionen(args[1:])]
-            elif sub in ("mv",):
+            elif sub == "mv":
                 frei = ohne_optionen(args[1:])
                 if frei:
                     ziele.append((frei[-1], "schreiben"))
                     ziele += [(a, "loeschen") for a in frei[:-1]]
-            elif sub in ("apply", "am") or (sub == "stash" and args[1:2] in (["pop"], ["apply"])):
+            elif sub in ("apply", "am", "cherry-pick", "revert") or \
+                    (sub == "stash" and args[1:2] in (["pop"], ["apply"])):
                 opak = True
-        elif cmd in ("python", "python3", "py", "node", "deno", "bun", "ruby", "perl", "pwsh", "powershell"):
-            for marke in ("-c", "-e", "--eval", "-Command", "-command"):
-                if marke in args:
-                    code = " ".join(args[args.index(marke) + 1:])
-                    if SCHREIB_INDIZIEN.search(code):
-                        opak = True
+        if verboten:
+            return ziele, opak, verboten
     return ziele, opak, verboten
+
+
+def pruefe_git(args, rolle, cwd, projekt):
+    sub = args[0]
+    rest = args[1:]
+    if sub in ("clean", "filter-branch", "filter-repo", "update-ref", "replace"):
+        return "'git %s' kann Arbeit unwiederbringlich löschen oder Verlauf umschreiben und ist gesperrt." % sub
+    if sub == "reset" and "--hard" in rest:
+        im_worktree = bool(projekt and cwd and not os.path.normcase(os.path.abspath(repo_wurzel(cwd) or cwd))
+                           == os.path.normcase(os.path.abspath(projekt)))
+        if not (rolle == "entwickler" and im_worktree):
+            return ("'git reset --hard' ist gesperrt (nicht committete Arbeit ginge verloren). Einen eigenen "
+                    "Merge rückgängig machen: 'git reset --keep ORIG_HEAD'.")
+    if sub == "branch" and any(a in ("-D", "--delete --force") or a == "-D" for a in rest):
+        return "'git branch -D' ist gesperrt; gemergte Branches mit 'git branch -d' löschen."
+    if sub == "push":
+        if any(a in ("-f", "--force", "--force-with-lease", "--mirror", "--delete", "-d") or a.startswith("--force")
+               or a.startswith("+") for a in rest):
+            return "Erzwungenes Pushen oder Löschen auf dem Server ist gesperrt."
+        if any(re.search(r"(^|:)(main|master)$", a) for a in ohne_optionen(rest)[1:]):
+            return "Push auf main/master macht nur Simon."
+    if sub == "checkout" and "-B" in rest:
+        return None
+    return None
 
 
 def pruefe_shell(eingabe, team, projekt, plugin, rolle):
@@ -533,26 +720,35 @@ def pruefe_shell(eingabe, team, projekt, plugin, rolle):
         blockieren("Shell-Befehl nicht lesbar.")
     if os.environ.get("DEV_TEAM_WARTUNG") != "1":
         pruefe_auf_schalter(befehl)
-    ziele, opak, verboten = shell_analyse(befehl)
+    cwd = eingabe.get("cwd") or projekt or os.getcwd()
+    ziele, opak, verboten = shell_analyse(befehl, cwd, rolle, projekt, plugin)
     if verboten:
         blockieren(verboten)
     if opak and not plugin_skript(befehl, plugin):
-        blockieren("Dieser Befehl schreibt Dateien auf eine Weise, die der Wächter nicht prüfen kann "
-                   "(Patch, Skript-Einzeiler mit Schreibzugriff). Dateien mit Write/Edit schreiben.")
-    cwd = eingabe.get("cwd") or projekt or os.getcwd()
+        blockieren(UNPRUEFBAR)
     for ziel, art in ziele:
         ziel = ziel.strip("'\"")
         if not ziel or re.match(r"\$\{?(TMPDIR|TEMP|TMP)\b", ziel):
             continue
-        if "$" in ziel and not ziel.startswith("$HOME"):
-            blockieren("Schreibziel mit Variable (%s) kann nicht geprüft werden." % ziel)
+        if ("$" in ziel and not ziel.startswith("$HOME")) or "`" in ziel:
+            blockieren("Schreibziel mit Variable oder Befehl (%s) kann nicht geprüft werden." % ziel)
         ziel = ziel.replace("$HOME", heimat())
-        absolut = os.path.abspath(os.path.join(cwd, os.path.expanduser(ziel)))
-        pruefe_ziel(absolut, team, projekt, plugin, rolle, art=art, ueber_shell=True)
+        pruefe_ziel(absolut_aus(cwd, ziel), team, projekt, plugin, rolle, art=art, ueber_shell=True)
 
 
 def plugin_skript(befehl, plugin):
-    return bool(plugin) and norm(plugin) in norm(befehl) and "-c" not in befehl.split()
+    """Nur wenn der ERSTE Befehl ein Skript im Plugin-Ordner ist (bash/python <plugin>/scripts/…)."""
+    if not plugin:
+        return False
+    try:
+        teile = shlex.split(befehl)
+    except ValueError:
+        return False
+    while teile and (teile[0] in ("bash", "sh", "python", "python3", "py") or teile[0].startswith("-")):
+        teile = teile[1:]
+    if not teile or any(t in (";", "&&", "||", "|") for t in shlex.split(befehl)) or re.search(r"[;&|`]|\$\(", befehl):
+        return False
+    return innerhalb(os.path.abspath(win_pfad(teile[0])), plugin)
 
 
 # --------------------------------------------------------------------------- Lesen (Entwickler)
@@ -563,6 +759,13 @@ def eigenes_revier(eingabe, projekt):
     return w or projekt
 
 
+def ausserhalb_revier(absolut, revier, plugin):
+    if innerhalb(absolut, revier) or (plugin and innerhalb(absolut, plugin)):
+        return False
+    return innerhalb(absolut, heimat()) or innerhalb(absolut, _KONTEXT["projekt"] or revier) or \
+        innerhalb(absolut, tempfile.gettempdir())
+
+
 def pruefe_lesen(eingabe, team, projekt, plugin, rolle, werkzeug):
     if rolle not in team.get("verdeckt_lesen_verboten_fuer", []):
         return
@@ -570,29 +773,40 @@ def pruefe_lesen(eingabe, team, projekt, plugin, rolle, werkzeug):
     if not isinstance(ti, dict):
         blockieren("Werkzeugaufruf mit unlesbaren Angaben.")
     revier = eigenes_revier(eingabe, projekt)
-    marken = ("verdeckt", ".dev-team")
+    marken = ("verdeckt", ".dev-team", ".verd")
+    sperre = "Der Entwickler arbeitet und liest nur in seinem eigenen Worktree. Verdeckte Tests und der Hauptordner sind gesperrt."
+    punkt_platzhalter = re.compile(r"(^|[/\\\s'\"])\.[^/\\\s]*[*?\[]")
     if werkzeug in SHELL_WERKZEUGE:
         text = str(ti.get("command") or "")
         tief = norm(text)
-        if any(m in tief.lower() for m in marken) or "CLAUDE_PROJECT_DIR" in text or "../../.." in tief:
-            blockieren("Der Entwickler arbeitet nur in seinem eigenen Worktree. Verdeckte Tests und der "
-                       "Hauptordner sind gesperrt.")
+        if any(m in tief.lower() for m in marken) or "CLAUDE_PROJECT_DIR" in text or "../.." in tief \
+                or re.search(r"\bcd\s+(\.\.|/|~|\$HOME|[A-Za-z]:)", tief) or punkt_platzhalter.search(tief) \
+                or re.search(r"\bpushd\b", tief):
+            blockieren(sperre)
         p = norm(projekt).rstrip("/")
         r = norm(revier).rstrip("/")
         for m in re.finditer(re.escape(p), tief):
             if not tief[m.start():].startswith(r) and r != p:
-                blockieren("Der Entwickler liest nicht im Hauptordner des Projekts, nur in seinem Worktree.")
+                blockieren(sperre)
+        for pfad in re.findall(r"(?:^|\s)(/[^\s'\";|&]+|~[^\s'\";|&]*|[A-Za-z]:[\\/][^\s'\";|&]+)", text):
+            absolut = absolut_aus(revier, pfad)
+            if ausserhalb_revier(absolut, revier, plugin) and not innerhalb(absolut, os.path.join(heimat(), ".cache")):
+                blockieren(sperre)
         return
     texte = [str(ti.get(k) or "") for k in ("file_path", "path", "pattern", "notebook_path", "glob")]
-    if any(m in norm(t).lower() for t in texte for m in marken):
-        blockieren("Die verdeckten Abnahmetests sind für den Entwickler gesperrt. Baue nach dem Bauplan.")
-    cwd = eingabe.get("cwd") or projekt
+    if any(m in norm(t).lower() for t in texte for m in marken) or any(punkt_platzhalter.search(norm(t)) for t in texte[1:]):
+        blockieren(sperre)
+    cwd = eingabe.get("cwd") or revier
     for k in ("file_path", "path", "notebook_path"):
         wert = ti.get(k)
         if isinstance(wert, str) and wert:
-            absolut = os.path.abspath(os.path.join(cwd, os.path.expanduser(wert)))
-            if innerhalb(absolut, projekt) and not innerhalb(absolut, revier):
-                blockieren("Der Entwickler liest nur in seinem eigenen Worktree, nicht im Hauptordner.")
+            if ausserhalb_revier(absolut_aus(cwd, wert), revier, plugin):
+                blockieren(sperre)
+    muster = ti.get("pattern")
+    if werkzeug == "Glob" and isinstance(muster, str) and (os.path.isabs(win_pfad(muster)) or muster.startswith("~")
+                                                           or muster.startswith("..")):
+        if ausserhalb_revier(absolut_aus(cwd, muster.split("*")[0] or "/"), revier, plugin):
+            blockieren(sperre)
 
 
 # --------------------------------------------------------------------------- Start
