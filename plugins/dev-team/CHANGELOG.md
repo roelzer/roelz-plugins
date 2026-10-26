@@ -1,5 +1,18 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.3.0 – Restpunkte aus Audit 3.1.0
+
+- Schranke erkennt Tests ohne echte Prüfung: nur Konstanten (`assert True`, `expect(true).toBe(true)`, `assert.equal(a, a)`) oder `return` vor der ersten Prüfung (Python per Syntaxbaum).
+- Testkonfiguration (auch neue, z. B. `conftest.py` mit `collect_ignore`) legt nur der Tester an.
+- Prüfer dürfen Git nur lesen (kein commit, merge, stash, tag, checkout -b, config).
+- Skills mit eigenem Agenten (`context: fork`) aus anderen Quellen sind gesperrt (Wächter prüft jetzt auch das Skill-Werkzeug).
+- Abhängigkeits-Schranke: Tippfehler-Namen bekannter Pakete (Typosquatting) sind rot.
+- Windows: Testbefehle laufen über Git Bash statt cmd.exe.
+- Cloud-Start: `plugin_stand` in `.claude/dev-team.json` nagelt den Dev-Team-Stand fest; ohne Angabe Warnung.
+- Reviewer: Datenmodell/Typen (ungültige Zustände), Kommentare noch wahr, Verlauf der geänderten Stellen (Pflichtfrage 12).
+- Vorlage: Mutationstests (mutmut/Stryker) als empfohlener Zusatzbefehl im Profil fachsoftware.
+- 152 automatische Tests.
+
 ## 3.2.0 – Befunde der Nachprüfung 3.1.0 behoben
 
 ### Warum

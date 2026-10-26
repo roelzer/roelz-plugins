@@ -1,6 +1,6 @@
 # Dev-Team – Anleitung
 
-Stand: Oktober 2026 · Version 3.2
+Stand: Oktober 2026 · Version 3.3
 
 Dieses Repo enthält zwei Plugins für Claude Code: **`dev-team`** und **`tool-scout`**. Beide enthalten kein Firmen- oder Kundenwissen und dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
 
@@ -42,6 +42,7 @@ Damit sich der Aufbau lohnt, ist das **technisch** abgesichert, nicht nur als Bi
 - Zusätzlich sperren die Projekteinstellungen (`.claude/settings.json`) die eingebauten Helfer.
 
 - Auch **Shell-Befehle** prüft der Wächter: Umleitungen, `sed -i`, `cp`, `mv`, `rm`, `git checkout`, Hüllen wie `bash -c` und `eval`, Pipes in einen Interpreter (`curl … | bash`), Skript-Einzeiler mit Schreib- oder Prozesszugriff, neue Claude-Sitzungen (`claude -p`), Paket-Installationen und `npx` mit fremden Paketen. Gesperrt sind auch `git reset --hard`, `git clean`, `git branch -D` und Pushes auf main oder mit Gewalt. Der Projektleiter führt keine Skripte aus dem Projekt aus.
+- Prüfer (Reviewer, Kritiker usw.) dürfen Git nur lesen, nicht committen oder zusammenführen. Skills, die einen eigenen Agenten starten würden (`context: fork`), sind gesperrt.
 - Der Entwickler arbeitet in seinem eigenen Worktree. Lesen außerhalb davon (Hauptordner, verdeckte Tests, `cd ..`) blockiert der Wächter. Das ist **stark erschwert, aber nicht unmöglich** (siehe Grenzen).
 - **Schutzschalter** (Hooks aus, Plugin aus, Freigaben umgehen) kann Claude weder in Dateien noch über die Shell setzen. Einstellungsdateien schreibt nur ein Plugin-Skript nach deinem OK.
 
@@ -90,14 +91,14 @@ Die **Test-Schranke** (`scripts/pruefe-tests.sh`) entscheidet, nicht die Selbsta
 - weniger Tests bestehen als beim letzten grünen Lauf,
 - Referenzfälle geändert oder Testdateien gelöscht wurden (nur mit deiner Freigabe),
 - der Entwickler bestehende Tests oder die Testkonfiguration angefasst hat (nach jedem Zusammenführen noch einmal geprüft),
-- neue Tests gar nichts prüfen oder Tests im Lauf übersprungen wurden,
+- neue Tests gar nichts prüfen, nur Selbstverständliches prüfen (`assert True`) oder vor der Prüfung aussteigen, oder Tests im Lauf übersprungen wurden,
 - sich der Testbefehl in `.claude/dev-team.json` geändert hat.
 
 **Ausnahmen genehmigst nur du:** Muss sich ein Referenzwert oder der Testbefehl ändern, trägst du in VS Code eine Zeile in `.claude/freigaben.md` ein: `Datum | Stichwort | Geltung | Grund`, z. B. `2026-10-26 | rohrtabelle-2026 | tests/referenz/fall3.json | neue Herstellertabelle`. Die Freigabe gilt nur für das, was unter „Geltung“ steht, und nur bei genau passendem Stichwort. Claude kann diese Datei nicht schreiben. Vorlage mit Beispielen: `vorlagen/freigaben-beispiel.md`.
 
 Meldet ein Entwickler „FERTIG“, prüft ein Hook, ob sein Worktree sauber committet ist und ob es für genau diesen Stand einen grünen Schranken-Nachweis gibt. Ohne Nachweis muss er nacharbeiten oder ehrlich „BLOCKIERT“ melden.
 
-Jeder Lauf steht automatisch in `docs/TESTNACHWEIS.md`. Neue Bibliotheken prüft die **Abhängigkeits-Schranke** (`scripts/pruefe-abhaengigkeiten.sh`): Gibt es das Paket wirklich, ist es alt und verbreitet genug, ist die Version festgeschrieben? KI erfindet sonst gern Paketnamen.
+Jeder Lauf steht automatisch in `docs/TESTNACHWEIS.md`. Neue Bibliotheken prüft die **Abhängigkeits-Schranke** (`scripts/pruefe-abhaengigkeiten.sh`): Gibt es das Paket wirklich, ist es alt und verbreitet genug, ist die Version festgeschrieben? KI erfindet sonst gern Paketnamen. Namen, die wie ein Tippfehler eines bekannten Pakets aussehen (`reqeusts`), sind ebenfalls rot.
 
 ## 4. Fachregeln – damit offensichtliche Fehler nicht durchrutschen
 
@@ -134,7 +135,7 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
   - `.claude/dev-team-start.sh`, das in der Cloud das Dev-Team von GitHub holt und Grundgesetz, Agenten, Abläufe und Protokoll bereitstellt. Auf deinen Rechnern tut es nichts, dort übernimmt das installierte Plugin.
 - In der Cloud heißen die Befehle mit Bindestrich, z. B. `/dev-team-auftrag`, die Agenten ohne Präfix, z. B. `kritiker`.
 - **Voraussetzung:** Die Cloud-Sitzung muss `github.com/roelzer/roelz-plugins` erreichen (das Repo ist öffentlich). Wenn nicht, sagt dir der Projektleiter das gleich zu Beginn.
-- **Sicherheit der Lieferkette:** Ohne weitere Angabe holt die Cloud den aktuellen Stand von `main`. Wer einen geprüften Stand festnageln will, setzt in der Cloud-Umgebung die Variable `DEV_TEAM_REF` auf einen Tag oder Commit. Wegen des öffentlichen Repos darf dort nie etwas Vertrauliches stehen.
+- **Sicherheit der Lieferkette:** Ohne weitere Angabe holt die Cloud den aktuellen Stand von `main`. Wer einen geprüften Stand festnageln will, trägt in `.claude/dev-team.json` unter `plugin_stand` einen Tag oder Commit ein (oder setzt in der Cloud-Umgebung `DEV_TEAM_REF`). Ohne Angabe meldet der Start eine Warnung. Wegen des öffentlichen Repos darf dort nie etwas Vertrauliches stehen.
 - Lektionen aus Cloud-Sitzungen landen als Vorschlag in `docs/LEKTIONEN_VORSCHLAEGE.md` des Projekts. Übernommen werden sie später, wenn du dabei bist.
 
 ## 8. Befehle

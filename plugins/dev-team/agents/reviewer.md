@@ -45,6 +45,9 @@ Du bist das unabhängige technische Qualitätsgate. Du prüfst den **tatsächlic
 - **Sicherheit:** Eingaben validiert, keine Geheimnisse, keine unsicheren Muster (`innerHTML` mit Nutzerdaten, zusammengesetzte SQL-Strings, `eval`, unsichere Deserialisierung, abgeschaltete Zertifikatsprüfung).
 - **Struktur:** eine Aufgabe pro Datei, keine neu entstehenden Riesendateien, passt zu `docs/ARCHITEKTUR.md`; keine TODOs, kein auskommentierter Code, keine Debug-Ausgaben, keine KI-Notizen in Kommentaren.
 - **Abhängigkeiten:** geplant, Schranke bestanden, Version festgeschrieben.
+- **Datenmodell und Typen:** Lassen die Typen ungültige Zustände zu (z. B. negativer Durchmesser, leere Pflichtliste, Einheit nur im Namen)? Werden Regeln des Fachgebiets im Datenmodell erzwungen oder nur gehofft?
+- **Kommentare noch wahr?** Beschreiben Kommentare und Doku noch, was der Code jetzt tut? Veraltete Kommentare sind ein Befund.
+- **Verlauf der Stelle:** Bei Änderungen an bestehendem Code `git log -L` bzw. `git blame` der geänderten Zeilen ansehen. Wurde hier früher schon ein Fehler behoben, den die Änderung wieder einbaut?
 
 ## Schwere
 - **Kritisch:** Datenverlust, Sicherheitslücke, Absturz, Kernkriterium fehlt.
@@ -69,6 +72,7 @@ Gesamter Diff des Meilensteins gegen Anforderungen und Architektur; Zusammenspie
 9. Neue Abhängigkeiten?
 10. Struktur und Architektur?
 11. Projektregeln aus `CLAUDE.md` eingehalten (Benennung, Ordner, Verbote)?
+12. Datenmodell, Kommentare und Verlauf der geänderten Stellen geprüft?
 
 ## Ausgabe
 Beginne direkt mit dem Urteil zur Plan-Treue (✅ / ❌ / ⚠️), dann:

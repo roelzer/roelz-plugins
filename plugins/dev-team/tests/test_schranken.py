@@ -177,6 +177,27 @@ class TestSchranke(unittest.TestCase):
         kopf = git(wt, "rev-parse", "HEAD").strip()
         self.assertTrue(os.path.isfile(os.path.join(self.p, ".dev-team", "schranke-ok", kopf)))
 
+    def test_leere_tests_erkannt(self):
+        for inhalt in ("import unittest\nclass N(unittest.TestCase):\n    def test_n(self):\n        self.assertTrue(True)\n",
+                       "def test_n():\n    assert True\n",
+                       "from src.rechnung import summe\ndef test_n():\n    return\n    assert summe([1]) == 1\n"):
+            self.schreibe("tests/test_neu.py", inhalt)
+            code, aus = self.lauf("--rolle", "tester")
+            self.assertEqual(code, 1, inhalt)
+            self.assertIn("ohne echte Prüfung", aus)
+        self.schreibe("tests/test_neu.py", "from src.rechnung import summe\ndef test_n():\n    assert summe([2]) == 2\n")
+        self.assertEqual(self.lauf("--rolle", "tester")[0], 0)
+
+    def test_js_immer_wahr(self):
+        self.schreibe("tests/ui.test.js", "test('x', () => { expect(true).toBe(true); });\n")
+        code, aus = self.lauf("--ohne-lauf")
+        self.assertEqual(code, 1)
+        self.assertIn("immer stimmt", aus)
+
+    def test_neue_testkonfig_durch_entwickler_rot(self):
+        self.schreibe("conftest.py", "collect_ignore = ['tests']\n")
+        self.assertEqual(self.lauf("--rolle", "entwickler")[0], 1)
+
     def test_rote_tests(self):
         self.schreibe("src/rechnung.py", "def summe(w):\n    return 0\n")
         code, aus = self.lauf()
@@ -446,6 +467,13 @@ class TestAbhaengigkeiten(unittest.TestCase):
         code, aus = self.lauf({})
         self.assertEqual(code, 1, aus)
         self.assertIn("Paketquelle", aus)
+
+    def test_typosquatting(self):
+        abh = lade_abh()
+        self.assertEqual(abh.aehnlich_bekannt("reqeusts", "pypi"), "requests")
+        self.assertEqual(abh.aehnlich_bekannt("lodahs", "npm"), "lodash")
+        self.assertIsNone(abh.aehnlich_bekannt("requests", "pypi"))
+        self.assertIsNone(abh.aehnlich_bekannt("nest", "npm"))
 
     def test_pypi_echt(self):
         self.schreibe("requirements.txt", "requests==2.32.3\nhttpx==0.27.0\n")

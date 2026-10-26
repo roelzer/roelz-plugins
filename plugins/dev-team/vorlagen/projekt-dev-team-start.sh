@@ -18,9 +18,12 @@ if grep -q 'dev-team@roelz-plugins' "$HOME/.claude/plugins/installed_plugins.jso
 fi
 
 # Lieferkette: Wer das Dev-Team auf einen geprüften Stand festnageln will, setzt DEV_TEAM_REF (Tag oder Commit)
-# in der Cloud-Umgebung. Ohne Angabe wird der aktuelle Stand von main geholt.
+# in der Cloud-Umgebung oder "plugin_stand" in .claude/dev-team.json. Ohne Angabe: aktueller Stand von main (mit Warnung).
 repo_url="${DEV_TEAM_REPO:-https://github.com/roelzer/roelz-plugins.git}"
 ref="${DEV_TEAM_REF:-}"
+if [ -z "$ref" ] && [ -f "$projekt/.claude/dev-team.json" ]; then
+  ref="$(sed -n 's/^[[:space:]]*"plugin_stand":[[:space:]]*"\([^"]*\)".*/\1/p' "$projekt/.claude/dev-team.json" | head -n 1)"
+fi
 cache="${XDG_CACHE_HOME:-$HOME/.cache}/roelz-plugins"
 plugin="$cache/plugins/dev-team"
 
@@ -67,6 +70,11 @@ case "$modus" in
     done
     printf '%s' "$eingabe" | CLAUDE_PLUGIN_ROOT="$plugin" CLAUDE_PROJECT_DIR="$projekt" bash "$plugin/scripts/sitzungsstart.sh"
     echo
+    if [ -z "$ref" ]; then
+      echo "⚠ Lieferkette: Das Dev-Team wurde vom aktuellen Stand von main geladen, nicht von einem geprüften Stand. Projektleiter: Sag Simon das; festnageln mit \"plugin_stand\" in .claude/dev-team.json (nur mit seiner Freigabe)."
+    else
+      echo "Dev-Team-Stand festgenagelt auf: $ref"
+    fi
     echo "Hinweis Cloud-Sitzung: Die Dev-Team-Befehle heißen hier mit Bindestrich, z. B. /dev-team-auftrag statt /dev-team:auftrag; die Agenten ohne Präfix, z. B. kritiker statt dev-team:kritiker. Für Aufgaben der Stufe Normal/Groß den Skill dev-team-auftrag verwenden."
     ;;
   agent)

@@ -390,8 +390,6 @@ class TeamlisteStimmt(unittest.TestCase):
         self.assertEqual(set(team["agenten"]), dateien)
 
 
-if __name__ == "__main__":
-    unittest.main()
 
 
 class ShellUmgehungen(Basis):
@@ -650,3 +648,49 @@ class EntwicklerLesesperre31(Basis):
                        "ls .d*", "pushd ../.."):
             self.assertEqual(self.werk("Bash", command=befehl), 2, befehl)
         self.assertEqual(self.werk("Bash", command="ls src && git status"), 0)
+
+
+class Audit32(Basis):
+    def bash(self, befehl, rolle=None, cwd=None):
+        e = {"tool_name": "Bash", "tool_input": {"command": befehl}}
+        if rolle:
+            e["agent_type"] = "dev-team:" + rolle
+            e["agent_id"] = "a"
+        return self.lauf(e)[0]
+
+    def test_pruefer_veraendern_git_nicht(self):
+        for befehl in ("git commit -m x", "git merge p1", "git stash", "git checkout -b neu", "git tag v1",
+                       "git -C . commit -m x", "git config user.name x"):
+            self.assertEqual(self.bash(befehl, "reviewer"), 2, befehl)
+        for befehl in ("git status", "git log --oneline -5", "git diff HEAD~1", "git -C . show HEAD", "git branch",
+                       "git blame src/rechnung.js"):
+            self.assertEqual(self.bash(befehl, "reviewer"), 0, befehl)
+        self.assertEqual(self.bash("git commit -m x", "entwickler"), 0)
+
+    def test_skill_mit_eigenem_agenten_blockiert(self):
+        heim = os.path.join(self.tmp, "heim")
+        ordner = os.path.join(heim, ".claude", "skills", "helfer")
+        os.makedirs(ordner)
+        with open(os.path.join(ordner, "SKILL.md"), "w") as f:
+            f.write("---\nname: helfer\ndescription: x\ncontext: fork\nagent: general-purpose\n---\nTu was.\n")
+        ordner2 = os.path.join(heim, ".claude", "skills", "harmlos")
+        os.makedirs(ordner2)
+        with open(os.path.join(ordner2, "SKILL.md"), "w") as f:
+            f.write("---\nname: harmlos\ndescription: x\n---\nText.\n")
+        env = {"HOME": heim, "USERPROFILE": heim}
+        e = {"tool_name": "Skill", "tool_input": {"skill": "helfer"}}
+        self.assertEqual(self.lauf(e, env_zusatz=env)[0], 2)
+        e = {"tool_name": "Skill", "tool_input": {"skill": "harmlos"}}
+        self.assertEqual(self.lauf(e, env_zusatz=env)[0], 0)
+        e = {"tool_name": "Skill", "tool_input": {"skill": "dev-team:auftrag"}}
+        self.assertEqual(self.lauf(e, env_zusatz=env)[0], 0)
+
+    def test_entwickler_legt_keine_testkonfig_an(self):
+        e = self.schreiben(os.path.join(self.projekt, "conftest.py"), "entwickler")
+        self.assertEqual(self.lauf(e)[0], 2)
+        e = self.schreiben(os.path.join(self.projekt, "conftest.py"), "tester")
+        self.assertEqual(self.lauf(e)[0], 0)
+
+
+if __name__ == "__main__":
+    unittest.main()

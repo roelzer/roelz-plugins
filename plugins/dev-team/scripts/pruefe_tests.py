@@ -22,6 +22,8 @@ Nachweis docs/TESTNACHWEIS.md und .dev-team/letzter-gruener-lauf.json im Hauptor
 """
 
 import argparse
+import ast
+import shutil
 import importlib.util
 import json
 import os
@@ -63,6 +65,8 @@ TESTKONFIG = re.compile(
 
 
 def sh(befehl, cwd, check=False):
+    if isinstance(befehl, str) and os.name == "nt" and shutil.which("bash"):
+        befehl = [shutil.which("bash"), "-c", befehl]  # Windows: Testbefehle wie in Git Bash, nicht cmd.exe
     r = subprocess.run(befehl, cwd=cwd, shell=isinstance(befehl, str), capture_output=True,
                        text=True, encoding="utf-8", errors="replace")
     if check and r.returncode != 0:
@@ -123,6 +127,73 @@ def neue_zeilen(wurzel, basis, pfad):
     return zeilen
 
 
+LEERE_PRUEFUNG_JS = re.compile(
+    r"expect\(\s*(true|1|['\"][^'\"]*['\"])\s*\)\.(toBe|toEqual|toBeTruthy|toStrictEqual)\(\s*(true|1|['\"][^'\"]*['\"])?\s*\)|"
+    r"assert(\.ok)?\(\s*true\s*\)|assert\.(strictEqual|equal|deepEqual)\(\s*(\w+|['\"][^'\"]*['\"])\s*,\s*\6\s*\)|"
+    r"Assert\.(True|IsTrue)\(\s*true\s*\)")
+
+
+def _ist_konstant_wahr(knoten):
+    try:
+        return bool(ast.literal_eval(knoten))
+    except (ValueError, TypeError, SyntaxError, MemoryError, RecursionError):
+        return False
+
+
+def _ist_pruefung(knoten):
+    if isinstance(knoten, ast.Assert):
+        return True
+    for k in ast.walk(knoten):
+        if isinstance(k, ast.Call):
+            f = k.func
+            name = f.attr if isinstance(f, ast.Attribute) else (f.id if isinstance(f, ast.Name) else "")
+            if name.startswith(("assert", "fail")) or name in ("raises", "approx", "expect"):
+                return True
+        if isinstance(k, (ast.With, ast.AsyncWith)):
+            for item in k.items:
+                c = item.context_expr
+                if isinstance(c, ast.Call):
+                    f = c.func
+                    name = f.attr if isinstance(f, ast.Attribute) else (f.id if isinstance(f, ast.Name) else "")
+                    if name in ("raises", "assertRaises", "assertRaisesRegex", "warns", "assertWarns"):
+                        return True
+    return False
+
+
+def leere_python_tests(inhalt):
+    """Findet Testfunktionen, die nichts prüfen können: nur konstant wahre Prüfungen,
+    oder ein return/pass vor der ersten Prüfung."""
+    try:
+        baum = ast.parse(inhalt)
+    except (SyntaxError, ValueError):
+        return []
+    befunde = []
+    for k in ast.walk(baum):
+        if not isinstance(k, (ast.FunctionDef, ast.AsyncFunctionDef)) or not k.name.startswith("test"):
+            continue
+        pruefungen, frueh = [], False
+        for anweisung in k.body:
+            if isinstance(anweisung, ast.Return) and not any(_ist_pruefung(a) for a in pruefungen):
+                frueh = True
+                break
+            if _ist_pruefung(anweisung):
+                pruefungen.append(anweisung)
+        if frueh:
+            befunde.append("%s (return vor der ersten Prüfung)" % k.name)
+            continue
+        asserts = [a for a in ast.walk(k) if isinstance(a, ast.Assert)]
+        aufrufe = [a for a in ast.walk(k) if isinstance(a, ast.Call) and isinstance(a.func, ast.Attribute)
+                   and a.func.attr.startswith("assert")]
+        alle = len(asserts) + len(aufrufe)
+        konstant = sum(1 for a in asserts if _ist_konstant_wahr(a.test))
+        konstant += sum(1 for a in aufrufe if a.args and all(_ist_konstant_wahr(x) for x in a.args)
+                        and a.func.attr in ("assertTrue", "assertEqual", "assertIs", "assertIsNotNone"))
+        if alle and konstant == alle and not any(_ist_pruefung(a) for a in ast.walk(k)
+                                                 if isinstance(a, (ast.With, ast.AsyncWith))):
+            befunde.append("%s (prüft nur Konstanten, z. B. assert True)" % k.name)
+    return befunde
+
+
 def ist_testdatei(bereich):
     return bereich in ("tests", "abnahme", "architektur", "referenz", "testkonfig")
 
@@ -179,6 +250,18 @@ def pruefe_diff(e, wurzel, basis, rolle, team, fg):
                 inhalt = ""
             if TEST_FUNKTION.search(inhalt) and not PRUEF_WORTE.search(inhalt):
                 e.f("Neue Testdatei ohne eine einzige Prüfung (assert/expect …): %s" % p)
+        if ist_testdatei(bereich) and status in "AM" and bereich != "referenz":
+            try:
+                with open(os.path.join(wurzel, p), encoding="utf-8", errors="replace") as f:
+                    inhalt = f.read()
+            except OSError:
+                inhalt = ""
+            if p.endswith(".py"):
+                for b in leere_python_tests(inhalt):
+                    e.f("Test ohne echte Prüfung in %s: %s" % (p, b))
+            for zeile in neue_zeilen(wurzel, basis, p):
+                if LEERE_PRUEFUNG_JS.search(zeile):
+                    e.f("Prüfung, die immer stimmt, in %s: %s" % (p, zeile.strip()[:120]))
         if bereich == "teamkonfig" and status in "AMD":
             (e.w if fg.deckt(".claude/dev-team.json") else e.f)(
                 "Dev-Team-Einstellungen (.claude/dev-team.json) geändert%s." % (
@@ -186,9 +269,9 @@ def pruefe_diff(e, wurzel, basis, rolle, team, fg):
                     " – Testbefehl und Prüfregeln dürfen sich nur mit Simons Freigabe ändern"))
         if TESTKONFIG.search(p) and status in "AMD":
             e.w("Testkonfiguration geändert (%s): Reviewer prüft, dass keine Tests ausgeschlossen werden." % p)
-        if entwicklerregeln and bereich == "testkonfig" and status in "MD":
-            e.f("Testkonfiguration %s %s (bestehende Testkonfiguration ändert nur der Tester)." % (
-                p, "geändert" if status == "M" else "gelöscht"))
+        if entwicklerregeln and bereich == "testkonfig" and status in "AMD":
+            e.f("Testkonfiguration %s %s (Testkonfiguration legt und ändert nur der Tester an)." % (
+                p, {"A": "angelegt", "M": "geändert"}.get(status, "gelöscht")))
         if entwicklerregeln:
             if ist_testdatei(bereich) and status in "MD":
                 e.f("Entwickler hat bestehende Testdatei %s %s." % (p, "geändert" if status == "M" else "gelöscht"))

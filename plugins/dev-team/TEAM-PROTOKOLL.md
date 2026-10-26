@@ -1,4 +1,4 @@
-# Dev-Team – Zusammenarbeit auf Senior-Niveau (Version 3.2)
+# Dev-Team – Zusammenarbeit auf Senior-Niveau (Version 3.3)
 
 Ideen aus anderen Projekten (Superpowers, BMAD, Anthropic, wshobson) und was übernommen wurde: `docs/VORBILDER.md` im Repo.
 

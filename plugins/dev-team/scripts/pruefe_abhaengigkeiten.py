@@ -156,7 +156,50 @@ def alter_tage(iso):
     return (datetime.now(timezone.utc) - t).days
 
 
+BEKANNT = {
+    "npm": ["react", "react-dom", "vue", "express", "lodash", "axios", "typescript", "vite", "vitest", "jest",
+            "eslint", "prettier", "next", "webpack", "chalk", "commander", "dotenv", "moment", "dayjs", "zod",
+            "tailwindcss", "postcss", "svelte", "playwright", "@playwright/test", "mocha", "uuid", "cors",
+            "body-parser", "jsonwebtoken", "bcrypt", "mongoose", "sequelize", "prisma", "electron", "socket.io",
+            "nodemon", "rxjs", "redux", "xlsx", "exceljs", "pdfkit", "puppeteer", "cheerio", "yargs", "semver"],
+    "pypi": ["requests", "numpy", "pandas", "scipy", "matplotlib", "flask", "django", "fastapi", "pydantic",
+             "pytest", "httpx", "openpyxl", "sqlalchemy", "pillow", "click", "rich", "typer", "uvicorn",
+             "beautifulsoup4", "lxml", "pyyaml", "jinja2", "boto3", "urllib3", "setuptools", "wheel", "cryptography",
+             "python-dateutil", "pytz", "tqdm", "black", "ruff", "mypy", "selenium", "scikit-learn", "torch",
+             "shapely", "pyproj", "ezdxf", "reportlab", "xlsxwriter", "psycopg2", "pymysql", "aiohttp", "mutmut"],
+}
+
+
+def _abstand(a, b):
+    if abs(len(a) - len(b)) > 2:
+        return 3
+    d = [[0] * (len(b) + 1) for _ in range(len(a) + 1)]
+    for i in range(len(a) + 1):
+        d[i][0] = i
+    for j in range(len(b) + 1):
+        d[0][j] = j
+    for i in range(1, len(a) + 1):
+        for j in range(1, len(b) + 1):
+            d[i][j] = min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] != b[j - 1]))
+            if i > 1 and j > 1 and a[i - 1] == b[j - 2] and a[i - 2] == b[j - 1]:
+                d[i][j] = min(d[i][j], d[i - 2][j - 2] + 1)  # vertauschte Buchstaben
+    return d[-1][-1]
+
+
+def aehnlich_bekannt(name, system):
+    """Name sieht aus wie ein bekanntes Paket mit Tippfehler (Typosquatting)?"""
+    n = name.lower().replace("_", "-")
+    for b in BEKANNT.get(system, []):
+        if n != b and ((len(b) >= 5 and _abstand(n, b) == 1) or n.replace("-", "") == b.replace("-", "")):
+            return b
+    return None
+
+
 def pruefe_npm(name, fehler, ok):
+    aehnlich = aehnlich_bekannt(name, "npm")
+    if aehnlich:
+        fehler.append("npm-Paket '%s' sieht aus wie ein Tippfehler von '%s' (Typosquatting?). Nur mit Simons "
+                      "Freigabe nach Prüfung durch den Sicherheitsprüfer." % (name, aehnlich))
     try:
         meta = hole_json("https://registry.npmjs.org/" + urllib.parse.quote(name, safe="@"))
     except urllib.error.HTTPError as e:
@@ -186,6 +229,10 @@ def pruefe_npm(name, fehler, ok):
 
 
 def pruefe_pypi(name, fehler, ok):
+    aehnlich = aehnlich_bekannt(name, "pypi")
+    if aehnlich:
+        fehler.append("PyPI-Paket '%s' sieht aus wie ein Tippfehler von '%s' (Typosquatting?). Nur mit Simons "
+                      "Freigabe nach Prüfung durch den Sicherheitsprüfer." % (name, aehnlich))
     try:
         meta = hole_json("https://pypi.org/pypi/%s/json" % urllib.parse.quote(name))
     except urllib.error.HTTPError as e:

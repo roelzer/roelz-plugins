@@ -68,7 +68,7 @@ def utf8_einrichten():
             pass
 
 
-_KONTEXT = {"projekt": None, "rolle": None}
+_KONTEXT = {"projekt": None, "rolle": None, "team": {}}
 
 
 def blockieren(grund, protokoll=None):
@@ -660,7 +660,8 @@ def shell_analyse(befehl, cwd=None, rolle="projektleiter", projekt=None, plugin=
             ziele += [(a, "schreiben") for a in ohne_optionen(args) if not re.fullmatch(r"\d+[kmgKMG]?", a)]
         elif cmd == "dd":
             ziele += [(a[3:], "schreiben") for a in args if a.startswith("of=")]
-        elif cmd == "git" and args:
+        elif cmd == "git" and git_ohne_globale(args):
+            args = git_ohne_globale(args)
             v = pruefe_git(args, rolle, cwd, projekt)
             if v:
                 verboten = v
@@ -689,9 +690,30 @@ def shell_analyse(befehl, cwd=None, rolle="projektleiter", projekt=None, plugin=
     return ziele, opak, verboten
 
 
+def git_ohne_globale(args):
+    """Globale Git-Optionen vor dem Unterbefehl entfernen (-C <pfad>, -c <x=y>, --no-pager …)."""
+    i = 0
+    while i < len(args) and args[i].startswith("-"):
+        i += 2 if args[i] in ("-C", "-c", "--git-dir", "--work-tree", "--namespace") else 1
+    return args[i:]
+
+
+GIT_LESEND = {"status", "log", "diff", "show", "blame", "rev-parse", "rev-list", "ls-files", "ls-tree",
+              "cat-file", "describe", "grep", "shortlog", "merge-base", "name-rev", "for-each-ref", "config",
+              "version", "help", "count-objects", "check-ignore", "var", "whatchanged", "reflog", "fetch"}
+
+
 def pruefe_git(args, rolle, cwd, projekt):
     sub = args[0]
     rest = args[1:]
+    agenten = (_KONTEXT.get("team") or {}).get("agenten") or {}
+    nur_lesen = rolle in agenten and not agenten[rolle].get("schreibt")
+    if nur_lesen and sub not in GIT_LESEND and not (sub == "worktree" and rest[:1] == ["list"]) \
+            and not (sub == "branch" and not ohne_optionen(rest)) and not (sub == "stash" and rest[:1] == ["list"]):
+        return ("Prüfer ('%s') verändern das Repository nicht (kein git %s). Nur lesende Git-Befehle "
+                "wie status, log, diff, show, blame." % (rolle, sub))
+    if sub == "config" and ohne_optionen(rest)[1:]:
+        return "Git-Einstellungen ändert Claude nicht (git config mit Wert)."
     if sub in ("clean", "filter-branch", "filter-repo", "update-ref", "replace"):
         return "'git %s' kann Arbeit unwiederbringlich löschen oder Verlauf umschreiben und ist gesperrt." % sub
     if sub == "reset" and "--hard" in rest:
@@ -749,6 +771,57 @@ def plugin_skript(befehl, plugin):
     if not teile or any(t in (";", "&&", "||", "|") for t in shlex.split(befehl)) or re.search(r"[;&|`]|\$\(", befehl):
         return False
     return innerhalb(os.path.abspath(win_pfad(teile[0])), plugin)
+
+
+# --------------------------------------------------------------------------- Skills
+
+def skill_datei(name):
+    """Sucht die SKILL.md zu einem Skill-Namen (plugin:skill oder skill)."""
+    plugin_name, _, kurz = name.rpartition(":")
+    kandidaten = []
+    projekt = _KONTEXT["projekt"]
+    if not plugin_name:
+        if projekt:
+            kandidaten.append(os.path.join(projekt, ".claude", "skills", kurz, "SKILL.md"))
+        kandidaten.append(os.path.join(heimat(), ".claude", "skills", kurz, "SKILL.md"))
+    wurzeln = [os.path.join(heimat(), ".claude", "plugins")]
+    for w in wurzeln:
+        for ordner, unter, dateien in os.walk(w):
+            tiefe = ordner[len(w):].count(os.sep)
+            if tiefe > 7:
+                unter[:] = []
+                continue
+            if os.path.basename(ordner) == kurz and "SKILL.md" in dateien and \
+                    (not plugin_name or ("%s%s" % (os.sep, plugin_name)) in ordner):
+                kandidaten.append(os.path.join(ordner, "SKILL.md"))
+    for k in kandidaten:
+        if os.path.isfile(k):
+            return k
+    return None
+
+
+def pruefe_skill(eingabe, rolle):
+    """Skills, die einen eigenen Agenten starten (context: fork), wären Helfer außerhalb des Teams."""
+    ti = eingabe.get("tool_input") or {}
+    name = str((ti.get("skill") or ti.get("name") or "") if isinstance(ti, dict) else "").strip().lstrip("/")
+    if not name:
+        blockieren("Skill-Aufruf ohne lesbaren Namen.")
+    if name.startswith("dev-team:"):
+        return
+    datei = skill_datei(name)
+    if not datei:
+        return  # eingebauter Skill ohne Datei – startet keinen eigenen Agenten
+    try:
+        with open(datei, encoding="utf-8", errors="replace") as f:
+            kopf = f.read(4000)
+    except OSError:
+        return
+    m = re.match(r"^---\s*\n(.*?)\n---", kopf, re.S)
+    if m and re.search(r"^\s*context\s*:\s*['\"]?fork", m.group(1), re.M | re.I):
+        blockieren("Der Skill '%s' startet einen eigenen Agenten (context: fork). Das wäre ein Helfer außerhalb "
+                   "des festen Teams. Die Aufgabe einem Agenten aus team.json geben." % name)
+    if rolle != "projektleiter" and m and re.search(r"^\s*agent\s*:", m.group(1), re.M | re.I):
+        blockieren("Agenten des Teams rufen keine Skills auf, die eigene Agenten festlegen ('%s')." % name)
 
 
 # --------------------------------------------------------------------------- Lesen (Entwickler)
@@ -838,6 +911,7 @@ def lauf(roh, plugin):
             blockieren("team.json im Plugin-Ordner fehlt oder ist ungültig – im Zweifel blockiert.")
         return
 
+    _KONTEXT["team"] = team
     werkzeug = str(eingabe.get("tool_name") or "")
     rolle = rolle_aus(eingabe.get("agent_type"), team, projekt)
     _KONTEXT["rolle"] = rolle or str(eingabe.get("agent_type"))
@@ -852,7 +926,9 @@ def lauf(roh, plugin):
                    "hier arbeiten." % eingabe.get("agent_type"))
     rolle = rolle or "projektleiter"
 
-    if werkzeug in SCHREIB_WERKZEUGE:
+    if werkzeug == "Skill" and projekt:
+        pruefe_skill(eingabe, rolle)
+    elif werkzeug in SCHREIB_WERKZEUGE:
         pruefe_schreiben(eingabe, team, projekt, plugin, rolle)
     elif werkzeug in SHELL_WERKZEUGE and projekt:
         pruefe_shell(eingabe, team, projekt, plugin, rolle)

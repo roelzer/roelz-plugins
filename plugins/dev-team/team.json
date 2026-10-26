@@ -1,6 +1,6 @@
 {
   "_zweck": "Einzige Quelle für das feste Team und die Schreibrechte. Wird vom Wächter-Hook (scripts/waechter.py) gelesen. Änderungen nur mit Simons Freigabe im Plugin-Repo.",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "agenten": {
     "kritiker": {
       "phase": "Planprüfung",
@@ -38,8 +38,7 @@
       "phase": "Bauen (ein Paket)",
       "schreibt": [
         "code",
-        "tests-neu",
-        "testkonfig-neu"
+        "tests-neu"
       ]
     },
     "tester": {
