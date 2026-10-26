@@ -117,8 +117,26 @@ def main():
                 z = os.path.join(tmp, d)
                 os.makedirs(os.path.dirname(z), exist_ok=True)
                 shutil.copy2(q, z)
+        umgebung = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
+
+        def cache_weg():
+            # Python würde sonst zwischengespeicherten Bytecode einer früheren Mutante verwenden
+            for o, unter, _ in os.walk(tmp):
+                for u in list(unter):
+                    if u == "__pycache__":
+                        shutil.rmtree(os.path.join(o, u), ignore_errors=True)
+                        unter.remove(u)
+
+        def tests_laufen(grenze_s):
+            cache_weg()
+            if os.name == "nt" and shutil.which("bash"):
+                return subprocess.run([shutil.which("bash"), "-c", befehl], cwd=tmp, capture_output=True, text=True,
+                                      timeout=grenze_s, env=umgebung)
+            return subprocess.run(befehl, shell=True, cwd=tmp, capture_output=True, text=True, timeout=grenze_s,
+                                  env=umgebung)
+
         start = time.time()
-        basis = subprocess.run(befehl, shell=True, cwd=tmp, capture_output=True, text=True, timeout=1800)
+        basis = tests_laufen(1800)
         dauer = time.time() - start
         if basis.returncode != 0:
             print("FEHLER: Die Tests sind schon ohne Mutation rot – erst grün machen.")
@@ -153,7 +171,7 @@ def main():
             with open(ziel, "w", encoding="utf-8") as f:
                 f.write(neu)
             try:
-                r = subprocess.run(befehl, shell=True, cwd=tmp, capture_output=True, text=True, timeout=grenze)
+                r = tests_laufen(grenze)
                 tot = r.returncode != 0
             except subprocess.TimeoutExpired:
                 tot = True  # Endlosschleife zählt als erkannt

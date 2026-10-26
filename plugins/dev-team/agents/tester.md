@@ -40,7 +40,7 @@ Du bist der unabhängige Testingenieur. Du prüfst, ob das beobachtbare Verhalte
 4. **Fachregeln:** jede bestätigte Regel über viele erzeugte Fälle mit festem Zufalls-Startwert (z. B. `hypothesis`, `fast-check`).
 5. **Andere Werte als in den Beispielen der Anforderungen**, damit Sonderfall-Code auffällt. Prüf-Schwerpunkt des Architekten abdecken.
 6. Ablegen am verdeckten Ort, den der Projektleiter nennt, mit Endung **`.verdeckt`**, plus `LIESMICH.md` (Datei → Kriterium → Zielort).
-7. **Nummern:** Jeder Testname enthält die Nummer der Anforderung bzw. Fachregel (`test_a3_leere_datei_meldet_fehler`, `test_r1_dn_nie_groesser`). Die Schranke prüft, dass jede Anforderung und jede bestätigte Fachregel mindestens einen Test hat.
+7. **Nummern:** Jeder Testname enthält die Nummer der Anforderung bzw. Fachregel (`test_a3_leere_datei_meldet_fehler`, `test_f1_dn_nie_groesser`). Die Schranke prüft, dass jede Anforderung und jede bestätigte Fachregel mindestens einen Test hat.
 8. **Fachregeln als Eigenschaftstests:** Jede bestätigte Fachregel wird über viele erzeugte Eingaben geprüft (feste Zufallsquelle, z. B. `random.Random(42)`, mindestens einige hundert Fälle, Grenzwerte ausdrücklich dabei), nicht nur an einem Beispiel.
 
 ## Modus `pruefen`

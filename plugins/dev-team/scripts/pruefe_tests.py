@@ -101,6 +101,12 @@ def lade_konfig(wurzel, hauptordner):
     return None, None
 
 
+def git_erste_fassung(wurzel, pfad):
+    r = sh(["git", "log", "--diff-filter=A", "--format=%H", "--reverse", "--", pfad], wurzel)
+    commit = (r.stdout or "").split()
+    return git_datei_text(wurzel, commit[0], pfad) if commit else None
+
+
 def git_datei_text(wurzel, commit, pfad):
     r = sh(["git", "show", "%s:%s" % (commit, pfad)], wurzel)
     return r.stdout if r.returncode == 0 else None
@@ -282,14 +288,40 @@ def testkonfig_teile(pfad, text):
     return None
 
 
-def pruefsummen_pruefen(e, hauptordner, wurzel, fg):
+def einstellungen_pruefen(e, hauptordner):
+    """Stolperdraht ohne Hooks: Sind Schutz-Hooks per Einstellung abgeschaltet oder umgelenkt, ist die
+    Schranke rot – sie läuft auch dann, wenn die Hooks schon aus sind."""
+    spec = importlib.util.spec_from_file_location("einstellungs_schutz",
+                                                  os.path.join(PLUGIN, "scripts", "einstellungs_schutz.py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    heim = os.path.expanduser("~")
+    for quelle, pfad in (("lokal", os.path.join(hauptordner, ".claude", "settings.local.json")),
+                         ("projekt", os.path.join(hauptordner, ".claude", "settings.json")),
+                         ("benutzer", os.path.join(heim, ".claude", "settings.json")),
+                         ("benutzer", os.path.join(heim, ".claude", "settings.local.json"))):
+        for text, _ in mod.befunde(mod.lade(pfad), quelle, True):
+            e.f("Einstellung schaltet den Dev-Team-Schutz ab oder lenkt ihn um: %s (%s). Stopp – Simon fragen." % (text, pfad))
+
+
+def pruefsummen_pruefen(e, hauptordner, wurzel, fg, rolle="projektleiter"):
     spec = importlib.util.spec_from_file_location("abnahme_pruefsummen",
                                                   os.path.join(PLUGIN, "scripts", "abnahme_pruefsummen.py"))
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
-    if not os.path.isfile(os.path.join(hauptordner, mod.DATEI)):
+    liste_pfad = os.path.join(hauptordner, mod.DATEI)
+    verdeckt_da = bool(mod.verdeckte(hauptordner))
+    if not os.path.isfile(liste_pfad):
+        if verdeckt_da and rolle in ("merge", "projektleiter"):
+            e.f("Verdeckte Abnahmetests vorhanden, aber keine festgehaltenen Prüfsummen (%s). Erst "
+                "abnahme_pruefsummen.py --schreiben und committen." % mod.DATEI)
         return
-    funde = mod.pruefen(hauptordner, wurzel)
+    erste = git_erste_fassung(hauptordner, mod.DATEI)
+    jetzt_text = datei_text(hauptordner, mod.DATEI) or ""
+    if erste is not None and erste != jetzt_text and not fg.deckt("docs/ABNAHME_PRUEFSUMMEN.txt"):
+        e.f("Die Prüfsummen-Liste weicht von ihrer ersten versionierten Fassung ab – Abnahmetests werden nie "
+            "nachträglich angepasst (nur mit Simons Freigabe).")
+    funde = mod.pruefen(hauptordner, wurzel, vollstaendig=(rolle == "projektleiter"))
     for t in funde:
         (e.w if fg.deckt("docs/ABNAHME_PRUEFSUMMEN.txt") else e.f)(t + (fg.text("docs/ABNAHME_PRUEFSUMMEN.txt") or
                                                                          " Abnahmetests werden nie passend gemacht."))
@@ -297,17 +329,32 @@ def pruefsummen_pruefen(e, hauptordner, wurzel, fg):
         e.o("Abnahmetests stimmen mit den festgehaltenen Prüfsummen überein.")
 
 
-def _testtexte(wurzel, hauptordner):
-    texte = []
+TESTNAME_JS = re.compile(r"\b(?:it|test|describe|context|specify)(?:\.\w+)*\s*\(\s*(['\"`])(.*?)\1")
+
+
+def _testnamen(wurzel, hauptordner):
+    """Nur Namen von Tests (Funktionen/Klassen test*, Titel von it()/test()) – keine beliebigen Wörter."""
+    namen = []
     for basis, unter in ((wurzel, "tests"), (wurzel, "test"), (wurzel, "e2e"), (hauptordner, ".dev-team/verdeckt")):
-        for ordner, _, dateien in os.walk(os.path.join(basis, unter)):
+        for ordner, unterordner, dateien in os.walk(os.path.join(basis, unter)):
+            unterordner[:] = [u for u in unterordner if u != "__pycache__"]
             for d in dateien:
-                try:
-                    with open(os.path.join(ordner, d), encoding="utf-8", errors="replace") as f:
-                        texte.append(f.read())
-                except OSError:
-                    pass
-    return "\n".join(texte)
+                inhalt = datei_text(ordner, d) or ""
+                if d.endswith((".py", ".py.verdeckt")):
+                    try:
+                        baum = ast.parse(inhalt)
+                    except (SyntaxError, ValueError):
+                        continue
+                    for k in ast.walk(baum):
+                        if isinstance(k, (ast.FunctionDef, ast.AsyncFunctionDef)) and k.name.lower().startswith("test"):
+                            namen.append(k.name)
+                            doc = ast.get_docstring(k) or ""
+                            namen.append(doc.split("\n")[0])
+                        elif isinstance(k, ast.ClassDef) and "test" in k.name.lower():
+                            namen.append(k.name)
+                else:
+                    namen += [m.group(2) for m in TESTNAME_JS.finditer(inhalt)]
+    return "\n".join(namen)
 
 
 def abdeckung_pruefen(e, wurzel, hauptordner, konfig, fg):
@@ -315,17 +362,27 @@ def abdeckung_pruefen(e, wurzel, hauptordner, konfig, fg):
     mindestens einen Test, der die Nummer im Namen oder Kommentar trägt."""
     texte = None
     lh = datei_text(wurzel, "docs/lastenheft.md") or ""
-    anf = sorted(set(re.findall(r"^\s*[-*|]?\s*\**(A\d+)\**\s*[:.)|]", lh, re.M)), key=lambda x: int(x[1:]))
+    anf = sorted(set(re.findall(r"^\s*(?:#{1,6}\s*|[-*|]\s*)?\**(A\d+)\**\s*[:.)|\s–-]", lh, re.M)),
+                 key=lambda x: int(x[1:]))
     regeln_text = datei_text(wurzel, "fachwissen/regeln.md") or ""
     regeln = []
     if (konfig or {}).get("profil") == "fachsoftware":
+        abschnitt = ""
         for zeile in regeln_text.splitlines():
-            m = re.match(r"^\s*\|?\s*(R\d+)\s*\|", zeile)
-            if m and re.search(r"bestätigt|bestaetigt", zeile, re.I):
+            if zeile.startswith("#"):
+                abschnitt = zeile.lower()
+                continue
+            m = re.match(r"^\s*\|?\s*([FR]\d+)\s*\|", zeile)
+            if not m:
+                continue
+            spalten = [c.strip().lower() for c in zeile.strip().strip("|").split("|")]
+            leer = len([c for c in spalten[1:2] if c]) == 0  # Vorlagenzeile ohne Regeltext
+            if not leer and ("bestätigt" in abschnitt or "bestaetigt" in abschnitt or
+                             any(c in ("bestätigt", "bestaetigt") for c in spalten)):
                 regeln.append(m.group(1))
     if not anf and not regeln:
         return
-    texte = _testtexte(wurzel, hauptordner)
+    texte = _testnamen(wurzel, hauptordner)
     def vorhanden(nr):
         return re.search(r"(?<![A-Za-z0-9])%s%s(?![0-9])" % (nr[0], nr[1:]), texte, re.I) is not None
     fehlt_a = [a for a in anf if not vorhanden(a)]
@@ -584,7 +641,7 @@ def main():
     if basis == git(wurzel, "rev-parse", "HEAD").strip() and arg.rolle in ("projektleiter", "merge", "reviewer"):
         e.w("Basis = aktueller Stand: Es werden keine Änderungen geprüft, nur der Testlauf.")
     if (konfig or {}).get("profil") == "fachsoftware" and arg.rolle == "projektleiter" and not any(
-            re.search(r"mutmut|stryker|mutation|cosmic-ray|pitest", str(z), re.I)
+            re.search(r"(^|[\s/\\])(mutationstest\.py|mutmut|stryker|cosmic-ray|pitest|mutpy)(\s|$)", str(z), re.I)
             for z in list((konfig or {}).get("zusatzbefehle") or []) + list((konfig or {}).get("meilensteinbefehle") or [])):
         (e.w if fg.deckt("mutation") else e.f)(
             "Profil fachsoftware ohne Mutationstest in 'meilensteinbefehle': Die Testqualität des Berechnungskerns "
@@ -595,7 +652,8 @@ def main():
         if len(eltern) < 3:
             e.f("HEAD ist kein Merge-Commit. Zusammenführen nur mit 'git merge --no-ff', sonst prüft --basis HEAD^1 "
                 "nur den letzten Commit des Pakets.")
-    pruefsummen_pruefen(e, hauptordner, wurzel, fg)
+    pruefsummen_pruefen(e, hauptordner, wurzel, fg, arg.rolle)
+    einstellungen_pruefen(e, hauptordner)
     if arg.rolle == "projektleiter":
         abdeckung_pruefen(e, wurzel, hauptordner, konfig, fg)
     wt_ordner = os.path.join(wurzel, ".claude", "worktrees")

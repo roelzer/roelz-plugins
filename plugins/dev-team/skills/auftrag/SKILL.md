@@ -1,6 +1,6 @@
 ---
 name: auftrag
-description: Projektleitungs-Workflow für Softwareaufträge mit dem festen Dev-Team. Anforderungen mit Freigabe, Plan und Baupläne vom Architekten, unabhängige Prüfungen, Abwägungsrunde, verdeckte Abnahmetests, eigenständiges Bauen durch bis zu 4 parallele Entwickler, Paket-Review vor jedem Merge, Fix-Schleife mit Obergrenze, alle Tests grün, Abnahme jeder Anforderung. Feste Stopps bei Simon.
+description: Projektleitungs-Workflow für Softwareaufträge mit dem festen Dev-Team. Anforderungen mit Freigabe, Plan und Baupläne vom Architekten, unabhängige Prüfungen, Abwägungsrunde, verdeckte Abnahmetests, eigenständiges Bauen durch bis zu 3 parallele Entwickler, Paket-Review vor jedem Merge, Fix-Schleife mit Obergrenze, alle Tests grün, Abnahme jeder Anforderung. Feste Stopps bei Simon.
 disable-model-invocation: true
 argument-hint: "[Was soll gebaut oder geändert werden?]"
 ---
@@ -61,7 +61,7 @@ Nach der Tabelle und den Risiko-Auslösern im Grundgesetz, nach Risiko, nicht na
 Entscheidungen in `docs/risiko-log.md`, bestätigte Regeln in `fachwissen/regeln.md`. Bei jeder neuen Regel fragen, ob sie fürs ganze Fachgebiet gilt. **Ohne ausdrückliche Freigabe wird nicht gebaut.**
 
 ## Phase 6 – Verdeckte Abnahmetests
-→ `tester` Modus `abnahme-entwurf` mit Anforderungen, Abnahmekriterien, Fachregeln, Prüf-Schwerpunkt und den Schnittstellen (Namen und Typen) aus den Bauplänen – **ohne** Lösungsideen. Ablageort: `.dev-team/verdeckt/` im Hauptordner (nicht im Repo; Entwickler arbeiten in Worktrees, der Wächter sperrt den Zugriff – das ist stark erschwert, aber nicht unmöglich, deshalb zählen die verdeckten Tests als zusätzliche Absicherung, nicht als einzige). Prüfe, dass `.dev-team/` in `.gitignore` steht. Jeder Testname (oder ein Kommentar daneben) trägt die Nummer der Anforderung (A3) bzw. Fachregel (R2), die er prüft.
+→ `tester` Modus `abnahme-entwurf` mit Anforderungen, Abnahmekriterien, Fachregeln, Prüf-Schwerpunkt und den Schnittstellen (Namen und Typen) aus den Bauplänen – **ohne** Lösungsideen. Ablageort: `.dev-team/verdeckt/` im Hauptordner (nicht im Repo; Entwickler arbeiten in Worktrees, der Wächter sperrt den direkten Zugriff, mit einem eigenen Skript ginge es trotzdem – deshalb zählen die verdeckten Tests als zusätzliche Absicherung, belegt durch Prüfsummen und den blinden Lauf). Prüfe, dass `.dev-team/` in `.gitignore` steht. Jeder Testname (oder ein Kommentar daneben) trägt die Nummer der Anforderung (A3) bzw. Fachregel (F2), die er prüft.
 Danach **Prüfsummen festhalten:** `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/abnahme_pruefsummen.py" --schreiben`. Das belegt, dass die Abnahmetests vor dem Bauen fertig waren; jede spätere Änderung macht die Schranke rot.
 
 ## Phase 7 – Eigenständig bauen

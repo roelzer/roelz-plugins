@@ -57,16 +57,51 @@ def main():
             init = os.path.join(os.path.dirname(ziel), "__init__.py")
             if ziel.endswith(".py") and os.path.isfile(os.path.join(tmp, "tests", "__init__.py")) and not os.path.exists(init):
                 open(init, "w").close()
-        if konfig.get("setup"):
-            subprocess.run(konfig["setup"], shell=True, cwd=tmp, capture_output=True, timeout=1800)
-        r = subprocess.run(konfig.get("testbefehl") or "false", shell=True, cwd=tmp, capture_output=True, text=True,
-                           encoding="utf-8", errors="replace", timeout=1800)
-        ausgabe = (r.stdout or "") + "\n" + (r.stderr or "")
-        zahl = None
-        if konfig.get("testzahl_muster"):
+        def laufen(befehl, ordner):
+            umg = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
+            if os.name == "nt" and shutil.which("bash"):
+                return subprocess.run([shutil.which("bash"), "-c", befehl], cwd=ordner, capture_output=True, text=True,
+                                      encoding="utf-8", errors="replace", timeout=1800, env=umg)
+            return subprocess.run(befehl, shell=True, cwd=ordner, capture_output=True, text=True, encoding="utf-8",
+                                  errors="replace", timeout=1800, env=umg)
+
+        def anzahl(ausgabe):
+            if not konfig.get("testzahl_muster"):
+                return None
             t = re.findall(konfig["testzahl_muster"], ausgabe)
-            if t:
-                zahl = t[-1][0] if isinstance(t[-1], tuple) else t[-1]
+            if not t:
+                return None
+            return int(t[-1][0] if isinstance(t[-1], tuple) else t[-1])
+
+        if konfig.get("setup"):
+            laufen(konfig["setup"], tmp)
+        r = laufen(konfig.get("testbefehl") or "false", tmp)
+        ausgabe = (r.stdout or "") + "\n" + (r.stderr or "")
+        zahl = anzahl(ausgabe)
+        # Liefen die verdeckten Tests überhaupt mit? Vergleich mit einem Lauf ohne sie.
+        ohne = tempfile.mkdtemp(prefix="dev-team-blind0-")
+        try:
+            with tarfile.open(fileobj=io.BytesIO(archiv.stdout)) as t:
+                t.extractall(ohne, filter="data") if hasattr(tarfile, "data_filter") else t.extractall(ohne)
+            if konfig.get("setup"):
+                laufen(konfig["setup"], ohne)
+            r0 = laufen(konfig.get("testbefehl") or "false", ohne)
+            zahl_ohne = anzahl((r0.stdout or "") + "\n" + (r0.stderr or ""))
+        finally:
+            shutil.rmtree(ohne, ignore_errors=True)
+        erwartet = 0
+        for voll in dateien:
+            inhalt = open(voll, encoding="utf-8", errors="replace").read()
+            erwartet += len(re.findall(r"^\s*(?:async\s+)?def\s+test\w*\s*\(|\b(?:it|test)\s*\(\s*['\"`]", inhalt, re.M))
+        if r.returncode != 0:
+            pass  # rot: die Tests sind gelaufen, Auswertung unten
+        elif zahl is None or zahl_ohne is None:
+            print("Verdeckte Abnahmetests (blind): NICHT PRÜFBAR – Testzahl unbekannt (testzahl_muster passt nicht).")
+            sys.exit(1)
+        elif erwartet and zahl - zahl_ohne < erwartet * 0.9:
+            print("Verdeckte Abnahmetests (blind): NICHT MITGELAUFEN – der Testbefehl erfasst sie nicht "
+                  "(%d statt etwa %d zusätzliche Tests). Testbefehl oder Ablageort prüfen." % (zahl - zahl_ohne, erwartet))
+            sys.exit(1)
         betroffen = set()
         for zeile in ausgabe.splitlines():
             if FEHL_ZEILE.search(zeile):

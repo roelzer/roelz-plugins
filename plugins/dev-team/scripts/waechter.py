@@ -48,7 +48,7 @@ SHELL_WERKZEUGE = {"Bash", "PowerShell", "Monitor"}
 IMMER_GESPERRT = {"Workflow"}
 # Bauende Rollen müssen beliebigen Code ausführen (Tests, eigene Hilfsskripte). Für sie wird nicht prüfbarer
 # Code nicht blockiert: Muster helfen dort kaum, die Sicherung liegt in Schranke, Prüfsummen und Review.
-BAUENDE_ROLLEN = {"entwickler", "tester", "architekt"}
+BAUENDE_ROLLEN = {"entwickler", "tester"}
 HARMLOS_STANDARD = {
     "TodoWrite", "TodoRead", "TaskCreate", "TaskUpdate", "TaskList", "TaskGet", "TaskStop", "TaskOutput",
     "AskUserQuestion", "SendUserMessage", "SendUserFile", "ToolSearch", "EnterPlanMode", "ExitPlanMode",
@@ -242,6 +242,32 @@ def cloud_kopie(projekt, kurz):
 
 # --------------------------------------------------------------------------- Agenten-Start
 
+def laufende_entwickler(projekt, stunden=3):
+    """Gestartete minus beendete Entwickler laut Agenten-Log (letzte Stunden; hängengebliebene zählen nicht ewig)."""
+    try:
+        with open(os.path.join(projekt, "docs", "AGENTEN_LOG.md"), encoding="utf-8") as f:
+            zeilen = f.readlines()[-400:]
+    except OSError:
+        return 0
+    jetzt = datetime.now()
+    start = ende = 0
+    for z in zeilen:
+        m = re.match(r"\|\s*(\d{4}-\d{2}-\d{2} \d{2}:\d{2})\s*\|\s*(▶|■[^|]*?)\s*\|\s*(?:dev-team:)?entwickler\s*\|", z)
+        if not m:
+            continue
+        try:
+            zeit = datetime.strptime(m.group(1), "%Y-%m-%d %H:%M")
+        except ValueError:
+            continue
+        if (jetzt - zeit).total_seconds() > stunden * 3600:
+            continue
+        if m.group(2).startswith("▶"):
+            start += 1
+        else:
+            ende += 1
+    return max(0, start - ende)
+
+
 def pruefe_agent_start(eingabe, team, projekt):
     ti = eingabe.get("tool_input") or {}
     if not isinstance(ti, dict):
@@ -269,6 +295,12 @@ def pruefe_agent_start(eingabe, team, projekt):
                        modell, kurz, ", ".join(erlaubt_m) or "nur der Standard", team["agenten"][kurz].get("modell")), kurz)
     if ti.get("name") or ti.get("team_name"):
         blockieren("Teammates/Agenten-Teams sind im Dev-Team nicht erlaubt. Ohne name-Angabe aufrufen.", kurz)
+    if kurz == "entwickler":
+        laufend = laufende_entwickler(projekt)
+        grenze = int(team.get("max_parallele_entwickler") or 3)
+        if laufend >= grenze:
+            blockieren("Es arbeiten schon %d Entwickler gleichzeitig (höchstens %d). Erst Ergebnisse abwarten." %
+                       (laufend, grenze), kurz)
     iso = ti.get("isolation")
     if iso and kurz == "entwickler" and str(iso) != "worktree":
         blockieren("Der Entwickler arbeitet immer in einem eigenen Worktree; isolation darf nicht "
@@ -502,6 +534,11 @@ EDITOREN = {"vim", "vi", "nvim", "emacs", "nano", "pico", "micro", "ed", "ex", "
 SHELLS = {"bash", "sh", "zsh", "dash", "ksh", "fish", "pwsh", "powershell", "cmd", "busybox"}
 INTERPRETER = {"python", "python3", "py", "node", "deno", "bun", "ruby", "perl", "php", "tclsh", "lua", "Rscript"}
 PAKET_AUSFUEHRER = {"npx", "bunx", "uvx", "pnpx"}
+CLAUDE_WORT = re.compile(r"(?<![\w./\\-])claude(?![\w/\\-])")
+NETZ_PROZESS = re.compile(r"subprocess|os\.system|os\.popen|os\.exec|os\.spawn|pty\.|child_process|execSync|"
+                          r"spawnSync|\bspawn\s*\(|\bexec\s*\(|socket|urllib|http\.client|httplib|requests\.|httpx|"
+                          r"aiohttp|\bfetch\s*\(|XMLHttpRequest|net\.connect|Deno\.run|Deno\.Command|ftplib|smtplib|"
+                          r"webbrowser|ctypes", re.IGNORECASE)
 UNPRUEFBAR = ("Dieser Befehl ist für den Wächter nicht prüfbar (Befehl in einer Hülle wie bash -c/eval, aus einer "
               "Variable, per Pipe an einen Interpreter oder ein Skript-Einzeiler mit Datei- oder Prozesszugriff). "
               "Dateien mit Write/Edit schreiben, Befehle direkt ausführen.")
@@ -692,8 +729,22 @@ def konfig_befehle(projekt):
     return listen
 
 
+def sed_awk_lesend(cmd, args):
+    """sed/awk nur zum Lesen: kein -i, keine Schreib-/Ausführ-Befehle im Programm."""
+    if any(a == "-i" or a.startswith(("-i", "--in-place")) or a in ("-f", "--file") for a in args):
+        return False
+    prog = next((a for a in args if not a.startswith("-")), "")
+    if cmd in ("sed", "gsed"):
+        ohne_regex = re.sub(r"s(.)(?:\\.|(?!\1).)*\1(?:\\.|(?!\1).)*\1([gpiIm0-9]*)", r"s\2", prog)
+        return not re.search(r"[wWeE]|s[^;]*[we]", ohne_regex.replace("s", "", 0)) or bool(
+            re.fullmatch(r"[0-9,$]*[pd]|/[^/]*/[pd]|[0-9,$]*q|s.*", prog) and not re.search(r"[wWe](\s|$|;)", ohne_regex))
+    return not re.search(r"system|getline|\|\s*\"|>|\bclose\b|fflush", prog)
+
+
 def pl_erlaubt(cmd, rest, cwd, projekt, plugin):
     if cmd in PL_ERLAUBT:
+        return True
+    if cmd in ("sed", "gsed", "awk", "gawk", "mawk") and sed_awk_lesend(cmd, rest[1:]):
         return True
     for liste in konfig_befehle(projekt):
         if liste and rest[:len(liste)] == liste:
@@ -732,6 +783,14 @@ def shell_analyse(befehl, cwd=None, rolle="projektleiter", projekt=None, plugin=
         opak = opak or o2
         if v2:
             return ziele, opak, v2
+    for m in re.finditer(r"(?:^|[\s;&|(])(?:\S*/)?(?:%s)(?:\.exe)?\b[^\n]*<<-?\s*(['\"]?)(\w+)\1[^\n]*\n(.*?)\n\s*\2\b"
+                         % "|".join(sorted(map(re.escape, SHELLS | INTERPRETER))), befehl, re.S):
+        inhalt = m.group(3)
+        if CLAUDE_WORT.search(inhalt) or "@anthropic-ai/claude-code" in inhalt:
+            return ziele, True, "Neue Claude-Sitzungen sind auch aus Skripten heraus nicht erlaubt."
+        if NETZ_PROZESS.search(inhalt):
+            return ziele, True, ("Skript-Heredoc mit Netz- oder Prozesszugriff (subprocess, urllib, fetch …) ist "
+                                 "gesperrt. Tests über den Testbefehl ausführen.")
     # Heredoc oder Pipe direkt in einen Interpreter / eine Shell
     if re.search(r"(?:^|[\s;&|(])(?:\S*/)?(?:%s)(?:\.exe)?(?=\s)[^\n|;&]*<<" % "|".join(
             sorted(map(re.escape, SHELLS | INTERPRETER))), befehl, re.M):
@@ -867,10 +926,16 @@ def shell_analyse(befehl, cwd=None, rolle="projektleiter", projekt=None, plugin=
                     code = a[2:] + " " + " ".join(args[j + 1:])
                     break
             if code is not None:
-                if "claude" in code:
+                if CLAUDE_WORT.search(code) or "@anthropic-ai/claude-code" in code:
                     verboten = "Neue Claude-Sitzungen sind auch aus Skripten heraus nicht erlaubt."
+                elif NETZ_PROZESS.search(code):
+                    verboten = ("Einzeiler mit Netz- oder Prozesszugriff (subprocess, urllib, fetch …) sind gesperrt: "
+                                "darüber ließen sich Helfer starten oder Daten senden. Tests über den Testbefehl.")
                 elif SCHREIB_INDIZIEN.search(code):
                     opak = True
+            elif "-m" in args and args[args.index("-m") + 1:args.index("-m") + 2] in (["twine"], ["build"]) \
+                    and "upload" in args:
+                verboten = "Veröffentlichen von Paketen macht nur Simon."
             elif "-m" in args:
                 modul = args[args.index("-m") + 1:]
                 if modul[:1] == ["pip"] and "install" in modul:
@@ -964,6 +1029,12 @@ def shell_analyse(befehl, cwd=None, rolle="projektleiter", projekt=None, plugin=
                     frei = ohne_optionen(args[1:])
                     pfade = frei[1:] if len(frei) > 1 else [a for a in frei if os.path.exists(absolut_aus(cwd or ".", a))]
                 ziele += [(a, "schreiben") for a in pfade]
+            elif sub == "archive":
+                for j, a in enumerate(args):
+                    if a in ("-o", "--output") and j + 1 < len(args):
+                        ziele.append((args[j + 1], "schreiben"))
+                    elif a.startswith("--output="):
+                        ziele.append((a.split("=", 1)[1], "schreiben"))
             elif sub == "rm":
                 ziele += [(a, "loeschen") for a in ohne_optionen(args[1:])]
             elif sub == "mv":
@@ -999,8 +1070,16 @@ def worktree_gemergt(pfad, cwd):
 
 def aussenwirkung(cmd, args):
     """Veröffentlichen, Hochladen, Senden: unumkehrbar und ohne Simons Freigabe verboten."""
-    if cmd in ("npm", "pnpm", "yarn", "bun") and args[:1] in (["publish"], ["unpublish"], ["deprecate"], ["dist-tag"]):
-        return "'%s %s' veröffentlicht – nur Simon." % (cmd, args[0])
+    if cmd in ("npm", "pnpm", "yarn", "bun", "npx", "lerna", "changeset", "nx") and \
+            any(a in ("publish", "unpublish", "deprecate", "dist-tag", "release", "version") for a in args):
+        return "'%s … publish/release' veröffentlicht – nur Simon." % cmd
+    if (cmd == "gem" and args[:1] == ["push"]) or (cmd in ("mvn", "mvnw") and "deploy" in args) or \
+            (cmd in ("gradle", "gradlew") and any(a.startswith("publish") for a in args)) or \
+            (cmd == "git" and args[:1] in (["send-email"], ["request-pull"])):
+        return "Veröffentlichen oder Versenden macht nur Simon."
+    if cmd in ("python", "python3", "py") and any(a.endswith("setup.py") for a in args) and \
+            any(a in ("upload", "register") for a in args):
+        return "Veröffentlichen von Paketen macht nur Simon."
     if (cmd == "twine" and args[:1] == ["upload"]) or (cmd in ("poetry", "uv", "pdm", "hatch", "flit", "cargo")
                                                          and args[:1] == ["publish"]):
         return "Veröffentlichen von Paketen macht nur Simon."
@@ -1037,8 +1116,8 @@ def git_global_verboten(args, rolle):
         wert = args[i + 1] if i + 1 < len(args) else ""
         if a == "-c" or a.startswith("--config-env"):
             schluessel = wert.split("=", 1)[0].lower()
-            if re.match(r"(alias\.|core\.|diff\.|merge\.|filter\.|credential|sequence\.|gpg\.|ssh\.|"
-                        r"uploadpack|receivepack|protocol|url\.|http\.|include)", schluessel) or \
+            if re.match(r"(alias\.|core\.|diff\.|merge\.|filter\.|credential|sequence\.|gpg\.|ssh\.|remote\.|"
+                        r"branch\.|push\.|uploadpack|receivepack|protocol|url\.|http\.|include)", schluessel) or \
                     schluessel.endswith((".command", ".cmd", ".program", ".tool", ".helper", ".textconv")):
                 return "git -c %s kann Befehle ausführen oder Ziele umlenken und ist gesperrt." % schluessel
         if rolle == "entwickler" and (a in ("-C", "--git-dir", "--work-tree") or
@@ -1059,7 +1138,7 @@ def git_ohne_globale(args):
 
 GIT_LESEND = {"status", "log", "diff", "show", "blame", "rev-parse", "rev-list", "ls-files", "ls-tree",
               "cat-file", "describe", "grep", "shortlog", "merge-base", "name-rev", "for-each-ref", "config",
-              "version", "help", "count-objects", "check-ignore", "var", "whatchanged", "reflog", "fetch"}
+              "version", "help", "count-objects", "check-ignore", "var", "whatchanged", "reflog", "fetch", "archive"}
 GIT_HAUPTZWEIG = re.compile(r"(^|[:/])(main|master)$")
 
 
@@ -1082,6 +1161,24 @@ def pruefe_git(args, rolle, cwd, projekt):
         if not (rolle == "entwickler" and im_worktree):
             return ("'git reset --hard' ist gesperrt (nicht committete Arbeit ginge verloren). Einen eigenen "
                     "Merge rückgängig machen: 'git reset --keep ORIG_HEAD'.")
+    if rolle == "projektleiter":
+        if sub in ("pull", "rebase", "update-index", "replace", "notes", "fast-import", "symbolic-ref", "commit-tree"):
+            if not (sub == "update-index" and set(rest) <= {"--refresh", "--really-refresh", "-q"}):
+                return ("'git %s' ist für den Projektleiter gesperrt (könnte den Arbeitsbranch an der Merge-Prüfung "
+                        "vorbei verändern). Pakete nur mit 'git merge --no-ff' zusammenführen." % sub)
+        if sub == "reset" and not (rest in (["--keep", "ORIG_HEAD"], ["-q", "--keep", "ORIG_HEAD"]) or not rest
+                                   or (rest[:1] == ["--"] or (len(rest) >= 2 and rest[0] == "HEAD" and rest[1] == "--"))):
+            return "Der Projektleiter setzt nur den eigenen Merge zurück: 'git reset --keep ORIG_HEAD'."
+        if sub in ("switch", "checkout") and any(a in ("-C", "-B", "--force-create") for a in rest):
+            return "'git %s -C/-B' setzt einen Branch zwangsweise um und ist gesperrt." % sub
+        if sub == "branch" and any(a in ("-f", "--force") for a in rest):
+            return "'git branch -f' setzt einen Branch zwangsweise um und ist gesperrt."
+        if sub == "remote" and rest[:1] and rest[0] not in ("-v", "--verbose", "show", "get-url"):
+            return "Remotes ändert nur Simon (kein git remote %s)." % rest[0]
+        if sub == "push":
+            frei_push = [a for a in rest if not a.startswith("-")]
+            if frei_push and frei_push[0] != "origin":
+                return "Gepusht wird nur nach 'origin' (keine fremden Adressen)."
     if sub == "reflog" and rest[:1] and rest[0] not in ("show",) and not rest[0].startswith("-"):
         return "'git reflog %s' verändert den Verlauf der Sicherungspunkte und ist gesperrt." % rest[0]
     if sub == "branch":
@@ -1408,6 +1505,11 @@ def main():
                 pass
             sys.exit(BLOCK)
         sys.exit(0)
+    nonce = os.environ.get("DEV_TEAM_WAECHTER_NONCE")
+    if nonce:
+        # Beleg für den Startskript-Wrapper, dass wirklich dieser Wächter gelaufen ist (nicht ein falsches python)
+        sys.stderr.write("")
+        sys.stdout.write("WAECHTER-OK-%s\n" % nonce)
     sys.exit(0)
 
 

@@ -366,6 +366,79 @@ class TestSchranke(unittest.TestCase):
         self.assertTrue(os.path.exists(os.path.join(self.p, "tests", "referenz", "fall2.json")))
         self.assertIn("fall2.json", open(os.path.join(self.p, "docs", "FREIGABEN_LOG.md"), encoding="utf-8").read())
 
+    def test_mutationstest_gleich_grosse_mutanten(self):
+        # drei gleiche Funktionen, nur f ist getestet: höchstens ein Drittel darf als erkannt gelten
+        self.schreibe("src/drei.py", "def f(x):\n    return x + 1\n\n\ndef g(x):\n    return x + 1\n\n\n"
+                      "def h(x):\n    return x + 1\n")
+        self.schreibe("tests/test_drei.py", "import unittest\nfrom src.drei import f\n"
+                      "class D(unittest.TestCase):\n    def test_f(self):\n        self.assertEqual(f(1), 2)\n")
+        code, aus = self.skript("mutationstest.py", "--dateien", "src/drei.py", "--schwelle", "60")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("überlebt", aus)
+
+    def test_pruefsummen_umbenennen_loeschen_liste(self):
+        self.schreibe(".dev-team/verdeckt/test_abn_a1.py", "def test_a1():\n    assert 1 + 1 == 2\n")
+        self.assertEqual(self.skript("abnahme_pruefsummen.py", "--schreiben")[0], 0)
+        git(self.p, "add", "-f", "docs/ABNAHME_PRUEFSUMMEN.txt")
+        git(self.p, "commit", "-qm", "plan")
+        self.basis = git(self.p, "rev-parse", "HEAD").strip()
+        # abgeschwächt unter anderem Namen aufgedeckt, Original fehlt → am Meilenstein rot
+        self.schreibe("tests/abnahme/test_anders.py", "def test_a1():\n    assert True\n")
+        os.remove(os.path.join(self.p, ".dev-team", "verdeckt", "test_abn_a1.py"))
+        code, aus = self.lauf("--rolle", "projektleiter", "--ohne-lauf")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("gelöscht", aus)
+        # Liste neu berechnet → weicht von der versionierten ersten Fassung ab
+        self.schreibe("docs/ABNAHME_PRUEFSUMMEN.txt", "# leer\n")
+        code, aus = self.lauf("--rolle", "tester", "--ohne-lauf")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("ersten versionierten Fassung", aus)
+
+    def test_verdeckt_ohne_liste_rot_beim_merge(self):
+        self.schreibe(".dev-team/verdeckt/test_abn_a1.py", "def test_a1():\n    assert 1 + 1 == 2\n")
+        code, aus = self.lauf("--rolle", "projektleiter", "--ohne-lauf")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("keine festgehaltenen Prüfsummen", aus)
+
+    def test_abdeckung_nur_ueber_testnamen(self):
+        self.schreibe("docs/lastenheft.md", "# L\n## A1 Summe\n## A2 Leer\n")
+        self.schreibe("tests/test_trick.py", "a1, a2 = 1, 2\ndef test_x():\n    assert a1 + a2 == 3\n")
+        code, aus = self.lauf("--rolle", "projektleiter")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("A1, A2", aus)
+
+    def test_fachregeln_mit_f_nummern(self):
+        k = json.load(open(os.path.join(self.p, ".claude", "dev-team.json")))
+        k["profil"] = "fachsoftware"
+        k["meilensteinbefehle"] = ["echo mutation"]
+        self.konfig(k)
+        self.schreibe("fachwissen/regeln.md", "# Fachregeln\n## Bestätigt\n| Nr. | Regel | Quelle |\n|---|---|---|\n"
+                      "| F1 | DN wird nie größer | Simon |\n| F2 | v <= 2 m/s | Simon |\n## Offen\n| F3 | x | |\n")
+        git(self.p, "add", "-A")
+        git(self.p, "commit", "-qm", "f")
+        self.basis = git(self.p, "rev-parse", "HEAD").strip()
+        code, aus = self.lauf("--rolle", "projektleiter")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("F1, F2", aus)
+        self.assertNotIn("F3", aus.split("Fachregeln ohne")[1].split("\n")[0])
+        self.assertIn("ohne Mutationstest", aus)  # 'echo mutation' zählt nicht
+
+    def test_stolperdraht_in_der_schranke(self):
+        self.schreibe(".claude/settings.local.json", '{"env": {"PATH": "/tmp/falsch"}}')
+        code, aus = self.lauf("--rolle", "tester", "--ohne-lauf")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("schaltet den Dev-Team-Schutz ab", aus)
+
+    def test_blind_merkt_nicht_mitgelaufen(self):
+        k = json.load(open(os.path.join(self.p, ".claude", "dev-team.json")))
+        k["testbefehl"] = "%s -m unittest discover -s tests -t . -p 'test_rechnung.py' -v" % sys.executable
+        self.konfig(k)
+        self.schreibe(".dev-team/verdeckt/test_abn_a7.py",
+                      "import unittest\nclass A(unittest.TestCase):\n    def test_a7(self):\n        self.assertTrue(False)\n")
+        code, aus = self.skript("verdeckt_blind.py")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("NICHT MITGELAUFEN", aus)
+
     def test_rote_tests(self):
         self.schreibe("src/rechnung.py", "def summe(w):\n    return 0\n")
         code, aus = self.lauf()
@@ -770,6 +843,18 @@ class EinstellungsSchutz(unittest.TestCase):
 
     def test_harmlose_aenderung_erlaubt(self):
         self.assertEqual(self.lauf({"permissions": {"allow": ["Bash(npm test)"]}})[0], 0)
+
+    def test_env_pfad_wird_entfernt(self):
+        code, aus = self.lauf({"env": {"PATH": "/tmp/falsch:/usr/bin"}, "permissions": {"allow": ["Bash(npm test)"]}})
+        self.assertEqual(code, 2, aus)
+        d = json.load(open(os.path.join(self.p, ".claude", "settings.local.json")))
+        self.assertNotIn("PATH", d.get("env", {}))
+        self.assertEqual(d["permissions"]["allow"], ["Bash(npm test)"])  # Harmloses bleibt
+
+    def test_hooks_aus_wird_entfernt(self):
+        self.lauf({"disableAllHooks": True})
+        d = json.load(open(os.path.join(self.p, ".claude", "settings.local.json")))
+        self.assertNotIn("disableAllHooks", d)
 
     def test_wartung_erlaubt(self):
         self.assertEqual(self.lauf({"disableAllHooks": True}, env={"DEV_TEAM_WARTUNG": "1"})[0], 0)

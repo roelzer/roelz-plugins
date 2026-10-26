@@ -72,19 +72,37 @@ def aufgedeckt_finden(wurzel, rel):
     return funde
 
 
-def pruefen(hauptordner, wurzel=None):
-    """-> Liste von Fehlertexten (leer = alles unverändert)."""
+def aufgedeckt_mit_summe(wurzel):
+    summen = {}
+    for ordner, unter, dateien in os.walk(os.path.join(wurzel, "tests", "abnahme")):
+        unter[:] = [u for u in unter if u != "__pycache__"]
+        for d in dateien:
+            if ist_testdatei(d):
+                summen.setdefault(summe(os.path.join(ordner, d)), []).append(os.path.join(ordner, d))
+    return summen
+
+
+def pruefen(hauptordner, wurzel=None, vollstaendig=False):
+    """-> Liste von Fehlertexten (leer = alles unverändert).
+    vollstaendig=True (Meilenstein): jeder festgehaltene Abnahmetest muss unverändert aufgedeckt vorliegen –
+    egal unter welchem Namen; umbenannt-und-abgeschwächt oder gelöscht ist rot."""
     wurzel = wurzel or hauptordner
     liste = lies_liste(hauptordner)
     fehler = []
     jetzt = verdeckte(hauptordner)
+    aufgedeckt = aufgedeckt_mit_summe(wurzel)
     for rel, soll in liste.items():
         if rel in jetzt and jetzt[rel] != soll:
             fehler.append("Verdeckter Abnahmetest %s wurde nach dem Festhalten geändert." % rel)
+        if rel not in jetzt and soll not in aufgedeckt:
+            fehler.append("Verdeckter Abnahmetest %s wurde gelöscht und liegt auch nicht aufgedeckt vor." % rel)
         for f in aufgedeckt_finden(wurzel, rel):
             if summe(f) != soll:
                 fehler.append("Aufgedeckter Abnahmetest %s weicht von der festgehaltenen Fassung ab."
                               % os.path.relpath(f, wurzel).replace("\\", "/"))
+        if vollstaendig and os.path.isdir(os.path.join(wurzel, "tests", "abnahme")) and soll not in aufgedeckt:
+            fehler.append("Abnahmetest %s liegt nicht unverändert unter tests/abnahme/ vor (aufgedeckt wird "
+                          "immer die festgehaltene Fassung, Inhalt unverändert)." % rel)
     return fehler
 
 

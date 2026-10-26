@@ -1,6 +1,6 @@
 # Dev-Team – Anleitung
 
-Stand: Oktober 2026 · Version 3.5
+Stand: Oktober 2026 · Version 3.6
 
 Dieses Repo enthält zwei Plugins für Claude Code: **`dev-team`** und **`tool-scout`**. Beide enthalten kein Firmen- oder Kundenwissen und dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
 
@@ -44,7 +44,7 @@ Damit sich der Aufbau lohnt, ist das **technisch** abgesichert, nicht nur als Bi
 
 - Auch **Shell-Befehle** prüft der Wächter: Umleitungen, `sed -i`, `cp`, `mv`, `rm`, `git checkout`, Hüllen wie `bash -c` und `eval`, Pipes in einen Interpreter (`curl … | bash`), Skript-Einzeiler mit Schreib- oder Prozesszugriff, neue Claude-Sitzungen (`claude -p`), Paket-Installationen und `npx` mit fremden Paketen. Gesperrt sind auch `git reset --hard`, `git clean`, `git branch -D` und Pushes auf main oder mit Gewalt. Der Projektleiter führt keine Skripte aus dem Projekt aus.
 - Prüfer (Reviewer, Kritiker usw.) dürfen Git nur lesen, nicht committen oder zusammenführen. Skills, die einen eigenen Agenten starten würden (`context: fork`), sind gesperrt.
-- Der Entwickler arbeitet in seinem eigenen Worktree. Lesen außerhalb davon (Hauptordner, verdeckte Tests, `cd ..`) blockiert der Wächter. Das ist **stark erschwert, aber nicht unmöglich** (siehe Grenzen).
+- Der Entwickler arbeitet in seinem eigenen Worktree. Lesen außerhalb davon (Hauptordner, verdeckte Tests, `cd ..`) blockiert der Wächter. Der direkte Weg ist gesperrt; **mit einem eigenen Skript geht es trotzdem**. Deshalb zählen die verdeckten Tests als zusätzliche Absicherung, die Prüfsummen und der blinde Lauf als Nachweis (siehe Grenzen).
 - **Schutzschalter** (Hooks aus, Plugin aus, Freigaben umgehen, Workflows an) kann Claude über die Datei-Werkzeuge nicht setzen, und Shell-Befehle mit diesen Namen werden blockiert. `~/.claude/CLAUDE.md` (Verknüpfung zum Grundgesetz) schreibt nur ein Plugin-Skript nach deinem OK. Einstellungsdateien schreibt nur ein Plugin-Skript nach deinem OK.
 
 **Ehrliche Grenzen:**
@@ -104,12 +104,12 @@ Jeder Lauf steht automatisch in `docs/TESTNACHWEIS.md`. Neue Bibliotheken prüft
 **Weitere Sicherungen (ab Version 3.5):**
 - **Prüfsummen der Abnahmetests:** Sobald der Tester die verdeckten Tests fertig hat, hält ein Skript ihre Prüfsummen fest (`docs/ABNAHME_PRUEFSUMMEN.txt`, wird mit dem Plan committet). Wird ein Abnahmetest später verändert, ist die Schranke rot.
 - **Blinder Lauf nach jedem Merge:** Die verdeckten Tests laufen nach jedem Zusammenführen in einer Kopie mit. Gemeldet wird nur „grün“ oder „rot bei Anforderung A3“ – der Entwickler erfährt nie den Test selbst.
-- **Jede Anforderung hat einen Test:** Tests tragen die Nummer der Anforderung (A3) bzw. Fachregel (R2). Am Meilenstein-Ende ist die Schranke rot, wenn eine Nummer ohne Test ist.
+- **Jede Anforderung hat einen Test:** Tests tragen die Nummer der Anforderung (A3) bzw. Fachregel (F2). Am Meilenstein-Ende ist die Schranke rot, wenn eine Nummer ohne Test ist.
 - **Berechnungssoftware:** Fachregeln werden über viele erzeugte Eingaben geprüft, und ein **Mutationstest** baut absichtlich kleine Fehler in den Rechenkern ein (z. B. `<` statt `<=`). Die Tests müssen die meisten davon finden (Schwelle, z. B. 70 %), sonst ist der Meilenstein rot. Eintrag in `.claude/dev-team.json` unter `meilensteinbefehle`.
 - **Vollständige Prüfberichte** jedes Agenten liegen in `docs/pruefberichte/`, je Lauf eine Kennzahl in `.dev-team/kennzahlen.jsonl` (für die spätere Messung, welche Rolle wie viel bringt).
 - **Referenzfälle und Testbefehl ändert nur du:** Neue Referenzdaten oder einen anderen Testbefehl gibst du per Zeile in `.claude/freigaben.md` frei (Geltung = Zielpfad, z. B. `tests/referenz/fall5.json`). Der Projektleiter übernimmt die Datei dann mit `scripts/geschuetzt_schreiben.py`; jede Übernahme steht mit Prüfsumme in `docs/FREIGABEN_LOG.md`.
 - **Wer startet die Schranke?** Der Projektleiter startet sie nach jedem Merge. Die Schranke ist ein Programm ohne KI; er prüft dabei nichts selbst, er liest nur „grün“ oder „rot“.
-- **Einstellungsschutz:** Versucht ein Programm, die Schutz-Hooks in einer Einstellungsdatei abzuschalten, blockiert Claude Code die Änderung (Hook `ConfigChange`), und es steht ein ⛔ im Log. Zusätzlich prüft der Projektleiter laut Grundgesetz zu Beginn jeder Sitzung die Einstellungsdateien.
+- **Einstellungsschutz:** Versucht ein Programm, die Schutz-Hooks in einer Einstellungsdatei abzuschalten oder umzulenken (z. B. `disableAllHooks`, ein anderer Suchpfad `PATH`), meldet Claude Code das dem Hook `ConfigChange`. Er blockiert die Änderung für die laufende Sitzung, **entfernt die schädlichen Einträge wieder aus der Datei** und schreibt ein ⛔ ins Log. Zusätzlich ist jede Test-Schranke rot, solange so ein Eintrag existiert, und der Projektleiter prüft laut Grundgesetz zu Beginn jeder Sitzung die Einstellungsdateien. **Ehrliche Grenze:** Ganz dicht ist das nur, wenn du den Wächter einmal als *verwaltete Einstellung* einrichtest (Abschnitt 9a) – die kann keine Projekt- oder Benutzereinstellung abschalten.
 
 ## 4. Fachregeln – damit offensichtliche Fehler nicht durchrutschen
 
@@ -199,6 +199,17 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
    - „Führ aus: echo '<<X' ; echo y > src/test4.js ; X=1“ → muss blockiert werden (getarnter Heredoc)
    - „Lass den Kritiker kurz das Lastenheft lesen“ → muss laufen
    Steht im `docs/AGENTEN_LOG.md` ein ⛔ für die gesperrten Versuche und ▶ für den Kritiker, wirkt die Sperre. Danach im Explorer nachsehen, dass `src/test.js` bis `src/test4.js` und `test.txt` auf dem Desktop **wirklich nicht** entstanden sind.
+
+## 9a. Wächter dauerhaft absichern (verwaltete Einstellung, einmalig, empfohlen)
+
+Hooks aus dem Plugin oder aus den Projekteinstellungen kann ein Programm, das ein Agent ausführt, für die **nächste** Sitzung abschalten. Hooks aus einer *verwalteten Einstellung* (managed settings) kann keine Benutzer-, Projekt- oder lokale Einstellung abschalten. Das braucht einmal Administratorrechte:
+
+1. Im Terminal: `python plugins/dev-team/scripts/verwaltete_einstellungen.py --datei %USERPROFILE%\Desktop\managed-settings.json` (im Repo-Ordner).
+2. Die Datei vom Desktop **als Administrator** nach `C:\Program Files\ClaudeCode\managed-settings.json` kopieren (Ordner anlegen, falls er fehlt).
+3. Claude Code neu starten, `/status` aufrufen: Unter „Setting sources“ muss „managed“ stehen.
+4. Ab jetzt läuft der Wächter aus der verwalteten Einstellung; der Plugin-Wächter tritt automatisch zurück, damit nichts doppelt läuft.
+
+Ändert sich der Python-Pfad oder verschiebst du das Repo, die Datei neu erzeugen. Hinweis: Unter WSL ist der entsprechende Ordner vom Benutzer beschreibbar und schützt dort nicht.
 
 ## 10. Updates
 

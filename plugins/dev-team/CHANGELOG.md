@@ -1,5 +1,33 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.6.0 – Befunde der Nachprüfung 3.5.0 (Umsetzung von P0/P1 nachgeschärft)
+
+### Warum
+Nachprüfung 3.5.0 (6/10, `docs/AUDIT-3.5.0.md`): Der Einstellungsschutz blockierte nur die laufende Sitzung, `env.PATH` konnte den Wächter umlenken, der Mutationstest zählte wegen Bytecode-Cache zu gut, Prüfsummen ließen sich durch Umbenennen/Löschen umgehen, die Fachregel-Abdeckung passte nicht zur eigenen Vorlage, Tester und Architekt durften wieder beliebige Einzeiler.
+
+### Einstellungen und Wächter-Start
+- `einstellungs_schutz.py` entfernt die schädlichen Einträge wieder aus der Datei (schützt auch die nächste Sitzung), erkennt `env.PATH`/`PYTHON*`/`CLAUDE_*` u. a., eigene Hooks in lokalen Einstellungen, pauschale Shell-Erlaubnis und Marktplatz-Umlenkung; prüft nur die geänderte Quelle (kein Dauer-Fehlalarm durch alte Benutzereinstellungen).
+- Die Test-Schranke ist rot, solange so ein Eintrag existiert (Stolperdraht auch ohne Hooks).
+- `waechter.sh` und `einstellungs-schutz.sh` bevorzugen feste Python-Pfade; der Wächter muss einen Einmal-Code zurückgeben, sonst wird blockiert (ein falsches „python“ fällt auf).
+- Neu: `scripts/verwaltete_einstellungen.py` erzeugt die verwaltete Einstellung (managed settings) – der einzige Weg, den Wächter dauerhaft gegen Abschalten zu sichern (ANLEITUNG 9a, macht Simon einmal als Administrator). Ist sie eingerichtet, tritt der Plugin-Wächter zurück.
+
+### Schranken
+- Mutationstest: ohne Bytecode-Cache (`PYTHONDONTWRITEBYTECODE`, Cache je Mutante gelöscht), neue Mutation „Rückgabe → None“, Windows über Git Bash.
+- Prüfsummen: Liste wird gegen ihre erste versionierte Fassung verglichen; gelöschte verdeckte Tests, fehlende Liste (beim Merge/Meilenstein) und am Meilenstein jede nicht unverändert aufgedeckte Fassung (auch unter anderem Namen) sind rot.
+- Abdeckung nur über Testnamen (Syntaxbaum bzw. Titel von `it()/test()`), Lastenheft auch mit Überschriften `## A1`. Fachregeln: F- und R-Nummern im Abschnitt „Bestätigt“ (passend zur Vorlage). Mutationspflicht nur mit echtem Werkzeug (`mutationstest.py`, mutmut, Stryker …).
+- Blinder Lauf prüft, dass die verdeckten Tests wirklich mitgelaufen sind (Testzahl mit/ohne).
+
+### Wächter
+- Einzeiler und Interpreter-Heredocs mit Netz- oder Prozesszugriff (subprocess, urllib, fetch …) sind für alle gesperrt; Architekt gehört nicht mehr zu den Rollen, die nicht prüfbaren Code ausführen dürfen.
+- Projektleiter: gesperrt sind `git pull`, `rebase`, `reset` (außer `--keep ORIG_HEAD` und Entstagen), `branch -f`, `switch -C`/`checkout -B`, `update-index` (außer `--refresh`), `remote add/set-url`, Push an andere Ziele als `origin`, `git -c remote.*/branch.*/push.*`.
+- Weitere Veröffentlichungswege gesperrt (`yarn npm publish`, `gem push`, `mvn deploy`, `gradle publish`, `python -m twine`, `setup.py upload`, `git send-email`).
+- Höchstens 3 Entwickler gleichzeitig jetzt **technisch** (Zählung über das Agenten-Log, `team.json` → `max_parallele_entwickler`).
+- Fehlalarme behoben: Projektleiter liest mit `sed -n`/`awk`, Reviewer mit `git archive | tar -t`, `.claude` im Pfad gilt nicht als Claude-Aufruf.
+
+### Doku
+- „Stark erschwert“ ersetzt durch „direkter Weg gesperrt, mit eigenem Skript möglich – deshalb Nachweise“; Einstellungsschutz ehrlich (nur mit verwalteter Einstellung dicht); Fachregeln einheitlich F-Nummern.
+- 215 automatische Tests.
+
 ## 3.5.0 – Maßnahmen P0 und P1 aus dem Systemaudit (von Simon freigegeben)
 
 ### Warum
