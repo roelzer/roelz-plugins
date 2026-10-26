@@ -1,39 +1,167 @@
 {
   "_zweck": "Einzige Quelle für das feste Team und die Schreibrechte. Wird vom Wächter-Hook (scripts/waechter.py) gelesen. Änderungen nur mit Simons Freigabe im Plugin-Repo.",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "agenten": {
-    "kritiker":            { "phase": "Planprüfung",           "schreibt": [] },
-    "fachpruefer":         { "phase": "Plan- und Ergebnisprüfung", "schreibt": [] },
-    "rechercheur":         { "phase": "bei Wissenslücken",     "schreibt": ["recherche"] },
-    "architekt":           { "phase": "Struktur entwerfen und prüfen", "schreibt": ["architektur"] },
-    "fachexperte":         { "phase": "Abwägungsrunde",        "schreibt": [] },
-    "pragmatiker":         { "phase": "Abwägungsrunde",        "schreibt": [] },
-    "langfrist-architekt": { "phase": "Abwägungsrunde",        "schreibt": [] },
-    "entwickler":          { "phase": "Bauen (ein Paket)",     "schreibt": ["code", "tests-neu"] },
-    "tester":              { "phase": "Testen",                "schreibt": ["tests", "abnahme"] },
-    "reviewer":            { "phase": "Paket- und Gesamtreview", "schreibt": [] },
-    "sicherheitspruefer":  { "phase": "bei Risiko-Auslösern",  "schreibt": [] },
-    "produktpruefer":      { "phase": "Abnahme",               "schreibt": [] },
-    "auditor":             { "phase": "Audit (außerhalb des Ablaufs)", "schreibt": [] }
+    "kritiker": {
+      "phase": "Planprüfung",
+      "schreibt": []
+    },
+    "fachpruefer": {
+      "phase": "Plan- und Ergebnisprüfung",
+      "schreibt": []
+    },
+    "rechercheur": {
+      "phase": "bei Wissenslücken",
+      "schreibt": [
+        "recherche"
+      ]
+    },
+    "architekt": {
+      "phase": "Struktur entwerfen und prüfen",
+      "schreibt": [
+        "architektur"
+      ]
+    },
+    "fachexperte": {
+      "phase": "Abwägungsrunde",
+      "schreibt": []
+    },
+    "pragmatiker": {
+      "phase": "Abwägungsrunde",
+      "schreibt": []
+    },
+    "langfrist-architekt": {
+      "phase": "Abwägungsrunde",
+      "schreibt": []
+    },
+    "entwickler": {
+      "phase": "Bauen (ein Paket)",
+      "schreibt": [
+        "code",
+        "tests-neu"
+      ]
+    },
+    "tester": {
+      "phase": "Testen",
+      "schreibt": [
+        "tests",
+        "abnahme"
+      ]
+    },
+    "reviewer": {
+      "phase": "Paket- und Gesamtreview",
+      "schreibt": []
+    },
+    "sicherheitspruefer": {
+      "phase": "bei Risiko-Auslösern",
+      "schreibt": []
+    },
+    "produktpruefer": {
+      "phase": "Abnahme",
+      "schreibt": []
+    },
+    "auditor": {
+      "phase": "Audit (außerhalb des Ablaufs)",
+      "schreibt": []
+    }
   },
-  "projektleiter_schreibt": ["prozess", "lastenheft", "regeln", "recherche", "quellen", "projektdateien", "referenz-neu", "konfig-neu"],
+  "projektleiter_schreibt": [
+    "prozess",
+    "lastenheft",
+    "regeln",
+    "recherche",
+    "quellen",
+    "projektdateien",
+    "teamkonfig",
+    "referenz-neu"
+  ],
   "bereiche": {
     "_erklaerung": "Reihenfolge zählt: der erste passende Bereich gilt. Muster relativ zum Projektordner (bzw. Worktree), '**' = beliebig tief.",
-    "reihenfolge": ["gesperrt", "konfig", "architektur", "abnahme", "referenz", "regeln", "lastenheft", "recherche", "quellen", "projektdateien", "prozess", "tests", "code"],
-    "gesperrt":       [".git/**", ".claude/agents/**", ".claude/skills/**", ".claude/hooks/**", ".claude/commands/**"],
-    "konfig":         [".claude/settings.json", ".claude/settings.local.json"],
-    "architektur":    ["docs/ARCHITEKTUR.md", "tests/architektur/**"],
-    "abnahme":        ["tests/abnahme/**", ".dev-team/verdeckt/**"],
-    "referenz":       ["tests/referenz/**"],
-    "regeln":         ["fachwissen/regeln.md"],
-    "lastenheft":     ["docs/lastenheft.md"],
-    "recherche":      ["fachwissen/recherche/**"],
-    "quellen":        ["fachwissen/quellen/**"],
-    "projektdateien": ["CLAUDE.md", ".gitignore", ".env.example", ".worktreeinclude", ".claude/dev-team.json", ".claude/dev-team-start.sh"],
-    "prozess":        ["docs/**", ".dev-team/**"],
-    "tests":          ["tests/**", "test/**", "**/__tests__/**", "e2e/**", "**/*.test.*", "**/*.spec.*", "**/test_*.py", "**/*_test.py", "**/*_test.go", "**/*Tests.cs", "**/*Test.java"],
-    "code":           ["**"]
+    "reihenfolge": [
+      "gesperrt",
+      "konfig",
+      "teamkonfig",
+      "architektur",
+      "abnahme",
+      "referenz",
+      "regeln",
+      "lastenheft",
+      "recherche",
+      "quellen",
+      "projektdateien",
+      "prozess",
+      "tests",
+      "code"
+    ],
+    "gesperrt": [
+      ".git/**",
+      ".claude/agents/**",
+      ".claude/skills/**",
+      ".claude/hooks/**",
+      ".claude/commands/**",
+      ".claude/freigaben.md"
+    ],
+    "konfig": [
+      ".claude/settings.json",
+      ".claude/settings.local.json"
+    ],
+    "architektur": [
+      "docs/ARCHITEKTUR.md",
+      "tests/architektur/**"
+    ],
+    "abnahme": [
+      "tests/abnahme/**",
+      ".dev-team/verdeckt/**"
+    ],
+    "referenz": [
+      "tests/referenz/**"
+    ],
+    "regeln": [
+      "fachwissen/regeln.md"
+    ],
+    "lastenheft": [
+      "docs/lastenheft.md"
+    ],
+    "recherche": [
+      "fachwissen/recherche/**"
+    ],
+    "quellen": [
+      "fachwissen/quellen/**"
+    ],
+    "projektdateien": [
+      "CLAUDE.md",
+      ".gitignore",
+      ".gitattributes",
+      ".env.example",
+      ".worktreeinclude",
+      ".claude/dev-team-start.sh"
+    ],
+    "prozess": [
+      "docs/**",
+      ".dev-team/**"
+    ],
+    "tests": [
+      "tests/**",
+      "test/**",
+      "**/__tests__/**",
+      "e2e/**",
+      "**/*.test.*",
+      "**/*.spec.*",
+      "**/test_*.py",
+      "**/*_test.py",
+      "**/*_test.go",
+      "**/*Tests.cs",
+      "**/*Test.java"
+    ],
+    "code": [
+      "**"
+    ],
+    "teamkonfig": [
+      ".claude/dev-team.json"
+    ]
   },
-  "verdeckt_lesen_verboten_fuer": ["entwickler"],
+  "verdeckt_lesen_verboten_fuer": [
+    "entwickler"
+  ],
   "verdeckt_pfad": ".dev-team/verdeckt/"
 }

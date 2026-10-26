@@ -47,29 +47,46 @@
     "SessionStart": [
       {
         "hooks": [
-          { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" start", "timeout": 120 }
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" start",
+            "timeout": 120
+          }
         ]
       }
     ],
     "SubagentStart": [
       {
         "hooks": [
-          { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" agent", "timeout": 15 }
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" agent",
+            "timeout": 15
+          }
         ]
       }
     ],
     "PreToolUse": [
       {
-        "matcher": "Agent|Task|Write|Edit|MultiEdit|NotebookEdit|Read|Grep|Glob|Bash",
+        "matcher": "Agent|Task|Write|Edit|MultiEdit|NotebookEdit|Read|Grep|Glob|Bash|PowerShell",
         "hooks": [
-          { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" waechter", "timeout": 15 }
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" waechter",
+            "timeout": 20,
+            "onFailure": "block"
+          }
         ]
       }
     ],
     "SubagentStop": [
       {
         "hooks": [
-          { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" log-ende", "timeout": 15 }
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" log-ende",
+            "timeout": 15
+          }
         ]
       }
     ]

@@ -25,12 +25,13 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Agent|Task|Write|Edit|MultiEdit|NotebookEdit|Read|Grep|Glob|Bash",
+        "matcher": "Agent|Task|Write|Edit|MultiEdit|NotebookEdit|Read|Grep|Glob|Bash|PowerShell",
         "hooks": [
           {
             "type": "command",
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/waechter.sh\"",
-            "timeout": 15
+            "timeout": 20,
+            "onFailure": "block"
           }
         ]
       }

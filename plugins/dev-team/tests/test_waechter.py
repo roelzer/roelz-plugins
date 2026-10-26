@@ -39,6 +39,10 @@ class Basis(unittest.TestCase):
             with open(pfad, "w") as f:
                 f.write("x")
         git(self.projekt, "init", "-q")
+        git(self.projekt, "add", "-A")
+        git(self.projekt, "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "start")
+        self.temp = os.path.join(self.tmp, "systemtemp")
+        os.makedirs(self.temp)
         self.leer = os.path.join(self.tmp, "kein-projekt")
         os.makedirs(self.leer)
 
@@ -48,7 +52,7 @@ class Basis(unittest.TestCase):
     def lauf(self, eingabe, projekt=None, skript="py", env_zusatz=None):
         projekt = self.projekt if projekt is None else projekt
         eingabe.setdefault("cwd", projekt)
-        env = dict(os.environ, CLAUDE_PROJECT_DIR=projekt, CLAUDE_PLUGIN_ROOT=PLUGIN)
+        env = dict(os.environ, CLAUDE_PROJECT_DIR=projekt, CLAUDE_PLUGIN_ROOT=PLUGIN, TMPDIR=self.temp)
         env.pop("DEV_TEAM_WARTUNG", None)
         if env_zusatz:
             env.update(env_zusatz)
@@ -70,16 +74,31 @@ class Basis(unittest.TestCase):
     def schreiben(self, pfad, rolle=None, werkzeug="Write"):
         e = {"tool_name": werkzeug, "tool_input": {"file_path": pfad, "content": "y"}}
         if rolle:
-            e["agent_type"] = rolle
+            e["agent_type"] = rolle if ":" in rolle else "dev-team:" + rolle
             e["agent_id"] = "a1"
         return e
 
 
 class Teamzwang(Basis):
     def test_teammitglied_erlaubt(self):
-        for name in ("kritiker", "dev-team:entwickler", "Dev-Team:Tester", "architekt"):
+        for name in ("dev-team:kritiker", "dev-team:entwickler", "Dev-Team:Tester", "dev-team:architekt"):
             code, _ = self.lauf(self.agent(name))
             self.assertEqual(code, 0, name)
+
+    def test_ohne_praefix_nur_mit_cloud_kopie(self):
+        self.assertEqual(self.lauf(self.agent("kritiker"))[0], 2)
+        os.makedirs(os.path.join(self.projekt, ".claude", "agents"), exist_ok=True)
+        open(os.path.join(self.projekt, ".claude", "agents", "dev-team-kritiker.md"), "w").close()
+        self.assertEqual(self.lauf(self.agent("kritiker"))[0], 0)
+
+    def test_gleichnamiger_eigener_agent_gilt_nicht_als_team(self):
+        e = {"tool_name": "Write", "tool_input": {"file_path": "src/x.js", "content": "y"},
+             "agent_type": "entwickler", "agent_id": "a"}
+        self.assertEqual(self.lauf(e)[0], 2)
+
+    def test_isolation_des_entwicklers_nicht_abschaltbar(self):
+        self.assertEqual(self.lauf(self.agent("dev-team:entwickler", isolation="none"))[0], 2)
+        self.assertEqual(self.lauf(self.agent("dev-team:entwickler", isolation="worktree"))[0], 0)
 
     def test_eingebaute_helfer_blockiert(self):
         for name in ("Explore", "Plan", "general-purpose", "claude-code-guide",
@@ -136,7 +155,7 @@ class Teamzwang(Basis):
         self.assertEqual(self.lauf(self.agent("Explore"), projekt=v2)[0], 2)
 
     def test_protokoll_schreibt_start_und_block(self):
-        self.lauf(self.agent("kritiker"))
+        self.lauf(self.agent("dev-team:kritiker"))
         self.lauf(self.agent("Explore"))
         with open(os.path.join(self.projekt, "docs", "AGENTEN_LOG.md"), encoding="utf-8") as f:
             log = f.read()
@@ -154,7 +173,7 @@ class Teamzwang(Basis):
         os.makedirs(leerplugin)
         env = dict(os.environ, CLAUDE_PROJECT_DIR=self.projekt)
         r = subprocess.run([sys.executable, WAECHTER_PY, leerplugin],
-                           input=json.dumps(self.agent("kritiker")), capture_output=True,
+                           input=json.dumps(self.agent("dev-team:kritiker")), capture_output=True,
                            text=True, env=env)
         self.assertEqual(r.returncode, 2)
 
@@ -187,10 +206,20 @@ class Schreibrechte(Basis):
         self.assertEqual(self.lauf(self.schreiben(self.p("tests/referenz/fall2.json")))[0], 0)
         self.assertEqual(self.lauf(self.schreiben(self.p("tests/referenz/fall1.json")))[0], 2)
 
-    def test_settings_nur_anlegen(self):
+    def test_einstellungen_nie_direkt(self):
         self.assertEqual(self.lauf(self.schreiben(self.p(".claude/settings.json")))[0], 2)
         os.remove(self.p(".claude/settings.json"))
-        self.assertEqual(self.lauf(self.schreiben(self.p(".claude/settings.json")))[0], 0)
+        self.assertEqual(self.lauf(self.schreiben(self.p(".claude/settings.json")))[0], 2)
+        self.assertEqual(self.lauf(self.schreiben(self.p(".claude/settings.local.json")))[0], 2)
+        self.assertEqual(self.lauf(self.schreiben(os.path.expanduser("~/.claude/settings.json")),
+                                   projekt=self.leer)[0], 2)
+
+    def test_freigabedatei_nur_von_hand(self):
+        self.assertEqual(self.lauf(self.schreiben(self.p(".claude/freigaben.md")))[0], 2)
+
+    def test_teamkonfig_projektleiter_ja_entwickler_nein(self):
+        self.assertEqual(self.lauf(self.schreiben(self.p(".claude/dev-team.json")))[0], 0)
+        self.assertEqual(self.lauf(self.schreiben(self.p(".claude/dev-team.json"), "entwickler"))[0], 2)
 
     def test_entwickler_code_ja(self):
         for rel in ("src/rechnung.js", "src/neu/modul.py", "package.json", "index.html"):
@@ -259,8 +288,6 @@ class Schreibrechte(Basis):
         self.assertEqual(self.lauf(self.schreiben(os.path.join(self.leer, "x.md")))[0], 0)
 
     def test_worktree_regeln_gelten_relativ_zum_worktree(self):
-        git(self.projekt, "add", "-A")
-        git(self.projekt, "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "start")
         wt = os.path.join(self.projekt, ".claude", "worktrees", "paket-1")
         git(self.projekt, "worktree", "add", "-q", wt, "-b", "paket-1")
         self.assertEqual(self.lauf(self.schreiben(os.path.join(wt, "src", "rechnung.js"), "entwickler"))[0], 0)
@@ -318,19 +345,19 @@ class Verdeckt(Basis):
 
     def test_tester_darf_lesen(self):
         e = {"tool_name": "Read", "tool_input": {"file_path": ".dev-team/verdeckt/a1.test.js"},
-             "agent_type": "tester", "agent_id": "a"}
+             "agent_type": "dev-team:tester", "agent_id": "a"}
         self.assertEqual(self.lauf(e)[0], 0)
 
     def test_entwickler_liest_normalen_code(self):
         e = {"tool_name": "Read", "tool_input": {"file_path": "src/rechnung.js"},
-             "agent_type": "entwickler", "agent_id": "a"}
+             "agent_type": "dev-team:entwickler", "agent_id": "a"}
         self.assertEqual(self.lauf(e)[0], 0)
 
 
 class Startskript(Basis):
     def test_bash_wrapper_reicht_durch(self):
         self.assertEqual(self.lauf(self.agent("Explore"), skript="sh")[0], 2)
-        self.assertEqual(self.lauf(self.agent("kritiker"), skript="sh")[0], 0)
+        self.assertEqual(self.lauf(self.agent("dev-team:kritiker"), skript="sh")[0], 0)
 
     def test_ohne_python_blockiert_im_projekt(self):
         bin_ordner = os.path.join(self.tmp, "bin")
@@ -342,13 +369,13 @@ class Startskript(Basis):
         env = {"PATH": bin_ordner, "CLAUDE_PROJECT_DIR": self.projekt, "CLAUDE_PLUGIN_ROOT": PLUGIN,
                "HOME": self.tmp}
         r = subprocess.run([os.path.join(bin_ordner, "bash"), WAECHTER_SH],
-                           input=json.dumps(self.agent("kritiker")), capture_output=True,
+                           input=json.dumps(self.agent("dev-team:kritiker")), capture_output=True,
                            text=True, env=env)
         self.assertEqual(r.returncode, 2)
         self.assertIn("Python 3", r.stderr)
         env["CLAUDE_PROJECT_DIR"] = self.leer
         r = subprocess.run([os.path.join(bin_ordner, "bash"), WAECHTER_SH],
-                           input=json.dumps(self.agent("kritiker")), capture_output=True,
+                           input=json.dumps(self.agent("dev-team:kritiker")), capture_output=True,
                            text=True, env=env, cwd=self.leer)
         self.assertEqual(r.returncode, 0)
 
@@ -363,3 +390,149 @@ class TeamlisteStimmt(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ShellUmgehungen(Basis):
+    """Die Umgehungen aus dem Audit 3.0.0 müssen jetzt blockiert werden."""
+
+    def bash(self, befehl, rolle=None, cwd=None):
+        e = {"tool_name": "Bash", "tool_input": {"command": befehl}}
+        if cwd:
+            e["cwd"] = cwd
+        if rolle:
+            e["agent_type"] = "dev-team:" + rolle
+            e["agent_id"] = "a"
+        return self.lauf(e)[0]
+
+    def test_projektleiter_schreibt_code_per_shell(self):
+        for befehl in ("cat > src/neu.py <<'EOF'\nprint(1)\nEOF", "echo x >> src/rechnung.js",
+                       "printf 'x' | tee src/a.js", "cp /tmp/x.js src/x.js", "touch src/leer.js",
+                       "sed -i 's/a/b/' src/rechnung.js", "git checkout -- src/rechnung.js",
+                       "git restore src/rechnung.js", "rm src/rechnung.js", "mv src/rechnung.js src/r2.js"):
+            self.assertEqual(self.bash(befehl), 2, befehl)
+
+    def test_entwickler_aendert_test_per_shell(self):
+        for befehl in ("sed -i 's/3/4/' tests/rechnung.test.js", "echo '' > tests/rechnung.test.js",
+                       "rm tests/rechnung.test.js", "git checkout HEAD~1 -- tests/rechnung.test.js",
+                       "echo 1 > tests/referenz/fall1.json"):
+            self.assertEqual(self.bash(befehl, "entwickler"), 2, befehl)
+
+    def test_pruefer_schreibt_nichts_per_shell(self):
+        self.assertEqual(self.bash("echo x > src/rechnung.js", "reviewer"), 2)
+        self.assertEqual(self.bash("echo x > docs/notiz.md", "reviewer"), 2)
+
+    def test_skript_einzeiler_mit_schreibzugriff(self):
+        for befehl in ("python3 -c \"open('src/x.py','w').write('1')\"",
+                       "node -e \"require('fs').writeFileSync('src/x.js','1')\"",
+                       "python -c \"import shutil; shutil.copy('a','b')\"", "git apply patch.diff"):
+            self.assertEqual(self.bash(befehl, "entwickler"), 2, befehl)
+
+    def test_lesende_einzeiler_erlaubt(self):
+        self.assertEqual(self.bash("python3 -c \"import json; print(json.load(open('package.json')))\""), 0)
+        self.assertEqual(self.bash("node -e \"console.log(1 > 0)\""), 0)
+
+    def test_neue_claude_sitzung_blockiert(self):
+        for befehl in ("claude -p 'bau das'", "npx @anthropic-ai/claude-code -p x", "cd src && claude"):
+            self.assertEqual(self.bash(befehl), 2, befehl)
+
+    def test_pakete_nicht_per_befehl(self):
+        for befehl in ("npm install lodash", "npm i -D left-pad", "pip install requests", "yarn add x",
+                       "uv pip install httpx", "poetry add x"):
+            self.assertEqual(self.bash(befehl, "entwickler"), 2, befehl)
+        for befehl in ("npm ci", "npm install", "pip install -r requirements.txt", "pip install -e ."):
+            self.assertEqual(self.bash(befehl, "entwickler"), 0, befehl)
+
+    def test_schutzschalter_in_shell(self):
+        for befehl in ("python -c \"x='bypassPermissions'\"", "echo '{\"defaultMode\": \"x\"}' > a.json",
+                       "claude --dangerously-skip-permissions"):
+            self.assertEqual(self.bash(befehl), 2, befehl)
+
+    def test_teamkonfig_nicht_loeschbar(self):
+        self.assertEqual(self.bash("rm .claude/dev-team.json"), 2)
+        self.assertEqual(self.bash("mv .claude/dev-team.json /tmp/x"), 2)
+
+    def test_plugin_skripte_nicht_ueberschreibbar(self):
+        self.assertEqual(self.bash("echo 'exit 0' > %s/scripts/waechter.sh" % PLUGIN), 2)
+        self.assertEqual(self.bash("cp /tmp/x %s/scripts/waechter.py" % PLUGIN), 2)
+
+    def test_normale_befehle_frei(self):
+        for befehl in ("git status", "git merge --no-ff dev-team/p1 -m 'P1'", "npm test",
+                       "git commit -m \"$(cat <<'EOF'\nP1: Text mit Apostroph's\nEOF\n)\"",
+                       "rm -f build/out.txt 2>/dev/null", "ls -la > /dev/null", "mkdir -p docs/uebergabe",
+                       "echo '- Frage' >> docs/OFFENE_FRAGEN.md", "node --test 2>&1 | tail -5"):
+            self.assertEqual(self.bash(befehl, "entwickler" if "build" in befehl else None), 0, befehl)
+
+    def test_variable_als_ziel(self):
+        self.assertEqual(self.bash("echo x > $ZIEL"), 2)
+        self.assertEqual(self.bash("echo x > $TMPDIR/a.txt"), 0)
+
+
+class EntwicklerRevier(Basis):
+    def setUp(self):
+        super().setUp()
+        self.wt = os.path.join(self.projekt, ".claude", "worktrees", "agent-1")
+        git(self.projekt, "worktree", "add", "-q", self.wt, "-b", "agent-1")
+        os.makedirs(os.path.join(self.projekt, ".dev-team", "verdeckt"), exist_ok=True)
+
+    def ent(self, werkzeug, ti):
+        e = {"tool_name": werkzeug, "tool_input": ti, "agent_type": "dev-team:entwickler",
+             "agent_id": "a", "cwd": self.wt}
+        return self.lauf(e)[0]
+
+    def test_umgehungen_aus_dem_audit(self):
+        self.assertEqual(self.ent("Bash", {"command": "cat ../../../.dev-team/v*/*"}), 2)
+        self.assertEqual(self.ent("Bash", {"command": "grep -r def %s --include=*.verdeckt" % self.projekt}), 2)
+        self.assertEqual(self.ent("Bash", {"command": "ln -s %s/.dev-team /tmp/x" % self.projekt}), 2)
+        self.assertEqual(self.ent("Glob", {"pattern": "**/*.verdeckt"}), 2)
+        self.assertEqual(self.ent("Grep", {"pattern": "x", "glob": "*.verdeckt"}), 2)
+        self.assertEqual(self.ent("Read", {"file_path": os.path.join(self.projekt, "src", "rechnung.js")}), 2)
+        self.assertEqual(self.ent("Bash", {"command": "cat %s/src/rechnung.js" % self.projekt}), 2)
+        self.assertEqual(self.ent("Bash", {"command": "echo $CLAUDE_PROJECT_DIR"}), 2)
+
+    def test_eigener_worktree_frei(self):
+        self.assertEqual(self.ent("Read", {"file_path": os.path.join(self.wt, "src", "rechnung.js")}), 0)
+        self.assertEqual(self.ent("Bash", {"command": "cat %s/src/rechnung.js" % self.wt}), 0)
+        self.assertEqual(self.ent("Grep", {"pattern": "summe", "path": "src"}), 0)
+
+    def test_eigene_neue_tests_weiter_bearbeitbar(self):
+        neu = os.path.join(self.wt, "tests", "neu.test.js")
+        self.assertEqual(self.ent("Write", {"file_path": neu, "content": "a"}), 0)
+        with open(neu, "w") as f:
+            f.write("a")
+        self.assertEqual(self.ent("Edit", {"file_path": neu, "old_string": "a", "new_string": "b"}), 0)
+        git(self.wt, "add", "-A")
+        git(self.wt, "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "neu")
+        self.assertEqual(self.ent("Edit", {"file_path": neu, "old_string": "a", "new_string": "b"}), 0)
+        alt = os.path.join(self.wt, "tests", "rechnung.test.js")
+        self.assertEqual(self.ent("Edit", {"file_path": alt, "old_string": "x", "new_string": "y"}), 2)
+
+
+class Robustheit(Basis):
+    def test_windows_kodierung_blockiert_trotzdem(self):
+        env = {"PYTHONIOENCODING": "cp1252", "PYTHONUTF8": "0"}
+        code, fehler = self.lauf(self.agent("Explore"), skript="sh", env_zusatz=env)
+        self.assertEqual(code, 2, fehler)
+        e = {"tool_name": "Write", "tool_input": {"file_path": "src/dichte.py", "content": "rho = 'ρ' # ⛔"}}
+        self.assertEqual(self.lauf(e, skript="sh", env_zusatz=env)[0], 2)
+
+    def test_kaputte_angaben_blockieren(self):
+        for ti in ("text statt objekt", {"file_path": ["a", "b"]}, {"file_path": 5}):
+            self.assertEqual(self.lauf({"tool_name": "Write", "tool_input": ti})[0], 2, ti)
+        self.assertEqual(self.lauf({"tool_name": "Agent", "tool_input": "x"})[0], 2)
+        self.assertEqual(self.lauf({"tool_name": "Bash", "tool_input": {"command": ["ls"]}})[0], 2)
+
+    def test_gitattributes_erzwingt_lf(self):
+        with open(os.path.join(PLUGIN, "..", "..", ".gitattributes")) as f:
+            t = f.read()
+        self.assertIn("*.sh text eol=lf", t)
+        self.assertIn("*.py text eol=lf", t)
+
+    def test_hooks_blockieren_bei_fehler(self):
+        for datei in (os.path.join(PLUGIN, "hooks", "hooks.json"),
+                      os.path.join(PLUGIN, "vorlagen", "projekt-settings.json")):
+            with open(datei, encoding="utf-8") as f:
+                d = json.load(f)
+            for eintrag in d["hooks"]["PreToolUse"]:
+                for h in eintrag["hooks"]:
+                    self.assertEqual(h.get("onFailure"), "block", datei)
+                self.assertIn("PowerShell", eintrag["matcher"])

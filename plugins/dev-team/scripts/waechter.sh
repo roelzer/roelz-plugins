@@ -8,7 +8,7 @@ eingabe="$(cat)"
 
 for py in python3 python py; do
   if command -v "$py" >/dev/null 2>&1 && "$py" -c 'import sys; sys.exit(0 if sys.version_info >= (3, 8) else 1)' >/dev/null 2>&1; then
-    printf '%s' "$eingabe" | "$py" "$plugin/scripts/waechter.py" "$plugin"
+    printf "%s" "$eingabe" | "$py" -X utf8 "$plugin/scripts/waechter.py" "$plugin"
     exit $?
   fi
 done
