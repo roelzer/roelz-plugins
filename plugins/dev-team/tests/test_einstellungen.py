@@ -62,7 +62,8 @@ class Einstellungen(unittest.TestCase):
 
     def test_zweimal_ist_stabil(self):
         d = tempfile.mkdtemp()
-        ziel = os.path.join(d, "s.json")
+        os.makedirs(os.path.join(d, ".claude"))
+        ziel = os.path.join(d, ".claude", "settings.json")
         for _ in range(2):
             subprocess.run([sys.executable, SKRIPT, "--vorlage", VORLAGE, "--ziel", ziel, "--schreiben"], capture_output=True)
         r = subprocess.run([sys.executable, SKRIPT, "--vorlage", VORLAGE, "--ziel", ziel], capture_output=True, text=True)
@@ -81,14 +82,23 @@ class Einstellungen(unittest.TestCase):
 
     def test_benutzer_vorlage_aendert_nur_sperren(self):
         d = tempfile.mkdtemp()
-        ziel = os.path.join(d, "s.json")
+        os.makedirs(os.path.join(d, ".claude"))
+        ziel = os.path.join(d, ".claude", "settings.json")
         with open(ziel, "w") as f:
             json.dump({"model": "opus"}, f)
         subprocess.run([sys.executable, SKRIPT, "--vorlage", os.path.join(PLUGIN, "vorlagen", "benutzer-settings.json"),
                         "--ziel", ziel, "--schreiben"], capture_output=True)
         with open(ziel) as f:
             neu = json.load(f)
-        self.assertEqual(set(neu), {"model", "permissions"})
+        self.assertEqual(set(neu), {"model", "permissions", "disableWorkflows"})
+
+    def test_ziel_nur_settings_json(self):
+        d = tempfile.mkdtemp()
+        ziel = os.path.join(d, "freigaben.md")
+        r = subprocess.run([sys.executable, SKRIPT, "--vorlage", VORLAGE, "--ziel", ziel, "--schreiben"],
+                           capture_output=True, text=True)
+        self.assertEqual(r.returncode, 1)
+        self.assertFalse(os.path.exists(ziel))
 
 
 class Vorlagen(unittest.TestCase):

@@ -22,6 +22,18 @@ for a in "$pl"/agents/*.md; do
   grep -q 'CLAUDE_PLUGIN_ROOT' "$a" && f "$a: \${CLAUDE_PLUGIN_ROOT} im Agenten (wird in Cloud-Kopien nicht ersetzt)"
   grep -q '## Dev-Team-Kontext' "$a" || f "$a: Dev-Team-Kontext fehlt"
 done
+# Modell im Steckbrief = Standard in team.json, Standard ist erlaubt
+python3 - "$pl" <<'PYEOF' || f "Modelle in Steckbriefen und team.json passen nicht zusammen"
+import json, re, sys
+pl = sys.argv[1]
+team = json.load(open(pl + "/team.json", encoding="utf-8"))["agenten"]
+fehler = 0
+for n, a in team.items():
+    m = re.search(r"^model:\s*(\S+)", open("%s/agents/%s.md" % (pl, n), encoding="utf-8").read(), re.M)
+    if not m or m.group(1) != a.get("modell") or a.get("modell") not in (a.get("modelle") or []):
+        print("Modell passt nicht: %s" % n); fehler = 1
+sys.exit(fehler)
+PYEOF
 for s in "$pl"/skills/*/SKILL.md; do
   n="$(basename "$(dirname "$s")")"
   grep -q "^name: $n\$" "$s" || f "$s: name passt nicht zum Ordner"

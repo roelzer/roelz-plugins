@@ -7,5 +7,6 @@
       "Read(**/*.pem)",
       "Read(**/*.key)"
     ]
-  }
+  },
+  "disableWorkflows": true
 }

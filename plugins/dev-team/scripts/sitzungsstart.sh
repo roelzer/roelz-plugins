@@ -13,7 +13,8 @@ projekt="${CLAUDE_PROJECT_DIR:-$PWD}"
 global="$HOME/.claude/CLAUDE.md"
 
 eingerichtet=""
-if [ -f "$global" ] && grep -q 'dev-team START' "$global" 2>/dev/null; then
+if [ -f "$global" ] && grep -q 'dev-team START' "$global" 2>/dev/null \
+   && grep -q '^@.*wissen/grundgesetz\.md' "$global" 2>/dev/null; then
   eingerichtet="ja"
 fi
 

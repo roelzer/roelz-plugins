@@ -60,7 +60,45 @@ def npm_namen(text):
     for feld in ("dependencies", "devDependencies", "optionalDependencies", "peerDependencies"):
         for k, v in (d.get(feld) or {}).items():
             namen[k] = v
+    # overrides / resolutions ersetzen Pakete tief im Baum – gleiche Prüfung wie direkte Abhängigkeiten
+    def flach(obj, praefix=""):
+        if isinstance(obj, dict):
+            for k, v in obj.items():
+                name = k.split(">")[-1].strip() if ">" in k else k
+                name = re.sub(r"^(\*\*/)?", "", name)
+                name = re.sub(r"(?<!^)@[^/]*$", "", name) if not name.startswith("@") or name.count("@") > 1 else name
+                if isinstance(v, str):
+                    namen["%s%s" % (praefix, name)] = v
+                else:
+                    flach(v, praefix)
+    for feld in ("overrides", "resolutions"):
+        flach(d.get(feld) or {})
+    flach(((d.get("pnpm") or {}).get("overrides")) or {})
     return namen
+
+
+REGISTRY_ERLAUBT = ("https://registry.npmjs.org/", "https://registry.yarnpkg.com/", "https://pypi.org/",
+                    "https://files.pythonhosted.org/", "https://api.nuget.org/")
+
+
+def fremde_lock_quellen(pfad, text):
+    """Adressen im Lockfile, die nicht auf die offizielle Registry zeigen."""
+    if not text:
+        return set()
+    name = os.path.basename(pfad)
+    funde = set()
+    if name in ("package-lock.json", "npm-shrinkwrap.json"):
+        funde |= set(re.findall(r'"resolved"\s*:\s*"([^"]+)"', text))
+    elif name == "yarn.lock":
+        funde |= set(re.findall(r'^\s*resolved\s+"?([^"\s#]+)', text, re.M))
+    elif name == "pnpm-lock.yaml":
+        funde |= set(re.findall(r"tarball:\s*['\"]?([^'\"\s}]+)", text))
+        funde |= {"git: " + x for x in re.findall(r"repo:\s*['\"]?([^'\"\s}]+)", text)}
+    elif name in ("uv.lock", "poetry.lock", "Pipfile.lock"):
+        funde |= set(re.findall(r'(?:registry|url|git|path|editable|directory)\s*=\s*"([^"]+)"', text))
+        funde |= set(re.findall(r'"(?:git|path|file)"\s*:\s*"([^"]+)"', text))
+    return {f for f in funde if not f.startswith(REGISTRY_ERLAUBT) and f not in (".",)
+            and not re.fullmatch(r"https://pypi\.org/simple/?", f)}
 
 
 PY_NAME = re.compile(r"^\s*([A-Za-z0-9][A-Za-z0-9._-]*)(\[[^\]]*\])?\s*(.*)$")
@@ -342,6 +380,15 @@ def main():
             pruefe_pypi(name, fehler, ok)
             if "==" not in neu[name] and basis_name != "pyproject.toml":
                 warn.append("Python '%s' in %s ohne feste Version (==)." % (name, pfad))
+
+    # Lockfiles: jede neue Adresse außerhalb der offiziellen Registry ist rot
+    for pfad in alle:
+        if os.path.basename(pfad) in ("package-lock.json", "npm-shrinkwrap.json", "yarn.lock", "pnpm-lock.yaml",
+                                      "uv.lock", "poetry.lock", "Pipfile.lock"):
+            neu_q = fremde_lock_quellen(pfad, lies(wurzel, pfad)) - fremde_lock_quellen(pfad, git_datei(wurzel, arg.basis, pfad))
+            for q in sorted(neu_q)[:5]:
+                fehler.append("%s: Paket kommt nicht aus der offiziellen Registry (%s). Nur mit Simons Freigabe und "
+                              "Prüfung durch den Sicherheitsprüfer." % (pfad, q[:120]))
 
     # Paketquellen umgelenkt? (eigener Index/Registry = alle Prüfungen oben wären wertlos)
     for pfad in alle:

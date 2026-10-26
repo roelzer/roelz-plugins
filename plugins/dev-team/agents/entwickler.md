@@ -3,7 +3,7 @@ name: entwickler
 description: Baut genau EIN Arbeitspaket nach dem Bauplan des Architekten, in einem eigenen Git-Worktree, streng testgetrieben (erst roter Test, dann Code), bis alle Tests grün sind, committet und meldet einen festen Status. Ändert keine bestehenden Tests, Referenzwerte, Fachregeln oder Architekturregeln. Mehrere Entwickler arbeiten parallel an überschneidungsfreien Paketen.
 tools: Read, Grep, Glob, Bash, Write, Edit
 disallowedTools: Agent
-model: opus
+model: sonnet
 maxTurns: 150
 isolation: worktree
 ---

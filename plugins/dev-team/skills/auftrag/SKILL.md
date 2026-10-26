@@ -66,8 +66,14 @@ Entscheidungen in `docs/risiko-log.md`, bestätigte Regeln in `fachwissen/regeln
 ## Phase 7 – Eigenständig bauen
 Nach „Eigenständig bauen“ und „Grenzen der Autonomie“ im Grundgesetz.
 
-1. **Arbeitsbranch** `dev-team/<auftrag>` anlegen. **Meilenstein-Basis** = `git rev-parse HEAD`, in STATUS eintragen. Prüfe `"worktree": {"baseRef": "head"}` in `.claude/settings.json`.
+1. **Planungsstand committen:** Plan, `docs/ARCHITEKTUR.md`, Architekturtests, Fachregeln und Lastenheft so, wie sie freigegeben sind, als Commit „Plan freigegeben“ festhalten (die verdeckten Tests liegen in `.dev-team/` und werden nicht committet). Erst dann **Arbeitsbranch** `dev-team/<auftrag>` anlegen. **Meilenstein-Basis** = `git rev-parse HEAD`, in STATUS eintragen. So bekommen alle Entwickler-Worktrees die Architekturtests mit. Prüfe `"worktree": {"baseRef": "head"}` in `.claude/settings.json`.
 2. **Pakete verteilen:** die nächste Gruppe aus dem Plan. Pakete, die laut Architekt parallel möglich sind und deren Abhängigkeiten gemergt sind, gehen gleichzeitig an je einen `entwickler` – **höchstens 4 gleichzeitig**; Aufgaben unter etwa einer halben Stunde nicht parallelisieren. Vor jedem Aufruf **Basis-Commit = aktueller HEAD** festhalten (nie `HEAD~1`). Jeder bekommt: Paket, Bauplan, Anforderungen, Basis-Commit, Startpunkt (= Basis), `docs/ARCHITEKTUR.md`, Plugin-Ordner. Alle Aufrufe einer Gruppe in **einer** Antwort starten; dann auf **alle** Ergebnisse warten.
+   **Modell wählen (Token sparen, Qualität halten):** Standard ist das Modell im Steckbrief (`team.json` → `modell`). Nur diese Abweichungen sind erlaubt, der Wächter sperrt alles andere:
+   - `entwickler`: Standard `sonnet` für Bauplan-Schwierigkeit `einfach` und `mittel`. `model: "opus"` bei `schwer`, ab Fix-Runde 3 und nach einem BLOCKIERT wegen Unklarheit.
+   - `tester`: Standard `opus` für verdeckte Abnahmetests; `model: "sonnet"` nur für reines Ausführen und Aufdecken ohne neue Tests.
+   - `fachexperte`, `rechercheur`, `produktpruefer`: Standard `sonnet`; `opus` bei Stufe Groß oder Fachsoftware mit Berechnungen.
+   - Architekt, Kritiker, Reviewer, Sicherheitsprüfer, Fachprüfer, Langfrist-Architekt, Auditor: immer `opus`, keine Abweichung.
+   Das gewählte Modell steht automatisch im Agenten-Log.
 3. **Status des Entwicklers auswerten:**
    - **FERTIG:** Branch, vollständiger Commit-Hash, Worktree-Pfad und Schranken-Zeile müssen da sein; im Log darf keine Zeile „Fertigmeldung NICHT belegt“ stehen. Sonst wie BLOCKIERT behandeln.
    - **FERTIG_MIT_BEDENKEN:** Bedenken lesen. Betreffen sie Richtigkeit oder Umfang: vor dem Review klären (Architekt fragen oder Entscheidung treffen). Sonst notieren und weiter zum Review.
@@ -79,7 +85,7 @@ Nach „Eigenständig bauen“ und „Grenzen der Autonomie“ im Grundgesetz.
    - Runde 4–5: neuer `entwickler` mit allen bisherigen Befunden und dem Satz „Vorgänger haben das N-mal versucht; du übernimmst“.
    - Danach: **Entscheidung** je offenem Befund (siehe „Entscheiden statt stehen bleiben“) – zurückstellen mit Begründung, oder als tragend einstufen und Simon vorlegen. Nie still verwerfen.
 6. **Merge:** `git merge --no-ff <branch> -m "P3: …"`. **Konflikt:** `git merge --abort`, Paket neu an einen `entwickler` auf dem aktuellen Stand – nie von Hand auflösen.
-7. **Nach jedem Merge die Schranke** im Hauptordner: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/pruefe-tests.sh" --basis <Meilenstein-Basis> --rolle merge`. Die Rolle `merge` prüft mit den Entwickler-Regeln, dass **kein** Entwickler bestehende Tests, Testkonfiguration, Referenzwerte oder Einstellungen geändert hat; deine eigenen Prozessdateien (`docs/STATUS.md` usw.) zählen dabei nicht. Rot → `git reset --keep ORIG_HEAD` (nimmt nur deinen eigenen Merge-Commit zurück; `--hard` ist gesperrt), Befund „Zusammenspiel mit …“ an einen `entwickler`. Danach Worktree aufräumen: `git worktree remove <pfad>` und `git branch -d <branch>`.
+7. **Nach jedem Merge die Schranke** im Hauptordner: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/pruefe-tests.sh" --basis HEAD^1 --rolle merge` (`HEAD^1` = Stand direkt vor diesem Merge; geprüft wird genau das, was das Paket mitbringt – Änderungen von Tester, Architekt oder dir dazwischen zählen nicht als Entwickler-Verstoß). Die Rolle `merge` prüft mit den Entwickler-Regeln, dass **kein** Entwickler bestehende Tests, Testkonfiguration, Referenzwerte oder Einstellungen geändert hat; deine eigenen Prozessdateien (`docs/STATUS.md` usw.) zählen dabei nicht. Rot → `git reset --keep ORIG_HEAD` (nimmt nur deinen eigenen Merge-Commit zurück; `--hard` ist gesperrt), Befund „Zusammenspiel mit …“ an einen `entwickler`. Danach Worktree aufräumen: `git worktree remove <pfad>` und `git branch -d <branch>`.
 8. STATUS nach jedem Schritt aktualisieren. Lektionsvorschläge der Agenten → `docs/LEKTIONEN_VORSCHLAEGE.md`.
 9. **Neue Fachregel:** erst die Prüfung bauen lassen und belegen, dass sie am alten Stand **rot** ist, dann beheben lassen.
 

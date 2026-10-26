@@ -63,16 +63,45 @@ def git(cwd, *args):
         return 1, ""
 
 
-def belegt(projekt, text):
-    wt_basis = os.path.join(projekt, ".claude", "worktrees")
-    kandidaten = re.findall(r"[^\s`'\"()]*[\\/]\.claude[\\/]worktrees[\\/][^\s`'\"()/\\]+", text)
+def win_pfad(pfad):
+    m = re.match(r"^/([A-Za-z])(/.*)?$", pfad or "")
+    if os.name == "nt" and m:
+        return "%s:%s" % (m.group(1).upper(), m.group(2) or "/")
+    return pfad
+
+
+def kandidaten_aus(text):
+    """Worktree-Pfade aus dem Bericht – auch in Backticks mit Leerzeichen, ohne Satzzeichen am Ende."""
+    roh = re.findall(r"`([^`\n]*[\\/]\.claude[\\/]worktrees[\\/][^`\n]+)`", text)
+    roh += re.findall(r"[^\s`'\"()]*[\\/]\.claude[\\/]worktrees[\\/][^\s`'\"()]+", text)
+    aus = []
+    for k in roh:
+        k = k.strip().rstrip(".,;:!?)]}")
+        m = re.match(r"(.*?[\\/]\.claude[\\/]worktrees[\\/][^\\/]+)", k)
+        if m:
+            aus.append(win_pfad(m.group(1)))
+    return aus
+
+
+def belegt(projekt, text, cwd=None):
+    wt_basis = os.path.normcase(os.path.abspath(os.path.join(projekt, ".claude", "worktrees")))
     pfade = []
-    for k in kandidaten:
+    for k in kandidaten_aus(text):
         p = os.path.abspath(k)
-        if os.path.isdir(p) and os.path.normcase(p).startswith(os.path.normcase(os.path.abspath(wt_basis))):
+        if os.path.isdir(p) and os.path.normcase(p).startswith(wt_basis + os.sep):
             pfade.append(p)
+    eigen = None
+    if cwd:
+        c = os.path.normcase(os.path.abspath(cwd))
+        if c.startswith(wt_basis + os.sep):
+            eigen = os.path.join(os.path.abspath(projekt), ".claude", "worktrees",
+                                 os.path.relpath(c, wt_basis).split(os.sep)[0])
+    if eigen and pfade and os.path.normcase(pfade[-1]) != os.path.normcase(eigen):
+        return False, "der genannte Worktree ist nicht der eigene (%s)" % eigen
     if not pfade:
-        return False, "kein gültiger Worktree-Pfad im Bericht"
+        if not eigen:
+            return False, "kein gültiger Worktree-Pfad im Bericht"
+        pfade = [eigen]
     wt = pfade[-1]
     code, kopf = git(wt, "rev-parse", "HEAD")
     if code != 0:
@@ -111,7 +140,7 @@ def main():
         return 0
     if status is None and not re.search(r"🟢|🟡|\bfertig\b", text[:800], re.IGNORECASE):
         return 0
-    ok, warum = belegt(projekt, text)
+    ok, warum = belegt(projekt, text, eingabe.get("cwd"))
     if ok:
         return 0
     grund = ("Fertigmeldung ohne Beleg (%s). Nötig: Worktree-Pfad nennen, alles committet, und für genau "

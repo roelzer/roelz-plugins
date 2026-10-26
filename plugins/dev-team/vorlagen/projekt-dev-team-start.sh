@@ -90,7 +90,9 @@ case "$modus" in
     case "$eingabe" in
       *'"tool_name":"Agent"'*|*'"tool_name": "Agent"'*|*'"tool_name":"Task"'*|*'"tool_name": "Task"'*|\
       *'"tool_name":"Write"'*|*'"tool_name": "Write"'*|*'"tool_name":"Edit"'*|*'"tool_name": "Edit"'*|\
-      *'"tool_name":"MultiEdit"'*|*'"tool_name": "MultiEdit"'*|*'"tool_name":"NotebookEdit"'*|*'"tool_name": "NotebookEdit"'*)
+      *'"tool_name":"MultiEdit"'*|*'"tool_name": "MultiEdit"'*|*'"tool_name":"NotebookEdit"'*|*'"tool_name": "NotebookEdit"'*|\
+      *'"tool_name":"Workflow"'*|*'"tool_name": "Workflow"'*|*'"tool_name":"Monitor"'*|*'"tool_name": "Monitor"'*|\
+      *'"tool_name":"Bash"'*|*'"tool_name": "Bash"'*|*'"tool_name":"PowerShell"'*|*'"tool_name": "PowerShell"'*)
         echo "⛔ Dev-Team-Wächter: Das Dev-Team ist in dieser Sitzung nicht geladen (Repo roelzer/roelz-plugins nicht erreichbar). Ohne Team wird nicht gebaut. Simon Bescheid geben." >&2
         exit 2 ;;
     esac

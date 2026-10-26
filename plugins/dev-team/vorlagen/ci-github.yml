@@ -1,0 +1,61 @@
+# Dev-Team: unabhängige Prüfung auf GitHub (optional)
+#
+# Ablage im Projekt: .github/workflows/dev-team.yml
+# Legt Simon von Hand an (die Schranke zählt .github/workflows zur Testkonfiguration).
+#
+# Wozu: Die Prüfungen laufen auf einem Rechner bei GitHub, an den kein Agent herankommt.
+# Was ein Agent auf dem eigenen Rechner verbogen hätte (Tests, Testkonfiguration,
+# Abhängigkeiten), fällt hier auf. Für den Hauptbranch in GitHub "Branch protection"
+# einschalten und diese Prüfung als Pflicht setzen – dann kommt nichts Rotes nach main.
+#
+# Anpassen: Python-/Node-Version und Setup-Schritt an das Projekt (siehe .claude/dev-team.json).
+
+name: dev-team-pruefung
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+jobs:
+  schranken:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Projekt holen
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Dev-Team-Prüfskripte holen (festgenagelter Stand aus plugin_stand, sonst main)
+        run: |
+          stand=$(python3 -c "import json;print(json.load(open('.claude/dev-team.json')).get('plugin_stand') or 'main')")
+          git clone -q https://github.com/roelzer/roelz-plugins.git "$RUNNER_TEMP/roelz-plugins"
+          git -C "$RUNNER_TEMP/roelz-plugins" checkout -q "$stand"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Setup aus .claude/dev-team.json
+        run: |
+          setup=$(python3 -c "import json;print(json.load(open('.claude/dev-team.json')).get('setup') or '')")
+          if [ -n "$setup" ]; then bash -c "$setup"; fi
+
+      - name: Basis bestimmen (Abzweigpunkt vom Hauptbranch)
+        run: |
+          ziel="${GITHUB_BASE_REF:-main}"
+          git fetch -q origin "$ziel" || true
+          echo "BASIS=$(git merge-base HEAD "origin/$ziel" 2>/dev/null || git rev-list --max-parents=0 HEAD | tail -n 1)" >> "$GITHUB_ENV"
+
+      - name: Test-Schranke (Entwickler-Regeln, alle Tests, Zusatzbefehle)
+        run: python3 -X utf8 "$RUNNER_TEMP/roelz-plugins/plugins/dev-team/scripts/pruefe_tests.py" --basis "$BASIS" --rolle merge
+
+      - name: Abhängigkeits-Schranke
+        run: python3 -X utf8 "$RUNNER_TEMP/roelz-plugins/plugins/dev-team/scripts/pruefe_abhaengigkeiten.py" --basis "$BASIS"

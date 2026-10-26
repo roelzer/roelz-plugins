@@ -34,6 +34,8 @@ def zusammenfuehren(alt, vorlage):
             neu.setdefault(schluessel, {}).update(vorlage[schluessel])
     if "disableAllHooks" in vorlage:
         neu["disableAllHooks"] = False
+    if "disableWorkflows" in vorlage:
+        neu["disableWorkflows"] = True
     if "worktree" in vorlage:
         neu.setdefault("worktree", {}).update(vorlage["worktree"])
     if vorlage.get("env"):
@@ -59,6 +61,13 @@ def main():
     erlaubt = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "vorlagen")
     if os.path.dirname(os.path.abspath(arg.vorlage)) != erlaubt:
         print("FEHLER: Als Vorlage sind nur Dateien aus %s erlaubt. Nichts geändert." % erlaubt)
+        sys.exit(1)
+    ziel_norm = os.path.abspath(arg.ziel).replace("\\", "/")
+    if not (ziel_norm.endswith("/.claude/settings.json")):
+        print("FEHLER: Ziel darf nur eine .claude/settings.json sein (Projekt oder ~/.claude). Nichts geändert.")
+        sys.exit(1)
+    if os.path.basename(arg.vorlage) not in ("projekt-settings.json", "benutzer-settings.json"):
+        print("FEHLER: Als Vorlage nur projekt-settings.json oder benutzer-settings.json. Nichts geändert.")
         sys.exit(1)
     with open(arg.vorlage, encoding="utf-8") as f:
         vorlage = json.load(f)

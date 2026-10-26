@@ -1,5 +1,35 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.4.0 – Befunde der Nachprüfung 3.3.0, Modellwahl
+
+### Warum
+Nachprüfung 3.3.0 (7/10, Tendenz 8, `docs/AUDIT-3.3.0.md`): neue Claude-Code-Werkzeuge (`Monitor`, `Workflow`) liefen am Wächter vorbei, weitere Shell-Wege, Merge-Schranke am Meilenstein-Ende fälschlich rot. Simons Wunsch: Modelle je Agent festlegen bzw. pro Aufgabe wählen, um Token zu sparen. Pilotlauf: Hintergrund-Agenten wurden im unbeaufsichtigten Modus nach 10 Minuten abgebrochen.
+
+### Teamzwang und Werkzeuge
+- Der Wächter sieht jetzt **alle** Werkzeuge (Matcher `*`). `Workflow` ist gesperrt (zusätzlich `CLAUDE_CODE_DISABLE_WORKFLOWS`, `disableWorkflows`, Sperrregel). `Monitor` wird wie die Shell geprüft. **Unbekannte Werkzeuge sind gesperrt**, bis Simon sie in `team.json` → `harmlose_werkzeuge` aufnimmt. Zusatz-Werkzeuge (MCP), die Befehle ausführen oder Dateien schreiben, sind gesperrt; Agenten des Teams nutzen keine.
+- **Modelle:** Standard je Agent in Steckbrief und `team.json` (`modell`), erlaubte Abweichungen in `modelle`. Prüfer, die Qualität absichern, immer Opus; Entwickler Sonnet, Opus bei Bauplan-Schwierigkeit `schwer` und ab Fix-Runde 3; kein Haiku. Der Wächter sperrt andere Modelle; das Modell steht im Agenten-Log. Der Architekt schätzt im Bauplan die Schwierigkeit.
+
+### Shell
+- **Erlaubnisliste für den Projektleiter:** Git, Lese- und Dateibefehle, Plugin-Skripte und die Befehle aus `.claude/dev-team.json`. Keine eigenen Skripte (auch nicht im Temp), keine Einzeiler, kein curl.
+- Befehlsersetzungen (`$( … )`, Backticks, `<( … )`) werden mitgeprüft, auch in Anführungszeichen. Zeilenumbrüche trennen Befehle. Heredocs nur außerhalb von Anführungszeichen (getarnter Heredoc geschlossen). `cd` im selben Befehl und fest zugewiesene Variablen werden berücksichtigt.
+- `git -c alias./core./…` gesperrt; Entwickler ohne `git -C/--git-dir/--work-tree`. Weitere Git-Sperren: Push auf `refs/heads/main`, `--all`, `branch -d -f`, `checkout -f`, `switch --discard-changes`, `stash drop/clear`, `worktree remove --force`, `reflog expire`, `gc --prune`.
+- Schreibziele von `curl -o`, `wget -O`, `sort -o` u. a., `<>`-Umleitung; Editoren, `script -c`, `setsid` & Co.; mehr Einzeiler-Muster (`os.open`, `copyFileSync`, `pathlib` …); PowerShell `[IO.File]` u. ä.; `uv run --with`, `uvx --from`, `pip install <datei>`.
+- Entwickler schreibt nur im eigenen Worktree; Lesen über Elternordner (`/`, oberhalb von HOME, `..`) gesperrt.
+- `~/.claude/CLAUDE.md` nur über `scripts/claude_md_block.py`; Sitzungsstart gibt das Grundgesetz mit, wenn die Verknüpfung fehlt. `settings_zusammenfuehren.py` schreibt nur `.claude/settings.json`.
+
+### Schranken
+- Merge-Prüfung mit `--basis HEAD^1` (nur das Paket); Planungsstand wird vor der Meilenstein-Basis committet.
+- Tests, die das Testwerkzeug verändern (assert-Methoden überschreiben, `except AssertionError`, `sys.exit`/`os._exit`, `setattr` auf unittest/pytest), und geänderte Testeinstellungen in `pyproject.toml`/`package.json` durch Entwickler sind rot.
+- Bei geändertem Manifest/Lockfile läuft die Abhängigkeits-Schranke automatisch. `overrides`/`resolutions` werden geprüft, Lockfile-Adressen außerhalb der offiziellen Registry sind rot.
+- Warnung bei Basis = HEAD und bei Fachsoftware ohne Mutationstests.
+- Fertig-Prüfung: Satzzeichen, Pfade in Backticks (mit Leerzeichen), `/c/…`, nur der eigene Worktree.
+
+### Sonstiges
+- Projektvorlage: `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0` (Hintergrund-Agenten werden in unbeaufsichtigten Läufen nicht mehr abgebrochen).
+- CI-Vorlage `vorlagen/ci-github.yml`: Schranken laufen bei GitHub, außerhalb der Reichweite der Agenten.
+- Doku ehrlich: Sandbox nur unter Linux/macOS/WSL2; Schritt 7 mit `Monitor` und getarntem Heredoc.
+- 176 automatische Tests.
+
 ## 3.3.0 – Restpunkte aus Audit 3.1.0
 
 - Schranke erkennt Tests ohne echte Prüfung: nur Konstanten (`assert True`, `expect(true).toBe(true)`, `assert.equal(a, a)`) oder `return` vor der ersten Prüfung (Python per Syntaxbaum).

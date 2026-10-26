@@ -7,6 +7,6 @@ Claude-Code-Marktplatz mit zwei Plugins:
 
 Beide enthalten kein Firmen- oder Kundenwissen.
 
-Einrichtung und Nutzung: siehe [ANLEITUNG.md](ANLEITUNG.md). Prüfberichte: [3.1.0](docs/AUDIT-3.1.0.md), [3.0.0](docs/AUDIT-3.0.0.md), [2.4.0](docs/AUDIT-2.4.0.md). Woher die Agentenregeln stammen: [docs/VORBILDER.md](docs/VORBILDER.md).
+Einrichtung und Nutzung: siehe [ANLEITUNG.md](ANLEITUNG.md). Prüfberichte: [3.3.0](docs/AUDIT-3.3.0.md), [3.1.0](docs/AUDIT-3.1.0.md), [3.0.0](docs/AUDIT-3.0.0.md), [2.4.0](docs/AUDIT-2.4.0.md). Woher die Agentenregeln stammen: [docs/VORBILDER.md](docs/VORBILDER.md).
 
 **Dieses Repo ist öffentlich.** Darum gilt: keine Passwörter, Schlüssel, Konto-, Kunden- oder Arbeitgeberdaten, keine internen Werte oder Unterlagen, keine Namen von Kunden oder Firmen. Das gilt auch für Lektionen und die Fachwissen-Bibliothek.

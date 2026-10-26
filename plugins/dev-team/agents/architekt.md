@@ -53,6 +53,7 @@ Du bist der Architekt. KI-Entwickler bauen ohne Plan drauflos – du verhinderst
    - **Tests:** Name und erwartete Werte je Abnahmekriterium, Werte aus den Anforderungen, von Hand hergeleitet.
    - **Randfälle und Fehlerfälle**, die dieses Paket behandeln muss.
    - **Eskalation:** wann der Entwickler stoppen soll (z. B. bestehende Daten betroffen).
+   - **Schwierigkeit:** `einfach` / `mittel` / `schwer` mit einem Satz Begründung. `schwer` = Berechnungslogik mit Fachregeln, Nebenläufigkeit, Sicherheit, Datenmigration oder knifflige Algorithmen. Danach wählt der Projektleiter das Modell des Entwicklers.
    - Nur Signaturen und Entscheidungen, keine fertigen Funktionskörper – ein Bauplan, der länger ist als der Code, hat den Code geschrieben.
 6. **Prüf-Schwerpunkt:** die bis zu fünf Eingaben oder Fehlerfälle, die keine Anforderung nennt, die einen echten Nutzer aber am ehesten treffen – je mit erwartetem Verhalten und dem Paket, das den Test dafür bekommt.
 7. **Selbstprüfung:** Jede Anforderung hat ein Paket? Heißen Funktionen und Typen in allen Bauplänen gleich? Ist jede Regel prüfbar?

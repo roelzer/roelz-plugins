@@ -1,7 +1,7 @@
 {
   "name": "dev-team",
   "displayName": "Dev-Team",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "description": "Festes Senior-Entwicklungsteam: Projektleitung, Architekt, Entwickler (auch parallel in eigenen Worktrees), Kritiker, Fachprüfer, Rechercheur, Abwägungsrunde, Tester mit verdeckten Abnahmetests, Reviewer, Sicherheitsprüfer, Produktprüfer, Auditor. Teamzwang und Schreibrechte technisch erzwungen, Test- und Abhängigkeits-Schranke. Enthält kein Firmen- oder Kundenwissen.",
   "author": {
     "name": "Simon Rölz"

@@ -30,19 +30,9 @@ Frag im Modus „privat“ außerdem, ob es schon ein Baukasten-Repo gibt und wo
 Verwende im nächsten Schritt den vollständigen, absoluten Pfad mit Schrägstrichen `/`, auch unter Windows.
 
 ## 3. Globale CLAUDE.md verknüpfen
-Datei: `~/.claude/CLAUDE.md` (anlegen, falls nicht vorhanden). Existiert schon ein Block zwischen `<!-- dev-team START -->` und `<!-- dev-team END -->`, ersetze nur diesen Block. Alles andere bleibt unverändert.
-
-```
-<!-- dev-team START -->
-## Dev-Team
-Modus: <privat|arbeit>
-Plugin-Ordner: <absoluter Plugin-Pfad>
-Lessons-Datei: <absoluter Lessons-Pfad>
-Baukasten: <absoluter Pfad zum Baukasten-Repo – Zeile weglassen, wenn es noch keinen gibt oder Modus „arbeit“>
-@<absoluter Plugin-Pfad>/wissen/grundgesetz.md
-@<absoluter Lessons-Pfad>
-<!-- dev-team END -->
-```
+`~/.claude/CLAUDE.md` schreibt Claude nicht direkt (der Wächter sperrt das, damit keine Sitzung das Grundgesetz abschalten kann). Zeige Simon die Änderung mit
+`python3 "${CLAUDE_PLUGIN_ROOT}/scripts/claude_md_block.py" --modus <privat|arbeit> --lessons <Lessons-Pfad> [--baukasten <Baukasten-Repo>]`
+und führe nach seinem OK denselben Befehl mit `--schreiben` aus. Das Skript ersetzt nur den Block zwischen `<!-- dev-team START -->` und `<!-- dev-team END -->`; alles andere bleibt. Im Block stehen Modus, Plugin-Ordner, Lessons-Datei, ggf. Baukasten und die Verknüpfungen `@…/grundgesetz.md` und `@<Lessons>`.
 
 ## 4. Schutzregeln für Geheimnisse
 Benutzereinstellungen schreibt Claude nicht direkt. Zeige Simon die Änderung mit

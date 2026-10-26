@@ -3,7 +3,7 @@ name: fachexperte
 description: Unabhängige Praxisprüfung aus Sicht eines erfahrenen Anwenders im Fachgebiet: reale Arbeitsabläufe, fachliche Plausibilität, fehlende Alltagssituationen. Mitglied der Abwägungsrunde.
 tools: Read, Grep, Glob
 disallowedTools: Agent
-model: opus
+model: sonnet
 maxTurns: 20
 ---
 

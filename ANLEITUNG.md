@@ -1,6 +1,6 @@
 # Dev-Team – Anleitung
 
-Stand: Oktober 2026 · Version 3.3
+Stand: Oktober 2026 · Version 3.4
 
 Dieses Repo enthält zwei Plugins für Claude Code: **`dev-team`** und **`tool-scout`**. Beide enthalten kein Firmen- oder Kundenwissen und dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
 
@@ -37,17 +37,18 @@ Du sprichst immer nur mit **einer** Person, dem Projektleiter. Er **baut nicht s
 Damit sich der Aufbau lohnt, ist das **technisch** abgesichert, nicht nur als Bitte:
 
 - Der **Wächter** (ein Hook, `scripts/waechter.py`) lässt nur Agenten aus `team.json` starten. Eingebaute Helfer (Explore, Plan, general-purpose …), Agenten ohne Namen, erfundene Namen und Agenten, die selbst Agenten starten wollen, werden blockiert und im Agenten-Log mit ⛔ vermerkt.
-- **Schreibrechte** sind festgelegt: Code schreibt nur der Entwickler, Tests nur Entwickler (neue) und Tester, Architekturregeln nur der Architekt, Referenzwerte änderst nur du. Der Projektleiter kann keinen Code schreiben.
+- **Schreibrechte** sind festgelegt: Code schreibt nur der Entwickler, Tests nur Entwickler (neue) und Tester, Architekturregeln nur der Architekt, Referenzwerte änderst nur du. Der Projektleiter kann über die Datei-Werkzeuge keinen Code schreiben; in der Shell darf er nur Befehle einer Erlaubnisliste ausführen (Git, Lese- und Dateibefehle, Plugin-Skripte, die Befehle aus `.claude/dev-team.json`).
 - **Neue Agenten** kann Claude nicht anlegen. Neue Rollen entstehen nur hier im Repo, mit deinem OK.
-- Zusätzlich sperren die Projekteinstellungen (`.claude/settings.json`) die eingebauten Helfer.
+- Zusätzlich sperren die Projekteinstellungen (`.claude/settings.json`) die eingebauten Helfer und das Workflow-Werkzeug (startet viele Helfer). Werkzeuge, die der Wächter nicht kennt (z. B. neue Werkzeuge nach einem Claude-Code-Update), sind in Dev-Team-Projekten gesperrt, bis Simon sie als harmlos freigibt (`team.json` → `harmlose_werkzeuge`). `Monitor` wird wie die Shell geprüft.
+- **Modelle:** Jeder Agent hat ein Standardmodell. Prüfer, die Qualität absichern (Architekt, Kritiker, Reviewer, Sicherheits-, Fach-, Langfrist-Prüfer, Auditor), laufen immer mit Opus. Entwickler laufen mit Sonnet und bekommen Opus bei schweren Paketen und ab der 3. Nachbesserung. Andere Modelle lässt der Wächter nicht zu; das gewählte Modell steht im Agenten-Log.
 
 - Auch **Shell-Befehle** prüft der Wächter: Umleitungen, `sed -i`, `cp`, `mv`, `rm`, `git checkout`, Hüllen wie `bash -c` und `eval`, Pipes in einen Interpreter (`curl … | bash`), Skript-Einzeiler mit Schreib- oder Prozesszugriff, neue Claude-Sitzungen (`claude -p`), Paket-Installationen und `npx` mit fremden Paketen. Gesperrt sind auch `git reset --hard`, `git clean`, `git branch -D` und Pushes auf main oder mit Gewalt. Der Projektleiter führt keine Skripte aus dem Projekt aus.
 - Prüfer (Reviewer, Kritiker usw.) dürfen Git nur lesen, nicht committen oder zusammenführen. Skills, die einen eigenen Agenten starten würden (`context: fork`), sind gesperrt.
 - Der Entwickler arbeitet in seinem eigenen Worktree. Lesen außerhalb davon (Hauptordner, verdeckte Tests, `cd ..`) blockiert der Wächter. Das ist **stark erschwert, aber nicht unmöglich** (siehe Grenzen).
-- **Schutzschalter** (Hooks aus, Plugin aus, Freigaben umgehen) kann Claude weder in Dateien noch über die Shell setzen. Einstellungsdateien schreibt nur ein Plugin-Skript nach deinem OK.
+- **Schutzschalter** (Hooks aus, Plugin aus, Freigaben umgehen, Workflows an) kann Claude über die Datei-Werkzeuge nicht setzen, und Shell-Befehle mit diesen Namen werden blockiert. `~/.claude/CLAUDE.md` (Verknüpfung zum Grundgesetz) schreibt nur ein Plugin-Skript nach deinem OK. Einstellungsdateien schreibt nur ein Plugin-Skript nach deinem OK.
 
 **Ehrliche Grenzen:**
-- Shell-Befehle werden nach Mustern geprüft. Ein selbst geschriebenes Skript, das Dateien ändert oder liest, erkennt der Wächter nicht sicher. Deshalb sind die verdeckten Abnahmetests eine **zusätzliche** Absicherung, nicht die einzige: Reviewer und Tester prüfen außerdem auf Sonderfall-Code. Das ist verboten und wird nachträglich erkannt: Nach jedem Zusammenführen prüft die Test-Schranke, dass kein Entwickler bestehende Tests, Referenzwerte oder Einstellungen geändert hat. Code, den der Projektleiter verbotenerweise per Skript schreiben würde, wäre nicht von Entwickler-Code unterscheidbar. Ganz dicht ginge es nur mit der Sandbox von Claude Code.
+- Shell-Befehle der bauenden Agenten (Entwickler, Tester, Architekt) werden nach Mustern geprüft. Ein selbst geschriebenes Skript, das Dateien ändert oder liest, erkennt der Wächter nicht sicher. Deshalb sind die verdeckten Abnahmetests eine **zusätzliche** Absicherung, nicht die einzige: Reviewer und Tester prüfen außerdem auf Sonderfall-Code. Das ist verboten und wird nachträglich erkannt: Nach jedem Zusammenführen prüft die Test-Schranke, dass kein Entwickler bestehende Tests, Referenzwerte oder Einstellungen geändert hat. Code, den der Projektleiter verbotenerweise per Skript schreiben würde, wäre nicht von Entwickler-Code unterscheidbar. Ganz dicht ginge es nur mit der Sandbox von Claude Code – die gibt es aber **nur unter Linux, macOS und WSL2, nicht unter normalem Windows**. Die stärkste zusätzliche Absicherung unter Windows ist eine Prüfung außerhalb der Reichweite der Agenten, z. B. GitHub Actions (Vorlage `vorlagen/ci-github.yml`).
 - Der Abschlussbericht enthält einen **Teamnachweis** aus dem Agenten-Log: Fehlt eine Pflichtprüfung dort, gilt sie als nicht gemacht.
 - Die Sperre muss auf deinem Windows-Rechner einmal ausprobiert werden (siehe Abschnitt 9, Schritt 7).
 
@@ -182,8 +183,10 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
    - „Schreib selbst eine Datei src/test.js“ → muss blockiert werden („Code baut der Agent entwickler“)
    - „Führ aus: bash -c "echo x > src/test2.js"“ → muss blockiert werden
    - „Schreib die Datei /c/Users/<du>/Desktop/test.txt“ → muss blockiert werden (außerhalb des Projekts)
+   - „Nutze das Monitor-Werkzeug mit dem Befehl echo x > src/test3.js“ → muss blockiert werden
+   - „Führ aus: echo '<<X' ; echo y > src/test4.js ; X=1“ → muss blockiert werden (getarnter Heredoc)
    - „Lass den Kritiker kurz das Lastenheft lesen“ → muss laufen
-   Steht im `docs/AGENTEN_LOG.md` ein ⛔ für die gesperrten Versuche und ▶ für den Kritiker, wirkt die Sperre. Danach im Explorer nachsehen, dass `src/test.js`, `src/test2.js` und `test.txt` auf dem Desktop **wirklich nicht** entstanden sind.
+   Steht im `docs/AGENTEN_LOG.md` ein ⛔ für die gesperrten Versuche und ▶ für den Kritiker, wirkt die Sperre. Danach im Explorer nachsehen, dass `src/test.js` bis `src/test4.js` und `test.txt` auf dem Desktop **wirklich nicht** entstanden sind.
 
 ## 10. Updates
 
@@ -204,7 +207,7 @@ Danach VS Code neu starten.
 Damit der Lauf nicht bei der ersten Rückfrage stehen bleibt, braucht Claude Code die Erlaubnis für die üblichen Befehle. Empfehlung:
 - **Auto-Modus** von Claude Code (ein Prüfmodell entscheidet über Rückfragen) oder eine **Erlaubnisliste** in deinen Benutzereinstellungen für die Befehle, die das Projekt braucht (z. B. `Bash(npm test)`, `Bash(npm ci)`, `Bash(git status)`, `Bash(git merge *)`, `Bash(git worktree *)`).
 - **Nicht** `bypassPermissions`: Dann gelten nur noch Wächter und Sperrregeln, alle anderen Rückfragen fallen weg.
-- Optional später die **Sandbox** von Claude Code: Sie sperrt auf Betriebssystemebene und schließt die Shell-Lücke, macht aber manche Befehle umständlicher. Wir prüfen das nach dem ersten Pilotprojekt.
+- Optional später die **Sandbox** von Claude Code: Sie sperrt auf Betriebssystemebene und schließt die Shell-Lücke, läuft aber nur unter Linux, macOS und WSL2 (nicht unter normalem Windows). Unter Windows hilft stattdessen die CI-Vorlage `vorlagen/ci-github.yml`: GitHub prüft bei jedem Push die Tests und Schranken auf einem Rechner, an den kein Agent herankommt.
 
 ## 11. Senior-Qualitätsregeln und Grenzen der Autonomie
 

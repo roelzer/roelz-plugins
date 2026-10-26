@@ -101,6 +101,25 @@ def lade_konfig(wurzel, hauptordner):
     return None, None
 
 
+def git_datei_text(wurzel, commit, pfad):
+    r = sh(["git", "show", "%s:%s" % (commit, pfad)], wurzel)
+    return r.stdout if r.returncode == 0 else None
+
+
+def datei_text(wurzel, pfad):
+    try:
+        with open(os.path.join(wurzel, pfad), encoding="utf-8", errors="replace") as f:
+            return f.read()
+    except OSError:
+        return None
+
+
+MANIFESTE = re.compile(r"(^|/)(package\.json|package-lock\.json|npm-shrinkwrap\.json|yarn\.lock|pnpm-lock\.yaml|"
+                       r"bun\.lockb?|requirements[^/]*\.txt|pyproject\.toml|uv\.lock|poetry\.lock|Pipfile(\.lock)?|"
+                       r"[^/]+\.(csproj|fsproj|vbproj)|Directory\.Packages\.props|\.npmrc|\.yarnrc(\.yml)?|"
+                       r"pip\.conf|pip\.ini|uv\.toml|nuget\.config|Cargo\.toml|go\.mod)$", re.IGNORECASE)
+
+
 def aenderungen(wurzel, basis):
     """Liste (status, pfad) gegenüber basis inkl. nicht committeter und neuer Dateien."""
     liste = []
@@ -194,6 +213,75 @@ def leere_python_tests(inhalt):
     return befunde
 
 
+TESTWERKZEUG_NAMEN = {"unittest", "pytest", "TestCase", "nose", "hypothesis", "doctest", "builtins", "sys", "os"}
+
+
+def _wurzelname(knoten):
+    while isinstance(knoten, (ast.Attribute, ast.Subscript, ast.Call)):
+        knoten = knoten.value if not isinstance(knoten, ast.Call) else knoten.func
+    return knoten.id if isinstance(knoten, ast.Name) else ""
+
+
+def testwerkzeug_eingriffe(inhalt):
+    """Eingriffe in das Testwerkzeug selbst: assert-Methoden überschreiben, AssertionError schlucken,
+    Testlauf vorzeitig beenden, Tests per Code abschalten."""
+    try:
+        baum = ast.parse(inhalt)
+    except (SyntaxError, ValueError):
+        return []
+    befunde = []
+    for k in ast.walk(baum):
+        if isinstance(k, (ast.Assign, ast.AugAssign, ast.AnnAssign)):
+            ziele = k.targets if isinstance(k, ast.Assign) else [k.target]
+            for z in ziele:
+                if isinstance(z, ast.Attribute) and (z.attr.startswith(("assert", "fail", "skip", "run"))
+                                                     or _wurzelname(z) in TESTWERKZEUG_NAMEN):
+                    befunde.append("Zuweisung an %s (Testwerkzeug verändert)" % ast.unparse(z)[:60])
+        if isinstance(k, ast.Call):
+            name = ast.unparse(k.func)[:60] if hasattr(ast, "unparse") else ""
+            if name in ("setattr", "delattr") and k.args and (_wurzelname(k.args[0]) in TESTWERKZEUG_NAMEN):
+                befunde.append("%s auf das Testwerkzeug" % name)
+            if name in ("os._exit", "sys.exit", "exit", "quit", "os.kill", "os.abort"):
+                befunde.append("%s im Test (beendet den Testlauf vorzeitig)" % name)
+            if name.endswith(("monkeypatch.setattr", "mock.patch", "patch.object")) and k.args and \
+                    any(w in ast.unparse(k.args[0]) for w in ("unittest", "pytest", "TestCase", "assert")):
+                befunde.append("%s auf das Testwerkzeug" % name)
+        if isinstance(k, ast.ExceptHandler):
+            typ = ast.unparse(k.type) if k.type is not None else ""
+            if k.type is None or any(t in typ for t in ("AssertionError", "BaseException")):
+                befunde.append("except %s schluckt fehlgeschlagene Prüfungen" % (typ or "(ohne Typ)"))
+            elif "Exception" in typ and any(isinstance(x, ast.Assert) for x in ast.walk(k)) is False:
+                pass
+    return befunde
+
+
+TESTWERKZEUG_JS = re.compile(r"\b(expect|assert|it|test|describe)\s*=[^=]|process\.exit\s*\(|"
+                             r"catch\s*\(\s*\w*\s*\)\s*\{\s*\}|\.mockImplementation\(\s*\(\)\s*=>\s*\{\s*\}\s*\)")
+
+
+def testkonfig_teile(pfad, text):
+    """Die Teile von pyproject.toml / package.json, die bestimmen, welche Tests laufen."""
+    if not text:
+        return None
+    try:
+        if pfad.endswith("pyproject.toml"):
+            import tomllib
+            d = tomllib.loads(text)
+            tool = d.get("tool") or {}
+            return json.dumps({k: tool.get(k) for k in ("pytest", "coverage", "unittest", "nose2", "hatch")
+                               if tool.get(k) is not None}, sort_keys=True)
+        if pfad.endswith("package.json"):
+            d = json.loads(text)
+            skripte = {k: v for k, v in (d.get("scripts") or {}).items()
+                       if re.search(r"test|spec|e2e|check|lint|build|verify|mutat", k)}
+            return json.dumps({"scripts": skripte, "jest": d.get("jest"), "vitest": d.get("vitest"),
+                               "mocha": d.get("mocha"), "ava": d.get("ava"), "c8": d.get("c8"),
+                               "nyc": d.get("nyc")}, sort_keys=True)
+    except Exception:
+        return "unlesbar"
+    return None
+
+
 def ist_testdatei(bereich):
     return bereich in ("tests", "abnahme", "architektur", "referenz", "testkonfig")
 
@@ -259,6 +347,12 @@ def pruefe_diff(e, wurzel, basis, rolle, team, fg):
             if p.endswith(".py"):
                 for b in leere_python_tests(inhalt):
                     e.f("Test ohne echte Prüfung in %s: %s" % (p, b))
+                for b in testwerkzeug_eingriffe(inhalt):
+                    e.f("Eingriff in das Testwerkzeug in %s: %s" % (p, b))
+            elif re.search(r"\.(m?[jt]sx?|cjs)$", p):
+                for zeile in neue_zeilen(wurzel, basis, p):
+                    if TESTWERKZEUG_JS.search(zeile):
+                        e.f("Eingriff in das Testwerkzeug in %s: %s" % (p, zeile.strip()[:120]))
             for zeile in neue_zeilen(wurzel, basis, p):
                 if LEERE_PRUEFUNG_JS.search(zeile):
                     e.f("Prüfung, die immer stimmt, in %s: %s" % (p, zeile.strip()[:120]))
@@ -269,6 +363,14 @@ def pruefe_diff(e, wurzel, basis, rolle, team, fg):
                     " – Testbefehl und Prüfregeln dürfen sich nur mit Simons Freigabe ändern"))
         if TESTKONFIG.search(p) and status in "AMD":
             e.w("Testkonfiguration geändert (%s): Reviewer prüft, dass keine Tests ausgeschlossen werden." % p)
+        if entwicklerregeln and status in "AM" and (p.endswith("pyproject.toml") or p.endswith("package.json")):
+            vorher = testkonfig_teile(p, git_datei_text(wurzel, basis, p))
+            jetzt = testkonfig_teile(p, datei_text(wurzel, p))
+            if status == "M" and vorher != jetzt and not fg.deckt(p):
+                e.f("Testeinstellungen in %s geändert (Testauswahl, Testskripte). Das darf nur der Tester." % p)
+            elif status == "A" and jetzt and re.search(r"deselect|ignore|addopts|testpaths|-k |testPathIgnore|"
+                                                        r"exclude|--grep|only|skip", jetzt):
+                e.w("Neue %s mit Testauswahl-Einstellungen: Reviewer prüft, dass keine Tests ausgeschlossen werden." % p)
         if entwicklerregeln and bereich == "testkonfig" and status in "AMD":
             e.f("Testkonfiguration %s %s (Testkonfiguration legt und ändert nur der Tester an)." % (
                 p, {"A": "angelegt", "M": "geändert"}.get(status, "gelöscht")))
@@ -407,7 +509,22 @@ def main():
     if konfig is None:
         e.f("Keine .claude/dev-team.json gefunden (Projekt nicht im Dev-Team aufgenommen).")
 
-    pruefe_diff(e, wurzel, basis, arg.rolle, team, fg)
+    liste = pruefe_diff(e, wurzel, basis, arg.rolle, team, fg)
+    if any(MANIFESTE.search(waechter.norm(p)) for _, p in liste or []):
+        abh = sh([sys.executable, "-X", "utf8", os.path.join(PLUGIN, "scripts", "pruefe_abhaengigkeiten.py"),
+                  "--basis", basis], wurzel)
+        letzte = "\n".join(((abh.stdout or "") + (abh.stderr or "")).strip().splitlines()[-12:])
+        if abh.returncode != 0:
+            e.f("Abhängigkeits-Schranke (automatisch, weil Manifest/Lockfile geändert):\n%s" % letzte)
+        else:
+            e.o("Abhängigkeits-Schranke grün (automatisch).")
+    if basis == git(wurzel, "rev-parse", "HEAD").strip() and arg.rolle in ("projektleiter", "merge", "reviewer"):
+        e.w("Basis = aktueller Stand: Es werden keine Änderungen geprüft, nur der Testlauf.")
+    if (konfig or {}).get("profil") == "fachsoftware" and arg.rolle == "projektleiter" and not any(
+            re.search(r"mutmut|stryker|mutation|cosmic-ray|pitest", str(z), re.I)
+            for z in (konfig or {}).get("zusatzbefehle") or []):
+        e.w("Profil fachsoftware ohne Mutationstests in den Zusatzbefehlen: Die Testqualität wird nicht "
+            "mechanisch gemessen (empfohlen: mutmut bzw. Stryker mit Schwelle).")
     wt_ordner = os.path.join(wurzel, ".claude", "worktrees")
     if not ist_worktree and os.path.isdir(wt_ordner) and os.listdir(wt_ordner):
         e.w("Im Hauptordner liegen Entwickler-Worktrees (.claude/worktrees/). Der Testbefehl darf sie "

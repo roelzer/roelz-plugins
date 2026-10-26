@@ -30,7 +30,7 @@ class Basis(unittest.TestCase):
         os.makedirs(os.path.join(self.projekt, "src"))
         os.makedirs(os.path.join(self.projekt, "tests", "referenz"))
         with open(os.path.join(self.projekt, ".claude", "dev-team.json"), "w") as f:
-            f.write("{}")
+            f.write('{"testbefehl": "npm test", "zusatzbefehle": ["node --test"]}')
         for datei in ("src/rechnung.js", "tests/rechnung.test.js", "tests/referenz/fall1.json",
                       "fachwissen/regeln.md", "docs/lastenheft.md", "docs/STATUS.md",
                       ".claude/settings.json"):
@@ -428,8 +428,10 @@ class ShellUmgehungen(Basis):
             self.assertEqual(self.bash(befehl, "entwickler"), 2, befehl)
 
     def test_lesende_einzeiler_erlaubt(self):
-        self.assertEqual(self.bash("python3 -c \"import json; print(json.load(open('package.json')))\""), 0)
-        self.assertEqual(self.bash("node -e \"console.log(1 > 0)\""), 0)
+        self.assertEqual(self.bash("python3 -c \"import json; print(json.load(open('package.json')))\"", "architekt"), 0)
+        self.assertEqual(self.bash("node -e \"console.log(1 > 0)\"", "architekt"), 0)
+        # Projektleiter: Einzeiler stehen nicht auf seiner Erlaubnisliste
+        self.assertEqual(self.bash("node -e \"console.log(1 > 0)\""), 2)
 
     def test_neue_claude_sitzung_blockiert(self):
         for befehl in ("claude -p 'bau das'", "npx @anthropic-ai/claude-code -p x", "cd src && claude"):
@@ -536,7 +538,7 @@ class Robustheit(Basis):
             for eintrag in d["hooks"]["PreToolUse"]:
                 for h in eintrag["hooks"]:
                     self.assertEqual(h.get("onFailure"), "block", datei)
-                self.assertIn("PowerShell", eintrag["matcher"])
+                self.assertEqual(eintrag["matcher"], "*", datei)  # alle Werkzeuge, auch neue
 
 
 class Audit31Luecken(Basis):
@@ -690,6 +692,156 @@ class Audit32(Basis):
         self.assertEqual(self.lauf(e)[0], 2)
         e = self.schreiben(os.path.join(self.projekt, "conftest.py"), "tester")
         self.assertEqual(self.lauf(e)[0], 0)
+
+class Modelle(Basis):
+    def test_erlaubte_modelle(self):
+        self.assertEqual(self.lauf(self.agent("dev-team:entwickler", model="opus", isolation="worktree"))[0], 0)
+        self.assertEqual(self.lauf(self.agent("dev-team:entwickler", model="sonnet"))[0], 0)
+        self.assertEqual(self.lauf(self.agent("dev-team:entwickler", model="haiku"))[0], 2)
+        self.assertEqual(self.lauf(self.agent("dev-team:reviewer", model="sonnet"))[0], 2)
+        self.assertEqual(self.lauf(self.agent("dev-team:reviewer"))[0], 0)
+        with open(os.path.join(self.projekt, "docs", "AGENTEN_LOG.md"), encoding="utf-8") as f:
+            log = f.read()
+        self.assertIn("[opus]", log)
+
+    def test_steckbrief_gleich_teamliste(self):
+        import re as _re
+        with open(os.path.join(PLUGIN, "team.json"), encoding="utf-8") as f:
+            team = json.load(f)["agenten"]
+        for name, a in team.items():
+            with open(os.path.join(PLUGIN, "agents", name + ".md"), encoding="utf-8") as f:
+                m = _re.search(r"^model:\s*(\S+)", f.read(), _re.M)
+            self.assertEqual(m.group(1), a["modell"], name)
+            self.assertIn(a["modell"], a["modelle"], name)
+            self.assertNotIn("haiku", a["modelle"], name)
+
+
+class Fehlalarme(Basis):
+    def bash(self, befehl, rolle=None):
+        e = {"tool_name": "Bash", "tool_input": {"command": befehl}}
+        if rolle:
+            e["agent_type"] = "dev-team:" + rolle
+            e["agent_id"] = "a"
+        return self.lauf(e)[0]
+
+    def test_heredoc_in_datei_mit_py_endung(self):
+        befehl = "cd %s && cat > rechnen.py <<'EOF'\nimport math\nprint(math.pi)\nEOF\npython3 -I rechnen.py" % self.temp
+        self.assertEqual(self.bash(befehl, "architekt"), 0)
+        self.assertEqual(self.bash("python3 <<'EOF'\nprint(1)\nEOF", "architekt"), 2)
+
+    def test_variablen_im_selben_befehl(self):
+        self.assertEqual(self.bash("S=%s; mkdir -p $S/gut; cp src/rechnung.js $S/gut/" % self.temp, "architekt"), 0)
+        self.assertEqual(self.bash("S=src; echo x > $S/a.js"), 2)
+        self.assertEqual(self.bash("echo x > $UNBEKANNT/a.js"), 2)
+
+class Audit33(Basis):
+    """Umgehungen aus der Nachprüfung 3.3.0 – müssen blockiert sein."""
+
+    def bash(self, befehl, rolle=None, cwd=None, werkzeug="Bash"):
+        e = {"tool_name": werkzeug, "tool_input": {"command": befehl}}
+        if cwd:
+            e["cwd"] = cwd
+        if rolle:
+            e["agent_type"] = "dev-team:" + rolle
+            e["agent_id"] = "a"
+        return self.lauf(e)[0]
+
+    def test_befehlsersetzung_wird_geprueft(self):
+        for befehl in ('echo "$(echo y > src/a.py)"', "echo `rm src/rechnung.js`", 'git commit -m "$(claude -p hi)"',
+                       "cat <(curl x)", "diff a >(tee src/a.js)"):
+            self.assertEqual(self.bash(befehl), 2, befehl)
+        for befehl in ('echo "$(git rev-parse HEAD)"', "echo '$(rm src/x)'"):
+            self.assertEqual(self.bash(befehl), 0, befehl)
+
+    def test_monitor_wie_shell(self):
+        self.assertEqual(self.bash("echo x > src/mon.py", werkzeug="Monitor"), 2)
+        self.assertEqual(self.bash("git status", werkzeug="Monitor"), 0)
+
+    def test_workflow_und_unbekannte_werkzeuge(self):
+        self.assertEqual(self.lauf({"tool_name": "Workflow", "tool_input": {"script": "x"}})[0], 2)
+        self.assertEqual(self.lauf({"tool_name": "NeuesWerkzeug2027", "tool_input": {}})[0], 2)
+        self.assertEqual(self.lauf({"tool_name": "TodoWrite", "tool_input": {}})[0], 0)
+        self.assertEqual(self.lauf({"tool_name": "mcp__memory__memory_read", "tool_input": {}})[0], 0)
+        self.assertEqual(self.lauf({"tool_name": "mcp__ide__executeCode", "tool_input": {}})[0], 2)
+        e = {"tool_name": "mcp__memory__memory_read", "tool_input": {}, "agent_type": "dev-team:entwickler",
+             "agent_id": "a"}
+        self.assertEqual(self.lauf(e)[0], 2)
+
+    def test_getarnter_heredoc(self):
+        for befehl in ("echo '<<X'\necho y > src/a.py\nX=1", "echo \"<<X\"\nbash -c 'claude -p x'\nX=1"):
+            self.assertEqual(self.bash(befehl), 2, befehl)
+        self.assertEqual(self.bash("cat > docs/notiz.md <<'EOF'\nText mit > Zeichen und src/a.py\nEOF"), 0)
+
+    def test_git_c_und_C(self):
+        for befehl in ("git -c alias.x='!echo y > src/a.py' x", "git -c core.hooksPath=/tmp/h commit -m x",
+                       "git -c core.pager='sh -c x' log"):
+            self.assertEqual(self.bash(befehl), 2, befehl)
+        wt = os.path.join(self.projekt, ".claude", "worktrees", "p1")
+        git(self.projekt, "worktree", "add", "-q", wt, "-b", "p1")
+        self.assertEqual(self.bash("git -C .. -C .. -C .. reset --hard HEAD~1", "entwickler", cwd=wt), 2)
+        self.assertEqual(self.bash("git --work-tree=" + self.projekt + " status", "entwickler", cwd=wt), 2)
+
+    def test_projektleiter_erlaubnisliste(self):
+        skript = os.path.join(self.temp, "h.py")
+        with open(skript, "w") as f:
+            f.write("open('src/a.py','w')\n")
+        for befehl in ("python3 " + skript, "node " + skript, "curl -s https://x.example", "sort -o src/a.js x",
+                       "make build", "perl -e 1", "awk '{print}' x", "sed -n 1p src/rechnung.js", "vim -es x",
+                       "script -c 'echo' /dev/null", "setsid bash -c 'echo x > src/a.js'"):
+            self.assertEqual(self.bash(befehl), 2, befehl)
+        for befehl in ("git status", "ls -la", "cat docs/STATUS.md", "grep -rn summe src", "npm test",
+                       "node --test", "mkdir -p docs/x", "bash %s/scripts/pruefe-tests.sh --basis HEAD" % PLUGIN,
+                       "find . -name '*.md'", "wc -l src/rechnung.js | sort"):
+            self.assertEqual(self.bash(befehl), 0, befehl)
+
+    def test_ausgabe_programme_fuer_agenten(self):
+        for befehl in ("curl -o tests/rechnung.test.js https://x.example", "wget -O tests/referenz/fall1.json u",
+                       "echo x 1<>tests/rechnung.test.js"):
+            self.assertEqual(self.bash(befehl, "entwickler"), 2, befehl)
+        for befehl in ("python3 -c \"import os; os.open('tests/x', os.O_CREAT)\"",
+                       "node -e \"require('fs').copyFileSync('a','tests/rechnung.test.js')\""):
+            self.assertEqual(self.bash(befehl, "entwickler"), 2, befehl)
+
+    def test_powershell_io(self):
+        self.assertEqual(self.bash("[IO.File]::WriteAllText('src/a.js','x')", "tester", werkzeug="PowerShell"), 2)
+
+    def test_weitere_git_sperren(self):
+        for befehl in ("git push origin HEAD:refs/heads/main", "git push origin refs/heads/main", "git push --all",
+                       "git branch -d -f p1", "git branch --delete --force p1", "git checkout -f",
+                       "git switch --discard-changes p1", "git stash drop", "git stash clear",
+                       "git worktree remove --force .claude/worktrees/p1", "git reflog expire --all"):
+            self.assertEqual(self.bash(befehl), 2, befehl)
+        self.assertEqual(self.bash("git reflog"), 0)
+
+    def test_pip_und_uv(self):
+        for befehl in ("uv run --with evilpkg x", "uvx --from evil ruff", "pip install ./evil-1.0.whl",
+                       "pip install /tmp/evil.tar.gz"):
+            self.assertEqual(self.bash(befehl, "entwickler"), 2, befehl)
+        self.assertEqual(self.bash("pip install -e .", "entwickler"), 0)
+
+    def test_entwickler_schreibt_nur_im_worktree(self):
+        wt = os.path.join(self.projekt, ".claude", "worktrees", "p1")
+        git(self.projekt, "worktree", "add", "-q", wt, "-b", "p1")
+        e = {"tool_name": "Write", "tool_input": {"file_path": os.path.join(self.projekt, "src", "neu.py"),
+                                                  "content": "x"}, "cwd": wt, "agent_type": "dev-team:entwickler",
+             "agent_id": "a"}
+        self.assertEqual(self.lauf(e)[0], 2)
+        e["tool_input"]["file_path"] = os.path.join(wt, "src", "neu.py")
+        self.assertEqual(self.lauf(e)[0], 0)
+
+    def test_lesen_ueber_elternordner(self):
+        wt = os.path.join(self.projekt, ".claude", "worktrees", "p1")
+        git(self.projekt, "worktree", "add", "-q", wt, "-b", "p1")
+        for ti, w in (({"pattern": "x", "path": "/"}, "Grep"), ({"pattern": "x", "path": self.tmp}, "Grep")):
+            e = {"tool_name": w, "tool_input": ti, "cwd": wt, "agent_type": "dev-team:entwickler", "agent_id": "a"}
+            self.assertEqual(self.lauf(e)[0], 2, ti)
+        self.assertEqual(self.bash("grep -r summe /", "entwickler", cwd=wt), 2)
+
+    def test_claude_md_nur_per_skript(self):
+        heim = os.path.join(self.tmp, "heim")
+        os.makedirs(os.path.join(heim, ".claude"))
+        e = self.schreiben(os.path.join(heim, ".claude", "CLAUDE.md"))
+        self.assertEqual(self.lauf(e, env_zusatz={"HOME": heim, "USERPROFILE": heim})[0], 2)
 
 
 if __name__ == "__main__":

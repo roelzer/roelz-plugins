@@ -198,6 +198,48 @@ class TestSchranke(unittest.TestCase):
         self.schreibe("conftest.py", "collect_ignore = ['tests']\n")
         self.assertEqual(self.lauf("--rolle", "entwickler")[0], 1)
 
+    def test_testwerkzeug_eingriffe(self):
+        for inhalt in ("import unittest\nunittest.TestCase.assertEqual = lambda *a: None\n",
+                       "from src.rechnung import summe\ndef test_n():\n    try:\n        assert summe([1]) == 9\n"
+                       "    except AssertionError:\n        pass\n",
+                       "import os\nos._exit(0)\n"):
+            self.schreibe("tests/test_aaa.py", inhalt)
+            code, aus = self.lauf("--rolle", "tester", "--ohne-lauf")
+            self.assertEqual(code, 1, inhalt)
+            self.assertIn("Eingriff in das Testwerkzeug", aus)
+
+    def test_pyproject_testauswahl_durch_entwickler(self):
+        self.schreibe("pyproject.toml", "[project]\nname='x'\n")
+        git(self.p, "add", "-A")
+        git(self.p, "commit", "-qm", "pp")
+        self.basis = git(self.p, "rev-parse", "HEAD").strip()
+        self.schreibe("pyproject.toml", "[project]\nname='x'\n[tool.pytest.ini_options]\naddopts='--deselect x'\n")
+        code, aus = self.lauf("--rolle", "entwickler", "--ohne-lauf")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("Testeinstellungen", aus)
+
+    def test_merge_basis_vor_merge_ignoriert_testeranteil(self):
+        # Tester-Änderung im Meilenstein, danach sauberer Merge eines Pakets: mit HEAD^1 grün
+        self.schreibe("tests/test_rechnung.py", TEST_GRUEN + "\n# Tester ergänzt\n")
+        git(self.p, "add", "-A")
+        git(self.p, "commit", "-qm", "tester")
+        git(self.p, "checkout", "-qb", "p1")
+        self.schreibe("src/rabatt.py", "def rabatt(x):\n    return x\n")
+        git(self.p, "add", "-A")
+        git(self.p, "commit", "-qm", "p1")
+        git(self.p, "checkout", "-q", "-")
+        git(self.p, "merge", "-q", "--no-ff", "p1", "-m", "P1")
+        self.assertEqual(self.lauf("--rolle", "merge")[0], 1)  # gegen Meilenstein-Basis: Tester-Anteil rot
+        r = subprocess.run(["bash", TESTS_SKRIPT, "--basis", "HEAD^1", "--rolle", "merge"], cwd=self.p,
+                           capture_output=True, text=True)
+        self.assertEqual(r.returncode, 0, r.stdout)
+
+    def test_abhaengigkeiten_laufen_automatisch(self):
+        self.schreibe(".npmrc", "registry=https://boese.example/\n")
+        code, aus = self.lauf("--rolle", "tester", "--ohne-lauf")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("Abhängigkeits-Schranke", aus)
+
     def test_rote_tests(self):
         self.schreibe("src/rechnung.py", "def summe(w):\n    return 0\n")
         code, aus = self.lauf()
@@ -475,6 +517,14 @@ class TestAbhaengigkeiten(unittest.TestCase):
         self.assertIsNone(abh.aehnlich_bekannt("requests", "pypi"))
         self.assertIsNone(abh.aehnlich_bekannt("nest", "npm"))
 
+    def test_overrides_und_lockfile(self):
+        abh = lade_abh()
+        self.assertEqual(abh.npm_namen('{"overrides": {"lodash": "github:evil/lodash"}}'), {"lodash": "github:evil/lodash"})
+        self.assertEqual(abh.fremde_lock_quellen("package-lock.json", '{"resolved": "https://evil.example/x.tgz"}'),
+                         {"https://evil.example/x.tgz"})
+        self.assertEqual(abh.fremde_lock_quellen("package-lock.json",
+                                                 '{"resolved": "https://registry.npmjs.org/a/-/a-1.tgz"}'), set())
+
     def test_pypi_echt(self):
         self.schreibe("requirements.txt", "requests==2.32.3\nhttpx==0.27.0\n")
         rel = {"upload_time_iso_8601": "2019-01-01T00:00:00Z"}
@@ -545,6 +595,11 @@ class FertigPruefung(unittest.TestCase):
         self.assertEqual(self.lauf("Status: FERTIG 🟢").strip(), "")
         with open(os.path.join(self.p, "docs", "AGENTEN_LOG.md"), encoding="utf-8") as f:
             self.assertIn("NICHT belegt", f.read())
+
+    def test_satzzeichen_und_eigener_worktree(self):
+        self.marker(self.kopf)
+        self.assertEqual(self.lauf("Status: FERTIG\nWorktree %s, Commit %s." % (self.wt, self.kopf)).strip(), "")
+        self.assertEqual(self.lauf("Status: FERTIG\nWorktree `%s`.\nCommit %s" % (self.wt, self.kopf)).strip(), "")
 
     def test_ehrlich_blockiert_wird_nie_aufgehalten(self):
         self.assertEqual(self.lauf("Status: BLOCKIERT 🔴 – Ausgangslage rot").strip(), "")
