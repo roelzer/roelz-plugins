@@ -26,15 +26,24 @@ def summe(pfad):
     return hashlib.sha256(inhalt).hexdigest()
 
 
+def ist_testdatei(name):
+    """Verdeckte Testdateien: alles außer Erklärtexten und Cache (Endung .verdeckt ist üblich, nicht Pflicht)."""
+    return not (name.upper().startswith(("README", "LIESMICH")) or name.endswith((".pyc", ".pyo")) or name.startswith("."))
+
+
 def verdeckte(hauptordner):
     wurzel = os.path.join(hauptordner, VERDECKT)
     aus = {}
-    for ordner, _, dateien in os.walk(wurzel):
+    for ordner, unter, dateien in os.walk(wurzel):
+        unter[:] = [u for u in unter if u != "__pycache__"]
         for d in sorted(dateien):
-            if d.endswith(".verdeckt"):
-                voll = os.path.join(ordner, d)
-                rel = os.path.relpath(voll, wurzel).replace("\\", "/")[:-len(".verdeckt")]
-                aus[rel] = summe(voll)
+            if not ist_testdatei(d):
+                continue
+            voll = os.path.join(ordner, d)
+            rel = os.path.relpath(voll, wurzel).replace("\\", "/")
+            if rel.endswith(".verdeckt"):
+                rel = rel[:-len(".verdeckt")]
+            aus[rel] = summe(voll)
     return aus
 
 
@@ -99,7 +108,7 @@ def main():
         a.error("--schreiben oder --pruefen angeben")
     jetzt = verdeckte(hauptordner)
     if not jetzt:
-        print("FEHLER: Keine verdeckten Tests (*.verdeckt) unter %s gefunden. Nichts geschrieben." % VERDECKT)
+        print("FEHLER: Keine verdeckten Tests unter %s gefunden. Nichts geschrieben." % VERDECKT)
         sys.exit(1)
     alt = lies_liste(hauptordner)
     if alt and alt != jetzt:

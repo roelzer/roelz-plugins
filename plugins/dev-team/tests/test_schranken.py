@@ -277,6 +277,15 @@ class TestSchranke(unittest.TestCase):
         code, aus = self.skript("abnahme_pruefsummen.py", "--schreiben")
         self.assertEqual(code, 1, aus)
 
+    def test_pruefsummen_ohne_endung_verdeckt(self):
+        self.schreibe(".dev-team/verdeckt/test_abnahme_a1.py", "def test_a1():\n    assert 1 + 1 == 2\n")
+        self.schreibe(".dev-team/verdeckt/README.md", "Erklärung\n")
+        code, aus = self.skript("abnahme_pruefsummen.py", "--schreiben")
+        self.assertEqual(code, 0, aus)
+        self.assertIn("1 Abnahmetests", aus)
+        self.schreibe("tests/abnahme/test_abnahme_a1.py", "def test_a1():\n    assert True\n")
+        self.assertEqual(self.lauf("--rolle", "tester", "--ohne-lauf")[0], 1)
+
     def test_abdeckung_am_meilenstein(self):
         self.schreibe("docs/lastenheft.md", "# L\n- A1: Summe\n- A2: Leere Liste\n")
         code, aus = self.lauf("--rolle", "projektleiter")

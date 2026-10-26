@@ -38,7 +38,8 @@ def main():
         print("FEHLER: .claude/dev-team.json fehlt oder ist ungültig.")
         sys.exit(1)
     verdeckt = os.path.join(hauptordner, ".dev-team", "verdeckt")
-    dateien = [os.path.join(o, d) for o, _, ds in os.walk(verdeckt) for d in ds if d.endswith(".verdeckt")]
+    dateien = [os.path.join(o, d) for o, _, ds in os.walk(verdeckt) if "__pycache__" not in o for d in ds
+               if not (d.upper().startswith(("README", "LIESMICH")) or d.endswith((".pyc", ".pyo")) or d.startswith("."))]
     if not dateien:
         print("HINWEIS: Keine verdeckten Abnahmetests vorhanden – nichts zu prüfen.")
         return
@@ -48,7 +49,8 @@ def main():
         with tarfile.open(fileobj=io.BytesIO(archiv.stdout)) as t:
             t.extractall(tmp, filter="data") if hasattr(tarfile, "data_filter") else t.extractall(tmp)
         for voll in dateien:
-            rel = os.path.relpath(voll, verdeckt).replace("\\", "/")[:-len(".verdeckt")]
+            rel = os.path.relpath(voll, verdeckt).replace("\\", "/")
+            rel = rel[:-len(".verdeckt")] if rel.endswith(".verdeckt") else rel
             ziel = os.path.join(tmp, rel if rel.startswith("tests/") else os.path.join("tests", "abnahme", rel))
             os.makedirs(os.path.dirname(ziel), exist_ok=True)
             shutil.copyfile(voll, ziel)
