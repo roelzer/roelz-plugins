@@ -1,6 +1,6 @@
 {
   "name": "roelz-plugins",
-  "description": "Simons Claude-Code-Plugins: Dev-Team und Tool-Scout. Beides ohne Firmen- oder Kundenwissen, auch auf Arbeitsrechnern nutzbar.",
+  "description": "Simons Claude-Code-Plugins: Dev-Team, Team-Tafel und Tool-Scout. Ohne Firmen- oder Kundenwissen, auch auf Arbeitsrechnern nutzbar.",
   "owner": {
     "name": "Simon Rölz"
   },
@@ -8,7 +8,13 @@
     {
       "name": "dev-team",
       "source": "./plugins/dev-team",
-      "description": "Programmierabteilung: Planung, Kritiker, Fachprüfer mit Recherche, Abwägungsrunde, Tester, Reviewer, Produktprüfer. Ohne Firmenwissen – überall nutzbar.",
+      "description": "Festes Senior-Entwicklungsteam mit Teamzwang: Architekt, Entwickler (parallel), Prüfer, verdeckte Abnahmetests, Test-Schranke „alle Tests grün“. Ohne Firmenwissen – überall nutzbar.",
+      "category": "development"
+    },
+    {
+      "name": "dev-team-tafel",
+      "source": "./plugins/dev-team-tafel",
+      "description": "Tafel neben dem Chat: wer im Dev-Team gerade arbeitet (Rolle, Modell, Laufzeit), letzte Ergebnisse mit Ampel, Sperren des Wächters, Teststand. Nur lesend.",
       "category": "development"
     },
     {

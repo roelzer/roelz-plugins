@@ -11,14 +11,19 @@ eingabe="$(cat 2>/dev/null)"
 projekt="${CLAUDE_PROJECT_DIR:-$PWD}"
 
 # Plugin lokal installiert? Dann übernimmt das Plugin.
-for f in "$HOME/.claude/plugins/installed_plugins.json" "$HOME/.claude/settings.json"; do
-  grep -q 'dev-team@roelz-plugins' "$f" 2>/dev/null && exit 0
-done
+# Nur wenn es installiert UND nicht abgeschaltet ist (in den Einstellungen "dev-team@roelz-plugins": true).
+if grep -q 'dev-team@roelz-plugins' "$HOME/.claude/plugins/installed_plugins.json" 2>/dev/null \
+   && ! grep -Eq '"dev-team@roelz-plugins"[[:space:]]*:[[:space:]]*false' "$HOME/.claude/settings.json" "$projekt/.claude/settings.local.json" 2>/dev/null; then
+  exit 0
+fi
 
 # Lieferkette: Wer das Dev-Team auf einen geprüften Stand festnageln will, setzt DEV_TEAM_REF (Tag oder Commit)
-# in der Cloud-Umgebung. Ohne Angabe wird der aktuelle Stand von main geholt.
+# in der Cloud-Umgebung oder "plugin_stand" in .claude/dev-team.json. Ohne Angabe: aktueller Stand von main (mit Warnung).
 repo_url="${DEV_TEAM_REPO:-https://github.com/roelzer/roelz-plugins.git}"
 ref="${DEV_TEAM_REF:-}"
+if [ -z "$ref" ] && [ -f "$projekt/.claude/dev-team.json" ]; then
+  ref="$(sed -n 's/^[[:space:]]*"plugin_stand":[[:space:]]*"\([^"]*\)".*/\1/p' "$projekt/.claude/dev-team.json" | head -n 1)"
+fi
 cache="${XDG_CACHE_HOME:-$HOME/.cache}/roelz-plugins"
 plugin="$cache/plugins/dev-team"
 
@@ -65,11 +70,43 @@ case "$modus" in
     done
     printf '%s' "$eingabe" | CLAUDE_PLUGIN_ROOT="$plugin" CLAUDE_PROJECT_DIR="$projekt" bash "$plugin/scripts/sitzungsstart.sh"
     echo
+    if [ -z "$ref" ]; then
+      echo "⚠ Lieferkette: Das Dev-Team wurde vom aktuellen Stand von main geladen, nicht von einem geprüften Stand. Projektleiter: Sag Simon das; festnageln mit \"plugin_stand\" in .claude/dev-team.json (nur mit seiner Freigabe)."
+    else
+      echo "Dev-Team-Stand festgenagelt auf: $ref"
+    fi
     echo "Hinweis Cloud-Sitzung: Die Dev-Team-Befehle heißen hier mit Bindestrich, z. B. /dev-team-auftrag statt /dev-team:auftrag; die Agenten ohne Präfix, z. B. kritiker statt dev-team:kritiker. Für Aufgaben der Stufe Normal/Groß den Skill dev-team-auftrag verwenden."
     ;;
   agent)
     [ -d "$plugin" ] || exit 0
     printf '%s' "$eingabe" | CLAUDE_PLUGIN_ROOT="$plugin" bash "$plugin/scripts/agent-kontext.sh"
+    ;;
+  waechter)
+    if [ -d "$plugin" ] && [ -f "$plugin/scripts/waechter.sh" ]; then
+      printf '%s' "$eingabe" | CLAUDE_PLUGIN_ROOT="$plugin" CLAUDE_PROJECT_DIR="$projekt" bash "$plugin/scripts/waechter.sh"
+      exit $?
+    fi
+    # Dev-Team nicht geladen: keine Agenten und keine Schreibvorgänge ohne Wächter.
+    case "$eingabe" in
+      *'"tool_name":"Agent"'*|*'"tool_name": "Agent"'*|*'"tool_name":"Task"'*|*'"tool_name": "Task"'*|\
+      *'"tool_name":"Write"'*|*'"tool_name": "Write"'*|*'"tool_name":"Edit"'*|*'"tool_name": "Edit"'*|\
+      *'"tool_name":"MultiEdit"'*|*'"tool_name": "MultiEdit"'*|*'"tool_name":"NotebookEdit"'*|*'"tool_name": "NotebookEdit"'*|\
+      *'"tool_name":"Workflow"'*|*'"tool_name": "Workflow"'*|*'"tool_name":"Monitor"'*|*'"tool_name": "Monitor"'*|\
+      *'"tool_name":"Bash"'*|*'"tool_name": "Bash"'*|*'"tool_name":"PowerShell"'*|*'"tool_name": "PowerShell"'*)
+        echo "⛔ Dev-Team-Wächter: Das Dev-Team ist in dieser Sitzung nicht geladen (Repo roelzer/roelz-plugins nicht erreichbar). Ohne Team wird nicht gebaut. Simon Bescheid geben." >&2
+        exit 2 ;;
+    esac
+    ;;
+  einstellungen)
+    if [ -f "$plugin/scripts/einstellungs-schutz.sh" ]; then
+      printf '%s' "$eingabe" | CLAUDE_PROJECT_DIR="$projekt" bash "$plugin/scripts/einstellungs-schutz.sh"
+      exit $?
+    fi
+    exit 0
+    ;;
+  fertig)
+    [ -d "$plugin" ] || exit 0
+    printf '%s' "$eingabe" | CLAUDE_PROJECT_DIR="$projekt" bash "$plugin/scripts/fertig-pruefung.sh"
     ;;
   log-start|log-ende)
     [ -d "$plugin" ] || exit 0

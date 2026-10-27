@@ -16,19 +16,25 @@ Jede Anforderung muss einem Paket zugeordnet sein.
 Welche Teile gibt es schon, wie hängen sie zusammen? Was ist der Stand der Tests und Referenzfälle?
 
 ## 4. Lösung
+Struktur und Abhängigkeitsrichtung kommen vom `architekt` (Details in `docs/ARCHITEKTUR.md`).
 - Aufbau: welche Module/Dateien neu, welche geändert, wie sie zusammenspielen (gern als Text-Diagramm).
 - Datenmodell: ändert es sich? Wenn ja, wie genau, und was passiert mit bestehenden Daten/Projekten?
 - Warum diese Lösung und nicht eine andere (kurz, mit verworfenen Alternativen).
 - Annahmen: alles, was angenommen statt gewusst wird, markiert mit **ANNAHME**.
 
 ## 5. Arbeitspakete
-Jedes Paket für sich lauffähig und testbar, in Reihenfolge.
-| Nr. | Was | Dateien | Fertig, wenn … (prüfbar) | Abhängig von |
-|---|---|---|---|---|
-| P1 | | | | – |
+Jedes Paket für sich lauffähig und testbar. Paketschnitt, Dateien und Parallelität legt der `architekt` fest. Parallel nur, wenn keine gemeinsamen Dateien und keine Abhängigkeit.
+| Nr. | Was | Dateien (gehören dem Paket) | Fertig, wenn … (prüfbar) | Abhängig von | Parallel möglich mit |
+|---|---|---|---|---|---|
+| P1 | Grundlagen (Datenmodell, Schnittstellen) | | | – | – |
+
+**Gruppen:** Gruppe 1: P1 · Gruppe 2: P2, P3 (parallel) · …
+**Meilensteine:** M1 = P1–P4 · …
 
 ## 6. Absicherung
-- Neue/angepasste Tests je Paket.
+- Testgetrieben: jedes Abnahmekriterium bekommt zuerst einen roten Test (Entwickler) – zusätzlich verdeckte Abnahmetests (Tester) vor dem Bauen.
+- Architekturtests in `tests/architektur/` (Architekt).
+- Neue Abhängigkeiten: Name, Grund, Abhängigkeits-Schranke.
 - Betroffene Referenzfälle, neue Referenzfälle nötig?
 - Betroffene Fachregeln, neue Plausibilitätsprüfungen (erst rot am alten Stand, dann beheben).
 

@@ -62,6 +62,15 @@ Wende die Punkte risikobasiert an. Markiere nicht relevante Punkte ausdrücklich
 - [ ] KI-Agenten erhalten nur notwendige Werkzeuge und Rechte; destruktive/produktive Aktionen benötigen Freigabe.
 - [ ] DSGVO-/AVV-/Aufbewahrungsfragen bei personenbezogenen Daten mit zuständiger Stelle geklärt.
 
+## 8b. Typische Schwächen von KI-erzeugtem Code
+Studien zeigen: KI-Code enthält in einem großen Teil der Aufgaben Sicherheitslücken, und größere Modelle sind nicht automatisch sicherer. Darum gezielt prüfen:
+- [ ] Ausgaben in HTML werden maskiert (kein `innerHTML`/`dangerouslySetInnerHTML` mit Nutzerdaten).
+- [ ] Nutzereingaben landen nicht ungefiltert in Logs (Log-Injection).
+- [ ] Keine erfundenen oder frisch registrierten Pakete (`scripts/pruefe-abhaengigkeiten.sh`).
+- [ ] Keine abgeschaltete Zertifikatsprüfung, kein Debug-Modus, keine zu weiten CORS-Regeln in der Auslieferung.
+- [ ] Keine selbstgebaute Kryptografie, keine festen Schlüssel oder Beispiel-Passwörter im Code.
+- [ ] Fehlerbehandlung verschluckt nichts, was ein Sicherheitsproblem anzeigen würde.
+
 ## 9. Mehrbenutzer, Datenintegrität und Migration
 - [ ] Gleichzeitige Änderung derselben Daten führt nicht unbemerkt zu Überschreiben (Versionsprüfung/Optimistic Locking, Transaktionen); mit einem Test mit zwei gleichzeitigen Schreibern belegt.
 - [ ] Teilweise Schreibvorgänge (Abbruch, Netzausfall) hinterlassen keinen halben Zustand.

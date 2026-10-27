@@ -1,6 +1,6 @@
 # Fachregeln
 
-Regeln, die ein Ergebnis dieses Projekts **niemals** verletzen darf. Jede bestätigte Regel steckt als automatische Plausibilitätsprüfung im Code und läuft über jedes berechnete Ergebnis (Tests und Programm).
+Regeln, die ein Ergebnis dieses Projekts **niemals** verletzen darf. Nummern: F1, F2 … (Tests tragen die Nummer im Namen, z. B. `test_f1_…`; die Schranke prüft, dass jede Regel unter „Bestätigt“ einen Test hat). Jede bestätigte Regel steckt als automatische Plausibilitätsprüfung im Code und läuft über jedes berechnete Ergebnis (Tests und Programm).
 
 - Nur Simon bestätigt oder ändert Regeln.
 - Zahlenwerte immer mit Einheit und Quelle. Unbekannte Werte: „offen“, nicht schätzen.

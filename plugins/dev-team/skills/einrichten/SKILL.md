@@ -9,6 +9,10 @@ argument-hint: "[privat|arbeit]"
 
 Führe die Schritte der Reihe nach aus. Zeige Simon vor jeder Änderung an einer Datei kurz, was du ändern wirst.
 
+## 0. Voraussetzungen prüfen
+- **Python 3** muss als `python3`, `python` oder `py` aufrufbar sein (`python --version`). Ohne Python blockiert der Wächter in Dev-Team-Projekten jede Arbeit – mit Absicht, damit das Team nie ohne Schutz arbeitet. Fehlt es: Simon bitten, Python von python.org zu installieren (Haken bei „Add python.exe to PATH“), dann Claude Code neu starten.
+- **Git** ab Version 2.31 (`git --version`), wegen der Worktrees.
+
 ## 1. Modus klären
 Modus aus dem Argument (`$ARGUMENTS`) übernehmen; fehlt er, frag:
 - **privat** – eigener Rechner. Lektionen werden direkt im Plugin-Repo gespeichert und per Git auf alle Rechner verteilt.
@@ -23,29 +27,19 @@ Plugin-Ordner: `${CLAUDE_PLUGIN_ROOT}`
 
 Frag im Modus „privat“ außerdem, ob es schon ein Baukasten-Repo gibt und wo es liegt (optional, siehe Skill `baukasten`).
 
+**Gehirn:** Frag nach dem Ordner von Simons Obsidian-Tresor (lokaler Klon von `roelzer/brain`, erkennbar an `00 Start.md`). Ist er da, kommt er mit `--gehirn <Ordner>` in den Block. Ab dann gilt: Lektionen, Projektstand, Entscheidungen und Fachwissen schreibt das Team über `scripts/gehirn.py` ins Gehirn. Ohne Gehirn läuft alles wie bisher, Wissen sammelt sich dann in `docs/GEHIRN_NACHTRAG.md`.
+
 Verwende im nächsten Schritt den vollständigen, absoluten Pfad mit Schrägstrichen `/`, auch unter Windows.
 
 ## 3. Globale CLAUDE.md verknüpfen
-Datei: `~/.claude/CLAUDE.md` (anlegen, falls nicht vorhanden). Existiert schon ein Block zwischen `<!-- dev-team START -->` und `<!-- dev-team END -->`, ersetze nur diesen Block. Alles andere bleibt unverändert.
-
-```
-<!-- dev-team START -->
-## Dev-Team
-Modus: <privat|arbeit>
-Plugin-Ordner: <absoluter Plugin-Pfad>
-Lessons-Datei: <absoluter Lessons-Pfad>
-Baukasten: <absoluter Pfad zum Baukasten-Repo – Zeile weglassen, wenn es noch keinen gibt oder Modus „arbeit“>
-@<absoluter Plugin-Pfad>/wissen/grundgesetz.md
-@<absoluter Lessons-Pfad>
-<!-- dev-team END -->
-```
+`~/.claude/CLAUDE.md` schreibt Claude nicht direkt (der Wächter sperrt das, damit keine Sitzung das Grundgesetz abschalten kann). Zeige Simon die Änderung mit
+`python3 "${CLAUDE_PLUGIN_ROOT}/scripts/claude_md_block.py" --modus <privat|arbeit> --lessons <Lessons-Pfad> [--baukasten <Baukasten-Repo>] [--gehirn <Gehirn-Ordner>]`
+und führe nach seinem OK denselben Befehl mit `--schreiben` aus. Das Skript ersetzt nur den Block zwischen `<!-- dev-team START -->` und `<!-- dev-team END -->`; alles andere bleibt. Im Block stehen Modus, Plugin-Ordner, Lessons-Datei, ggf. Baukasten und Gehirn und die Verknüpfungen `@…/grundgesetz.md` und `@<Lessons>`.
 
 ## 4. Schutzregeln für Geheimnisse
-In `~/.claude/settings.json` unter `permissions.deny` diese Regeln ergänzen (bestehende Einträge behalten, gültiges JSON sicherstellen):
-```
-"Read(**/.env)", "Read(**/.env.*)", "Read(**/secrets/**)", "Read(**/*.pem)", "Read(**/*.key)"
-```
-Zeige Simon das Ergebnis, bevor du speicherst.
+Benutzereinstellungen schreibt Claude nicht direkt. Zeige Simon die Änderung mit
+`python3 "${CLAUDE_PLUGIN_ROOT}/scripts/settings_zusammenfuehren.py" --vorlage "${CLAUDE_PLUGIN_ROOT}/vorlagen/benutzer-settings.json" --ziel ~/.claude/settings.json`
+(ergänzt nur Lese-Sperren für Geheimnisse, bestehende Einträge bleiben) und führe nach seinem OK denselben Befehl mit `--schreiben` aus.
 
 ## 5. Abschluss
 Sag Simon in drei Zeilen:

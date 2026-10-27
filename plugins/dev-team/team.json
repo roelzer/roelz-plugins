@@ -1,0 +1,278 @@
+{
+  "_zweck": "Einzige Quelle für das feste Team und die Schreibrechte. Wird vom Wächter-Hook (scripts/waechter.py) gelesen. Änderungen nur mit Simons Freigabe im Plugin-Repo.",
+  "version": "3.8.1",
+  "_modelle": "Standardmodell steht im Steckbrief (model:) und hier unter 'modell'. Der Projektleiter darf beim Aufruf nur ein Modell aus 'modelle' angeben (Regel im Skill auftrag: Schwierigkeit laut Bauplan). Prüfer, die Qualität absichern, laufen immer mit dem stärksten Modell. Haiku wird nicht verwendet.",
+  "max_parallele_entwickler": 3,
+  "agenten": {
+    "kritiker": {
+      "phase": "Planprüfung",
+      "schreibt": [],
+      "modell": "opus",
+      "modelle": [
+        "opus"
+      ]
+    },
+    "fachpruefer": {
+      "phase": "Plan- und Ergebnisprüfung",
+      "schreibt": [],
+      "modell": "opus",
+      "modelle": [
+        "opus"
+      ]
+    },
+    "rechercheur": {
+      "phase": "bei Wissenslücken",
+      "schreibt": [
+        "recherche"
+      ],
+      "modell": "sonnet",
+      "modelle": [
+        "sonnet",
+        "opus"
+      ]
+    },
+    "architekt": {
+      "phase": "Struktur entwerfen und prüfen",
+      "schreibt": [
+        "architektur"
+      ],
+      "modell": "opus",
+      "modelle": [
+        "opus"
+      ]
+    },
+    "designer": {
+      "phase": "Oberfläche entwerfen und Treue prüfen",
+      "schreibt": [
+        "design"
+      ],
+      "modell": "opus",
+      "modelle": [
+        "opus"
+      ]
+    },
+    "gastgeber": {
+      "phase": "Wow-Ideen vor dem Bauen, Nachschliff nach dem Bauen",
+      "schreibt": [],
+      "modell": "opus",
+      "modelle": ["opus"]
+    },
+    "fachexperte": {
+      "phase": "Abwägungsrunde",
+      "schreibt": [],
+      "modell": "sonnet",
+      "modelle": [
+        "sonnet",
+        "opus"
+      ]
+    },
+    "pragmatiker": {
+      "phase": "Abwägungsrunde",
+      "schreibt": [],
+      "modell": "sonnet",
+      "modelle": [
+        "sonnet"
+      ]
+    },
+    "langfrist-architekt": {
+      "phase": "Abwägungsrunde",
+      "schreibt": [],
+      "modell": "opus",
+      "modelle": [
+        "opus"
+      ]
+    },
+    "entwickler": {
+      "phase": "Bauen (ein Paket)",
+      "schreibt": [
+        "code",
+        "tests-neu"
+      ],
+      "modell": "sonnet",
+      "modelle": [
+        "sonnet",
+        "opus"
+      ]
+    },
+    "tester": {
+      "phase": "Testen",
+      "schreibt": [
+        "tests",
+        "abnahme",
+        "testkonfig"
+      ],
+      "modell": "opus",
+      "modelle": [
+        "opus",
+        "sonnet"
+      ]
+    },
+    "reviewer": {
+      "phase": "Paket- und Gesamtreview",
+      "schreibt": [],
+      "modell": "opus",
+      "modelle": [
+        "opus"
+      ]
+    },
+    "sicherheitspruefer": {
+      "phase": "bei Risiko-Auslösern",
+      "schreibt": [],
+      "modell": "opus",
+      "modelle": [
+        "opus"
+      ]
+    },
+    "produktpruefer": {
+      "phase": "Abnahme",
+      "schreibt": [],
+      "modell": "sonnet",
+      "modelle": [
+        "sonnet",
+        "opus"
+      ]
+    },
+    "auditor": {
+      "phase": "Audit (außerhalb des Ablaufs)",
+      "schreibt": [],
+      "modell": "opus",
+      "modelle": [
+        "opus"
+      ]
+    }
+  },
+  "projektleiter_schreibt": [
+    "prozess",
+    "lastenheft",
+    "regeln",
+    "recherche",
+    "quellen",
+    "projektdateien",
+    "teamkonfig-neu",
+    "startskript-neu"
+  ],
+  "bereiche": {
+    "_erklaerung": "Reihenfolge zählt: der erste passende Bereich gilt. Muster relativ zum Projektordner (bzw. Worktree), '**' = beliebig tief.",
+    "reihenfolge": [
+      "gesperrt",
+      "nachweis",
+      "konfig",
+      "teamkonfig",
+      "startskript",
+      "architektur",
+      "design",
+      "abnahme",
+      "referenz",
+      "regeln",
+      "lastenheft",
+      "recherche",
+      "quellen",
+      "projektdateien",
+      "prozess",
+      "testkonfig",
+      "tests",
+      "code"
+    ],
+    "gesperrt": [
+      ".git/**",
+      ".claude/agents/**",
+      ".claude/skills/**",
+      ".claude/hooks/**",
+      ".claude/commands/**",
+      ".claude/freigaben.md"
+    ],
+    "konfig": [
+      ".claude/settings.json",
+      ".claude/settings.local.json"
+    ],
+    "architektur": [
+      "docs/ARCHITEKTUR.md",
+      "tests/architektur/**"
+    ],
+    "abnahme": [
+      "tests/abnahme/**",
+      ".dev-team/verdeckt/**"
+    ],
+    "referenz": [
+      "tests/referenz/**"
+    ],
+    "regeln": [
+      "fachwissen/regeln.md"
+    ],
+    "lastenheft": [
+      "docs/lastenheft.md"
+    ],
+    "recherche": [
+      "fachwissen/recherche/**"
+    ],
+    "quellen": [
+      "fachwissen/quellen/**"
+    ],
+    "projektdateien": [
+      "CLAUDE.md",
+      ".gitignore",
+      ".gitattributes",
+      ".env.example",
+      ".worktreeinclude"
+    ],
+    "prozess": [
+      "docs/**",
+      ".dev-team/**"
+    ],
+    "tests": [
+      "tests/**",
+      "test/**",
+      "**/__tests__/**",
+      "e2e/**",
+      "**/*.test.*",
+      "**/*.spec.*",
+      "**/test_*.py",
+      "**/*_test.py",
+      "**/*_test.go",
+      "**/*Tests.cs",
+      "**/*Test.java"
+    ],
+    "code": [
+      "**"
+    ],
+    "teamkonfig": [
+      ".claude/dev-team.json"
+    ],
+    "nachweis": [
+      ".dev-team/schranke-ok/**",
+      ".dev-team/letzter-gruener-lauf.json",
+      "docs/AGENTEN_LOG.md",
+      "docs/TESTNACHWEIS.md",
+      "docs/pruefberichte/**",
+      "docs/ABNAHME_PRUEFSUMMEN.txt",
+      "docs/FREIGABEN_LOG.md",
+      ".dev-team/kennzahlen.jsonl"
+    ],
+    "testkonfig": [
+      "**/conftest.py",
+      "**/sitecustomize.py",
+      "pytest.ini",
+      "tox.ini",
+      "setup.cfg",
+      "**/vitest.config.*",
+      "**/vitest.workspace.*",
+      "**/jest.config.*",
+      "**/playwright.config.*",
+      "**/karma.conf.*",
+      "**/.mocharc*",
+      "**/cypress.config.*"
+    ],
+    "startskript": [
+      ".claude/dev-team-start.sh"
+    ],
+    "design": [
+      "docs/DESIGN.md",
+      "design/**"
+    ]
+  },
+  "verdeckt_lesen_verboten_fuer": [
+    "entwickler"
+  ],
+  "verdeckt_pfad": ".dev-team/verdeckt/",
+  "harmlose_werkzeuge": []
+}

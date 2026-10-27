@@ -33,6 +33,10 @@ venv/
 .DS_Store
 Thumbs.db
 
+# Dev-Team: Arbeitsdateien und verdeckte Abnahmetests – nie ins Repo
+.dev-team/
+.claude/worktrees/
+
 # Persönliche Claude-Einstellungen
 .claude/settings.local.json
 CLAUDE.local.md

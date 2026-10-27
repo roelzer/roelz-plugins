@@ -31,7 +31,17 @@ fachwissen/          ← bei fachlichen Ergebnissen
 tests/referenz/      ← bei fachlichen Ergebnissen
 ```
 
-**Dev-Team für Cloud-Sitzungen:** `.claude/dev-team-start.sh` aus `${CLAUDE_PLUGIN_ROOT}/vorlagen/projekt-dev-team-start.sh` kopieren und `.claude/settings.json` aus `${CLAUDE_PLUGIN_ROOT}/vorlagen/projekt-settings.json`. Gibt es die settings.json schon: nur die Schlüssel `extraKnownMarketplaces.roelz-plugins`, `enabledPlugins` und die vier `hooks`-Einträge ergänzen (bestehende Hooks behalten), alles andere unverändert lassen, gültiges JSON sicherstellen. Diese Datei wird mit committet, damit das Dev-Team in jeder Sitzung dieses Repos gilt, auch in der Cloud.
+**Dev-Team-Dateien:**
+- `.claude/dev-team-start.sh` aus `${CLAUDE_PLUGIN_ROOT}/vorlagen/projekt-dev-team-start.sh` (holt das Team in Cloud-Sitzungen, tut lokal nichts).
+- `.claude/dev-team.json` aus `${CLAUDE_PLUGIN_ROOT}/vorlagen/dev-team.json`: Profil, Setup-, Test- und Zusatzbefehle aus der Bestandsaufnahme eintragen und Simon zeigen. Den Testbefehl einmal ausführen: Er muss laufen, bevor gebaut wird. Erst committen, wenn alles stimmt – danach ändert sie nur noch `scripts/geschuetzt_schreiben.py` mit Simons Freigabe.
+- `.worktreeinclude` mit einer Zeile `.env`, falls das Projekt eine `.env` nutzt.
+- `.gitignore`: die Zeilen `.dev-team/` und `.claude/worktrees/` ergänzen.
+- `.gitattributes`: fehlt sie, aus `${CLAUDE_PLUGIN_ROOT}/vorlagen/gitattributes.txt`; gibt es sie, die Zeilen für `*.sh` und `*.py` ergänzen.
+- `docs/ENTSCHEIDUNGEN.md` aus `${CLAUDE_PLUGIN_ROOT}/vorlagen/entscheidungen.md`, falls nicht vorhanden.
+- `.claude/settings.json` (Claude schreibt Einstellungsdateien nie direkt, ob neu oder bestehend):
+  `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/settings_zusammenfuehren.py" --vorlage "${CLAUDE_PLUGIN_ROOT}/vorlagen/projekt-settings.json" --ziel .claude/settings.json`
+  zeigt den Unterschied. Simon zeigen, nach seinem OK denselben Befehl mit `--schreiben`. Fremde Einstellungen und Hooks bleiben erhalten.
+Diese Dateien werden mit committet, damit Teamzwang und Dev-Team in jeder Sitzung dieses Repos gelten, auch in der Cloud.
 
 Gibt es zum Fachgebiet eine Datei in `${CLAUDE_PLUGIN_ROOT}/wissen/fachwissen/`: deren bestätigte Regeln in `fachwissen/regeln.md` übernehmen (Quelle: „aus Bibliothek“).
 
@@ -42,6 +52,9 @@ Gibt es zum Fachgebiet eine Datei in `${CLAUDE_PLUGIN_ROOT}/wissen/fachwissen/`:
 
 ## 4. Commit
 Ein Commit „Projekt ins Dev-Team aufgenommen“.
+
+## 4b. Ins Gehirn
+Gibt es im Gehirn schon `01 Projekte/<Projekt>.md`, lies sie zuerst (vielleicht steht dort schon Wissen aus früheren Sitzungen). Dann `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/gehirn.py" projekt --name <Projekt> --status aktiv --stand-datei docs/STATUS.md --fachgebiet <…> --ordner <Projektordner>`. Der automatische Abschnitt wird ersetzt, alles andere in der Notiz bleibt.
 
 ## 5. Bericht an Simon
 - **Ampel** zum Ist-Zustand.

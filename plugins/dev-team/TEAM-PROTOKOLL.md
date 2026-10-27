@@ -1,42 +1,53 @@
-# Dev-Team – Zusammenarbeit auf Senior-Niveau
+# Dev-Team – Zusammenarbeit auf Senior-Niveau (Version 3.8)
+
+Ideen aus anderen Projekten (Superpowers, BMAD, Anthropic, wshobson) und was übernommen wurde: `docs/VORBILDER.md` im Repo.
+
+Das Team ist **fest**: genau die Agenten in `team.json`. Jede Datei in `agents/` hat denselben Steckbrief: Wann gerufen · Bekommt / bekommt nicht · Darf / darf nicht · Pflichtfragen · Ausgabe · Fertig, wenn.
 
 ## Zuständigkeiten
 
 | Rolle | Verantwortet | Verantwortet ausdrücklich nicht |
 |---|---|---|
-| Projektleitung (`auftrag`) | Anforderungen, Plan, Priorisierung, Integration, Risikoentscheidungen im erlaubten Rahmen, Status und Abnahmebericht | Kritische Risiken stillschweigend übergehen oder Tests als Beweis vollständiger Sicherheit darstellen |
-| `kritiker` | Gegenprüfung von Plan und Risikoannahmen vor Umsetzung | Code schreiben oder Befunde ohne konkrete Evidenz erzeugen |
-| `fachpruefer` | Fachliche Plausibilität, bestätigte Fachregeln und ihre Prüfabdeckung | Neue Fachregeln oder Zahlen eigenmächtig verbindlich machen |
-| `rechercheur` | Quellenbasierte Recherche und Dokumentation von Wissenslücken | Recherche ungeprüft als verbindliche Regel behandeln |
-| `quellenpruefer` | Unabhängige Quellen- und Geltungsbereichsprüfung | Fachregeln freigeben |
-| `fachexperte` | Alltagstauglichkeit und fachliche Nutzerperspektive | Architektur- oder Sicherheitsfreigabe ersetzen |
-| `pragmatiker` | Aufwand/Nutzen, kleinste tragfähige Lösung | Anforderungen oder Sicherheitsmaßnahmen aus Bequemlichkeit streichen |
-| `langfrist-architekt` | Wartbarkeit, Struktur, Datenmodell, Migrationen und technische Schulden | Ohne Evidenz kompletten Neubau verlangen |
-| `tester` | Reproduzierbare Testfälle und tatsächliche Testausführung | Produktivlogik oder erwartete Referenzwerte ändern |
-| `reviewer` | Unabhängige Code-/Diff-Prüfung und technisches Qualitätsurteil | Eigene Befunde selbst implementieren oder ungeprüfte Tests als grün melden |
-| `auditor` | Unabhängiges Audit des Dev-Teams oder eines Projekts mit Bewertung und Maßnahmenplan | Befunde selbst beheben oder die eigene Behebung bewerten |
-| `sicherheitspruefer` | Angriffswege, Zugriffskontrollen, Datenflüsse, Update-/Betriebssicherheit | Vollständigen Penetrationstest behaupten, wenn nur Quellcode geprüft wurde |
-| `produktpruefer` | Anforderungsabnahme und Nutzbarkeit | Technische oder Sicherheitsfreigabe ersetzen |
+| Projektleitung (`auftrag`) | Anforderungen, Plan, Priorisierung, Auftrag an jeden Agenten, Merge der Pakete, Status, Bericht | Code oder Tests schreiben (gesperrt), Prüfungen selbst machen, fehlende Rollen ersetzen |
+| `architekt` | Code planen, bevor gebaut wird: Architektur-Rückgrat, Abhängigkeitsrichtung, Paketschnitt, Bauplan je Paket mit exakten Schnittstellen, Prüf-Schwerpunkt, Architekturtests; Strukturprüfung am Meilenstein-Ende | Produktivcode schreiben; tragende Entscheidungen still treffen; seinen eigenen Entwurf in der Abwägungsrunde bewerten |
+| `designer` | Oberfläche gestalten, bevor gebaut wird: Gestaltungsrichtung, Abläufe, Bildschirme mit allen Zuständen (Desktop + Handy), Design-Vorgabe (`design/tokens.json`); Treue-Check per Screenshot nach dem Bauen; nur bei Projekten mit Oberfläche | Code schreiben; die Bedienbarkeit abschließend beurteilen (das macht der Produktprüfer) |
+| `gastgeber` | an das denken, woran niemand gedacht hat: Nutzerreise durchgehen, unausgesprochene Wünsche und Nebensätze aufgreifen, höchstens drei Wow-Vorschläge mit Aufwand und Prüfkriterium (Vorbild 5-Sterne-Hotels, Emirates, Disney); fehlende Grundanforderungen als „Lücken im Fundament“ melden; nach dem Bauen Nachschliff-Ideen | Dateien ändern; Wow-Ideen selbst in den Plan aufnehmen (Simon wählt); Abnahme-Urteil (das macht der Produktprüfer) |
+| `entwickler` | genau ein Paket nach Bauplan, streng testgetrieben, alle Tests grün, Commit im eigenen Worktree, fester Status (FERTIG / FERTIG_MIT_BEDENKEN / BLOCKIERT / BRAUCHT_KONTEXT) | bestehende Tests, Referenzwerte, Fachregeln, Architekturregeln ändern; vom Bauplan still abweichen; Pakete anderer; Merge |
+| `kritiker` | Gegenprüfung von Plan und Risikoannahmen vor dem Bauen | Code schreiben oder Befunde ohne Beleg erzeugen |
+| `fachpruefer` | fachliche Plausibilität, bestätigte Fachregeln, Referenzfälle | neue Regeln oder Zahlen eigenmächtig verbindlich machen |
+| `rechercheur` | quellenbasierte Recherche (Modus `recherche`) und unabhängige Gegenprüfung (Modus `gegenpruefung`, frischer Aufruf) | Recherche als verbindliche Regel behandeln |
+| `fachexperte` | Alltagstauglichkeit aus Anwendersicht (Abwägungsrunde) | Architektur- oder Sicherheitsfreigabe |
+| `pragmatiker` | Aufwand/Nutzen, kleinste tragfähige Lösung (Abwägungsrunde) | Anforderungen oder Sicherheit aus Bequemlichkeit streichen |
+| `langfrist-architekt` | unabhängige Prüfung des Architektur-Entwurfs auf Jahre (Abwägungsrunde) | selbst entwerfen; ohne Beleg Neubau verlangen |
+| `tester` | verdeckte Abnahmetests vor dem Bauen, vollständige Testläufe, Testlücken | Produktivlogik oder Referenzwerte ändern; Tests abschwächen |
+| `reviewer` | Paket-Review vor jedem Merge (1. Plan-Treue, 2. Qualität), Nachprüfung je Befund, Gesamt-Review je Meilenstein; glaubt dem Entwicklerbericht nicht | Befunde selbst beheben; ungeprüfte Tests als grün melden |
+| `sicherheitspruefer` | Angriffswege, Rechte, Datenflüsse, Abhängigkeiten, Betrieb | Penetrationstest behaupten, wenn nur Code gelesen wurde |
+| `produktpruefer` | Abnahme jeder Anforderung, echte Abläufe, Aussehen Desktop + Handy | technische oder Sicherheitsfreigabe |
+| `auditor` | unabhängiges Audit des Teams oder eines Projekts | Befunde selbst beheben oder eigene Behebung bewerten |
+
+## Warum diese Agenten eigenständig sind und andere zusammengelegt wurden
+- **Eigenständig** bleibt, wer einen eigenen Blickwinkel hat, andere Rechte braucht oder vom Ersteller unabhängig sein muss (wer baut, prüft nicht).
+- **Zusammengelegt** wurden Rollen mit gleichem Blickwinkel: Rechercheur und Quellenprüfer sind jetzt ein Agent mit zwei Modi. Die Unabhängigkeit bleibt, weil die Gegenprüfung immer ein **frischer Aufruf** ohne Gedächtnis ist.
+- **Neu:** `entwickler` (damit der Projektleiter den Überblick behält und nicht selbst baut), `architekt` (sauberer Aufbau mit automatisch geprüften Regeln).
+- **Kein Agent, sondern Checkliste:** Übergabe und Betrieb (Skill `uebergabe`), Sicherheits-Checkliste (Skill `sicherheit`).
 
 ## Regeln der Orchestrierung
+Grenzen der Autonomie, Belegpflicht und Schleifenlimits stehen im Grundgesetz und gelten vor dieser Liste.
 
-Grenzen der Autonomie, Belegpflicht und Schleifenlimits stehen im Grundgesetz und gelten vor dieser Liste. Diese Liste erläutert sie.
-
-1. **Unabhängigkeit vor Konsens:** Prüfer erstellen zunächst eigene Urteile, ohne die Bewertungen anderer zu sehen.
-2. **Evidenzpflicht:** Jeder wichtige Befund nennt Datei/Zeile oder reproduzierbares Szenario, Auswirkung und Abhilfe.
-3. **Schweregrad statt Stimmenmehrheit:** Ein einzelner belastbarer kritischer Sicherheits- oder Datenintegritätsbefund blockiert die Freigabe, bis er behoben oder ausdrücklich durch zuständige Verantwortliche bewertet wurde.
-4. **Kein Test-Theater:** Nur tatsächlich ausgeführte Tests zählen als ausgeführt. Nicht verfügbare Tests werden als „nicht geprüft“ geführt.
-5. **Keine stillen Lockerungen:** Bestehende Tests, Referenzwerte, fachliche Regeln und Anforderungen werden nicht entfernt oder passend gemacht, um ein grünes Ergebnis zu erzeugen.
-6. **Kleine Änderungen:** Arbeitspakete sollen unabhängig testbar und möglichst rücksetzbar sein.
-7. **Produktionsschutz:** Keine destruktiven Aktionen, produktiven Datenmigrationen, produktiven Releases, externen Datenübertragungen oder neuen laufenden Kosten ohne Freigabe.
-8. **Sichere Autonomie:** Projektleitung darf lokale, reversible Entwicklungsarbeit selbstständig fortführen. Bei Datenschutz, Produktfachlichkeit, Kosten, Datenverlust und produktivem Betrieb muss sie die definierten Freigabegrenzen beachten.
-9. **Widersprüche sichtbar machen:** Bei abweichenden Urteilen werden Belege, Annahmen und Auswirkungen verglichen; nicht durch Mehrheitsentscheid wegabgestimmt.
-10. **Lernen mit Kontrolle:** Lessons werden als Vorschlag formuliert und erst nach Freigabe übernommen. Allgemeine Wissensbibliotheken enthalten keine vertraulichen Kunden- oder Arbeitgeberdaten.
+1. **Nur das feste Team.** Technisch erzwungen durch den Wächter (`scripts/waechter.py`) und die Projekteinstellungen.
+2. **Unabhängigkeit vor Konsens:** Prüfer urteilen zuerst allein, ohne die Bewertungen anderer.
+3. **Belegpflicht:** jeder Befund mit Datei/Zeile oder reproduzierbarem Szenario, Auswirkung, Abhilfe und Sicherheit (0–100).
+4. **Schweregrad statt Stimmenmehrheit:** Ein belastbarer kritischer Befund blockiert.
+5. **Kein Test-Theater:** Nur tatsächlich ausgeführte Tests zählen; „grün“ heißt Test-Schranke OK.
+6. **Keine stillen Lockerungen:** Tests, Referenzwerte, Fachregeln und Anforderungen werden nie passend gemacht.
+7. **Kleine, rücksetzbare Pakete:** jedes Paket ein eigener Branch, ein Merge-Commit, rückgängig machbar.
+8. **Parallel nur ohne Überschneidung (höchstens 3 Entwickler):** Der Architekt markiert, welche Pakete parallel gebaut werden können. Konflikt beim Zusammenführen → Merge abbrechen, Paket neu auf aktuellem Stand bauen lassen, nie von Hand auflösen.
+9. **Produktionsschutz:** keine destruktiven Aktionen, Releases, externen Datenübertragungen oder laufenden Kosten ohne Freigabe.
+10. **Widersprüche sichtbar machen:** Belege vergleichen, nicht abstimmen.
+11. **Lernen mit Kontrolle:** Lektionen sind Vorschläge, bis Simon sie bestätigt.
 
 ## Qualitätsstufen
-
-Verbindlich ist die Tabelle im Grundgesetz (`wissen/grundgesetz.md`, Abschnitt „Stufen“) inklusive der Risiko-Auslöser. Hier steht bewusst keine zweite Definition.
+Verbindlich ist die Tabelle im Grundgesetz (`wissen/grundgesetz.md`, Abschnitt „Stufen“). Hier steht bewusst keine zweite Definition.
 
 ## Definition eines belastbaren Abschlusses
-
-Ein Abschlussbericht enthält vollständige Anforderungen mit Nachweisen, tatsächlich ausgeführte Tests, nicht geprüfte Bereiche, Befunde nach Schwere, bekannte Risiken, Daten-/Update-/Rollback-Hinweise bei Relevanz und den nächsten konkreten Betriebsschritt. „Funktioniert auf meinem Rechner“ ist kein ausreichender Abschluss.
+Ein Abschlussbericht enthält: Abnahmeliste aller Anforderungen mit Nachweis; grüne Test-Schranke mit Eintrag in `docs/TESTNACHWEIS.md`; Teamnachweis (jede Pflichtprüfung im Agenten-Log beim richtigen Agenten); nicht geprüfte Bereiche; Befunde nach Schwere; bekannte Risiken; Daten-/Update-/Rollback-Hinweise bei Relevanz; nächster Betriebsschritt. „Funktioniert auf meinem Rechner“ ist kein Abschluss.

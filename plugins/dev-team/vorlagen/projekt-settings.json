@@ -11,35 +11,105 @@
     "dev-team@roelz-plugins": true,
     "tool-scout@roelz-plugins": true
   },
+  "disableAllHooks": false,
+  "worktree": {
+    "baseRef": "head"
+  },
+  "env": {
+    "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1",
+    "CLAUDE_CODE_DISABLE_EXPLORE_PLAN_AGENTS": "1",
+    "CLAUDE_CODE_FORK_SUBAGENT": "0",
+    "CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS": "0",
+    "CLAUDE_CODE_DISABLE_WORKFLOWS": "1"
+  },
+  "permissions": {
+    "deny": [
+      "Workflow",
+      "Agent(Explore)",
+      "Agent(Plan)",
+      "Agent(general-purpose)",
+      "Agent(claude-code-guide)",
+      "Agent(statusline-setup)",
+      "Agent(name:*)",
+      "Edit(**/.claude/agents/**)",
+      "Edit(~/.claude/agents/**)",
+      "Edit(**/.claude/skills/**)",
+      "Edit(**/.claude/hooks/**)",
+      "Edit(/.claude/settings.json)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git push origin main*)",
+      "Bash(git push origin master*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)"
+    ]
+  },
   "hooks": {
     "SessionStart": [
       {
         "hooks": [
-          { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" start", "timeout": 120 }
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" start",
+            "timeout": 120
+          }
         ]
       }
     ],
     "SubagentStart": [
       {
         "hooks": [
-          { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" agent", "timeout": 15 }
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" agent",
+            "timeout": 15
+          }
         ]
       }
     ],
     "PreToolUse": [
       {
-        "matcher": "Agent|Task",
+        "matcher": "*",
         "hooks": [
-          { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" log-start", "timeout": 15 }
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" waechter",
+            "timeout": 20,
+            "onFailure": "block"
+          }
         ]
       }
     ],
     "SubagentStop": [
       {
         "hooks": [
-          { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" log-ende", "timeout": 15 }
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" fertig",
+            "timeout": 15
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" log-ende",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "ConfigChange": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" einstellungen",
+            "timeout": 20
+          }
         ]
       }
     ]
-  }
+  },
+  "disableWorkflows": true
 }
