@@ -1,7 +1,7 @@
 {
   "name": "dev-team",
   "displayName": "Dev-Team",
-  "version": "3.8.1",
+  "version": "3.8.2",
   "description": "Festes Senior-Entwicklungsteam: Projektleitung, Architekt, Designer (Oberflächen), Entwickler (auch parallel in eigenen Worktrees), Kritiker, Fachprüfer, Rechercheur, Abwägungsrunde, Tester mit verdeckten Abnahmetests, Reviewer, Sicherheitsprüfer, Produktprüfer, Auditor. Teamzwang und Schreibrechte technisch erzwungen, Test- und Abhängigkeits-Schranke. Enthält kein Firmen- oder Kundenwissen. Neu: Gastgeber für den Wow-Effekt (Vorbild 5-Sterne-Hotels, Emirates).",
   "author": {
     "name": "Simon Rölz"

@@ -1,5 +1,10 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.8.2 – Einrichten auf einem frischen Rechner
+
+- `/dev-team:einrichten privat` bricht mit Gehirn nicht mehr ab, wenn das Plugin als Kopie im Cache liegt (Lektionen kommen aus dem Gehirn).
+- Alter Dev-Team-Block ohne Marker in `~/.claude/CLAUDE.md` wird erkannt und mit Simon entfernt, damit nicht zwei Grundgesetze gelten.
+
 ## 3.8.1 – Gehirn beim Sitzungsstart abgleichen
 
 - Der Sitzungsstart holt das Gehirn zuerst von GitHub (höchstens 8 Sekunden, ohne Rückfragen, eigene ungespeicherte Änderungen bleiben erhalten). So gelten Lektionen vom anderen Laptop sofort, auch wenn Obsidian dort zu ist. Ohne Netz oder bei einem offenen Konflikt gilt der lokale Stand, mit Hinweis.

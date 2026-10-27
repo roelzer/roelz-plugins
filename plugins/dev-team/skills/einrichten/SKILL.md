@@ -21,7 +21,7 @@ Modus aus dem Argument (`$ARGUMENTS`) übernehmen; fehlt er, frag:
 Plugin-Ordner: `${CLAUDE_PLUGIN_ROOT}`
 
 ## 2. Lessons-Pfad festlegen
-- **privat:** Prüfe, ob der Plugin-Ordner ein lokaler Git-Klon ist (enthält der Pfad `.claude/plugins/cache`, ist es nur eine Kopie). Bei einer Kopie: Simon erklären, dass er das Repo klonen und den Marktplatz aus dem lokalen Ordner hinzufügen soll (siehe ANLEITUNG.md im Repo), sonst gehen Lektionen beim nächsten Update verloren. Danach abbrechen.
+- **privat:** Mit Gehirn (siehe unten) ist es egal, ob der Plugin-Ordner ein Git-Klon oder eine Kopie im Cache ist (`.claude/plugins/cache`): Lektionen und Fachwissen liegen dann im Gehirn, die Datei im Plugin ist nur Rückfall. **Ohne** Gehirn und bei einer Kopie: Simon erklären, dass neue Lektionen beim nächsten Update verloren gingen, und ihm das Gehirn empfehlen; erst wenn er beides ablehnt, abbrechen.
   Lessons-Pfad = `${CLAUDE_PLUGIN_ROOT}/wissen/lessons.md`
 - **arbeit:** Lessons-Pfad = `~/.claude/dev-team/lessons-arbeit.md`. Existiert die Datei nicht, lege sie als Kopie von `${CLAUDE_PLUGIN_ROOT}/wissen/lessons.md` an.
 
@@ -32,6 +32,7 @@ Frag im Modus „privat“ außerdem, ob es schon ein Baukasten-Repo gibt und wo
 Verwende im nächsten Schritt den vollständigen, absoluten Pfad mit Schrägstrichen `/`, auch unter Windows.
 
 ## 3. Globale CLAUDE.md verknüpfen
+**Alter Block aus Version 1/2:** Steht in `~/.claude/CLAUDE.md` schon ein Dev-Team-Abschnitt **ohne** die Marker `<!-- dev-team START -->` / `<!-- dev-team END -->` (z. B. mit `@…/grundgesetz.md` aus einem anderen Ordner), zeig ihn Simon. Er muss weg, sonst gelten zwei Grundgesetze. Simon löscht ihn selbst im Editor oder gibt dir ausdrücklich das OK; dann ersetze ihn durch die Ausgabe des Skripts unten.
 `~/.claude/CLAUDE.md` schreibt Claude nicht direkt (der Wächter sperrt das, damit keine Sitzung das Grundgesetz abschalten kann). Zeige Simon die Änderung mit
 `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/claude_md_block.py" --modus <privat|arbeit> --lessons <Lessons-Pfad> [--baukasten <Baukasten-Repo>] [--gehirn <Gehirn-Ordner>]`
 und führe nach seinem OK denselben Befehl mit `--schreiben` aus. Das Skript ersetzt nur den Block zwischen `<!-- dev-team START -->` und `<!-- dev-team END -->`; alles andere bleibt. Im Block stehen Modus, Plugin-Ordner, Lessons-Datei, ggf. Baukasten und Gehirn und die Verknüpfungen `@…/grundgesetz.md` und `@<Lessons>`.
