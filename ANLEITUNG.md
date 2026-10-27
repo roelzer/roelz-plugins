@@ -208,6 +208,9 @@ Hooks aus dem Plugin oder aus den Projekteinstellungen kann ein Programm, das ei
 2. Die Datei vom Desktop **als Administrator** nach `C:\Program Files\ClaudeCode\managed-settings.json` kopieren (Ordner anlegen, falls er fehlt).
 3. Claude Code neu starten, `/status` aufrufen: Unter „Setting sources“ muss „managed“ stehen.
 4. Ab jetzt läuft der Wächter aus der verwalteten Einstellung; der Plugin-Wächter tritt automatisch zurück, damit nichts doppelt läuft.
+5. **Probe (wichtig, bisher nur auf deinem Rechner möglich):** In einem Testprojekt die Datei `.claude/settings.local.json` mit dem Inhalt `{"disableAllHooks": true}` anlegen, Claude Code neu starten und bitten: „Leg die Datei src/probe.js an.“ Das muss mit ⛔ blockiert werden. Danach die Datei `settings.local.json` wieder löschen.
+
+**Stand der Prüfung (27.10.2026):** Ohne verwaltete Einstellung ist die Lücke im echten Lauf bestätigt: Mit `disableAllHooks` und umgelenktem Suchpfad in `settings.local.json` konnte der Projektleiter in der nächsten Sitzung Code schreiben. Ob die verwaltete Einstellung das verhindert, ist **noch nicht live geprüft** – das Einrichten einer verwalteten Einstellung in der Cloud-Testumgebung wurde (zu Recht) von der Sicherheitsprüfung von Claude Code abgelehnt. Die Wirkung beruht auf der Claude-Code-Doku; die Probe in Schritt 5 ist der Nachweis.
 
 Ändert sich der Python-Pfad oder verschiebst du das Repo, die Datei neu erzeugen. Hinweis: Unter WSL ist der entsprechende Ordner vom Benutzer beschreibbar und schützt dort nicht.
 
