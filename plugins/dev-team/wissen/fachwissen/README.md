@@ -1,5 +1,7 @@
 # Fachwissen-Bibliothek
 
+> **Rückfall-Bibliothek.** Ist das Gehirn eingerichtet, gilt `02 Wissen/` im Gehirn als Quelle (dort auch die vollständigen Wärmenetz-Regeln). Diese Dateien nur noch für Rechner ohne Gehirn.
+
 Gemeinsames Fachwissen für **alle Projekte** eines Fachgebiets, auf allen Rechnern (über GitHub verteilt). Neue Projekte im selben Fachgebiet starten mit diesen Regeln.
 
 Eine Datei pro Fachgebiet, z. B. `waermenetz.md`. Aufbau wie `fachwissen/regeln.md` im Projekt.

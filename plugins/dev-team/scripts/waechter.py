@@ -351,6 +351,7 @@ BEREICH_TEXT = {
     "testkonfig": "Testkonfiguration (bestehende ändert nur der Tester)",
     "konfig": "Projekteinstellungen (.claude/settings*.json)",
     "architektur": "Architekturregeln (nur der Architekt)",
+    "design": "Design-Entwurf und Design-Vorgabe (nur der Designer)",
     "abnahme": "Abnahmetests (nur der Tester)",
     "referenz": "Referenzfälle (nur Simon, neue über scripts/geschuetzt_schreiben.py mit seiner Freigabe)",
     "regeln": "Fachregeln (nur nach Simons Bestätigung, durch den Projektleiter)",

@@ -1091,6 +1091,22 @@ class PilotReibung3(Basis):
     def test_dev_full_ist_kein_ziel(self):
         self.assertEqual(self.bash("python3 -c 'print(1)' > /dev/full", "reviewer"), 0)
 
+class Designer(Basis):
+    def test_designer_schreibt_nur_design(self):
+        for datei, erwartet in (("docs/DESIGN.md", 0), ("design/tokens.json", 0), ("design/skizzen/start.svg", 0),
+                                ("src/rechnung.js", 2), ("tests/rechnung.test.js", 2), ("docs/plan.md", 2)):
+            e = self.schreiben(os.path.join(self.projekt, datei), "designer")
+            self.assertEqual(self.lauf(e)[0], erwartet, datei)
+
+    def test_andere_schreiben_kein_design(self):
+        for rolle in (None, "entwickler", "architekt"):
+            e = self.schreiben(os.path.join(self.projekt, "docs", "DESIGN.md"), rolle)
+            self.assertEqual(self.lauf(e)[0], 2, rolle)
+
+    def test_designer_immer_opus(self):
+        self.assertEqual(self.lauf(self.agent("dev-team:designer"))[0], 0)
+        self.assertEqual(self.lauf(self.agent("dev-team:designer", model="sonnet"))[0], 2)
+
 
 if __name__ == "__main__":
     unittest.main()

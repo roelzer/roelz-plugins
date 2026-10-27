@@ -1,4 +1,4 @@
-# Dev-Team – Zusammenarbeit auf Senior-Niveau (Version 3.6)
+# Dev-Team – Zusammenarbeit auf Senior-Niveau (Version 3.7)
 
 Ideen aus anderen Projekten (Superpowers, BMAD, Anthropic, wshobson) und was übernommen wurde: `docs/VORBILDER.md` im Repo.
 
@@ -10,6 +10,7 @@ Das Team ist **fest**: genau die Agenten in `team.json`. Jede Datei in `agents/`
 |---|---|---|
 | Projektleitung (`auftrag`) | Anforderungen, Plan, Priorisierung, Auftrag an jeden Agenten, Merge der Pakete, Status, Bericht | Code oder Tests schreiben (gesperrt), Prüfungen selbst machen, fehlende Rollen ersetzen |
 | `architekt` | Code planen, bevor gebaut wird: Architektur-Rückgrat, Abhängigkeitsrichtung, Paketschnitt, Bauplan je Paket mit exakten Schnittstellen, Prüf-Schwerpunkt, Architekturtests; Strukturprüfung am Meilenstein-Ende | Produktivcode schreiben; tragende Entscheidungen still treffen; seinen eigenen Entwurf in der Abwägungsrunde bewerten |
+| `designer` | Oberfläche gestalten, bevor gebaut wird: Gestaltungsrichtung, Abläufe, Bildschirme mit allen Zuständen (Desktop + Handy), Design-Vorgabe (`design/tokens.json`); Treue-Check per Screenshot nach dem Bauen; nur bei Projekten mit Oberfläche | Code schreiben; die Bedienbarkeit abschließend beurteilen (das macht der Produktprüfer) |
 | `entwickler` | genau ein Paket nach Bauplan, streng testgetrieben, alle Tests grün, Commit im eigenen Worktree, fester Status (FERTIG / FERTIG_MIT_BEDENKEN / BLOCKIERT / BRAUCHT_KONTEXT) | bestehende Tests, Referenzwerte, Fachregeln, Architekturregeln ändern; vom Bauplan still abweichen; Pakete anderer; Merge |
 | `kritiker` | Gegenprüfung von Plan und Risikoannahmen vor dem Bauen | Code schreiben oder Befunde ohne Beleg erzeugen |
 | `fachpruefer` | fachliche Plausibilität, bestätigte Fachregeln, Referenzfälle | neue Regeln oder Zahlen eigenmächtig verbindlich machen |

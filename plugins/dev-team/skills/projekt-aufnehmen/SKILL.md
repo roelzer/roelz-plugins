@@ -53,6 +53,9 @@ Gibt es zum Fachgebiet eine Datei in `${CLAUDE_PLUGIN_ROOT}/wissen/fachwissen/`:
 ## 4. Commit
 Ein Commit „Projekt ins Dev-Team aufgenommen“.
 
+## 4b. Ins Gehirn
+Gibt es im Gehirn schon `01 Projekte/<Projekt>.md`, lies sie zuerst (vielleicht steht dort schon Wissen aus früheren Sitzungen). Dann `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/gehirn.py" projekt --name <Projekt> --status aktiv --stand-datei docs/STATUS.md --fachgebiet <…> --ordner <Projektordner>`. Der automatische Abschnitt wird ersetzt, alles andere in der Notiz bleibt.
+
 ## 5. Bericht an Simon
 - **Ampel** zum Ist-Zustand.
 - So ist das Projekt aufgebaut (5–10 Zeilen, einfache Sprache).

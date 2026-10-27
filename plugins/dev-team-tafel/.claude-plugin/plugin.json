@@ -1,0 +1,7 @@
+{
+  "name": "dev-team-tafel",
+  "version": "0.1.0",
+  "description": "Team-Tafel für das Dev-Team: zeigt neben dem Chat, wer gerade arbeitet, die letzten Ergebnisse mit Ampel, Sperren des Wächters und den Teststand.",
+  "author": { "name": "Simon Rölz" },
+  "types": "./types/index.d.ts"
+}

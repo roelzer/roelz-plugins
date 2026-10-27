@@ -25,7 +25,7 @@ Nach der Tabelle und den Risiko-Auslösern im Grundgesetz, nach Risiko, nicht na
 **Stufe Klein:** Simon bestätigt in einem Satz, was geändert wird → Arbeitsbranch → `entwickler` (ein Paket; Kriterium: ein Test, der den Fehler zeigt) → `reviewer` Modus `paket` → Merge → Schranke → kurzer Bericht mit Testnachweis.
 
 ## Phase 1 – Verstehen und Anforderungen festhalten
-1. `git status` (fremde Änderungen nie überschreiben), `CLAUDE.md`, `docs/lastenheft.md`, `docs/ARCHITEKTUR.md`, `docs/risiko-log.md`, `fachwissen/regeln.md`, Lessons-Datei, Fachwissen-Bibliothek.
+1. `git status` (fremde Änderungen nie überschreiben), `CLAUDE.md`, `docs/lastenheft.md`, `docs/ARCHITEKTUR.md`, `docs/risiko-log.md`, `fachwissen/regeln.md`, Lessons-Datei, Fachwissen-Bibliothek (mit Gehirn: `<Gehirn>/02 Wissen/` und die Projektnotiz `<Gehirn>/01 Projekte/<Projekt>.md`).
 2. **Jede** Anforderung einzeln mit **Simons eigenen Worten**, Nummer (A1, A2 …) und messbarem Abnahmekriterium. Nebensätze zählen. Muss / Soll / Idee trennen. In `docs/lastenheft.md`.
 3. Daten, Rollen, Vertrauensgrenzen, externe Dienste, Betrieb, Risiko-Auslöser erfassen.
 4. Skill `baukasten`: gibt es passende Bausteine?
@@ -37,6 +37,7 @@ Nach der Tabelle und den Risiko-Auslösern im Grundgesetz, nach Risiko, nicht na
 1. Technik offen (Web-App, .exe, Excel …)? Erst mit dem Skill `loesungsweg` klären.
 2. Schreibe `docs/plan.md` nach `${CLAUDE_PLUGIN_ROOT}/vorlagen/plan.md`: Ziel, Anforderungen, Ausgangslage, Absicherung, Risiken, harte Stopps.
 3. → `architekt` Modus `entwurf`. Er liefert: tragende Entscheidungen für Simon (mit Alternativen), Rückgrat in `docs/ARCHITEKTUR.md`, Architekturtests, Paketschnitt mit Parallelität, **Bauplan je Paket** (Dateien, Nutzt/Liefert-Schnittstellen, Tests, Randfälle) und den Prüf-Schwerpunkt. Trage Abschnitt 4, 5, die Baupläne und den Prüf-Schwerpunkt in den Plan ein. Laufen die Architekturtests nicht im Testbefehl mit, schlage Simon die Ergänzung der Zusatzbefehle vor (Änderungen an `.claude/dev-team.json` brauchen seine Freigabe).
+3b. **Hat das Projekt eine Oberfläche** (Web, Desktop, Formulare, Berichte mit Layout): → `designer` Modus `entwurf` mit Lastenheft, Zielgruppe/Einsatzort, Plan und Architektur-Entwurf; ohne Design-Vorgabe zusätzlich Modus `vorgabe`. Er legt `docs/DESIGN.md` und `design/` an (Abläufe, Bildschirme mit allen Zuständen für Desktop und Handy, Farben/Schrift/Abstände in `design/tokens.json`). Danach nimmt der `architekt` die Übergabe-Hinweise in die Baupläne auf (welche Bausteine, welche Zustände, Tests dafür). Kritiker und Abwägungsrunde bekommen `docs/DESIGN.md` mit.
 4. Jede Anforderung hat ein Paket mit Bauplan, sonst ist der Plan nicht fertig. Mehr als ~8 Pakete: Meilensteine, jeder mit eigenem Stopp.
 
 ## Phase 3 – Unabhängige Planprüfung (parallel, höchstens 3)
@@ -100,7 +101,8 @@ Und weiter. **Ausnahmen – hier wird angehalten:** die harten Stopps im Grundge
 1. → `tester` Modus `pruefen` (deckt die verdeckten Tests auf, voller Testlauf, Lücken nach Wichtigkeit). Danach `git status`: nur Testdateien neu oder geändert.
 2. Parallel (höchstens 3): `fachpruefer` Modus `ergebnis` (bei fachlichen Folgen), `architekt` Modus `struktur`, `reviewer` Modus `gesamt` (`<Meilenstein-Basis>..HEAD`, mit der Liste zurückgestellter Befunde).
 3. `sicherheitspruefer` bei Risiko-Auslösern und vor jedem größeren Release.
-4. `produktpruefer` zuletzt: jede Anforderung einzeln, Anwendung starten, Screenshots Desktop + Handy bei Web-Oberflächen.
+3b. Bei Oberfläche: `designer` Modus `treue` – vergleicht per Screenshot, ob gebaut wurde, was entworfen war.
+4. `produktpruefer` zuletzt: jede Anforderung einzeln, Anwendung starten, Screenshots Desktop + Handy bei Web-Oberflächen, Bedienbarkeit nach sieben Punkten.
 5. Befunde: **ein** `entwickler` bekommt die vollständige Liste (nicht ein Entwickler pro Befund), danach **eine** `reviewer`-Nachprüfung und die betroffenen Prüfer erneut. Was danach offen ist: Entscheidung oder Simon.
 6. Zum Schluss Schranke im Hauptordner mit `--rolle projektleiter --basis <Meilenstein-Basis>`: muss „OK – alles grün“ melden. Sie prüft zusätzlich, dass jede Anforderung und bei Fachsoftware jede bestätigte Fachregel einen Test hat, dass die Abnahmetests den Prüfsummen entsprechen, und führt die `meilensteinbefehle` aus (bei Fachsoftware Pflicht: Mutationstest).
 7. **Referenzfälle und `.claude/dev-team.json`** änderst du nicht selbst. Liefert Simon neue Referenzdaten oder will er einen anderen Testbefehl: Er trägt eine Freigabe in `.claude/freigaben.md` ein (Geltung = Zielpfad), dann `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/geschuetzt_schreiben.py" --quelle <datei> --ziel <pfad> --freigabe <stichwort>`.
@@ -118,5 +120,11 @@ Und weiter. **Ausnahmen – hier wird angehalten:** die harten Stopps im Grundge
 9. Ideen des Produktprüfers und Fachregel-Vorschläge.
 10. Lektionsvorschläge mit Empfehlung (bestätigt → `/dev-team:lektion vorschlaege`).
 11. Merge nach `main` nur nach Simons Freigabe; bei Kundenprojekten `/dev-team:uebergabe`.
+12. **Ins Gehirn schreiben** (vor dem Bericht, ohne Nachfrage – das ist Teil von „fertig“):
+    - Projektstand: `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/gehirn.py" projekt --name <Projekt> --status <aktiv|fertig|ruhend> --stand-datei docs/STATUS.md --fachgebiet <…> --ordner <Projektordner>`.
+    - Lektionsvorschläge der Agenten: je `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/gehirn.py" lektion --text "- [Bereich] Regel. (Anlass, Datum)" --projekt <Projekt>` (landen unter „Vorgeschlagen“; bestätigt werden sie erst über `/dev-team:lektion vorschlaege`).
+    - Entscheidungen, die Simon in diesem Auftrag **selbst** getroffen hat: je `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/gehirn.py" entscheidung --text "…" --grund "…" --betrifft <Projekt>`. Deine eigenen Entscheidungen aus `docs/ENTSCHEIDUNGEN.md` erst nach Simons OK.
+    - Meldet das Skript „nicht eingerichtet“ (z. B. Cloud): dieselben Inhalte in `docs/GEHIRN_NACHTRAG.md` sammeln und im Bericht sagen, dass sie noch ins Gehirn müssen.
+    - Nie ins Gehirn: Zugangsdaten, echte Kundendaten, Rechnungen, Original-LVs, Namen oder Adressen von Endkunden (das Skript blockt Zugangsdaten, den Rest prüfst du).
 
 Fertig heißt: Kriterien belegt, Schranke grün, Teamnachweis vollständig, Entscheidungen offengelegt, kritische Risiken behandelt, Einschränkungen genannt, nächster Betriebsschritt klar. Für die nächste Aufgabe `/clear`.

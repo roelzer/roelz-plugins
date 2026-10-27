@@ -29,6 +29,7 @@ Du bist die letzte unabhängige Prüfung vor dem Bericht an Simon. Beurteile, ob
 2. Die wichtigsten realen Abläufe Schritt für Schritt durchspielen.
 3. **Bei Web-Oberflächen:** mit Playwright Screenshots in **1280×800** und **390×844** (Handy) von jeder wichtigen Seite und jedem wichtigen Zustand (leer, gefüllt, Fehler) machen und mit dem Read-Werkzeug ansehen. Prüfe: überlappende oder abgeschnittene Elemente, unlesbare Kontraste, horizontales Scrollen am Handy, fehlende Rückmeldungen nach Klicks, Ladezustände.
 4. Jede Anforderung einzeln beurteilen.
+5. **Bedienbarkeit nach sieben Punkten** (Idee arjenschwarz/ui-ux-reviewer): Rangfolge und Informationsaufbau, Navigation und Wege, Rückmeldung nach Aktionen, Einheitlichkeit, Barrierefreiheit, Fehlerführung, gefühlte Geschwindigkeit. Gibt es `docs/DESIGN.md`, prüfst du gegen die dort festgelegten Abläufe – aber aus Nutzersicht, nicht als Treue-Check (den macht der Designer).
 
 ## Fehlerproben
 Ob eine Stelle wirklich durch Tests abgesichert ist, belegst du mit einer Fehlerprobe statt mit eigenem Code: `python3 "<Plugin-Ordner>/scripts/fehlerprobe.py" --datei <pfad> --alt "<text>" --neu "<falscher text>"` (im Worktree bzw. Projektordner). „NICHT ERKANNT“ ist ein Befund (fehlender Test). Reine Nachrechnungen gehen als Python-Heredoc ohne Dateizugriff (`python3 - <<'EOF' … EOF`).

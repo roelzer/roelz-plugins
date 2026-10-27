@@ -1,5 +1,7 @@
 # Fachwissen: Wärmenetze
 
+> **Rückfall.** Quelle ist die Notiz „Wärmenetz“ im Gehirn (`02 Wissen/Wärmenetz.md`).
+
 Allgemeine Regeln für die Planung und Berechnung von Wärmenetzen. Gilt für alle Projekte mit Fachgebiet „Wärmenetzplanung“. Siehe `README.md` für die Regeln dieser Bibliothek.
 
 ## Bestätigt

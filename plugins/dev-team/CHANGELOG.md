@@ -1,5 +1,12 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.7.0 – Designer, Team-Tafel, Gehirn
+
+- **Neuer Agent `designer`** (Opus): Modus `entwurf` (Gestaltungsrichtung, Farben mit Kontrast 4,5:1, Schriften, Raster, alle Zustände für Desktop und 390 px, echte Texte, Pflichtboden Tastatur/Fokus/44 px), `vorgabe` (`design/vorgabe.md`, `design/tokens.json`) und `treue` (Screenshots 1280×800 und 390×844 gegen `docs/DESIGN.md`). Im Ablauf: Phase 2 bei Oberflächen, Phase 8 Treue-Prüfung. Bereich `design` im Rechtesystem. Produktprüfer prüft zusätzlich Bedienbarkeit nach sieben Punkten.
+- **Team-Tafel** als eigenes Plugin `dev-team-tafel`: zeigt neben dem Chat laufende Agenten (Rolle, Modell, Laufzeit), zuletzt fertige, Phase/Ampel, Ergebnisse, Sperren und Testnachweis. Nur lesend; ein Fehler der Tafel verhindert nie einen Agentenstart.
+- **Gehirn-Anbindung:** neues Skript `scripts/gehirn.py` (projekt, lektion, entscheidung, wissen) schreibt in Simons Obsidian-Tresor – mit `git pull`, Prüfung auf Zugangsdaten und Sperrwörter (Liste im Gehirn), Commit und Push; streicht nie Zeilen bestehender Wissensnotizen. `claude_md_block.py --gehirn`, Sitzungsstart und Agenten-Kontext laden die bestätigten Lektionen aus dem Gehirn. Abläufe auftrag (Phase 9), lektion, neues-projekt, projekt-aufnehmen, recherche und einrichten schreiben ins Gehirn; ohne Gehirn `docs/GEHIRN_NACHTRAG.md`. `wissen/lessons.md` und `wissen/fachwissen/` sind nur noch Rückfall.
+- 231 automatische Tests (neu: `tests/test_gehirn.py`, Klasse `Designer`), dazu 4 Tests der Tafel (`claude plugin test`).
+
 ## 3.6.1 – Reibung aus dem Pilotlauf (Meilenstein-Ende)
 
 - Live-Kontrolle 27.10.2026: Ohne verwaltete Einstellung lässt sich der Schutz über `settings.local.json` (`disableAllHooks` + umgelenkter `PATH`) für die nächste Sitzung abschalten – bestätigt. Die verwaltete Einstellung selbst ist noch nicht live geprüft (Einrichten in der Testumgebung abgelehnt); Probe für Simon in ANLEITUNG 9a, Schritt 5.

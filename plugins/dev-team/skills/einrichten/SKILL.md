@@ -27,12 +27,14 @@ Plugin-Ordner: `${CLAUDE_PLUGIN_ROOT}`
 
 Frag im Modus „privat“ außerdem, ob es schon ein Baukasten-Repo gibt und wo es liegt (optional, siehe Skill `baukasten`).
 
+**Gehirn:** Frag nach dem Ordner von Simons Obsidian-Tresor (lokaler Klon von `roelzer/brain`, erkennbar an `00 Start.md`). Ist er da, kommt er mit `--gehirn <Ordner>` in den Block. Ab dann gilt: Lektionen, Projektstand, Entscheidungen und Fachwissen schreibt das Team über `scripts/gehirn.py` ins Gehirn. Ohne Gehirn läuft alles wie bisher, Wissen sammelt sich dann in `docs/GEHIRN_NACHTRAG.md`.
+
 Verwende im nächsten Schritt den vollständigen, absoluten Pfad mit Schrägstrichen `/`, auch unter Windows.
 
 ## 3. Globale CLAUDE.md verknüpfen
 `~/.claude/CLAUDE.md` schreibt Claude nicht direkt (der Wächter sperrt das, damit keine Sitzung das Grundgesetz abschalten kann). Zeige Simon die Änderung mit
-`python3 "${CLAUDE_PLUGIN_ROOT}/scripts/claude_md_block.py" --modus <privat|arbeit> --lessons <Lessons-Pfad> [--baukasten <Baukasten-Repo>]`
-und führe nach seinem OK denselben Befehl mit `--schreiben` aus. Das Skript ersetzt nur den Block zwischen `<!-- dev-team START -->` und `<!-- dev-team END -->`; alles andere bleibt. Im Block stehen Modus, Plugin-Ordner, Lessons-Datei, ggf. Baukasten und die Verknüpfungen `@…/grundgesetz.md` und `@<Lessons>`.
+`python3 "${CLAUDE_PLUGIN_ROOT}/scripts/claude_md_block.py" --modus <privat|arbeit> --lessons <Lessons-Pfad> [--baukasten <Baukasten-Repo>] [--gehirn <Gehirn-Ordner>]`
+und führe nach seinem OK denselben Befehl mit `--schreiben` aus. Das Skript ersetzt nur den Block zwischen `<!-- dev-team START -->` und `<!-- dev-team END -->`; alles andere bleibt. Im Block stehen Modus, Plugin-Ordner, Lessons-Datei, ggf. Baukasten und Gehirn und die Verknüpfungen `@…/grundgesetz.md` und `@<Lessons>`.
 
 ## 4. Schutzregeln für Geheimnisse
 Benutzereinstellungen schreibt Claude nicht direkt. Zeige Simon die Änderung mit

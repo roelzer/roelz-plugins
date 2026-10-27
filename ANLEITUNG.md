@@ -1,6 +1,6 @@
 # Dev-Team – Anleitung
 
-Stand: Oktober 2026 · Version 3.6
+Stand: Oktober 2026 · Version 3.7
 
 Dieses Repo enthält zwei Plugins für Claude Code: **`dev-team`** und **`tool-scout`**. Beide enthalten kein Firmen- oder Kundenwissen und dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
 
@@ -24,6 +24,7 @@ Du sprichst immer nur mit **einer** Person, dem Projektleiter. Er **baut nicht s
 | **Entwickler** | beim Bauen, einer pro Arbeitspaket | baut genau ein Paket nach Bauplan in eigenem Arbeitsordner, streng testgetrieben, bis alles grün ist, und meldet einen festen Status (FERTIG / FERTIG_MIT_BEDENKEN / BLOCKIERT / BRAUCHT_KONTEXT). **Bis zu vier parallel**, wenn der Architekt die Pakete als unabhängig markiert hat |
 | **Reviewer** | nach jedem Paket, nach jeder Nachbesserung und am Meilenstein-Ende | glaubt dem Bericht des Entwicklers nicht: erst „fehlt etwas, zu viel, missverstanden?“, dann „ist der Code gut?“ (verschluckte Fehler, Duplikate, Testtricks, Sicherheit); bei Nachbesserungen je Befund „behoben / nicht behoben“ |
 | **Sicherheitsprüfer** | bei Login, Rechten, sensiblen Daten, Server, Updates, großen Releases | Angriffswege, Datenschutz, Scanner, typische KI-Schwächen |
+| **Designer** | bei Projekten mit Oberfläche, vor dem Bauen und vor der Abnahme | **gestaltet die Oberfläche, bevor gebaut wird**: eine klare Gestaltungsrichtung, Abläufe, jeden Bildschirm mit allen Zuständen (leer, laden, Fehler, Handy), Farben/Schrift/Abstände als Vorgabe; prüft nach dem Bauen per Screenshot, ob so gebaut wurde. Schreibt keinen Code |
 | **Produktprüfer** | zum Schluss | jede Anforderung mit Nachweis abnehmen, Anwendung starten, Screenshots Desktop und Handy |
 | **Auditor** | auf Wunsch (`/dev-team:audit`) | prüft das Team oder ein Projekt unabhängig, bewertet 1–10; behebt selbst nichts |
 | Tool-Scout | wenn du willst | fremde Plugins/Skills prüfen, bevor du sie installierst |
@@ -127,11 +128,18 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
 - **`docs/STATUS.md`:** oben steht immer die Phase und **jeder laufende Agent**, z. B. „Entwickler P3 ⏳, Entwickler P4 ⏳, Reviewer P2 ✅“, dazu die Pakettabelle mit Branch, Review, Merge und Testergebnis.
 - **`docs/AGENTEN_LOG.md`:** wird automatisch mitgeschrieben, auch wenn du nicht da bist. Jede Zeile: Uhrzeit, ▶ Start / ■ Ende mit Ampel / ⛔ blockiert, Agent, Auftrag bzw. Ergebnis.
 - **`docs/TESTNACHWEIS.md`:** jeder Lauf der Test-Schranke mit Stand und Zahl bestandener Tests.
+- **Team-Tafel (neu in 3.7, Zusatz-Plugin `dev-team-tafel`):** eine Tafel neben dem Chat. Sie zeigt live, wer gerade arbeitet (Rolle, Modell, Laufzeit, Paket), wer zuletzt fertig wurde, Phase und Ampel aus `STATUS.md`, die letzten Ergebnisse und Sperren aus dem Agenten-Log und den letzten Testnachweis. Sie liest nur und aktualisiert sich alle 5 Sekunden. Öffnen: startet von selbst, sonst `/tafel`. Installieren: siehe 9, Schritt 2.
 
 ## 6. Mehrere Projekte und gemeinsames Lernen
 
 - **Getrennt arbeiten:** Jedes Projekt hat seinen eigenen Ordner und sein eigenes VS-Code-Fenster. Mehrere können gleichzeitig laufen, ohne sich zu sehen.
-- **Gemeinsam lernen:** Geteilt werden nur zwei Dinge, beide ohne Projekt-, Kunden- oder Firmennamen:
+- **Gemeinsam lernen – über das Gehirn (neu in 3.7):** Alles, was das Team dauerhaft weiß, steht in deinem Obsidian-Tresor (Repo `roelzer/brain`). Das Team schreibt selbst hinein, über `scripts/gehirn.py`:
+  - nach jedem Auftrag den **Projektstand** in `01 Projekte/<Projekt>.md` (nur der Bereich zwischen den Dev-Team-Markern wird ersetzt, deine eigenen Notizen bleiben) und die Zeile in der Projektübersicht,
+  - **Lektionsvorschläge** unter „Vorgeschlagen“ in `05 Lektionen/Dev-Team-Lektionen.md`; bestätigst du sie, wandern sie nach oben und gelten ab der nächsten Sitzung für alle Agenten,
+  - **Entscheidungen**, die du getroffen hast, in den Entscheidungslog,
+  - von dir bestätigtes **Fachwissen** in `02 Wissen/` (bestehende Zeilen werden nie gestrichen).
+  Vorher holt das Skript den neuesten Stand (`git pull`), danach committet und pusht es. Zugangsdaten und Wörter aus der Notiz „Sperrwörter“ im Gehirn werden geblockt (dort steht z. B., dass Firmenwissen deines Arbeitgebers draußen bleibt). Ohne Gehirn (Cloud, fremder Rechner) sammelt der Projektleiter alles in `docs/GEHIRN_NACHTRAG.md`.
+- **Rückfall ohne Gehirn:** die beiden Dateien im Plugin, beide ohne Projekt-, Kunden- oder Firmennamen:
   - **Lessons** – Erfahrungen zu Arbeitsweise und Code. Beim eigenständigen Bauen sammelt jedes Projekt Vorschläge in `docs/LEKTIONEN_VORSCHLAEGE.md`. Im Abschlussbericht bestätigst du sie, dann übernimmt `/dev-team:lektion vorschlaege` sie für alle Projekte.
   - **Fachwissen-Bibliothek** (`plugins/dev-team/wissen/fachwissen/`) – allgemeine Regeln je Fachgebiet, z. B. `waermenetz.md`. Nach jeder bestätigten Fachregel fragt der Projektleiter, ob sie allgemein gilt. Neue Projekte im selben Fachgebiet starten mit allen Regeln von dort.
 - **Bleibt im Projekt:** interne Werte und Unterlagen eines Arbeitgebers oder Kunden.
@@ -182,12 +190,14 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
    claude plugin marketplace add C:/Users/<du>/roelz-plugins
    claude plugin install dev-team@roelz-plugins
    claude plugin install tool-scout@roelz-plugins
+   claude plugin install dev-team-tafel@roelz-plugins
    ```
    Den Marktplatz **aus dem lokalen Ordner** hinzufügen, nicht direkt von GitHub. Nur so landen neue Lektionen im Repo.
 3. **VS Code komplett schließen und neu öffnen.** Plugins werden nur beim Start geladen.
 4. **Einrichten:** Claude Code starten und eingeben:
    - privater Rechner: `/dev-team:einrichten privat`
    - Arbeitsrechner: `/dev-team:einrichten arbeit` (Lektionen bleiben dann lokal und fließen nicht ins private Repo)
+   - Der Projektleiter fragt dabei nach dem Ordner deines Gehirns (lokaler Klon von `roelzer/brain`, z. B. `C:/Users/<du>/roelz-brain`). Damit liest und schreibt das Team ab dann dort.
 5. **Noch einmal neu starten.** Fragt Claude, ob verknüpfte Dateien geladen werden dürfen: zustimmen.
 6. Prüfen: `/agents` zeigt die Dev-Team-Agenten mit `dev-team:` davor.
 7. **Teamzwang einmal ausprobieren** (in einem Testprojekt, das mit `/dev-team:neues-projekt test-teamzwang` angelegt wurde), Claude bitten:

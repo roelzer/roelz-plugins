@@ -35,6 +35,29 @@ else
   sed -n '/^## Lektionen/,$p' "$plugin/wissen/lessons.md" 2>/dev/null | tail -n +2
 fi
 
+# Gehirn (Simons Obsidian-Tresor): Dev-Team-Lektionen und Projektnotiz mitgeben.
+gehirn=""
+[ -f "$global" ] && gehirn="$(grep -m 1 '^Gehirn:' "$global" 2>/dev/null | sed 's/^Gehirn:[[:space:]]*//' | tr '\\' '/' | tr -d '\r')"
+if [ -n "$gehirn" ] && [ -f "$gehirn/00 Start.md" ]; then
+  echo
+  echo "## Gehirn (Obsidian-Tresor): $gehirn"
+  echo "Alles, was das Team dauerhaft lernt oder über Projekte weiß, kommt ins Gehirn – über"
+  echo "python3 \"$plugin_fwd/scripts/gehirn.py\" (projekt | lektion | entscheidung | wissen). Fachwissen: $gehirn/02 Wissen/"
+  gl="$gehirn/05 Lektionen/Dev-Team-Lektionen.md"
+  if [ -f "$gl" ]; then
+    echo
+    echo "### Dev-Team-Lektionen aus dem Gehirn (bestätigt)"
+    sed -n '/^## Lektionen/,/^## /p' "$gl" 2>/dev/null | grep '^- '
+  fi
+  pname="$(basename "$projekt")"
+  if [ -f "$gehirn/01 Projekte/$pname.md" ]; then
+    echo
+    echo "Projektnotiz im Gehirn: $gehirn/01 Projekte/$pname.md (bei Bedarf lesen)"
+  fi
+elif [ -n "$eingerichtet" ]; then
+  echo "Hinweis: Kein Gehirn eingerichtet (Zeile „Gehirn:“ fehlt). Wissen landet dann in docs/GEHIRN_NACHTRAG.md. Einrichten mit /dev-team:einrichten."
+fi
+
 # Festes Team immer nennen (Teamzwang).
 team=""
 for py in python3 python py; do

@@ -3,7 +3,11 @@
 das direkte Bearbeiten, damit eine Sitzung das Grundgesetz nicht abschalten oder sich mehr Rechte
 geben kann).
 
-  python3 claude_md_block.py --modus privat|arbeit --lessons <pfad> [--baukasten <repo>] [--schreiben]
+  python3 claude_md_block.py --modus privat|arbeit --lessons <pfad> [--baukasten <repo>] [--gehirn <tresor>] [--schreiben]
+
+--gehirn: Simons Obsidian-Tresor (Git-Repo mit „00 Start.md“). Dann lädt jede Sitzung die
+Dev-Team-Lektionen aus dem Gehirn, und scripts/gehirn.py schreibt Projektstand, Lektionen,
+Entscheidungen und Fachwissen dorthin.
 
 Ohne --schreiben wird nur der Unterschied angezeigt.
 """
@@ -27,6 +31,7 @@ def main():
     a.add_argument("--modus", required=True, choices=["privat", "arbeit"])
     a.add_argument("--lessons", required=True)
     a.add_argument("--baukasten", default="")
+    a.add_argument("--gehirn", default="")
     a.add_argument("--schreiben", action="store_true")
     arg = a.parse_args()
 
@@ -48,6 +53,14 @@ def main():
                   "Nichts geändert.")
             sys.exit(1)
         zeilen.append("Baukasten: %s" % bk)
+    if arg.gehirn:
+        gh = fwd(arg.gehirn)
+        echt = subprocess.run(["git", "-C", gh, "rev-parse", "--show-toplevel"], capture_output=True, text=True)
+        if echt.returncode != 0 or fwd(echt.stdout.strip()) != gh or not os.path.isfile(os.path.join(gh, "00 Start.md")):
+            print("FEHLER: Gehirn muss der Wurzelordner des Obsidian-Tresors sein (Git-Repo mit „00 Start.md“). "
+                  "Nichts geändert.")
+            sys.exit(1)
+        zeilen.append("Gehirn: %s" % gh)
     zeilen += ["@%s/wissen/grundgesetz.md" % fwd(PLUGIN), "@%s" % lessons, "<!-- dev-team END -->"]
     block = "\n".join(zeilen) + "\n"
 
