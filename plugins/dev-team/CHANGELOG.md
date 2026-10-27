@@ -1,5 +1,14 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.8.0 – Gastgeber für den Wow-Effekt
+
+- **Neuer Agent `gastgeber`** (Opus, nur lesend): denkt an das, woran niemand gedacht hat. Modus `ideen` (Phase 2, Schritt 3c): Nutzerreise vom ersten Start bis zum Weitergeben, Nebensätze aus dem Lastenheft, höchstens drei Wow-Vorschläge mit Aufwand und Prüfkriterium; fehlende Grundanforderungen getrennt als „Lücken im Fundament“. Modus `nachschliff` (Phase 8, Stufe Groß): Verbesserungen für den nächsten Auftrag.
+- **Neuer Skill `/dev-team:wow`**: Gastgeber auch außerhalb eines Auftrags, für eine Idee, ein Lastenheft oder ein fertiges Produkt. Gewählte Ideen werden Anforderungen mit A-Nummer und Test, der Rest landet in `docs/wow-ideen.md`, Entscheidungen im Gehirn.
+- **`wissen/wow-prinzipien.md`**: zehn Prinzipien (W1–W10) aus Recherche zu Ritz-Carlton, Will Guidara (Eleven Madison Park), Emirates, Disney, Omotenashi, Kano-Modell und Peak-End-Regel, mit Quellen. Quelle der Wahrheit ist die Notiz „Wow-Effekt“ im Gehirn.
+- Stopp 2 (Freigabe) zeigt die Wow-Vorschläge zur Auswahl. ANLEITUNG: „bis zu drei“ parallele Entwickler korrigiert.
+- `gehirn.py wissen`: keine doppelte Überschrift mehr, wenn die Datei schon eine hat.
+- 235 automatische Tests.
+
 ## 3.7.0 – Designer, Team-Tafel, Gehirn
 
 - **Neuer Agent `designer`** (Opus): Modus `entwurf` (Gestaltungsrichtung, Farben mit Kontrast 4,5:1, Schriften, Raster, alle Zustände für Desktop und 390 px, echte Texte, Pflichtboden Tastatur/Fokus/44 px), `vorgabe` (`design/vorgabe.md`, `design/tokens.json`) und `treue` (Screenshots 1280×800 und 390×844 gegen `docs/DESIGN.md`). Im Ablauf: Phase 2 bei Oberflächen, Phase 8 Treue-Prüfung. Bereich `design` im Rechtesystem. Produktprüfer prüft zusätzlich Bedienbarkeit nach sieben Punkten.

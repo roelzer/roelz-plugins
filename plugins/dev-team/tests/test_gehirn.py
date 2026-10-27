@@ -104,6 +104,11 @@ class Gehirn(unittest.TestCase):
         self.assertEqual(self.lauf("wissen", "--titel", "Rohre", "--datei", w3).returncode, 0)
         self.assertIn("Zeile drei", self.datei("02 Wissen/Rohre.md"))
 
+    def test_wissen_ohne_doppelte_ueberschrift(self):
+        w = self.schreib("u.md", "# Mein Thema\n\nText\n")
+        self.assertEqual(self.lauf("wissen", "--titel", "Mein Thema", "--datei", w).returncode, 0)
+        self.assertEqual(self.datei("02 Wissen/Mein Thema.md").count("# Mein Thema"), 1)
+
     def test_zugangsdaten_und_sperrwoerter_werden_geblockt(self):
         vorher = git(self.w, "rev-parse", "HEAD").stdout
         for text in ("token: ghp_abcdefghijklmnopqrstuvwxyz0123", "passwort = Geheim12345",

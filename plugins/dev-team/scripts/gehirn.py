@@ -266,8 +266,9 @@ def cmd_wissen(w, a):
     rel = os.path.join("02 Wissen", titel + ".md")
     p = os.path.join(w, rel)
     if not inhalt.lstrip().startswith("---"):
-        inhalt = "---\ntyp: wissen\nstand: %s\nquelle: %s\nvertraulichkeit: allgemein\n---\n# %s\n\n%s" % (
-            HEUTE, a.quelle or "Dev-Team", titel, inhalt.strip() + "\n")
+        kopf = "" if inhalt.lstrip().startswith("# ") else "# %s\n\n" % titel
+        inhalt = "---\ntyp: wissen\nstand: %s\nquelle: %s\nvertraulichkeit: allgemein\n---\n%s%s" % (
+            HEUTE, a.quelle or "Dev-Team", kopf, inhalt.strip() + "\n")
     alt = lies(p)
     if alt is not None and alt.strip() == inhalt.strip():
         return [], ""

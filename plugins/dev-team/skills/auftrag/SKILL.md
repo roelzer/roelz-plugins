@@ -38,6 +38,7 @@ Nach der Tabelle und den Risiko-Auslösern im Grundgesetz, nach Risiko, nicht na
 2. Schreibe `docs/plan.md` nach `${CLAUDE_PLUGIN_ROOT}/vorlagen/plan.md`: Ziel, Anforderungen, Ausgangslage, Absicherung, Risiken, harte Stopps.
 3. → `architekt` Modus `entwurf`. Er liefert: tragende Entscheidungen für Simon (mit Alternativen), Rückgrat in `docs/ARCHITEKTUR.md`, Architekturtests, Paketschnitt mit Parallelität, **Bauplan je Paket** (Dateien, Nutzt/Liefert-Schnittstellen, Tests, Randfälle) und den Prüf-Schwerpunkt. Trage Abschnitt 4, 5, die Baupläne und den Prüf-Schwerpunkt in den Plan ein. Laufen die Architekturtests nicht im Testbefehl mit, schlage Simon die Ergänzung der Zusatzbefehle vor (Änderungen an `.claude/dev-team.json` brauchen seine Freigabe).
 3b. **Hat das Projekt eine Oberfläche** (Web, Desktop, Formulare, Berichte mit Layout): → `designer` Modus `entwurf` mit Lastenheft, Zielgruppe/Einsatzort, Plan und Architektur-Entwurf; ohne Design-Vorgabe zusätzlich Modus `vorgabe`. Er legt `docs/DESIGN.md` und `design/` an (Abläufe, Bildschirme mit allen Zuständen für Desktop und Handy, Farben/Schrift/Abstände in `design/tokens.json`). Danach nimmt der `architekt` die Übergabe-Hinweise in die Baupläne auf (welche Bausteine, welche Zustände, Tests dafür). Kritiker und Abwägungsrunde bekommen `docs/DESIGN.md` mit.
+3c. **Hat das Produkt Nutzer** (fast immer – Ausnahme: reine Hintergrundskripte, Bibliotheken): → `gastgeber` Modus `ideen` mit Lastenheft (inkl. Gesprächsnotizen), Plan, `docs/DESIGN.md` falls vorhanden, Zielgruppe und Einsatzort. Er liefert „Lücken im Fundament“ (fehlende Grundanforderungen → in den Plan einarbeiten wie einen Kritiker-Befund) und höchstens drei Wow-Vorschläge mit Aufwand und Prüfkriterium. Die Wow-Vorschläge baust du **nicht** in den Plan ein – sie gehen an Simon in Stopp 2. Stufe Klein: entfällt.
 4. Jede Anforderung hat ein Paket mit Bauplan, sonst ist der Plan nicht fertig. Mehr als ~8 Pakete: Meilensteine, jeder mit eigenem Stopp.
 
 ## Phase 3 – Unabhängige Planprüfung (parallel, höchstens 3)
@@ -57,7 +58,8 @@ Nach der Tabelle und den Risiko-Auslösern im Grundgesetz, nach Risiko, nicht na
 2. **Tragende Architekturentscheidungen** mit Alternativen und Empfehlung – Simon entscheidet sie.
 3. Deine Empfehlung je Punkt der Prüfer (beheben / akzeptieren / später).
 4. Neu vorgeschlagene Fachregeln zur Bestätigung.
-5. Paketliste mit Parallelität, geschätzter Bauzeit, Arbeitsbranch; Frage: „Freigabe zum eigenständigen Bauen?“
+5. **Wow-Vorschläge des Gastgebers** (Top 3: was der Nutzer erlebt, Aufwand, Prüfkriterium) mit deiner Empfehlung. Was Simon wählt, wird eine Anforderung mit nächster A-Nummer im Lastenheft (Prüfkriterium = Abnahmekriterium), bekommt Paket und Bauplan vom `architekt` und wird getestet wie alles andere. Nicht Gewähltes → `docs/wow-ideen.md`.
+6. Paketliste mit Parallelität, geschätzter Bauzeit, Arbeitsbranch; Frage: „Freigabe zum eigenständigen Bauen?“
 
 Entscheidungen in `docs/risiko-log.md`, bestätigte Regeln in `fachwissen/regeln.md`. Bei jeder neuen Regel fragen, ob sie fürs ganze Fachgebiet gilt. **Ohne ausdrückliche Freigabe wird nicht gebaut.**
 
@@ -102,6 +104,7 @@ Und weiter. **Ausnahmen – hier wird angehalten:** die harten Stopps im Grundge
 2. Parallel (höchstens 3): `fachpruefer` Modus `ergebnis` (bei fachlichen Folgen), `architekt` Modus `struktur`, `reviewer` Modus `gesamt` (`<Meilenstein-Basis>..HEAD`, mit der Liste zurückgestellter Befunde).
 3. `sicherheitspruefer` bei Risiko-Auslösern und vor jedem größeren Release.
 3b. Bei Oberfläche: `designer` Modus `treue` – vergleicht per Screenshot, ob gebaut wurde, was entworfen war.
+3c. Stufe Groß mit Nutzern: `gastgeber` Modus `nachschliff` (mit den Berichten von Produktprüfer und Designer, nach dem Produktprüfer) – Vorschläge für den nächsten Auftrag, blockiert nichts.
 4. `produktpruefer` zuletzt: jede Anforderung einzeln, Anwendung starten, Screenshots Desktop + Handy bei Web-Oberflächen, Bedienbarkeit nach sieben Punkten.
 5. Befunde: **ein** `entwickler` bekommt die vollständige Liste (nicht ein Entwickler pro Befund), danach **eine** `reviewer`-Nachprüfung und die betroffenen Prüfer erneut. Was danach offen ist: Entscheidung oder Simon.
 6. Zum Schluss Schranke im Hauptordner mit `--rolle projektleiter --basis <Meilenstein-Basis>`: muss „OK – alles grün“ melden. Sie prüft zusätzlich, dass jede Anforderung und bei Fachsoftware jede bestätigte Fachregel einen Test hat, dass die Abnahmetests den Prüfsummen entsprechen, und führt die `meilensteinbefehle` aus (bei Fachsoftware Pflicht: Mutationstest).
@@ -117,7 +120,7 @@ Und weiter. **Ausnahmen – hier wird angehalten:** die harten Stopps im Grundge
 6. Reviewer-, Architekt- und Sicherheitsurteil, zurückgestellte Befunde, offene Risiken, bekannte Einschränkungen.
 7. Daten-, Backup-, Release- und Rollback-Hinweise, falls relevant.
 8. Offene Fragen aus `docs/OFFENE_FRAGEN.md`.
-9. Ideen des Produktprüfers und Fachregel-Vorschläge.
+9. Ideen des Produktprüfers und des Gastgebers (Nachschliff) und Fachregel-Vorschläge.
 10. Lektionsvorschläge mit Empfehlung (bestätigt → `/dev-team:lektion vorschlaege`).
 11. Merge nach `main` nur nach Simons Freigabe; bei Kundenprojekten `/dev-team:uebergabe`.
 12. **Ins Gehirn schreiben** (vor dem Bericht, ohne Nachfrage – das ist Teil von „fertig“):

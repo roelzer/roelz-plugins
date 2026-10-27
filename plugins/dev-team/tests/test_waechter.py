@@ -1108,5 +1108,20 @@ class Designer(Basis):
         self.assertEqual(self.lauf(self.agent("dev-team:designer", model="sonnet"))[0], 2)
 
 
+class Gastgeber(Basis):
+    def test_gastgeber_schreibt_nichts(self):
+        for datei in ("docs/wow-ideen.md", "docs/lastenheft.md", "src/app.js", "docs/DESIGN.md"):
+            e = self.schreiben(os.path.join(self.projekt, datei), "gastgeber")
+            self.assertEqual(self.lauf(e)[0], 2, datei)
+
+    def test_gastgeber_startet_nur_mit_opus(self):
+        self.assertEqual(self.lauf(self.agent("dev-team:gastgeber"))[0], 0)
+        self.assertEqual(self.lauf(self.agent("dev-team:gastgeber", model="sonnet"))[0], 2)
+
+    def test_projektleiter_schreibt_wow_ideen(self):
+        e = self.schreiben(os.path.join(self.projekt, "docs", "wow-ideen.md"), None)
+        self.assertEqual(self.lauf(e)[0], 0)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,6 +1,6 @@
 # Dev-Team – Anleitung
 
-Stand: Oktober 2026 · Version 3.7
+Stand: Oktober 2026 · Version 3.8
 
 Dieses Repo enthält zwei Plugins für Claude Code: **`dev-team`** und **`tool-scout`**. Beide enthalten kein Firmen- oder Kundenwissen und dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
 
@@ -21,10 +21,11 @@ Du sprichst immer nur mit **einer** Person, dem Projektleiter. Er **baut nicht s
 | ↳ **Rechercheur** | bei Wissenslücken | erst Recherche mit Quellen, dann in einem frischen Aufruf Gegenprüfung gegen zweite Quellen |
 | **Abwägungsrunde** | vor der Freigabe | drei unabhängige Urteile: **Fachexperte** (praxistauglich?), **Pragmatiker** (Aufwand/Nutzen?), **Langfrist-Architekt** (rächt sich das später?) |
 | **Tester** | vor dem Bauen und nach dem Bauen | schreibt **verdeckte Abnahmetests**, die der Entwickler nie sieht; danach voller Testlauf und Lücken schließen |
-| **Entwickler** | beim Bauen, einer pro Arbeitspaket | baut genau ein Paket nach Bauplan in eigenem Arbeitsordner, streng testgetrieben, bis alles grün ist, und meldet einen festen Status (FERTIG / FERTIG_MIT_BEDENKEN / BLOCKIERT / BRAUCHT_KONTEXT). **Bis zu vier parallel**, wenn der Architekt die Pakete als unabhängig markiert hat |
+| **Entwickler** | beim Bauen, einer pro Arbeitspaket | baut genau ein Paket nach Bauplan in eigenem Arbeitsordner, streng testgetrieben, bis alles grün ist, und meldet einen festen Status (FERTIG / FERTIG_MIT_BEDENKEN / BLOCKIERT / BRAUCHT_KONTEXT). **Bis zu drei parallel**, wenn der Architekt die Pakete als unabhängig markiert hat |
 | **Reviewer** | nach jedem Paket, nach jeder Nachbesserung und am Meilenstein-Ende | glaubt dem Bericht des Entwicklers nicht: erst „fehlt etwas, zu viel, missverstanden?“, dann „ist der Code gut?“ (verschluckte Fehler, Duplikate, Testtricks, Sicherheit); bei Nachbesserungen je Befund „behoben / nicht behoben“ |
 | **Sicherheitsprüfer** | bei Login, Rechten, sensiblen Daten, Server, Updates, großen Releases | Angriffswege, Datenschutz, Scanner, typische KI-Schwächen |
 | **Designer** | bei Projekten mit Oberfläche, vor dem Bauen und vor der Abnahme | **gestaltet die Oberfläche, bevor gebaut wird**: eine klare Gestaltungsrichtung, Abläufe, jeden Bildschirm mit allen Zuständen (leer, laden, Fehler, Handy), Farben/Schrift/Abstände als Vorgabe; prüft nach dem Bauen per Screenshot, ob so gebaut wurde. Schreibt keinen Code |
+| **Gastgeber** | beim Planen (und bei großen Aufträgen nach dem Bauen) | **denkt an das, woran du nicht denkst** – wie ein 5-Sterne-Hotel oder Emirates: geht die ganze Nutzerreise durch (erster Start, Höhepunkt, Fehler, Abschluss, Weitergeben), greift Nebensätze aus dem Lastenheft auf und schlägt höchstens drei Wow-Momente vor, je mit Aufwand und Prüfkriterium. Du wählst aus; Gewähltes wird eine normale Anforderung mit Test. Fehlende Grundfunktionen meldet er getrennt als Lücke. Auch einzeln: `/dev-team:wow` |
 | **Produktprüfer** | zum Schluss | jede Anforderung mit Nachweis abnehmen, Anwendung starten, Screenshots Desktop und Handy |
 | **Auditor** | auf Wunsch (`/dev-team:audit`) | prüft das Team oder ein Projekt unabhängig, bewertet 1–10; behebt selbst nichts |
 | Tool-Scout | wenn du willst | fremde Plugins/Skills prüfen, bevor du sie installierst |
@@ -167,6 +168,7 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
 | `/dev-team:neues-projekt <name>` | neues Projekt mit Struktur anlegen |
 | `/dev-team:projekt-aufnehmen` | bestehendes Projekt (z. B. SiRo) ins Dev-Team holen |
 | `/dev-team:recherche <Thema>` | Fachgrundlagen recherchieren |
+| `/dev-team:wow <Idee \| Projekt \| nachschliff>` | Wow-Effekt finden: woran hat noch niemand gedacht? (Gastgeber) |
 | `/dev-team:lektion <…>` | Lektion aus einem Fehler festhalten |
 | `/dev-team:lektion vorschlaege` | gesammelte Lektionsvorschläge eines Projekts übernehmen |
 | `/dev-team:audit plugin\|projekt` | unabhängiges Audit, Behebung, Nachprüfung durch frischen Auditor |
