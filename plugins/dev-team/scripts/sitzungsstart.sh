@@ -39,8 +39,21 @@ fi
 gehirn=""
 [ -f "$global" ] && gehirn="$(grep -m 1 '^Gehirn:' "$global" 2>/dev/null | sed 's/^Gehirn:[[:space:]]*//' | tr '\\' '/' | tr -d '\r')"
 if [ -n "$gehirn" ] && [ -f "$gehirn/00 Start.md" ]; then
+  # Erst den neuesten Stand holen (anderer Laptop, Obsidian evtl. zu). Höchstens 8 Sekunden, nie nachfragen,
+  # eigene Änderungen werden beiseitegelegt und wieder aufgesetzt. Klappt es nicht: lokaler Stand, mit Hinweis.
+  abgleich="nicht abgeglichen (kein Netz, kein Remote oder Konflikt) – es gilt der lokale Stand"
+  if git -C "$gehirn" remote 2>/dev/null | grep -q . && command -v timeout >/dev/null 2>&1; then
+    if [ -d "$gehirn/.git/rebase-merge" ] || [ -d "$gehirn/.git/rebase-apply" ] || [ -f "$gehirn/.git/MERGE_HEAD" ]; then
+      abgleich="nicht abgeglichen: im Gehirn läuft noch ein Zusammenführen (in Obsidian oder per git lösen)"
+    elif GIT_TERMINAL_PROMPT=0 GCM_INTERACTIVE=never timeout 8 git -C "$gehirn" pull --rebase --autostash -q >/dev/null 2>&1; then
+      abgleich="abgeglichen mit GitHub"
+    else
+      git -C "$gehirn" rebase --abort >/dev/null 2>&1
+    fi
+  fi
   echo
   echo "## Gehirn (Obsidian-Tresor): $gehirn"
+  echo "Stand: $abgleich."
   echo "Alles, was das Team dauerhaft lernt oder über Projekte weiß, kommt ins Gehirn – über"
   echo "python3 \"$plugin_fwd/scripts/gehirn.py\" (projekt | lektion | entscheidung | wissen). Fachwissen: $gehirn/02 Wissen/"
   gl="$gehirn/05 Lektionen/Dev-Team-Lektionen.md"

@@ -140,5 +140,37 @@ class Gehirn(unittest.TestCase):
             self.assertIn("Gehirn: " + self.w.replace("\\", "/"), f.read())
 
 
+class GehirnAbgleich(unittest.TestCase):
+    """Sitzungsstart holt Lektionen, die auf dem anderen Laptop geschrieben wurden."""
+
+    def test_zweiter_laptop_bekommt_neue_lektion(self):
+        with tempfile.TemporaryDirectory() as t:
+            quelle = os.path.join(t, "start")
+            os.makedirs(os.path.join(quelle, "05 Lektionen"))
+            with open(os.path.join(quelle, "00 Start.md"), "w", encoding="utf-8") as f:
+                f.write("# Start\n")
+            git(quelle, "init", "-q")
+            git(quelle, "-c", "user.name=t", "-c", "user.email=t@t", "add", "-A")
+            git(quelle, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "start")
+            remote = os.path.join(t, "remote.git")
+            subprocess.run(["git", "clone", "-q", "--bare", quelle, remote], check=True)
+            a, b = os.path.join(t, "a"), os.path.join(t, "b")
+            subprocess.run(["git", "clone", "-q", remote, a], check=True)
+            subprocess.run(["git", "clone", "-q", remote, b], check=True)
+            r = subprocess.run([sys.executable, SKRIPT, "lektion", "--text", "[T] Regel von A. (T, 2026)", "--bestaetigt"],
+                               capture_output=True, text=True, env=dict(os.environ, DEV_TEAM_GEHIRN_TEST=a))
+            self.assertEqual(r.returncode, 0, r.stdout)
+            heim = os.path.join(t, "heim", ".claude")
+            os.makedirs(heim)
+            with open(os.path.join(heim, "CLAUDE.md"), "w", encoding="utf-8") as f:
+                f.write("<!-- dev-team START -->\nGehirn: %s\n@x/wissen/grundgesetz.md\n<!-- dev-team END -->\n"
+                        % b.replace("\\", "/"))
+            env = dict(os.environ, HOME=os.path.dirname(heim), CLAUDE_PLUGIN_ROOT=PLUGIN, CLAUDE_PROJECT_DIR=t)
+            aus = subprocess.run(["bash", os.path.join(PLUGIN, "scripts", "sitzungsstart.sh")], input="{}",
+                                 capture_output=True, text=True, env=env).stdout
+            self.assertIn("abgeglichen mit GitHub", aus)
+            self.assertIn("Regel von A", aus)
+
+
 if __name__ == "__main__":
     unittest.main()

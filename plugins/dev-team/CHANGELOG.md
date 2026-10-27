@@ -1,5 +1,10 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.8.1 – Gehirn beim Sitzungsstart abgleichen
+
+- Der Sitzungsstart holt das Gehirn zuerst von GitHub (höchstens 8 Sekunden, ohne Rückfragen, eigene ungespeicherte Änderungen bleiben erhalten). So gelten Lektionen vom anderen Laptop sofort, auch wenn Obsidian dort zu ist. Ohne Netz oder bei einem offenen Konflikt gilt der lokale Stand, mit Hinweis.
+- 236 automatische Tests.
+
 ## 3.8.0 – Gastgeber für den Wow-Effekt
 
 - **Neuer Agent `gastgeber`** (Opus, nur lesend): denkt an das, woran niemand gedacht hat. Modus `ideen` (Phase 2, Schritt 3c): Nutzerreise vom ersten Start bis zum Weitergeben, Nebensätze aus dem Lastenheft, höchstens drei Wow-Vorschläge mit Aufwand und Prüfkriterium; fehlende Grundanforderungen getrennt als „Lücken im Fundament“. Modus `nachschliff` (Phase 8, Stufe Groß): Verbesserungen für den nächsten Auftrag.
