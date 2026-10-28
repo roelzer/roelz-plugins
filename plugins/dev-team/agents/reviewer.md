@@ -71,7 +71,7 @@ Ob eine Stelle wirklich durch Tests abgesichert ist, belegst du mit einer Fehler
 5. Duplikate?
 6. Korrektheit und Randfälle?
 7. Testqualität?
-8. Sicherheitsmuster?
+8. Sicherheitsmuster (nur grobe Muster im Diff; die tiefe Prüfung gehört dem Sicherheitsprüfer)?
 9. Neue Abhängigkeiten?
 10. Struktur und Architektur?
 11. Projektregeln aus `CLAUDE.md` eingehalten (Benennung, Ordner, Verbote)?

@@ -1,5 +1,30 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.10.0 – Jede Frage hat einen Besitzer
+
+- **Grundgesetz „Wer prüft was“:** Sicherheit/Betrieb → Sicherheitsprüfer, Komplexität → Pragmatiker, Struktur → Architekt/Reviewer, Testqualität → Tester, Fachliches → Fachprüfer, Plan → Kritiker.
+- **Kritiker:** nur noch 8 Pflichtfragen (Sicherheit, Betrieb und Komplexität entfallen, sie gehören den Besitzern). Reviewer prüft Sicherheitsmuster nur grob.
+- **Abwägungsrunde:** einmalige Aussprache bei Widersprüchen, jeder sieht die Urteile der anderen und antwortet kurz.
+- **Rückfragen** (Entwickler → Architekt u. a.) beantwortet der Projektleiter sofort im selben Schritt.
+- Entwickler und Tester sowie die prüfenden Rollen untereinander reden weiterhin nie direkt.
+
+## 3.9.1 – Lücken fallen auf
+
+- **Fehlerbehebung Wächter:** Das Werkzeug `SubagentHandback` (Berichtsrückgabe nur lesender Agenten) war gesperrt, dadurch kamen die Urteile von Kritiker und Abwägungsrunde nicht beim Projektleiter an und der Auftrag blieb stehen. Es steht jetzt in der festen Liste harmloser Werkzeuge, mit Test. Ein Eintrag in `team.json` ist nicht mehr nötig.
+- **Sicherheitsprüfer** läuft bei Stufe Normal und Groß immer, nicht mehr nur bei erkanntem Risiko-Auslöser.
+- **Auslöser-Checkliste:** Der Plan führt jeden Risiko-Auslöser mit ja/nein und Begründung; der Kritiker prüft sie (neue Pflichtfrage 11).
+- **Kritiker, Frage 2:** unbelegte Annahmen und Fachwissen-Lücken einzeln auflisten.
+- **Fachwissen-Inventur** (Profil `fachsoftware`): vor dem Bauen Bibliothek gegen Anforderungen abgleichen; Berechnungen ohne bestätigte Regel werden nicht gebaut; jede Lücke geht automatisch an den Rechercheur, das Ergebnis steht sofort als „Vorgeschlagen“ im Gehirn, Simon bestätigt nur noch.
+- **Designer** prüft jedes Paket mit Oberflächenänderung vor dem Merge (Aussehen, Anordnung, bei Bedarf neu anordnen), auch bei Excel- und AutoCAD-Oberflächen. Die Ausnahme aus 3.9.0 ist zurückgenommen.
+
+## 3.9.0 – Schlanker Ablauf, Messung
+
+- **Messung:** `.dev-team/kennzahlen.jsonl` bekommt je Agentenlauf eine Startmarke (`ereignis: start`) und ein Ende mit Zeitstempel, Modell, Länge des Berichts sowie Zahl der Befunde „Kritisch“ und „Wichtig“ (Näherung aus dem Berichtstext). So lässt sich je Rolle ausrechnen, was sie kostet und was sie findet, bevor weiter gekürzt wird.
+- **Phase 8:** `architekt` Modus `struktur` läuft nur noch bei Stufe Groß, bei Strukturänderung im Meilenstein oder wenn ein Paketreview Strukturbefunde hatte; sonst deckt `reviewer` Modus `gesamt` die Architekturprüfung ab.
+- **Gastgeber** Modus `ideen` nur bei Stufe Groß mit Nutzern oder auf Zuruf (`/dev-team:wow`).
+- **Designer** entfällt, wenn die Oberfläche in Excel oder AutoCAD vorgegeben ist.
+- Abwägungsrunde bleibt unverändert (Simons Vorgabe).
+
 ## 3.8.2 – Einrichten auf einem frischen Rechner
 
 - `/dev-team:einrichten privat` bricht mit Gehirn nicht mehr ab, wenn das Plugin als Kopie im Cache liegt (Lektionen kommen aus dem Gehirn).

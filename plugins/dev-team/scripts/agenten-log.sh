@@ -61,6 +61,10 @@ if [ "$ereignis" = "start" ]; then
   [ -n "$agent" ] || agent="general-purpose"
   auftrag="$(feld tool_input.description | saeubern)"
   echo "| $zeit | ▶ | $agent | $auftrag |" >> "$log" 2>/dev/null
+  # Startmarke für die Laufzeitmessung (Ende minus Start je Rolle)
+  mkdir -p "$projekt/.dev-team" 2>/dev/null
+  printf '{"ereignis":"start","ts":%s,"agent":"%s"}\n' "$(date +%s)" "$(printf '%s' "$agent" | tr -cd 'a-z-')" \
+    >> "$projekt/.dev-team/kennzahlen.jsonl" 2>/dev/null
 else
   agent="$(feld agent_type)"
   agent="${agent#dev-team:}"
@@ -97,7 +101,12 @@ else
   echo "| $zeit | ■ $ampel | $agent | $erste ([Bericht]($bericht_rel)) |" >> "$log" 2>/dev/null
   # Kennzahl je Agentenlauf (für die Messung von Nutzen und Kosten je Rolle)
   mkdir -p "$projekt/.dev-team" 2>/dev/null
-  printf '{"zeit":"%s","agent":"%s","id":"%s","ampel":"%s","zeichen":%s}\n' "$zeit" "$agent" "${kennung:-x}" "$ampel" \
-    "$(printf '%s' "$nachricht" | wc -c | tr -d ' ')" >> "$projekt/.dev-team/kennzahlen.jsonl" 2>/dev/null
+  # Wirkung (Näherung): Zeilen mit "Kritisch"/"Wichtig" als Befund-Überschrift oder Listenpunkt.
+  n_kritisch="$(printf '%s\n' "$nachricht" | grep -ciE '^[[:space:]]*([-*#]+|[0-9]+\.)[[:space:]]*\**kritisch' 2>/dev/null)"
+  n_wichtig="$(printf '%s\n' "$nachricht" | grep -ciE '^[[:space:]]*([-*#]+|[0-9]+\.)[[:space:]]*\**wichtig' 2>/dev/null)"
+  modell="$(feld model | tr -cd 'A-Za-z0-9._-' | cut -c1-40)"
+  printf '{"ereignis":"ende","zeit":"%s","ts":%s,"agent":"%s","id":"%s","modell":"%s","ampel":"%s","zeichen":%s,"kritisch":%s,"wichtig":%s}\n' \
+    "$zeit" "$(date +%s)" "$agent" "${kennung:-x}" "$modell" "$ampel" \
+    "$(printf '%s' "$nachricht" | wc -c | tr -d ' ')" "${n_kritisch:-0}" "${n_wichtig:-0}" >> "$projekt/.dev-team/kennzahlen.jsonl" 2>/dev/null
 fi
 exit 0

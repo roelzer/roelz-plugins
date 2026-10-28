@@ -12,7 +12,7 @@ Eine Tafel neben dem Chat, die zeigt, was das Dev-Team gerade macht:
 Die Tafel liest nur. Sie ändert nichts am Projekt und blockiert nichts; fällt sie aus, arbeitet das Team normal weiter.
 
 ## Einschalten
-1. Im Plugin-Repo `git pull`, dann `claude plugin marketplace update roelz-plugins`.
+1. `claude plugin marketplace update roelz-plugins` (holt die neueste Version von GitHub).
 2. `claude plugin install dev-team-tafel@roelz-plugins`
 3. Claude Code bzw. VS Code neu starten. Die Tafel öffnet sich beim Start; sonst `/tafel` eingeben.
 

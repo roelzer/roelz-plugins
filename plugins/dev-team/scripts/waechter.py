@@ -56,6 +56,9 @@ HARMLOS_STANDARD = {
     "ReadMcpResourceTool", "SendMessage", "ListAgents", "PushNotification", "ReportFindings",
     "ReadNotifications", "ListPlugins", "ListSkills", "SearchSkills", "ListConnectors", "SearchMcpRegistry",
     "CronList", "TaskGet", "ReadMcpResourceDirTool", "EnterWorktree", "ExitWorktree",
+    # Gibt nur den Bericht eines Agenten an den Projektleiter zurück. Ohne ihn kommen die Urteile der
+    # nur lesenden Agenten (Kritiker, Abwägungsrunde, Prüfer) nie an.
+    "SubagentHandback",
 }
 MCP_LESEND = re.compile(r"(^|_)(get|list|search|read|fetch|find|query|view|describe|show|lookup|current|recent|"
                         r"approximate|conversation|count|check|status|preview|inspect|browse|resolve)(_|$|[A-Z])")

@@ -13,10 +13,10 @@ Gearbeitet wird **ausschließlich** mit den Agenten aus `team.json` im Plugin-Or
 
 | Phase | Agenten |
 |---|---|
-| Planen | `architekt` (Entwurf), `designer` (Entwurf, bei Oberfläche), `gastgeber` (Wow-Ideen, bei Nutzern), `kritiker`, `fachpruefer`, `sicherheitspruefer`, `rechercheur` |
+| Planen | `architekt` (Entwurf), `designer` (Entwurf, bei Oberfläche), `gastgeber` (Wow-Ideen, Stufe Groß mit Nutzern oder auf Zuruf), `kritiker`, `fachpruefer`, `sicherheitspruefer`, `rechercheur` |
 | Abwägen | `fachexperte`, `pragmatiker`, `langfrist-architekt` |
 | Bauen | `entwickler` (ein Paket pro Aufruf, bis zu 3 parallel), `reviewer` (Paket-Review, Nachprüfung) |
-| Prüfen | `tester`, `fachpruefer`, `architekt` (Struktur), `designer` (Treue, bei Oberfläche), `reviewer` (gesamt), `sicherheitspruefer`, `produktpruefer`, `gastgeber` (Nachschliff, Stufe Groß) |
+| Prüfen | `tester`, `fachpruefer`, `architekt` (Struktur, Stufe Groß oder bei Strukturänderung), `designer` (Treue, bei Oberfläche), `reviewer` (gesamt), `sicherheitspruefer`, `produktpruefer`, `gastgeber` (Nachschliff, Stufe Groß) |
 | Außerhalb | `auditor` |
 
 - **Keine Helfer.** Keine eingebauten Agenten (Explore, Plan, general-purpose …), keine Agenten ohne Namen, keine selbst erfundenen oder selbst angelegten Agenten, keine Teammates, kein Workflow-Werkzeug. Agenten-Aufrufe, Skills mit eigenen Agenten und Workflows sind technisch gesperrt (Wächter-Hook und Projekteinstellungen). Werkzeuge, die der Wächter nicht kennt, sind in Dev-Team-Projekten gesperrt. Neue Claude-Sitzungen über die Shell sind blockiert, über die Shell bleibt aber eine Restlücke (siehe „Wer darf was schreiben“).
@@ -67,13 +67,27 @@ Steht in `.claude/dev-team.json` (`"profil"`):
 ## Ablauf (Stufe Normal und Groß) – Details im Skill `/dev-team:auftrag`
 1. **Verstehen:** Anforderungen A1 … → **Stopp 1**, Simon bestätigt.
 2. **Planen:** du schreibst `docs/plan.md`, der `architekt` entwirft das Architektur-Rückgrat, die Architekturtests, den Paketschnitt und einen **Bauplan je Paket** (Dateien, exakte Schnittstellen, Tests, Randfälle). Tragende Architekturentscheidungen legt er Simon mit Alternativen vor.
-3. **Planprüfung:** `kritiker`, `fachpruefer` (fachliche Folgen), `sicherheitspruefer` (Auslöser); bei Wissenslücken `rechercheur`.
+3. **Planprüfung:** `kritiker`, `fachpruefer` (fachliche Folgen), `sicherheitspruefer` (bei Normal und Groß immer, bei Klein mit Auslöser); bei Wissenslücken `rechercheur`. Dazu Pflicht: Auslöser-Checkliste im Plan und bei Fachsoftware die Fachwissen-Inventur.
 4. **Abwägungsrunde:** `fachexperte`, `pragmatiker`, `langfrist-architekt`, unabhängig und parallel.
 5. **Freigabe** durch Simon → **Stopp 2**. Erst dann wird gebaut.
 6. **Verdeckte Abnahmetests:** `tester` schreibt sie aus den Anforderungen, bevor gebaut wird. Der Entwickler sieht sie nie.
 7. **Bauen:** je Paket ein `entwickler` in eigenem Worktree, bis zu drei parallel bei überschneidungsfreien Paketen; `reviewer` prüft jedes Paket vor dem Merge (erst Plan-Treue, dann Qualität); Fix-Schleife mit höchstens 5 Runden; nach jedem Merge Test-Schranke.
 8. **Prüfen** je Meilenstein: `tester` (deckt Abnahmetests auf) → `fachpruefer` → `architekt` (Struktur) → `reviewer` (gesamt) → `sicherheitspruefer` → `produktpruefer`.
 9. **Bericht** an Simon → **Stopp 3**.
+
+## Wer prüft was (jede Frage hat einen Besitzer)
+Damit nichts doppelt oder dreifach geprüft wird, fragt je Thema genau eine Rolle gründlich; die anderen verlassen sich darauf oder prüfen nur den Rand.
+
+| Thema | Besitzer | Andere |
+|---|---|---|
+| Sicherheit, Datenschutz, Betrieb (Backup, Update, Rollback) | `sicherheitspruefer` | Kritiker prüft nur die Auslöser-Checkliste, Reviewer nur grobe Muster im Diff |
+| Komplexität, Kosten, Anbieterbindung | `pragmatiker` | – |
+| Struktur und Architektur | `architekt` entwirft; `reviewer` prüft den Code dagegen | `langfrist-architekt` bewertet nur Haltbarkeit |
+| Testqualität | `tester` | Kritiker prüft nur, ob die Abnahmekriterien Sonderfall-Code zulassen; Reviewer, ob ein Test echtes Verhalten prüft |
+| Fachliche Richtigkeit | `fachpruefer` | `fachexperte` bewertet nur die Alltagstauglichkeit |
+| Plan vollständig und tragfähig | `kritiker` | – |
+
+**Wer miteinander reden darf:** Entwickler und Tester nie; prüfende Rollen (Kritiker, Reviewer, Sicherheitsprüfer, Produktprüfer) nie untereinander. Rückfragen des Entwicklers an den Architekten und Absprachen der Planungsgruppe (Architekt, Designer, Fachprüfer, Rechercheur) beantwortet der Projektleiter **sofort im selben Schritt** (siehe Skill auftrag), ohne den Ablauf neu zu starten. Die Abwägungsrunde hat eine Aussprache (Skill auftrag, Phase 4).
 
 ## Alle Tests grün – mechanisch belegt
 - „Grün“ heißt: Die **Test-Schranke** (`scripts/pruefe-tests.sh`) meldet „OK – alles grün“. Sie führt den Testbefehl und die Zusatzbefehle aus `.claude/dev-team.json` aus und prüft außerdem: keine übersprungenen oder exklusiven Tests, keine geänderten Referenzfälle, keine gelöschten Tests, nicht weniger Tests als beim letzten grünen Lauf, keine 0-Tests-Läufe, Entwickler hat keine bestehenden Tests oder Testkonfiguration angefasst. Nach jedem Merge prüft der Projektleiter das mit `--rolle merge --basis HEAD^1`. Tests, die das Testwerkzeug selbst verändern (assert-Methoden überschreiben, `except AssertionError`, `sys.exit` im Test), und geänderte Testeinstellungen in `pyproject.toml`/`package.json` sind ebenfalls rot. Bei geänderten Manifesten oder Lockfiles läuft die Abhängigkeits-Schranke automatisch mit.
