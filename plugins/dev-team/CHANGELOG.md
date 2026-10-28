@@ -1,5 +1,13 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.9.1 – Lücken fallen auf
+
+- **Sicherheitsprüfer** läuft bei Stufe Normal und Groß immer, nicht mehr nur bei erkanntem Risiko-Auslöser.
+- **Auslöser-Checkliste:** Der Plan führt jeden Risiko-Auslöser mit ja/nein und Begründung; der Kritiker prüft sie (neue Pflichtfrage 11).
+- **Kritiker, Frage 2:** unbelegte Annahmen und Fachwissen-Lücken einzeln auflisten.
+- **Fachwissen-Inventur** (Profil `fachsoftware`): vor dem Bauen Bibliothek gegen Anforderungen abgleichen; Berechnungen ohne bestätigte Regel werden nicht gebaut; jede Lücke geht automatisch an den Rechercheur, das Ergebnis steht sofort als „Vorgeschlagen“ im Gehirn, Simon bestätigt nur noch.
+- **Designer** prüft jedes Paket mit Oberflächenänderung vor dem Merge (Aussehen, Anordnung, bei Bedarf neu anordnen), auch bei Excel- und AutoCAD-Oberflächen. Die Ausnahme aus 3.9.0 ist zurückgenommen.
+
 ## 3.9.0 – Schlanker Ablauf, Messung
 
 - **Messung:** `.dev-team/kennzahlen.jsonl` bekommt je Agentenlauf eine Startmarke (`ereignis: start`) und ein Ende mit Zeitstempel, Modell, Länge des Berichts sowie Zahl der Befunde „Kritisch“ und „Wichtig“ (Näherung aus dem Berichtstext). So lässt sich je Rolle ausrechnen, was sie kostet und was sie findet, bevor weiter gekürzt wird.

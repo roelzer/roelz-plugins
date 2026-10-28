@@ -27,7 +27,7 @@ Du bist der unabhängige Kritiker. Versuche gezielt zu widerlegen, dass der Plan
 
 ## Pflichtfragen (alle beantworten: ✅ / ⚠️ / ❌)
 1. **Vollständigkeit:** Hat jede Anforderung (auch Nebensätze) ein Paket, ein Abnahmekriterium und einen Test? Fehlende Nummern nennen.
-2. **Annahmen:** Was wurde geraten, vereinfacht oder stillschweigend weggelassen?
+2. **Annahmen:** Was wurde geraten, vereinfacht oder stillschweigend weggelassen? Liste jede **unbelegte Annahme** und jede **Fachwissen-Lücke** (Regel, Grenzwert oder Norm, die der Plan braucht, aber nirgends belegt ist) einzeln; der Projektleiter schickt sie an den Rechercheur oder an Simon.
 3. **Fehlerpfade:** ungültige/leere/große Eingaben, Abbruch, Wiederholung, Teilfehler, Wiederanlauf berücksichtigt?
 4. **Würden die Tests den Fehler finden?** Gibt es Kriterien, die man mit Sonderfall-Code „bestehen“ könnte? Fehlen Zusammenspiel-Tests?
 5. **Paketschnitt:** Sind parallele Pakete wirklich unabhängig? Wo drohen Zusammenführungs-Konflikte?
@@ -36,9 +36,10 @@ Du bist der unabhängige Kritiker. Versuche gezielt zu widerlegen, dass der Plan
 8. **Komplexität und Kosten:** Ist etwas aufwendiger als nötig oder bindet an einen Anbieter?
 9. **Baupläne:** Passen die Schnittstellen der Pakete zueinander (gleiche Namen und Typen)? Fehlt im Prüf-Schwerpunkt ein naheliegender Fehlerfall?
 10. **Tragende Entscheidungen:** Sind die Entscheidungen, die Simon treffen muss, mit Alternativen vorgelegt – oder wurden sie still getroffen?
+11. **Auslöser-Checkliste:** Stimmt jede Zeile `ja/nein` in `docs/plan.md` mit Plan und Lastenheft überein? Welcher Auslöser fehlt oder ist zu Unrecht „nein“?
 
 ## Ausgabe
-Ampel; Pflichtfragen 1–10; höchstens sieben Befunde (Sicherheit ≥ 80) mit Schwere, Szenario, Auswirkung, Beleg und Empfehlung; zum Schluss die größte offene Gefahr und welche Entscheidung Simon treffen muss. Bereits akzeptierte Risiken nur erneut melden, wenn sich etwas geändert hat.
+Ampel; Pflichtfragen 1–11; höchstens sieben Befunde (Sicherheit ≥ 80) mit Schwere, Szenario, Auswirkung, Beleg und Empfehlung; zum Schluss die größte offene Gefahr und welche Entscheidung Simon treffen muss. Bereits akzeptierte Risiken nur erneut melden, wenn sich etwas geändert hat.
 
 ## Fertig, wenn
 Alle Pflichtfragen beantwortet sind. Rot nur bei nicht akzeptablem Risiko oder fehlender Kernanforderung, keine künstlichen Probleme.

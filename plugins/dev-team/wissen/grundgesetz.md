@@ -67,7 +67,7 @@ Steht in `.claude/dev-team.json` (`"profil"`):
 ## Ablauf (Stufe Normal und Groß) – Details im Skill `/dev-team:auftrag`
 1. **Verstehen:** Anforderungen A1 … → **Stopp 1**, Simon bestätigt.
 2. **Planen:** du schreibst `docs/plan.md`, der `architekt` entwirft das Architektur-Rückgrat, die Architekturtests, den Paketschnitt und einen **Bauplan je Paket** (Dateien, exakte Schnittstellen, Tests, Randfälle). Tragende Architekturentscheidungen legt er Simon mit Alternativen vor.
-3. **Planprüfung:** `kritiker`, `fachpruefer` (fachliche Folgen), `sicherheitspruefer` (Auslöser); bei Wissenslücken `rechercheur`.
+3. **Planprüfung:** `kritiker`, `fachpruefer` (fachliche Folgen), `sicherheitspruefer` (bei Normal und Groß immer, bei Klein mit Auslöser); bei Wissenslücken `rechercheur`. Dazu Pflicht: Auslöser-Checkliste im Plan und bei Fachsoftware die Fachwissen-Inventur.
 4. **Abwägungsrunde:** `fachexperte`, `pragmatiker`, `langfrist-architekt`, unabhängig und parallel.
 5. **Freigabe** durch Simon → **Stopp 2**. Erst dann wird gebaut.
 6. **Verdeckte Abnahmetests:** `tester` schreibt sie aus den Anforderungen, bevor gebaut wird. Der Entwickler sieht sie nie.
