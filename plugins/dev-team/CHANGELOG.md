@@ -2,6 +2,7 @@
 
 ## 3.9.1 – Lücken fallen auf
 
+- **Fehlerbehebung Wächter:** Das Werkzeug `SubagentHandback` (Berichtsrückgabe nur lesender Agenten) war gesperrt, dadurch kamen die Urteile von Kritiker und Abwägungsrunde nicht beim Projektleiter an und der Auftrag blieb stehen. Es steht jetzt in der festen Liste harmloser Werkzeuge, mit Test. Ein Eintrag in `team.json` ist nicht mehr nötig.
 - **Sicherheitsprüfer** läuft bei Stufe Normal und Groß immer, nicht mehr nur bei erkanntem Risiko-Auslöser.
 - **Auslöser-Checkliste:** Der Plan führt jeden Risiko-Auslöser mit ja/nein und Begründung; der Kritiker prüft sie (neue Pflichtfrage 11).
 - **Kritiker, Frage 2:** unbelegte Annahmen und Fachwissen-Lücken einzeln auflisten.

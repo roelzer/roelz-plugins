@@ -974,6 +974,10 @@ class PilotReibung(Basis):
     def test_neue_harmlose_werkzeuge(self):
         self.assertEqual(self.lauf({"tool_name": "ReadNotifications", "tool_input": {}})[0], 0)
 
+    def test_berichtsrueckgabe_der_agenten_nie_gesperrt(self):
+        # Nur lesende Agenten geben ihren Bericht darüber ab; ein Sperren stoppt das ganze Team.
+        self.assertEqual(self.lauf({"tool_name": "SubagentHandback", "tool_input": {"report": "x"}})[0], 0)
+
     def test_entwickler_heredoc_inhalt_ist_kein_lesezugriff(self):
         wt = os.path.join(self.projekt, ".claude", "worktrees", "p1")
         git(self.projekt, "worktree", "add", "-q", wt, "-b", "p1")
