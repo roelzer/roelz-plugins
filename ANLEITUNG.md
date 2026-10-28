@@ -1,6 +1,6 @@
 # Dev-Team – Anleitung
 
-Stand: Oktober 2026 · Version 3.8
+Stand: Oktober 2026 · Version 3.9
 
 Dieses Repo enthält zwei Plugins für Claude Code: **`dev-team`** und **`tool-scout`**. Beide enthalten kein Firmen- oder Kundenwissen und dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
 
@@ -25,7 +25,7 @@ Du sprichst immer nur mit **einer** Person, dem Projektleiter. Er **baut nicht s
 | **Reviewer** | nach jedem Paket, nach jeder Nachbesserung und am Meilenstein-Ende | glaubt dem Bericht des Entwicklers nicht: erst „fehlt etwas, zu viel, missverstanden?“, dann „ist der Code gut?“ (verschluckte Fehler, Duplikate, Testtricks, Sicherheit); bei Nachbesserungen je Befund „behoben / nicht behoben“ |
 | **Sicherheitsprüfer** | bei Login, Rechten, sensiblen Daten, Server, Updates, großen Releases | Angriffswege, Datenschutz, Scanner, typische KI-Schwächen |
 | **Designer** | bei Projekten mit Oberfläche, vor dem Bauen und vor der Abnahme | **gestaltet die Oberfläche, bevor gebaut wird**: eine klare Gestaltungsrichtung, Abläufe, jeden Bildschirm mit allen Zuständen (leer, laden, Fehler, Handy), Farben/Schrift/Abstände als Vorgabe; prüft nach dem Bauen per Screenshot, ob so gebaut wurde. Schreibt keinen Code |
-| **Gastgeber** | beim Planen (und bei großen Aufträgen nach dem Bauen) | **denkt an das, woran du nicht denkst** – wie ein 5-Sterne-Hotel oder Emirates: geht die ganze Nutzerreise durch (erster Start, Höhepunkt, Fehler, Abschluss, Weitergeben), greift Nebensätze aus dem Lastenheft auf und schlägt höchstens drei Wow-Momente vor, je mit Aufwand und Prüfkriterium. Du wählst aus; Gewähltes wird eine normale Anforderung mit Test. Fehlende Grundfunktionen meldet er getrennt als Lücke. Auch einzeln: `/dev-team:wow` |
+| **Gastgeber** | bei großen Aufträgen mit Nutzern (vor und nach dem Bauen) oder auf Zuruf | **denkt an das, woran du nicht denkst** – wie ein 5-Sterne-Hotel oder Emirates: geht die ganze Nutzerreise durch (erster Start, Höhepunkt, Fehler, Abschluss, Weitergeben), greift Nebensätze aus dem Lastenheft auf und schlägt höchstens drei Wow-Momente vor, je mit Aufwand und Prüfkriterium. Du wählst aus; Gewähltes wird eine normale Anforderung mit Test. Fehlende Grundfunktionen meldet er getrennt als Lücke. Auch einzeln: `/dev-team:wow` |
 | **Produktprüfer** | zum Schluss | jede Anforderung mit Nachweis abnehmen, Anwendung starten, Screenshots Desktop und Handy |
 | **Auditor** | auf Wunsch (`/dev-team:audit`) | prüft das Team oder ein Projekt unabhängig, bewertet 1–10; behebt selbst nichts |
 | Tool-Scout | wenn du willst | fremde Plugins/Skills prüfen, bevor du sie installierst |

@@ -1,5 +1,13 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.9.0 – Schlanker Ablauf, Messung
+
+- **Messung:** `.dev-team/kennzahlen.jsonl` bekommt je Agentenlauf eine Startmarke (`ereignis: start`) und ein Ende mit Zeitstempel, Modell, Länge des Berichts sowie Zahl der Befunde „Kritisch“ und „Wichtig“ (Näherung aus dem Berichtstext). So lässt sich je Rolle ausrechnen, was sie kostet und was sie findet, bevor weiter gekürzt wird.
+- **Phase 8:** `architekt` Modus `struktur` läuft nur noch bei Stufe Groß, bei Strukturänderung im Meilenstein oder wenn ein Paketreview Strukturbefunde hatte; sonst deckt `reviewer` Modus `gesamt` die Architekturprüfung ab.
+- **Gastgeber** Modus `ideen` nur bei Stufe Groß mit Nutzern oder auf Zuruf (`/dev-team:wow`).
+- **Designer** entfällt, wenn die Oberfläche in Excel oder AutoCAD vorgegeben ist.
+- Abwägungsrunde bleibt unverändert (Simons Vorgabe).
+
 ## 3.8.2 – Einrichten auf einem frischen Rechner
 
 - `/dev-team:einrichten privat` bricht mit Gehirn nicht mehr ab, wenn das Plugin als Kopie im Cache liegt (Lektionen kommen aus dem Gehirn).
