@@ -75,6 +75,20 @@ Steht in `.claude/dev-team.json` (`"profil"`):
 8. **Prüfen** je Meilenstein: `tester` (deckt Abnahmetests auf) → `fachpruefer` → `architekt` (Struktur) → `reviewer` (gesamt) → `sicherheitspruefer` → `produktpruefer`.
 9. **Bericht** an Simon → **Stopp 3**.
 
+## Wer prüft was (jede Frage hat einen Besitzer)
+Damit nichts doppelt oder dreifach geprüft wird, fragt je Thema genau eine Rolle gründlich; die anderen verlassen sich darauf oder prüfen nur den Rand.
+
+| Thema | Besitzer | Andere |
+|---|---|---|
+| Sicherheit, Datenschutz, Betrieb (Backup, Update, Rollback) | `sicherheitspruefer` | Kritiker prüft nur die Auslöser-Checkliste, Reviewer nur grobe Muster im Diff |
+| Komplexität, Kosten, Anbieterbindung | `pragmatiker` | – |
+| Struktur und Architektur | `architekt` entwirft; `reviewer` prüft den Code dagegen | `langfrist-architekt` bewertet nur Haltbarkeit |
+| Testqualität | `tester` | Kritiker prüft nur, ob die Abnahmekriterien Sonderfall-Code zulassen; Reviewer, ob ein Test echtes Verhalten prüft |
+| Fachliche Richtigkeit | `fachpruefer` | `fachexperte` bewertet nur die Alltagstauglichkeit |
+| Plan vollständig und tragfähig | `kritiker` | – |
+
+**Wer miteinander reden darf:** Entwickler und Tester nie; prüfende Rollen (Kritiker, Reviewer, Sicherheitsprüfer, Produktprüfer) nie untereinander. Rückfragen des Entwicklers an den Architekten und Absprachen der Planungsgruppe (Architekt, Designer, Fachprüfer, Rechercheur) beantwortet der Projektleiter **sofort im selben Schritt** (siehe Skill auftrag), ohne den Ablauf neu zu starten. Die Abwägungsrunde hat eine Aussprache (Skill auftrag, Phase 4).
+
 ## Alle Tests grün – mechanisch belegt
 - „Grün“ heißt: Die **Test-Schranke** (`scripts/pruefe-tests.sh`) meldet „OK – alles grün“. Sie führt den Testbefehl und die Zusatzbefehle aus `.claude/dev-team.json` aus und prüft außerdem: keine übersprungenen oder exklusiven Tests, keine geänderten Referenzfälle, keine gelöschten Tests, nicht weniger Tests als beim letzten grünen Lauf, keine 0-Tests-Läufe, Entwickler hat keine bestehenden Tests oder Testkonfiguration angefasst. Nach jedem Merge prüft der Projektleiter das mit `--rolle merge --basis HEAD^1`. Tests, die das Testwerkzeug selbst verändern (assert-Methoden überschreiben, `except AssertionError`, `sys.exit` im Test), und geänderte Testeinstellungen in `pyproject.toml`/`package.json` sind ebenfalls rot. Bei geänderten Manifesten oder Lockfiles läuft die Abhängigkeits-Schranke automatisch mit.
 - Übersprungene oder offene Tests im Testlauf, neue Tests ohne eine einzige Prüfung und Änderungen an `.claude/dev-team.json` sind ebenfalls rot. Geänderte Abnahmetests (gegen `docs/ABNAHME_PRUEFSUMMEN.txt`) sind rot. Am Meilenstein-Ende (`--rolle projektleiter`) zusätzlich: jede Anforderung (A-Nummer) und bei Fachsoftware jede bestätigte Fachregel (F-Nummer, auch R-Nummer wird erkannt) hat einen Test, und die `meilensteinbefehle` (Mutationstest) sind grün.

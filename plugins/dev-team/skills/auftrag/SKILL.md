@@ -52,6 +52,7 @@ Nach der Tabelle und den Risiko-Auslösern im Grundgesetz, nach Risiko, nicht na
 
 ## Phase 4 – Abwägungsrunde (Normal und Groß: immer)
 - `fachexperte`, `pragmatiker`, `langfrist-architekt` **parallel**, je mit Lastenheft, Plan, `docs/ARCHITEKTUR.md`, Kritiker- und Fachprüfer-Bericht, ohne die Urteile der anderen.
+- **Aussprache (einmal):** Gibt es Widersprüche zwischen den dreien, bekommt jeder die beiden anderen Urteile wörtlich (Nachricht an den bereits fertigen Agenten) und antwortet kurz: Position beibehalten oder ändern, mit Grund. Danach nicht noch eine Runde.
 - Zusammenfassen: Einigkeit, Widersprüche, deine begründete Empfehlung. Gesamtampel: 🔴 sobald einer 🔴; 🟢 nur wenn alle 🟢; sonst 🟡. Kritische Sicherheits-, Datenintegritäts- oder Fachregel-Befunde werden nicht überstimmt.
 
 ## Phase 5 – Freigabe
@@ -83,7 +84,7 @@ Nach „Eigenständig bauen“ und „Grenzen der Autonomie“ im Grundgesetz.
 3. **Status des Entwicklers auswerten:**
    - **FERTIG:** Branch, vollständiger Commit-Hash, Worktree-Pfad und Schranken-Zeile müssen da sein; im Log darf keine Zeile „Fertigmeldung NICHT belegt“ stehen. Sonst wie BLOCKIERT behandeln.
    - **FERTIG_MIT_BEDENKEN:** Bedenken lesen. Betreffen sie Richtigkeit oder Umfang: vor dem Review klären (Architekt fragen oder Entscheidung treffen). Sonst notieren und weiter zum Review.
-   - **BRAUCHT_KONTEXT:** fehlende Angaben liefern, denselben Entwickler fortsetzen (Nachricht an ihn) oder neu beauftragen.
+   - **BRAUCHT_KONTEXT:** Rückfrage an den `architekt` (bzw. Fachprüfer/Designer) sofort stellen und die Antwort wörtlich zurückgeben, im selben Schritt; fehlende Angaben liefern, denselben Entwickler fortsetzen (Nachricht an ihn) oder neu beauftragen.
    - **BLOCKIERT:** Ist es Kontext → liefern. Ist das Paket zu groß → Architekt teilt es. Ist der Bauplan falsch → Architekt korrigiert. Nie denselben Auftrag unverändert wiederholen.
 4. **Paket mit Oberflächenänderung:** vor dem Merge zusätzlich → `designer` Modus `treue` (Screenshots Desktop und Handy bzw. Dialog im Zielprogramm): sieht es gut aus, ist alles sinnvoll angeordnet, stimmen Abstände, Reihenfolge, Zustände? Bei Mängeln liefert er eine neue Anordnung in `docs/DESIGN.md`/`design/`; der Entwickler setzt sie um (zählt zur Fix-Schleife).
 4b. **Paket-Review vor dem Merge:** → `reviewer` Modus `paket` mit Bauplan, Anforderungen, `<Basis>..<Commit>`, Worktree-Pfad. Der Reviewer führt die Schranke mit `--rolle entwickler` selbst aus.

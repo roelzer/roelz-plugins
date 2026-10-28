@@ -1,5 +1,13 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.10.0 – Jede Frage hat einen Besitzer
+
+- **Grundgesetz „Wer prüft was“:** Sicherheit/Betrieb → Sicherheitsprüfer, Komplexität → Pragmatiker, Struktur → Architekt/Reviewer, Testqualität → Tester, Fachliches → Fachprüfer, Plan → Kritiker.
+- **Kritiker:** nur noch 8 Pflichtfragen (Sicherheit, Betrieb und Komplexität entfallen, sie gehören den Besitzern). Reviewer prüft Sicherheitsmuster nur grob.
+- **Abwägungsrunde:** einmalige Aussprache bei Widersprüchen, jeder sieht die Urteile der anderen und antwortet kurz.
+- **Rückfragen** (Entwickler → Architekt u. a.) beantwortet der Projektleiter sofort im selben Schritt.
+- Entwickler und Tester sowie die prüfenden Rollen untereinander reden weiterhin nie direkt.
+
 ## 3.9.1 – Lücken fallen auf
 
 - **Fehlerbehebung Wächter:** Das Werkzeug `SubagentHandback` (Berichtsrückgabe nur lesender Agenten) war gesperrt, dadurch kamen die Urteile von Kritiker und Abwägungsrunde nicht beim Projektleiter an und der Auftrag blieb stehen. Es steht jetzt in der festen Liste harmloser Werkzeuge, mit Test. Ein Eintrag in `team.json` ist nicht mehr nötig.

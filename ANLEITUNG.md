@@ -1,6 +1,6 @@
 # Dev-Team – Anleitung
 
-Stand: Oktober 2026 · Version 3.9
+Stand: Oktober 2026 · Version 3.10
 
 Dieses Repo enthält zwei Plugins für Claude Code: **`dev-team`** und **`tool-scout`**. Beide enthalten kein Firmen- oder Kundenwissen und dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
 
@@ -183,18 +183,19 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
 
 **Voraussetzungen:** Claude Code ab Version 2.1.295, Git für Windows (ab 2.31, mit Git Bash – ohne Git Bash laufen die Hooks nicht, und der Wächter blockiert dann mit Absicht alles), **Python 3** im PATH (python.org, Haken bei „Add python.exe to PATH“ – ohne Python blockiert der Wächter mit Absicht jede Arbeit in Dev-Team-Projekten), VS Code mit der Claude-Code-Erweiterung, Zugriff auf dein GitHub-Konto.
 
-1. **Repo klonen** (VS-Code-Terminal):
+1. **Marktplatz von GitHub hinzufügen** (gilt auf jedem Rechner gleich, das Repo ist öffentlich):
    ```
-   git clone https://github.com/roelzer/roelz-plugins.git C:/Users/<du>/roelz-plugins
+   claude plugin marketplace add roelzer/roelz-plugins
    ```
 2. **Plugins installieren:**
    ```
-   claude plugin marketplace add C:/Users/<du>/roelz-plugins
    claude plugin install dev-team@roelz-plugins
    claude plugin install tool-scout@roelz-plugins
    claude plugin install dev-team-tafel@roelz-plugins
    ```
-   Den Marktplatz **aus dem lokalen Ordner** hinzufügen, nicht direkt von GitHub. Nur so landen neue Lektionen im Repo.
+   **Automatische Updates einschalten:** in Claude Code `/plugin` → Marketplaces → `roelz-plugins` → Auto-update aktivieren. Dann holt jeder Rechner neue Versionen beim Start selbst; ein Update-Befehl ist nicht nötig (von Hand: `claude plugin marketplace update roelz-plugins`). Neue Versionen werden nur erkannt, wenn die Versionsnummer in `plugin.json` steigt, das tut sie bei jeder Änderung.
+   **Lektionen und Wissen** landen im Gehirn (`roelzer/brain`), nicht mehr im Plugin-Ordner. Deshalb braucht es keinen lokalen Klon mehr; das Gehirn richtest du in Schritt 4 pro Rechner ein.
+   *Bisher eingerichtet mit lokalem Ordner?* Einmal pro Rechner umstellen: `claude plugin marketplace remove roelz-plugins`, dann Schritt 1 und 2. Danach darfst du den alten Ordner löschen, sofern dort nichts Ungespeichertes liegt.
 3. **VS Code komplett schließen und neu öffnen.** Plugins werden nur beim Start geladen.
 4. **Einrichten:** Claude Code starten und eingeben:
    - privater Rechner: `/dev-team:einrichten privat`
@@ -224,15 +225,14 @@ Hooks aus dem Plugin oder aus den Projekteinstellungen kann ein Programm, das ei
 
 **Stand der Prüfung (27.10.2026):** Ohne verwaltete Einstellung ist die Lücke im echten Lauf bestätigt: Mit `disableAllHooks` und umgelenktem Suchpfad in `settings.local.json` konnte der Projektleiter in der nächsten Sitzung Code schreiben. Ob die verwaltete Einstellung das verhindert, ist **noch nicht live geprüft** – das Einrichten einer verwalteten Einstellung in der Cloud-Testumgebung wurde (zu Recht) von der Sicherheitsprüfung von Claude Code abgelehnt. Die Wirkung beruht auf der Claude-Code-Doku; die Probe in Schritt 5 ist der Nachweis.
 
-Ändert sich der Python-Pfad oder verschiebst du das Repo, die Datei neu erzeugen. Hinweis: Unter WSL ist der entsprechende Ordner vom Benutzer beschreibbar und schützt dort nicht.
+Ändert sich der Python-Pfad oder verschiebst du das Repo, die Datei neu erzeugen. **Achtung bei Plugin-Installation von GitHub:** Die Datei verweist auf einen Skript-Ordner. Liegt dieser im Plugin-Cache, ändert sich der Pfad mit jeder neuen Version; dann nach einem Update die Datei neu erzeugen (oder für diesen Zweck einen festen Klon des Repos behalten). Hinweis: Unter WSL ist der entsprechende Ordner vom Benutzer beschreibbar und schützt dort nicht.
 
 ## 10. Updates
 
-Wird am Dev-Team etwas geändert (neue Regel, neuer Agent), landet es auf GitHub. Auf dem anderen Rechner:
+Wird am Dev-Team etwas geändert (neue Regel, neuer Agent), landet es auf GitHub. Mit eingeschaltetem Auto-Update (Schritt 9.2) holt jeder Rechner die neue Version beim Start selbst. Von Hand:
 ```
-cd C:/Users/<du>/roelz-plugins
-git pull
 claude plugin marketplace update roelz-plugins
+claude plugin update dev-team@roelz-plugins
 ```
 Danach VS Code neu starten.
 
