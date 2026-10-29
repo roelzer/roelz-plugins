@@ -8,6 +8,7 @@ wiederverwendet (Windows: Junction, sonst Symlink). Andernfalls läuft der Setup
   python3 worktree_vorbereiten.py            # im Worktree ausführen
   python3 worktree_vorbereiten.py --trennen  # Verknüpfung lösen (z. B. vor dem Aufnehmen einer neuen
                                              # Abhängigkeit), danach läuft der Setup-Befehl im Worktree
+  python3 worktree_vorbereiten.py --nur-trennen --ordner <worktree>  # vor dem Aufräumen des Worktrees
 
 Nie `rm -rf node_modules` auf eine Verknüpfung anwenden: Das könnte den Inhalt im Hauptordner löschen.
 Ausgabe: eine Zeile, was passiert ist. Exit 0 = Worktree bereit.
@@ -96,6 +97,7 @@ def setup_ausfuehren(worktree, grund):
 def main():
     a = argparse.ArgumentParser()
     a.add_argument("--trennen", action="store_true")
+    a.add_argument("--nur-trennen", action="store_true", help="nur Verknüpfung lösen (vor git worktree remove)")
     a.add_argument("--ordner", default=os.getcwd())
     arg = a.parse_args()
     code, worktree = git(arg.ordner, "rev-parse", "--show-toplevel")
@@ -105,6 +107,13 @@ def main():
     worktree = os.path.abspath(worktree)
     nm = os.path.join(worktree, "node_modules")
 
+    if arg.nur_trennen:
+        if ist_verknuepfung(nm):
+            trennen(nm)
+            print("OK – Verknüpfung gelöst, Hauptordner unberührt.")
+        else:
+            print("OK – keine Verknüpfung vorhanden.")
+        return 0
     if arg.trennen:
         if ist_verknuepfung(nm):
             trennen(nm)

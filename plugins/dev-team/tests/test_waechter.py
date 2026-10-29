@@ -829,8 +829,11 @@ class Audit33(Basis):
         with open(skript, "w") as f:
             f.write("open('src/a.py','w')\n")
         # 3.11: keine Erlaubnisliste mehr – Skripte, curl GET, make laufen; Code-Schreiben bleibt gesperrt.
-        for befehl in ("python3 " + skript, "node " + skript, "curl -s https://x.example", "make build", "perl -e 1"):
+        for befehl in ("curl -s https://x.example", "make build", "perl -e 1"):
             self.assertEqual(self.bash(befehl), 0, befehl)
+        # Skripte an eigenen Schreiborten (hier Temp) startet der Projektleiter nicht (Review 3.11)
+        for befehl in ("python3 " + skript, "node " + skript):
+            self.assertEqual(self.bash(befehl), 2, befehl)
         for befehl in ("sort -o src/a.js x", "awk '{system(\"rm x\")}' x", "sed -i 1d src/rechnung.js", "vim -es x",
                        "script -c 'echo' /dev/null", "setsid bash -c 'echo x > src/a.js'"):
             self.assertEqual(self.bash(befehl), 2, befehl)

@@ -80,8 +80,10 @@ CHROME_LESEND = {"read_page", "get_page_text", "find", "tabs_context_mcp", "tabs
 # Werkzeuge, die Helfer, Sitzungen oder Zeitpläne außerhalb des festen Teams anlegen würden.
 NEUE_HELFER = re.compile(r"(team|cron|trigger|workflow|spawn|schedule|swarm|delegate|subagent|agent)", re.I)
 MCP_NACH_AUSSEN = re.compile(r"(send|post|publish|deploy|push|upload|merge|delete|remove|share|invite|transfer|"
-                             r"pay|purchase|order|release|(create|open|add|update|submit)_?(pull_?request|issue|"
-                             r"comment|review|release))", re.I)
+                             r"pay|purchase|order|release|write|insert|update|upsert|create_or_update|"
+                             r"(create|put|edit|move|rename)_?files?|migrat|"
+                             r"secret|credential|token|create_branch|commit|execute|apply|drop|truncate|"
+                             r"(create|open|add|submit)_?(pull_?request|issue|comment|review|release|repo))", re.I)
 
 SCHUTZSCHALTER = [
     r"DEV_TEAM_WARTUNG", r"disableAllHooks", r"bypassPermissions", r"dangerously-skip-permissions",
@@ -473,7 +475,8 @@ def pruefe_ziel(absolut, team, projekt, plugin, rolle, art="schreiben", ueber_sh
 
     if rolle == "entwickler":
         revier = repo_wurzel(_KONTEXT.get("cwd") or "") or projekt
-        if not innerhalb(absolut, revier):
+        echt = os.path.realpath(absolut)
+        if not innerhalb(absolut, revier) or not innerhalb(echt, os.path.realpath(revier)):
             blockieren("Der Entwickler schreibt nur in seinem eigenen Worktree (%s), nicht in %s%s."
                        % (norm(revier), np, weg))
     rel = norm(os.path.relpath(absolut, basis))
@@ -597,12 +600,19 @@ PROZESS_START = re.compile(r"subprocess|os\.system|os\.popen|os\.exec|os\.spawn|
 LOKAL = re.compile(r"^(localhost|127\.0\.0\.1|\[::1\]|0\.0\.0\.0)$", re.IGNORECASE)
 
 
+LOKAL_FETCH = re.compile(r"""\bfetch\s*\(\s*(['"])https?://(localhost|127\.0\.0\.1|\[::1\])(:\d+)?(/[^'"`$+]*)?\1""")
+VERSCHLEIERT = re.compile(r"socket|net\.connect|atob|btoa|Buffer|fromCharCode|\bchr\s*\(|decode|eval|Function\s*\(|"
+                          r"\\x[0-9a-f]{2}|\\u[0-9a-f]{4}|['\"`]\s*\+|\+\s*['\"`]|\$\{|%[sd]|\.format\(|\bf['\"]|"
+                          r"\.join\(|reverse|replace\(|import\s*\(|require\s*\(\s*[^'\"]", re.IGNORECASE)
+
+
 def nur_lokales_netz(code):
-    """Einzeiler, der nur die eigene App unter localhost anspricht (z. B. fetch('http://localhost:5173'))."""
-    if PROZESS_START.search(code):
+    """Einzeiler, der nur die eigene App unter localhost anspricht – streng: Jeder Netzaufruf muss ein
+    wörtliches fetch('http://localhost…') sein, nichts darf zusammengesetzt oder verschleiert sein."""
+    if PROZESS_START.search(code) or VERSCHLEIERT.search(code) or not LOKAL_FETCH.search(code):
         return False
-    hosts = re.findall(r"https?://(\[[^\]]+\]|[^/:'\"\s`]+)", code)
-    return bool(hosts) and all(LOKAL.match(h) for h in hosts)
+    rest = LOKAL_FETCH.sub("LOKAL", code)
+    return not NETZ_PROZESS.search(rest) and not re.search(r"https?://", rest)
 
 
 UNPRUEFBAR = ("Dieser Befehl ist für den Wächter nicht prüfbar (Befehl in einer Hülle wie bash -c/eval, aus einer "
@@ -926,6 +936,11 @@ def shell_analyse(befehl, cwd=None, rolle="projektleiter", projekt=None, plugin=
             return ziele, opak, UNPRUEFBAR
         cmd = os.path.basename(win_pfad(roh_cmd)).lower()
         args = rest[1:]
+        if rolle == "projektleiter" and projekt and ("/" in roh_cmd or "\\" in roh_cmd) and \
+                selbst_geschriebener_ort(absolut_aus(cwd or ".", roh_cmd), projekt) and \
+                not (plugin and innerhalb(absolut_aus(cwd or ".", roh_cmd), plugin)):
+            return ziele, opak, ("Der Projektleiter führt keine Skripte aus, die an seinen eigenen Schreiborten "
+                                 "liegen (docs/, .dev-team/, ~/.claude/, Temp).")
         if cmd.endswith(".exe"):
             cmd = cmd[:-4]
 
@@ -978,9 +993,14 @@ def shell_analyse(befehl, cwd=None, rolle="projektleiter", projekt=None, plugin=
                 pass  # Inhalt des Heredocs wurde oben als Shell-Code geprüft
             elif nach_pipe or not ohne_optionen(args):
                 verboten = UNPRUEFBAR  # z. B. curl … | bash
-            else:
-                pass  # Skriptdatei: läuft wie jedes andere Programm (Schreibziele werden nicht erraten)
+            elif rolle == "projektleiter" and projekt and selbst_geschriebener_ort(
+                    absolut_aus(cwd or ".", ohne_optionen(args)[0]), projekt):
+                verboten = ("Der Projektleiter führt keine Skripte aus, die an seinen eigenen Schreiborten liegen "
+                            "(docs/, .dev-team/, ~/.claude/, Temp). Projektskripte (scripts/, package.json) laufen.")
         elif cmd in INTERPRETER:
+            if cmd in ("perl", "ruby") and any(re.fullmatch(r"-\w*i\w*", a) for a in args):
+                frei_i = [a for a in ohne_optionen(args)]
+                ziele += [(a, "schreiben") for a in frei_i[1:]]  # erstes freies Wort ist das Programm (-e …)
             code = None
             for j, a in enumerate(args):
                 if a in ("-c", "-e", "--eval", "-p", "--print", "-r"):
@@ -1004,7 +1024,12 @@ def shell_analyse(befehl, cwd=None, rolle="projektleiter", projekt=None, plugin=
                 pass  # python -m pip/pytest …: Abhängigkeiten prüft die Abhängigkeits-Schranke beim Merge
             else:
                 frei = ohne_optionen(args)
-                if (nach_pipe or not args or (frei and frei[0] == "-")) and not any(
+                if rolle == "projektleiter" and projekt and frei and frei[0] != "-" and selbst_geschriebener_ort(
+                        absolut_aus(cwd or ".", frei[0]), projekt) and not (plugin and innerhalb(
+                        absolut_aus(cwd or ".", frei[0]), plugin)):
+                    verboten = ("Der Projektleiter führt keine Skripte aus, die an seinen eigenen Schreiborten liegen "
+                                "(docs/, .dev-team/, ~/.claude/, Temp). Projektskripte (scripts/, package.json) laufen.")
+                elif (nach_pipe or not args or (frei and frei[0] == "-")) and not any(
                         a in ("--version", "-V", "--help", "-h") for a in args):
                     opak = True  # liest Programm von der Eingabe
         elif cmd in PAKET_AUSFUEHRER or (cmd in ("npm", "pnpm", "yarn") and args[:1] in (["exec"], ["dlx"])) \
@@ -1043,9 +1068,12 @@ def shell_analyse(befehl, cwd=None, rolle="projektleiter", projekt=None, plugin=
         elif cmd in ("patch", "unzip", "7z", "ed", "ex") or (cmd == "tar" and any("x" in a.lstrip("-") for a in args[:1])) \
                 or (cmd in ("awk", "gawk") and "inplace" in " ".join(args)):
             opak = True
+        elif cmd in ("perl", "ruby") and any(re.fullmatch(r"-\w*i\w*", a) for a in args):
+            frei = ohne_optionen(args)
+            ziele += [(a, "schreiben") for a in frei[1:]]
         elif cmd == "tee":
             ziele += [(a, "schreiben") for a in ohne_optionen(args)]
-        elif cmd in ("sed", "gsed", "perl") and any(a == "-i" or a.startswith("-i") or a == "--in-place" or
+        elif cmd in ("sed", "gsed", "perl", "ruby") and any(a == "-i" or a.startswith("-i") or a == "--in-place" or
                                                      a.startswith("--in-place") or a == "-pi" for a in args):
             frei = ohne_optionen(args)
             kandidaten = frei if ("-e" in args and cmd == "sed") else frei[1:]
@@ -1115,6 +1143,18 @@ def shell_analyse(befehl, cwd=None, rolle="projektleiter", projekt=None, plugin=
     return ziele, opak, verboten
 
 
+def ist_verknuepft(pfad):
+    """Symlink oder Windows-Junction (worktree_vorbereiten.py verknüpft node_modules so)."""
+    if os.path.islink(pfad):
+        return True
+    if os.name == "nt" and os.path.isdir(pfad):
+        try:
+            return bool(os.stat(pfad, follow_symlinks=False).st_file_attributes & 0x400)
+        except (OSError, AttributeError):
+            return False
+    return False
+
+
 def worktree_gemergt(pfad, cwd):
     kopf = git_out(pfad, "rev-parse", "HEAD")
     if not kopf:
@@ -1154,7 +1194,10 @@ def aussenwirkung(cmd, args):
         ziele_url = [a for a in args if not a.startswith("-") and re.match(r"^(https?://)?[\w.\-\[\]:]+(:\d+)?(/|$)", a)
                      and ("." in a or ":" in a or a.startswith("localhost"))]
         hosts = [re.match(r"^(?:https?://)?(\[[^\]]+\]|[^/:?#]+)", u).group(1) for u in ziele_url]
-        if hosts and all(LOKAL.match(h) for h in hosts):
+        umlenkend = any(re.match(r"^(-x|--proxy|--preproxy|--socks|--resolve|--connect-to|-K|--config|--url|--next|"
+                                 r"-:|-L|--location|-e|--execute|--post-file|--body-file|--remote-name-all)", a)
+                        for a in args) or any(re.fullmatch(r"-[a-zA-Z]*[xKLe][a-zA-Z]*", a) for a in args)
+        if hosts and all(LOKAL.match(h) for h in hosts) and not umlenkend:
             return None  # eigene App unter localhost testen (auch POST)
         for j, a in enumerate(args):
             nxt = args[j + 1].upper() if j + 1 < len(args) else ""
@@ -1256,6 +1299,12 @@ def pruefe_git(args, rolle, cwd, projekt):
         return "'git %s --force' verwirft nicht committete Arbeit und ist gesperrt." % sub
     if sub == "stash" and rest[:1] and rest[0] in ("drop", "clear"):
         return "'git stash %s' löscht gesicherte Arbeit und ist gesperrt." % rest[0]
+    if sub == "worktree" and rest[:1] == ["remove"]:
+        pfad_wt = [a for a in rest[1:] if not a.startswith("-")]
+        if pfad_wt and ist_verknuepft(os.path.join(absolut_aus(cwd or ".", pfad_wt[0]), "node_modules")):
+            return ("Im Worktree ist node_modules mit dem Hauptordner verknüpft. Erst 'python3 \"<Plugin-Ordner>/"
+                    "scripts/worktree_vorbereiten.py\" --nur-trennen --ordner %s' – sonst könnte das Aufräumen die "
+                    "Pakete im Hauptordner mitlöschen." % pfad_wt[0])
     if sub == "worktree" and rest[:1] == ["remove"] and any(a in ("-f", "--force") for a in rest):
         pfad = [a for a in rest[1:] if not a.startswith("-")]
         if not (rolle == "projektleiter" and pfad and worktree_gemergt(absolut_aus(cwd or ".", pfad[0]), cwd or projekt)):
@@ -1331,6 +1380,16 @@ def pruefe_shell(eingabe, team, projekt, plugin, rolle):
                  r"\[Reflection\.|New-Object\s+(System\.)?IO\.",
                  befehl, re.IGNORECASE):
         blockieren(UNPRUEFBAR)
+    if "python-pfad" in befehl:
+        blockieren("~/.claude/dev-team/python-pfad legt fest, mit welchem Python der Wächter läuft. Kein Agent "
+                   "liest oder schreibt sie über die Shell.")
+    if rolle == "entwickler" and re.search(r"\b(npm|pnpm|yarn|bun)\s+(i|install|add|ci|uninstall|remove|rm|update|"
+                                           r"dedupe|prune|link)\b", befehl):
+        nm = os.path.join(repo_wurzel(cwd) or cwd, "node_modules")
+        if ist_verknuepft(nm):
+            blockieren("node_modules in diesem Worktree ist mit dem Hauptordner verknüpft. Erst "
+                       "'python3 \"<Plugin-Ordner>/scripts/worktree_vorbereiten.py\" --trennen' ausführen (eigene "
+                       "Installation), sonst änderst du die Pakete aller anderen.")
     ziele, opak, verboten = shell_analyse(befehl, cwd, rolle, projekt, plugin)
     if verboten:
         blockieren(verboten)
@@ -1344,6 +1403,15 @@ def pruefe_shell(eingabe, team, projekt, plugin, rolle):
             blockieren("Schreibziel mit Variable oder Befehl (%s) kann nicht geprüft werden." % ziel)
         ziel = ziel.replace("$HOME", heimat())
         pruefe_ziel(absolut_aus(cwd, ziel), team, projekt, plugin, rolle, art=art, ueber_shell=True)
+
+
+def selbst_geschriebener_ort(absolut, projekt):
+    """Orte, an denen der Projektleiter selbst Dateien anlegen darf. Skripte von dort führt er nicht aus –
+    sonst ließe sich jede Shell-Regel über „Datei schreiben, dann starten“ umgehen."""
+    orte = [tempfile.gettempdir(), os.path.join(heimat(), ".claude")]
+    if projekt:
+        orte += [os.path.join(projekt, "docs"), os.path.join(projekt, ".dev-team"), os.path.join(projekt, "fachwissen")]
+    return any(innerhalb(absolut, o) for o in orte)
 
 
 def plugin_skript(befehl, plugin):
