@@ -86,7 +86,8 @@
       "phase": "Bauen (ein Paket)",
       "schreibt": [
         "code",
-        "tests-neu"
+        "tests-neu",
+        "testkonfig-neu"
       ],
       "modell": "sonnet",
       "modelle": [
@@ -213,7 +214,8 @@
       ".gitignore",
       ".gitattributes",
       ".env.example",
-      ".worktreeinclude"
+      ".worktreeinclude",
+      ".claude/launch.json"
     ],
     "prozess": [
       "docs/**",
