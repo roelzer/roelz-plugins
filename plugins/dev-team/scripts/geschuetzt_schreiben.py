@@ -23,7 +23,7 @@ from datetime import datetime
 HIER = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HIER)
 import pruefe_tests  # noqa: E402  (Freigabe-Prüfung wiederverwenden)
-import waechter  # noqa: E402
+import bereiche  # noqa: E402
 
 ERLAUBT = ("tests/referenz/", ".claude/dev-team.json")
 
@@ -39,7 +39,7 @@ def main():
         print("FEHLER: Nicht in einem Dev-Team-Projekt (Hauptordner) aufgerufen. Nichts geändert.")
         sys.exit(1)
     ziel = os.path.abspath(os.path.join(wurzel, arg.ziel))
-    rel = waechter.norm(os.path.relpath(ziel, wurzel))
+    rel = bereiche.norm(os.path.relpath(ziel, wurzel))
     if rel.startswith("../") or not (rel.startswith(ERLAUBT[0]) or rel == ERLAUBT[1]):
         print("FEHLER: Ziel nur tests/referenz/… oder .claude/dev-team.json. Nichts geändert.")
         sys.exit(1)

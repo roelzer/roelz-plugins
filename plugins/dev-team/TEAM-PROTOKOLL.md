@@ -34,7 +34,7 @@ Das Team ist **fest**: genau die Agenten in `team.json`. Jede Datei in `agents/`
 ## Regeln der Orchestrierung
 Grenzen der Autonomie, Belegpflicht und Schleifenlimits stehen im Grundgesetz und gelten vor dieser Liste.
 
-1. **Nur das feste Team.** Technisch erzwungen durch den Wächter (`scripts/waechter.py`) und die Projekteinstellungen.
+1. **Nur das feste Team.** Regel; sichtbar im Agenten-Protokoll. Technisch gesperrt ist nur: Entwickler und Tester reden nicht miteinander, der Entwickler ändert keine bestehenden Tests und rührt die verdeckten Tests nicht an (`scripts/waechter.sh`).
 2. **Unabhängigkeit vor Konsens:** Prüfer urteilen zuerst allein, ohne die Bewertungen anderer.
 3. **Belegpflicht:** jeder Befund mit Datei/Zeile oder reproduzierbarem Szenario, Auswirkung, Abhilfe und Sicherheit (0–100).
 4. **Schweregrad statt Stimmenmehrheit:** Ein belastbarer kritischer Befund blockiert.

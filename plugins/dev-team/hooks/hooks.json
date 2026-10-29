@@ -1,5 +1,5 @@
 {
-  "description": "Dev-Team: Grundgesetz in jeder Sitzung (auch Cloud), Pfade für jeden Agenten, Wächter (nur lesende Werkzeuge blockieren bei Zeitüberschreitung nicht; Teamzwang, Schreibrechte, verdeckte Abnahmetests, Schutzschalter), Fertig-Prüfung der Entwickler und automatisches Agenten-Protokoll in docs/AGENTEN_LOG.md.",
+  "description": "Dev-Team: Grundgesetz in jeder Sitzung (auch Cloud), Pfade für jeden Agenten, minimaler Wächter (nur: Entwickler/Tester reden nicht miteinander, Entwickler ändert keine bestehenden Tests und rührt verdeckte Tests nicht an), Fertig-Prüfung der Entwickler und automatisches Agenten-Protokoll in docs/AGENTEN_LOG.md.",
   "hooks": {
     "SessionStart": [
       {
@@ -25,23 +25,22 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Read|Grep|Glob|LS|NotebookRead",
+        "matcher": "Agent|Task",
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/waechter.sh\"",
-            "timeout": 30
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/agenten-log.sh\" start",
+            "timeout": 10
           }
         ]
       },
       {
-        "matcher": "^(?!(Read|Grep|Glob|LS|NotebookRead)$).*",
+        "matcher": "Agent|Task|SendMessage|Write|Edit|MultiEdit|NotebookEdit|Read|Grep|Glob|Bash|PowerShell|Monitor",
         "hooks": [
           {
             "type": "command",
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/waechter.sh\"",
-            "timeout": 60,
-            "onFailure": "block"
+            "timeout": 10
           }
         ]
       }
@@ -57,18 +56,6 @@
           {
             "type": "command",
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/agenten-log.sh\" ende",
-            "timeout": 15
-          }
-        ]
-      }
-    ],
-    "ConfigChange": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/einstellungs-schutz.sh\"",
             "timeout": 15
           }
         ]

@@ -423,12 +423,6 @@ class TestSchranke(unittest.TestCase):
         self.assertNotIn("F3", aus.split("Fachregeln ohne")[1].split("\n")[0])
         self.assertIn("ohne Mutationstest", aus)  # 'echo mutation' zählt nicht
 
-    def test_stolperdraht_in_der_schranke(self):
-        self.schreibe(".claude/settings.local.json", '{"env": {"PATH": "/tmp/falsch"}}')
-        code, aus = self.lauf("--rolle", "tester", "--ohne-lauf")
-        self.assertEqual(code, 1, aus)
-        self.assertIn("schaltet den Dev-Team-Schutz ab", aus)
-
     def test_blind_merkt_nicht_mitgelaufen(self):
         k = json.load(open(os.path.join(self.p, ".claude", "dev-team.json")))
         k["testbefehl"] = "%s -m unittest discover -s tests -t . -p 'test_rechnung.py' -v" % sys.executable
@@ -820,55 +814,6 @@ class FertigPruefung(unittest.TestCase):
 
     def test_andere_agenten_unberuehrt(self):
         self.assertEqual(self.lauf("🟢 alles gut", agent="dev-team:reviewer").strip(), "")
-
-class EinstellungsSchutz(unittest.TestCase):
-    SKRIPT = os.path.join(PLUGIN, "scripts", "einstellungs_schutz.py")
-
-    def setUp(self):
-        self.p = tempfile.mkdtemp(prefix="cfg-")
-        self.heim = tempfile.mkdtemp(prefix="heim-")
-        os.makedirs(os.path.join(self.p, ".claude"))
-        os.makedirs(os.path.join(self.p, "docs"))
-        open(os.path.join(self.p, ".claude", "dev-team.json"), "w").write("{}")
-
-    def lauf(self, lokal=None, env=None):
-        if lokal is not None:
-            with open(os.path.join(self.p, ".claude", "settings.local.json"), "w") as f:
-                json.dump(lokal, f)
-        e = {"hook_event_name": "ConfigChange", "cwd": self.p}
-        r = subprocess.run([sys.executable, self.SKRIPT], input=json.dumps(e), capture_output=True, text=True,
-                           env=dict(os.environ, CLAUDE_PROJECT_DIR=self.p, HOME=self.heim, USERPROFILE=self.heim,
-                                    **(env or {})))
-        return r.returncode, r.stderr
-
-    def test_hooks_aus_wird_blockiert(self):
-        code, aus = self.lauf({"disableAllHooks": True})
-        self.assertEqual(code, 2)
-        self.assertIn("disableAllHooks", aus)
-        self.assertIn("einstellungen", open(os.path.join(self.p, "docs", "AGENTEN_LOG.md"), encoding="utf-8").read())
-
-    def test_plugin_aus_und_bypass(self):
-        self.assertEqual(self.lauf({"enabledPlugins": {"dev-team@roelz-plugins": False}})[0], 2)
-        self.assertEqual(self.lauf({"permissions": {"defaultMode": "bypassPermissions"}})[0], 2)
-
-    def test_harmlose_aenderung_erlaubt(self):
-        self.assertEqual(self.lauf({"permissions": {"allow": ["Bash(npm test)"]}})[0], 0)
-
-    def test_env_pfad_wird_entfernt(self):
-        code, aus = self.lauf({"env": {"PATH": "/tmp/falsch:/usr/bin"}, "permissions": {"allow": ["Bash(npm test)"]}})
-        self.assertEqual(code, 2, aus)
-        d = json.load(open(os.path.join(self.p, ".claude", "settings.local.json")))
-        self.assertNotIn("PATH", d.get("env", {}))
-        self.assertEqual(d["permissions"]["allow"], ["Bash(npm test)"])  # Harmloses bleibt
-
-    def test_hooks_aus_wird_entfernt(self):
-        self.lauf({"disableAllHooks": True})
-        d = json.load(open(os.path.join(self.p, ".claude", "settings.local.json")))
-        self.assertNotIn("disableAllHooks", d)
-
-    def test_wartung_erlaubt(self):
-        self.assertEqual(self.lauf({"disableAllHooks": True}, env={"DEV_TEAM_WARTUNG": "1"})[0], 0)
-
 
 if __name__ == "__main__":
     unittest.main()

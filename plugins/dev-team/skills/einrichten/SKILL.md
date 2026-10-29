@@ -10,7 +10,7 @@ argument-hint: "[privat|arbeit]"
 Führe die Schritte der Reihe nach aus. Zeige Simon vor jeder Änderung an einer Datei kurz, was du ändern wirst.
 
 ## 0. Voraussetzungen prüfen
-- **Python 3** muss als `python3`, `python` oder `py` aufrufbar sein (`python --version`). Ohne Python blockiert der Wächter in Dev-Team-Projekten jede Arbeit – mit Absicht, damit das Team nie ohne Schutz arbeitet. Fehlt es: Simon bitten, Python von python.org zu installieren (Haken bei „Add python.exe to PATH“), dann Claude Code neu starten.
+- **Python 3** muss als `python3`, `python` oder `py` aufrufbar sein (`python --version`). Python brauchen Test-Schranke und Prüfskripte; der Wächter selbst läuft ohne Python.
 - **Git** ab Version 2.31 (`git --version`), wegen der Worktrees.
 
 ## 1. Modus klären
@@ -33,7 +33,7 @@ Verwende im nächsten Schritt den vollständigen, absoluten Pfad mit Schrägstri
 
 ## 3. Globale CLAUDE.md verknüpfen
 **Alter Block aus Version 1/2:** Steht in `~/.claude/CLAUDE.md` schon ein Dev-Team-Abschnitt **ohne** die Marker `<!-- dev-team START -->` / `<!-- dev-team END -->` (z. B. mit `@…/grundgesetz.md` aus einem anderen Ordner), zeig ihn Simon. Er muss weg, sonst gelten zwei Grundgesetze. Simon löscht ihn selbst im Editor oder gibt dir ausdrücklich das OK; dann ersetze ihn durch die Ausgabe des Skripts unten.
-`~/.claude/CLAUDE.md` schreibt Claude nicht direkt (der Wächter sperrt das, damit keine Sitzung das Grundgesetz abschalten kann). Zeige Simon die Änderung mit
+`~/.claude/CLAUDE.md` schreibt Claude nicht direkt . Zeige Simon die Änderung mit
 `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/claude_md_block.py" --modus <privat|arbeit> --lessons <Lessons-Pfad> [--baukasten <Baukasten-Repo>] [--gehirn <Gehirn-Ordner>]`
 und führe nach seinem OK denselben Befehl mit `--schreiben` aus. Das Skript ersetzt nur den Block zwischen `<!-- dev-team START -->` und `<!-- dev-team END -->`; alles andere bleibt. Im Block stehen Modus, Plugin-Ordner, Lessons-Datei, ggf. Baukasten und Gehirn und die Verknüpfungen `@…/grundgesetz.md` und `@<Lessons>`.
 

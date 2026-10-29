@@ -21,6 +21,14 @@ import os
 import sys
 
 MARKE = "dev-team-start.sh"
+# Einträge früherer Dev-Team-Versionen, die seit 3.11 (minimaler Wächter) nicht mehr gelten und die Arbeit
+# ausbremsten. Sie werden beim Zusammenführen entfernt; alles andere bleibt.
+VERALTET_DENY = {"Workflow", "Agent(Explore)", "Agent(Plan)", "Agent(general-purpose)", "Agent(claude-code-guide)",
+                 "Agent(statusline-setup)", "Agent(name:*)", "Edit(**/.claude/agents/**)", "Edit(~/.claude/agents/**)",
+                 "Edit(**/.claude/skills/**)", "Edit(**/.claude/hooks/**)", "Edit(/.claude/settings.json)",
+                 "Bash(git push origin main*)", "Bash(git push origin master*)"}
+VERALTET_ENV = {"CLAUDE_CODE_DISABLE_EXPLORE_PLAN_AGENTS", "CLAUDE_CODE_DISABLE_WORKFLOWS",
+                "CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS"}
 
 
 def ist_dev_team_hook(eintrag):
@@ -34,21 +42,27 @@ def zusammenfuehren(alt, vorlage):
             neu.setdefault(schluessel, {}).update(vorlage[schluessel])
     if "disableAllHooks" in vorlage:
         neu["disableAllHooks"] = False
-    if "disableWorkflows" in vorlage:
-        neu["disableWorkflows"] = True
+    if neu.get("disableWorkflows") is True and "disableWorkflows" not in vorlage:
+        neu.pop("disableWorkflows")
+    for k in VERALTET_ENV:
+        (neu.get("env") or {}).pop(k, None)
     if "worktree" in vorlage:
         neu.setdefault("worktree", {}).update(vorlage["worktree"])
     if vorlage.get("env"):
         neu.setdefault("env", {}).update(vorlage["env"])
     perm = neu.setdefault("permissions", {})
     deny = perm.setdefault("deny", [])
+    deny[:] = [r for r in deny if r not in VERALTET_DENY]
     for regel in vorlage.get("permissions", {}).get("deny", []):
         if regel not in deny:
             deny.append(regel)
     hooks = neu.setdefault("hooks", {}) if vorlage.get("hooks") else {}
+    for ereignis in list(hooks):
+        hooks[ereignis] = [e for e in hooks[ereignis] if not ist_dev_team_hook(e)]
+        if not hooks[ereignis]:
+            del hooks[ereignis]
     for ereignis, eintraege in vorlage.get("hooks", {}).items():
-        bestehend = [e for e in hooks.get(ereignis, []) if not ist_dev_team_hook(e)]
-        hooks[ereignis] = bestehend + copy.deepcopy(eintraege)
+        hooks[ereignis] = hooks.get(ereignis, []) + copy.deepcopy(eintraege)
     return neu
 
 

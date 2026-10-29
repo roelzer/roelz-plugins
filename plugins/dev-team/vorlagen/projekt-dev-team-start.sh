@@ -54,7 +54,7 @@ case "$modus" in
   start)
     if ! holen; then
       echo "⚠ Dev-Team konnte in dieser Cloud-Sitzung nicht geladen werden: Das Repo roelzer/roelz-plugins ist nicht erreichbar."
-      echo "Notbetrieb: Du kannst normal arbeiten (lesen, ändern, testen, committen, den Arbeitsbranch pushen). Gesperrt sind nur zerstörende Schritte (Push auf main/force, reset --hard, Veröffentlichen). Teamzwang und Agenten-Protokoll fehlen."
+      echo "Du kannst normal arbeiten (lesen, ändern, testen, committen, den Arbeitsbranch pushen); es fehlen nur Team-Agenten und Agenten-Protokoll."
       echo "Projektleiter: Sag Simon das in einem Satz. Dauerhafte Abhilfe: roelzer/roelz-plugins in der Cloud-Umgebung hinzufügen und eine neue Sitzung starten."
       exit 0
     fi
@@ -93,22 +93,8 @@ case "$modus" in
       printf '%s' "$eingabe" | CLAUDE_PLUGIN_ROOT="$plugin" CLAUDE_PROJECT_DIR="$projekt" bash "$plugin/scripts/waechter.sh"
       exit $?
     fi
-    # Dev-Team nicht geladen (z. B. Cloud-Umgebung ohne Zugriff auf roelzer/roelz-plugins).
-    # Seit 3.11: Die Sitzung bleibt arbeitsfähig (lesen, ändern, committen, Branch pushen). Gesperrt sind nur die
-    # Schadensfälle, die sich ohne Plugin sicher erkennen lassen. Der Sitzungsstart sagt dem Projektleiter, dass
-    # das Team fehlt und wie Simon es dazuholt.
-    gefahr='git[[:space:]]+(push[^|;&]*([[:space:]]-f([[:space:]\"]|$)|--force|[[:space:]:+](main|master)([[:space:]\"]|$))|reset[[:space:]]+--hard|clean[[:space:]]+-[a-z]*f|branch[[:space:]]+-D|filter-branch|gc[[:space:]]+--prune)|npm[[:space:]]+publish|gh[[:space:]]+(pr[[:space:]]+merge|release|repo[[:space:]]+delete)|rm[[:space:]]+-[a-z]*r[a-z]*f?[[:space:]]+(/|~|\$HOME)([[:space:]]|$)|disableAllHooks|DEV_TEAM_WARTUNG|bypassPermissions|dangerously-skip-permissions'
-    if [[ "$eingabe" =~ $gefahr ]]; then
-      echo "⛔ Dev-Team-Wächter (Notbetrieb, Team nicht geladen): Dieser Schritt kann Arbeit zerstören oder veröffentlichen und ist ohne Dev-Team gesperrt. Alles andere geht." >&2
-      exit 2
-    fi
-    exit 0
-    ;;
-  einstellungen)
-    if [ -f "$plugin/scripts/einstellungs-schutz.sh" ]; then
-      printf '%s' "$eingabe" | CLAUDE_PROJECT_DIR="$projekt" bash "$plugin/scripts/einstellungs-schutz.sh"
-      exit $?
-    fi
+    # Dev-Team nicht geladen (z. B. Cloud-Umgebung ohne roelzer/roelz-plugins): nichts sperren. Der Sitzungsstart
+    # sagt dem Projektleiter, dass das Team fehlt.
     exit 0
     ;;
   fertig)
