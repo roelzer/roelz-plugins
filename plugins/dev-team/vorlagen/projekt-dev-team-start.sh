@@ -54,7 +54,8 @@ case "$modus" in
   start)
     if ! holen; then
       echo "⚠ Dev-Team konnte in dieser Cloud-Sitzung nicht geladen werden: Das Repo roelzer/roelz-plugins ist nicht erreichbar."
-      echo "Projektleiter: Sag Simon das zu Beginn. Abhilfe: roelzer/roelz-plugins zur Sitzung bzw. zur Cloud-Umgebung hinzufügen, dann 'bash .claude/dev-team-start.sh start' ausführen und die Ausgabe als Arbeitsregeln übernehmen."
+      echo "Notbetrieb: Du kannst normal arbeiten (lesen, ändern, testen, committen, den Arbeitsbranch pushen). Gesperrt sind nur zerstörende Schritte (Push auf main/force, reset --hard, Veröffentlichen). Teamzwang und Agenten-Protokoll fehlen."
+      echo "Projektleiter: Sag Simon das in einem Satz. Dauerhafte Abhilfe: roelzer/roelz-plugins in der Cloud-Umgebung hinzufügen und eine neue Sitzung starten."
       exit 0
     fi
     # Agenten und Skills ins Projekt kopieren (nicht committen, siehe .gitignore).
@@ -92,16 +93,16 @@ case "$modus" in
       printf '%s' "$eingabe" | CLAUDE_PLUGIN_ROOT="$plugin" CLAUDE_PROJECT_DIR="$projekt" bash "$plugin/scripts/waechter.sh"
       exit $?
     fi
-    # Dev-Team nicht geladen: keine Agenten und keine Schreibvorgänge ohne Wächter.
-    case "$eingabe" in
-      *'"tool_name":"Agent"'*|*'"tool_name": "Agent"'*|*'"tool_name":"Task"'*|*'"tool_name": "Task"'*|\
-      *'"tool_name":"Write"'*|*'"tool_name": "Write"'*|*'"tool_name":"Edit"'*|*'"tool_name": "Edit"'*|\
-      *'"tool_name":"MultiEdit"'*|*'"tool_name": "MultiEdit"'*|*'"tool_name":"NotebookEdit"'*|*'"tool_name": "NotebookEdit"'*|\
-      *'"tool_name":"Workflow"'*|*'"tool_name": "Workflow"'*|*'"tool_name":"Monitor"'*|*'"tool_name": "Monitor"'*|\
-      *'"tool_name":"Bash"'*|*'"tool_name": "Bash"'*|*'"tool_name":"PowerShell"'*|*'"tool_name": "PowerShell"'*)
-        echo "⛔ Dev-Team-Wächter: Das Dev-Team ist in dieser Sitzung nicht geladen (Repo roelzer/roelz-plugins nicht erreichbar). Ohne Team wird nicht gebaut. Simon Bescheid geben." >&2
-        exit 2 ;;
-    esac
+    # Dev-Team nicht geladen (z. B. Cloud-Umgebung ohne Zugriff auf roelzer/roelz-plugins).
+    # Seit 3.11: Die Sitzung bleibt arbeitsfähig (lesen, ändern, committen, Branch pushen). Gesperrt sind nur die
+    # Schadensfälle, die sich ohne Plugin sicher erkennen lassen. Der Sitzungsstart sagt dem Projektleiter, dass
+    # das Team fehlt und wie Simon es dazuholt.
+    gefahr='git[[:space:]]+(push[^|;&]*([[:space:]]-f([[:space:]\"]|$)|--force|[[:space:]:+](main|master)([[:space:]\"]|$))|reset[[:space:]]+--hard|clean[[:space:]]+-[a-z]*f|branch[[:space:]]+-D|filter-branch|gc[[:space:]]+--prune)|npm[[:space:]]+publish|gh[[:space:]]+(pr[[:space:]]+merge|release|repo[[:space:]]+delete)|rm[[:space:]]+-[a-z]*r[a-z]*f?[[:space:]]+(/|~|\$HOME)([[:space:]]|$)|disableAllHooks|DEV_TEAM_WARTUNG|bypassPermissions|dangerously-skip-permissions'
+    if [[ "$eingabe" =~ $gefahr ]]; then
+      echo "⛔ Dev-Team-Wächter (Notbetrieb, Team nicht geladen): Dieser Schritt kann Arbeit zerstören oder veröffentlichen und ist ohne Dev-Team gesperrt. Alles andere geht." >&2
+      exit 2
+    fi
+    exit 0
     ;;
   einstellungen)
     if [ -f "$plugin/scripts/einstellungs-schutz.sh" ]; then

@@ -347,6 +347,31 @@ class Nachpruefung311(Auftrag):
         self.assertEqual(self.lauf(g, skript="sh")[0], 0)
 
 
+class Notbetrieb(unittest.TestCase):
+    """Cloud-Sitzung, in der das Dev-Team nicht geladen werden kann: arbeiten und pushen geht, nur Zerstörendes nicht."""
+
+    def lauf(self, werkzeug, befehl=None):
+        import tempfile
+        t = tempfile.mkdtemp()
+        ti = {"command": befehl} if befehl else {"file_path": "x"}
+        r = subprocess.run(["bash", os.path.join(PLUGIN, "vorlagen", "projekt-dev-team-start.sh"), "waechter"],
+                           input=json.dumps({"tool_name": werkzeug, "tool_input": ti}), capture_output=True, text=True,
+                           env=dict(os.environ, HOME=t, CLAUDE_PROJECT_DIR=t, XDG_CACHE_HOME=os.path.join(t, "c")))
+        return r.returncode
+
+    def test_arbeiten_geht(self):
+        for b in ("git push origin main-1tg5m0", "git push -u origin dev-team/c02", "git status", "npm test",
+                  "git commit -m x", "git merge --no-ff dev-team/p1"):
+            self.assertEqual(self.lauf("Bash", b), 0, b)
+        for w in ("Write", "Edit", "Agent", "Read"):
+            self.assertEqual(self.lauf(w), 0, w)
+
+    def test_zerstoerendes_nicht(self):
+        for b in ("git push origin main", "git push origin HEAD:main", "git push -f origin x", "git push --force",
+                  "git reset --hard HEAD~1", "git clean -fdx", "git branch -D x", "npm publish"):
+            self.assertEqual(self.lauf("Bash", b), 2, b)
+
+
 class Tempo(Auftrag):
     """waechter.sh merkt sich das bewährte Python und misst langsame Läufe."""
 
