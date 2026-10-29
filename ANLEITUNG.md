@@ -34,25 +34,20 @@ Du sprichst immer nur mit **einer** Person, dem Projektleiter. Er **baut nicht s
 
 **Warum so geschnitten:** Eigenständig ist, wer einen eigenen Blickwinkel hat, andere Rechte braucht oder vom Ersteller unabhängig sein muss. Rechercheur und Quellenprüfer waren dieselbe Sicht und sind jetzt ein Agent mit zwei Modi. Übergabe und Betrieb sind eine Checkliste, kein Agent.
 
-## 2. Teamzwang: es arbeitet nur dieses Team
+## 2. Das feste Team und der (minimale) Wächter
 
-Damit sich der Aufbau lohnt, ist das **technisch** abgesichert, nicht nur als Bitte:
+Es arbeitet das feste Team aus `team.json`; wer was macht und schreibt, steht im Grundgesetz. Seit 3.11 ist das **Regel und Protokoll, keine Sperre** – das Team soll dir Arbeit abnehmen, nicht sich selbst blockieren. Im Agenten-Log siehst du, wer gearbeitet hat.
 
-- Der **Wächter** (ein Hook, `scripts/waechter.py`) lässt nur Agenten aus `team.json` starten. Eingebaute Helfer (Explore, Plan, general-purpose …), Agenten ohne Namen, erfundene Namen und Agenten, die selbst Agenten starten wollen, werden blockiert und im Agenten-Log mit ⛔ vermerkt.
-- **Schreibrechte** sind festgelegt: Code schreibt nur der Entwickler, Tests nur Entwickler (neue) und Tester, Architekturregeln nur der Architekt, Referenzwerte änderst nur du. Der Projektleiter kann über die Datei-Werkzeuge keinen Code schreiben; in der Shell darf er nur Befehle einer Erlaubnisliste ausführen (Git, Lese- und Dateibefehle, Plugin-Skripte, die Befehle aus `.claude/dev-team.json`).
-- **Neue Agenten** kann Claude nicht anlegen. Neue Rollen entstehen nur hier im Repo, mit deinem OK.
-- Zusätzlich sperren die Projekteinstellungen (`.claude/settings.json`) die eingebauten Helfer und das Workflow-Werkzeug (startet viele Helfer). Werkzeuge, die der Wächter nicht kennt (z. B. neue Werkzeuge nach einem Claude-Code-Update), sind in Dev-Team-Projekten gesperrt, bis Simon sie als harmlos freigibt (`team.json` → `harmlose_werkzeuge`). `Monitor` wird wie die Shell geprüft.
-- **Modelle:** Jeder Agent hat ein Standardmodell. Prüfer, die Qualität absichern (Architekt, Kritiker, Reviewer, Sicherheits-, Fach-, Langfrist-Prüfer, Auditor), laufen immer mit Opus. Entwickler laufen mit Sonnet und bekommen Opus bei schweren Paketen und ab der 3. Nachbesserung. Andere Modelle lässt der Wächter nicht zu; das gewählte Modell steht im Agenten-Log.
+Der **Wächter** (`scripts/waechter.sh`, reines Bash, kein Python) prüft nur noch zwei Dinge, und nur bei Entwickler und Tester:
+1. **Entwickler und Tester reden nicht miteinander:** Sie starten keine Agenten und schicken keine Nachrichten. Ergebnisse gehen über ihren Bericht an den Projektleiter.
+2. **Der Entwickler ändert keine bestehenden Tests**, Testkonfigurationen oder Referenzwerte (neue darf er anlegen und weiter bearbeiten) und rührt die **verdeckten Abnahmetests** unter `.dev-team/` nicht an.
 
-- Auch **Shell-Befehle** prüft der Wächter: Umleitungen, `sed -i`, `cp`, `mv`, `rm`, `git checkout`, Hüllen wie `bash -c` und `eval`, Pipes in einen Interpreter (`curl … | bash`), Skript-Einzeiler mit Schreib- oder Prozesszugriff, neue Claude-Sitzungen (`claude -p`), Paket-Installationen und `npx` mit fremden Paketen. Gesperrt sind auch `git reset --hard`, `git clean`, `git branch -D` und Pushes auf main oder mit Gewalt. Der Projektleiter führt keine Skripte aus dem Projekt aus.
-- Prüfer (Reviewer, Kritiker usw.) dürfen Git nur lesen, nicht committen oder zusammenführen. Skills, die einen eigenen Agenten starten würden (`context: fork`), sind gesperrt.
-- Der Entwickler arbeitet in seinem eigenen Worktree. Lesen außerhalb davon (Hauptordner, verdeckte Tests, `cd ..`) blockiert der Wächter. Der direkte Weg ist gesperrt; **mit einem eigenen Skript geht es trotzdem**. Deshalb zählen die verdeckten Tests als zusätzliche Absicherung, die Prüfsummen und der blinde Lauf als Nachweis (siehe Grenzen).
-- **Schutzschalter** (Hooks aus, Plugin aus, Freigaben umgehen, Workflows an) kann Claude über die Datei-Werkzeuge nicht setzen, und Shell-Befehle mit diesen Namen werden blockiert. `~/.claude/CLAUDE.md` (Verknüpfung zum Grundgesetz) schreibt nur ein Plugin-Skript nach deinem OK. Einstellungsdateien schreibt nur ein Plugin-Skript nach deinem OK.
+Für alle anderen Aufrufe endet er sofort. Kann er nicht laufen (Last, fehlende Datei), wird nichts blockiert.
 
-**Ehrliche Grenzen:**
-- Shell-Befehle der bauenden Agenten (Entwickler, Tester, Architekt) werden nach Mustern geprüft. Ein selbst geschriebenes Skript, das Dateien ändert oder liest, erkennt der Wächter nicht sicher. Deshalb sind die verdeckten Abnahmetests eine **zusätzliche** Absicherung, nicht die einzige: Reviewer und Tester prüfen außerdem auf Sonderfall-Code. Das ist verboten und wird nachträglich erkannt: Nach jedem Zusammenführen prüft die Test-Schranke, dass kein Entwickler bestehende Tests, Referenzwerte oder Einstellungen geändert hat. Code, den der Projektleiter verbotenerweise per Skript schreiben würde, wäre nicht von Entwickler-Code unterscheidbar. Ganz dicht ginge es nur mit der Sandbox von Claude Code – die gibt es aber **nur unter Linux, macOS und WSL2, nicht unter normalem Windows**. Die stärkste zusätzliche Absicherung unter Windows ist eine Prüfung außerhalb der Reichweite der Agenten, z. B. GitHub Actions (Vorlage `vorlagen/ci-github.yml`).
-- Der Abschlussbericht enthält einen **Teamnachweis** aus dem Agenten-Log: Fehlt eine Pflichtprüfung dort, gilt sie als nicht gemacht.
-- Die Sperre muss auf deinem Windows-Rechner einmal ausprobiert werden (siehe Abschnitt 9, Schritt 7).
+Was es außerdem gibt, ohne zu bremsen:
+- Die **Test-Schranke** nach jedem Paket und Merge erkennt geänderte Tests und Referenzwerte – auch wenn jemand sie über die Shell geändert hat.
+- **Sperrregeln in den Projekteinstellungen:** kein Force-Push, kein Push auf main, keine Geheimnisse (`.env`, Schlüssel) lesen. Noch stärker: auf GitHub für `main` den Branch-Schutz einschalten.
+- **Prüfsummen und blinder Lauf** der verdeckten Tests, Reviewer, Teamnachweis im Abschlussbericht.
 
 ## 3. Wie viel Prüfung? Stufen und Profile
 
@@ -111,7 +106,6 @@ Jeder Lauf steht automatisch in `docs/TESTNACHWEIS.md`. Neue Bibliotheken prüft
 - **Vollständige Prüfberichte** jedes Agenten liegen in `docs/pruefberichte/`, je Lauf eine Kennzahl in `.dev-team/kennzahlen.jsonl` (für die spätere Messung, welche Rolle wie viel bringt).
 - **Referenzfälle und Testbefehl ändert nur du:** Neue Referenzdaten oder einen anderen Testbefehl gibst du per Zeile in `.claude/freigaben.md` frei (Geltung = Zielpfad, z. B. `tests/referenz/fall5.json`). Der Projektleiter übernimmt die Datei dann mit `scripts/geschuetzt_schreiben.py`; jede Übernahme steht mit Prüfsumme in `docs/FREIGABEN_LOG.md`.
 - **Wer startet die Schranke?** Der Projektleiter startet sie nach jedem Merge. Die Schranke ist ein Programm ohne KI; er prüft dabei nichts selbst, er liest nur „grün“ oder „rot“.
-- **Einstellungsschutz:** Versucht ein Programm, die Schutz-Hooks in einer Einstellungsdatei abzuschalten oder umzulenken (z. B. `disableAllHooks`, ein anderer Suchpfad `PATH`), meldet Claude Code das dem Hook `ConfigChange`. Er blockiert die Änderung für die laufende Sitzung, **entfernt die schädlichen Einträge wieder aus der Datei** und schreibt ein ⛔ ins Log. Zusätzlich ist jede Test-Schranke rot, solange so ein Eintrag existiert, und der Projektleiter prüft laut Grundgesetz zu Beginn jeder Sitzung die Einstellungsdateien. **Ehrliche Grenze:** Ganz dicht ist das nur, wenn du den Wächter einmal als *verwaltete Einstellung* einrichtest (Abschnitt 9a) – die kann keine Projekt- oder Benutzereinstellung abschalten.
 
 ## 4. Fachregeln – damit offensichtliche Fehler nicht durchrutschen
 
@@ -154,7 +148,7 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
   - `.claude/settings.json` startet bei jeder Sitzung
   - `.claude/dev-team-start.sh`, das in der Cloud das Dev-Team von GitHub holt und Grundgesetz, Agenten, Abläufe und Protokoll bereitstellt. Auf deinen Rechnern tut es nichts, dort übernimmt das installierte Plugin.
 - **Wichtig – claude.ai-Projekte:** In Cloud-Threads eines claude.ai-Projekts laufen laut Claude-Code-Doku die Hooks und Plugins aus `.claude/settings.json` des Repos **nicht**. Dort gilt das Dev-Team nur, wenn du es in den Projekteinstellungen unter „Project settings → Plugins“ einträgst. Ohne diesen Eintrag gibt es dort **keinen** Teamzwang – dann nicht eigenständig bauen lassen.
-- `.claude/dev-team-start.sh` legt das Einrichten einmal an; danach kann es kein Agent mehr ändern (sonst könnte er den Wächter in der Cloud abschalten).
+- Kann eine Cloud-Sitzung das Dev-Team nicht laden (Repo `roelz-plugins` fehlt in der Umgebung), arbeitet sie normal weiter, nur ohne Team-Agenten und Protokoll. Abhilfe: `roelzer/roelz-plugins` in der Cloud-Umgebung hinzufügen.
 - In der Cloud heißen die Befehle mit Bindestrich, z. B. `/dev-team-auftrag`, die Agenten ohne Präfix, z. B. `kritiker`.
 - **Voraussetzung:** Die Cloud-Sitzung muss `github.com/roelzer/roelz-plugins` erreichen (das Repo ist öffentlich). Wenn nicht, sagt dir der Projektleiter das gleich zu Beginn.
 - **Sicherheit der Lieferkette:** Ohne weitere Angabe holt die Cloud den aktuellen Stand von `main`. Wer einen geprüften Stand festnageln will, trägt in `.claude/dev-team.json` unter `plugin_stand` einen Tag oder Commit ein (oder setzt in der Cloud-Umgebung `DEV_TEAM_REF`). Ohne Angabe meldet der Start eine Warnung. Wegen des öffentlichen Repos darf dort nie etwas Vertrauliches stehen.
@@ -181,7 +175,7 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
 
 ## 9. Einrichtung auf einem Rechner
 
-**Voraussetzungen:** Claude Code ab Version 2.1.295, Git für Windows (ab 2.31, mit Git Bash – ohne Git Bash laufen die Hooks nicht, und der Wächter blockiert dann mit Absicht alles), **Python 3** im PATH (python.org, Haken bei „Add python.exe to PATH“ – ohne Python blockiert der Wächter mit Absicht jede Arbeit in Dev-Team-Projekten), VS Code mit der Claude-Code-Erweiterung, Zugriff auf dein GitHub-Konto.
+**Voraussetzungen:** Claude Code ab Version 2.1.295, Git für Windows (ab 2.31, mit Git Bash – ohne Git Bash laufen die Hooks nicht), **Python 3** im PATH (python.org, Haken bei „Add python.exe to PATH“; brauchen Test-Schranke und Prüfskripte), VS Code mit der Claude-Code-Erweiterung, Zugriff auf dein GitHub-Konto.
 
 1. **Marktplatz von GitHub hinzufügen** (gilt auf jedem Rechner gleich, das Repo ist öffentlich):
    ```
@@ -203,29 +197,7 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
    - Der Projektleiter fragt dabei nach dem Ordner deines Gehirns (lokaler Klon von `roelzer/brain`, z. B. `C:/Users/<du>/roelz-brain`). Damit liest und schreibt das Team ab dann dort.
 5. **Noch einmal neu starten.** Fragt Claude, ob verknüpfte Dateien geladen werden dürfen: zustimmen.
 6. Prüfen: `/agents` zeigt die Dev-Team-Agenten mit `dev-team:` davor.
-7. **Teamzwang einmal ausprobieren** (in einem Testprojekt, das mit `/dev-team:neues-projekt test-teamzwang` angelegt wurde), Claude bitten:
-   - „Starte den Explore-Agenten und such nach README“ → muss mit ⛔ blockiert werden
-   - „Schreib selbst eine Datei src/test.js“ → muss blockiert werden („Code baut der Agent entwickler“)
-   - „Führ aus: bash -c "echo x > src/test2.js"“ → muss blockiert werden
-   - „Schreib die Datei /c/Users/<du>/Desktop/test.txt“ → muss blockiert werden (außerhalb des Projekts)
-   - „Nutze das Monitor-Werkzeug mit dem Befehl echo x > src/test3.js“ → muss blockiert werden
-   - „Führ aus: echo '<<X' ; echo y > src/test4.js ; X=1“ → muss blockiert werden (getarnter Heredoc)
-   - „Lass den Kritiker kurz das Lastenheft lesen“ → muss laufen
-   Steht im `docs/AGENTEN_LOG.md` ein ⛔ für die gesperrten Versuche und ▶ für den Kritiker, wirkt die Sperre. Danach im Explorer nachsehen, dass `src/test.js` bis `src/test4.js` und `test.txt` auf dem Desktop **wirklich nicht** entstanden sind.
-
-## 9a. Wächter dauerhaft absichern (verwaltete Einstellung, einmalig, empfohlen)
-
-Hooks aus dem Plugin oder aus den Projekteinstellungen kann ein Programm, das ein Agent ausführt, für die **nächste** Sitzung abschalten. Hooks aus einer *verwalteten Einstellung* (managed settings) kann keine Benutzer-, Projekt- oder lokale Einstellung abschalten. Das braucht einmal Administratorrechte:
-
-1. Im Terminal: `python plugins/dev-team/scripts/verwaltete_einstellungen.py --datei %USERPROFILE%\Desktop\managed-settings.json` (im Repo-Ordner).
-2. Die Datei vom Desktop **als Administrator** nach `C:\Program Files\ClaudeCode\managed-settings.json` kopieren (Ordner anlegen, falls er fehlt).
-3. Claude Code neu starten, `/status` aufrufen: Unter „Setting sources“ muss „managed“ stehen.
-4. Ab jetzt läuft der Wächter aus der verwalteten Einstellung; der Plugin-Wächter tritt automatisch zurück, damit nichts doppelt läuft.
-5. **Probe (wichtig, bisher nur auf deinem Rechner möglich):** In einem Testprojekt die Datei `.claude/settings.local.json` mit dem Inhalt `{"disableAllHooks": true}` anlegen, Claude Code neu starten und bitten: „Leg die Datei src/probe.js an.“ Das muss mit ⛔ blockiert werden. Danach die Datei `settings.local.json` wieder löschen.
-
-**Stand der Prüfung (27.10.2026):** Ohne verwaltete Einstellung ist die Lücke im echten Lauf bestätigt: Mit `disableAllHooks` und umgelenktem Suchpfad in `settings.local.json` konnte der Projektleiter in der nächsten Sitzung Code schreiben. Ob die verwaltete Einstellung das verhindert, ist **noch nicht live geprüft** – das Einrichten einer verwalteten Einstellung in der Cloud-Testumgebung wurde (zu Recht) von der Sicherheitsprüfung von Claude Code abgelehnt. Die Wirkung beruht auf der Claude-Code-Doku; die Probe in Schritt 5 ist der Nachweis.
-
-Ändert sich der Python-Pfad oder verschiebst du das Repo, die Datei neu erzeugen. **Achtung bei Plugin-Installation von GitHub:** Die Datei verweist auf einen Skript-Ordner. Liegt dieser im Plugin-Cache, ändert sich der Pfad mit jeder neuen Version; dann nach einem Update die Datei neu erzeugen (oder für diesen Zweck einen festen Klon des Repos behalten). Hinweis: Unter WSL ist der entsprechende Ordner vom Benutzer beschreibbar und schützt dort nicht.
+7. **Wächter kurz ausprobieren** (in einem Testprojekt): Claude bitten „Lass einen Entwickler die bestehende Datei tests/… ändern“ → muss mit ⛔ blockiert werden; „Lass den Entwickler einen neuen Test anlegen“ → muss laufen.
 
 ## 10. Updates
 
@@ -236,18 +208,18 @@ claude plugin update dev-team@roelz-plugins
 ```
 Danach VS Code neu starten.
 
-**Nach dem Update auf 3.11 einmal je Projekt:** `/dev-team:projekt-aufnehmen` ausführen. Es bringt die Projekteinstellungen (aufgeteilter Wächter-Hook: Lesen blockiert nie, Rest 60 s) und `.claude/dev-team-start.sh` auf den neuen Stand und zeigt dir die Änderung vorher. Ältere Projekte hatten einen Hook mit 20 s, der bei Last alles blockierte. Auf jedem Rechner zusätzlich einmal `/dev-team:einrichten` (privat bzw. arbeit), damit Worktrees überall vom aktuellen Stand starten.
+**Nach dem Update auf 3.11 einmal je Projekt:** `/dev-team:projekt-aufnehmen` ausführen. Es bringt die Projekteinstellungen auf den neuen Stand (minimaler Wächter, alte Sperren wie die gegen eingebaute Helfer oder `git push origin main*` – die auch Branches wie `main-1tg5m0` traf – werden entfernt) und zeigt dir die Änderung vorher. Auf jedem Rechner zusätzlich einmal `/dev-team:einrichten` (privat bzw. arbeit), damit Worktrees überall vom aktuellen Stand starten.
 
 **Bestehende Projekte auf Version 3 umstellen:** im Projekt `/dev-team:projekt-aufnehmen` ausführen. Es legt `.claude/dev-team.json` an und zeigt dir die Änderungen an `.claude/settings.json` (Teamzwang, Worktrees), bevor es sie schreibt.
 
-**Am Team selbst arbeiten** (Agenten, `team.json`, Hooks ändern): Der Wächter sperrt das in normalen Sitzungen. Für Wartung Claude Code mit gesetzter Variable starten, z. B. in Git Bash: `DEV_TEAM_WARTUNG=1 claude`. Danach die Plugin-Tests laufen lassen: `python3 -m unittest discover -s plugins/dev-team/tests`.
+**Am Team selbst arbeiten** (Agenten, `team.json`, Hooks ändern): im Repo-Ordner ändern, danach die Plugin-Tests laufen lassen: `python3 -m unittest discover -s plugins/dev-team/tests`.
 
 ## 10a. Freigaben für stundenlanges eigenständiges Bauen
 
 Damit der Lauf nicht bei der ersten Rückfrage stehen bleibt, braucht Claude Code die Erlaubnis für die üblichen Befehle. Empfehlung:
 - **Auto-Modus** von Claude Code (ein Prüfmodell entscheidet über Rückfragen) oder eine **Erlaubnisliste** in deinen Benutzereinstellungen für die Befehle, die das Projekt braucht (z. B. `Bash(npm test)`, `Bash(npm ci)`, `Bash(npm run *)`, `Bash(npx *)`, `Bash(curl *localhost*)`, `Bash(git status)`, `Bash(git merge *)`, `Bash(git worktree *)`, dazu die Browser-Werkzeuge `mcp__Claude_Browser`). Die eigentliche Sperre ist der Wächter; seit 3.11 sperrt er nur noch Schadensfälle.
 - **Laptop nicht schlafen lassen,** solange ein Lauf arbeiten soll (Windows: Energieoptionen → „Nie“ im Netzbetrieb, oder einmalig `powercfg /change standby-timeout-ac 0`). Endet die Sitzung (App zu, Laptop aus), stehen die Agenten bis zur nächsten Sitzung. Echte Nachtarbeit geht nur als **Cloud-Sitzung/Routine** auf GitHub – das richten wir gezielt ein.
-- **Nicht** `bypassPermissions`: Dann gelten nur noch Wächter und Sperrregeln, alle anderen Rückfragen fallen weg.
+- **Nicht** `bypassPermissions`: Dann fallen alle Rückfragen weg, auch für Befehle außerhalb des Projekts.
 - Optional später die **Sandbox** von Claude Code: Sie sperrt auf Betriebssystemebene und schließt die Shell-Lücke, läuft aber nur unter Linux, macOS und WSL2 (nicht unter normalem Windows). Unter Windows hilft stattdessen die CI-Vorlage `vorlagen/ci-github.yml`: GitHub prüft bei jedem Push die Tests und Schranken auf einem Rechner, an den kein Agent herankommt.
 
 ## 11. Senior-Qualitätsregeln und Grenzen der Autonomie

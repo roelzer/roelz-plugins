@@ -81,7 +81,7 @@ for py in python3 python py; do
 done
 if [ -n "$team" ]; then
   echo
-  echo "Festes Dev-Team (nur diese Agenten, sonst blockiert der Wächter): $team"
+  echo "Festes Dev-Team: $team"
   echo "Projektleiter: Du baust und prüfst nicht selbst. Code = entwickler, Tests = tester, Struktur = architekt."
 fi
 

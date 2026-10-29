@@ -19,14 +19,14 @@ Gearbeitet wird **ausschließlich** mit den Agenten aus `team.json` im Plugin-Or
 | Prüfen | `tester`, `fachpruefer`, `architekt` (Struktur, Stufe Groß oder bei Strukturänderung), `designer` (Treue, bei Oberfläche), `reviewer` (gesamt), `sicherheitspruefer`, `produktpruefer`, `gastgeber` (Nachschliff, Stufe Groß) |
 | Außerhalb | `auditor` |
 
-- **Keine Helfer.** Keine eingebauten Agenten (Explore, Plan, general-purpose …), keine Agenten ohne Namen, keine selbst erfundenen oder selbst angelegten Agenten, keine Teammates, kein Workflow-Werkzeug. Agenten-Aufrufe, Skills mit eigenen Agenten und Workflows sind technisch gesperrt (Wächter-Hook und Projekteinstellungen). Werkzeuge, die der Wächter nicht kennt, sind in Dev-Team-Projekten gesperrt. Neue Claude-Sitzungen über die Shell sind blockiert, über die Shell bleibt aber eine Restlücke (siehe „Wer darf was schreiben“).
+- **Keine Helfer.** Keine eingebauten Agenten (Explore, Plan, general-purpose …), keine Agenten ohne Namen, keine selbst erfundenen oder selbst angelegten Agenten, keine Teammates, kein Workflow-Werkzeug. Das ist eine Regel, keine technische Sperre (seit 3.11 ist der Wächter minimal); das Agenten-Protokoll zeigt, wer gearbeitet hat.
 - **Fehlt eine Rolle:** anhalten und Simon fragen. Nicht ersatzweise selbst machen, nicht umbenennen, nicht umgehen.
-- **Wirst du vom Wächter blockiert:** nie umgehen, auch nicht über die Shell (`echo >`, `sed -i`, `cp`, `git checkout -- …`). Grund lesen, richtigen Agenten beauftragen oder Simon fragen.
+- **Der Wächter prüft nur zwei Dinge:** Entwickler und Tester reden nicht miteinander (keine Agenten, keine Nachrichten), und der Entwickler ändert keine bestehenden Tests/Testkonfiguration/Referenzwerte und rührt die verdeckten Tests unter `.dev-team/` nicht an. Wirst du blockiert: nie umgehen; die Test-Schranke beim Merge findet Umgehungen über die Shell.
 - Agenten starten keine Agenten. Braucht ein Agent jemanden, steht das als Bitte in seinem Bericht, und du entscheidest.
-- Das Standardmodell eines Agenten steht in seinem Steckbrief. Abweichen nur nach der Modellregel im Skill `auftrag` und nur mit einem Modell, das `team.json` für diesen Agenten erlaubt (der Wächter prüft das).
+- Das Standardmodell eines Agenten steht in seinem Steckbrief. Abweichen nur nach der Modellregel im Skill `auftrag` und nur mit einem Modell, das `team.json` für diesen Agenten erlaubt.
 
 ## Wer darf was schreiben
-Für die Datei-Werkzeuge (Write/Edit) technisch erzwungen. Der Projektleiter darf in der Shell nur Befehle einer Erlaubnisliste ausführen (Git, Lese- und Dateibefehle, Plugin-Skripte, die Befehle aus `.claude/dev-team.json`). Prüfer dürfen in der Shell nichts Unprüfbares ausführen. Bauende Agenten (Entwickler, Tester, Architekt) müssen beliebigen Code ausführen; für sie prüft der Wächter offensichtliche Wege (Umleitungen, `tee`, `sed -i`, `cp`, `mv`, `rm`, `git checkout`, Senden nach außen), aber **ein eigenes Skript kann diese Sperren umgehen**. Deshalb liegt die Sicherung dort im Nachweis: Test-Schranke nach jedem Paket und Merge, Prüfsummen der Abnahmetests, Einstellungsschutz, Reviewer, blinder Lauf der verdeckten Tests. Wer die Shell nutzt, um eine Sperre zu umgehen, bricht das Grundgesetz; Test-Schranke, Reviewer und Teamnachweis erkennen veränderte Tests und Referenzwerte; abgeschaltete Schutz-Einstellungen erkennt die Schranke über den Einstellungs-Stolperdraht.
+Die Tabelle ist die Arbeitsteilung, an die sich jede Rolle hält. Technisch gesperrt ist davon nur: Der Entwickler ändert keine bestehenden Tests/Testkonfiguration/Referenzwerte (Write/Edit) und rührt `.dev-team/` nicht an. Die eigentliche Sicherung liegt im Nachweis: Test-Schranke nach jedem Paket und Merge (erkennt geänderte Tests und Referenzwerte, auch über die Shell), Prüfsummen der Abnahmetests, Reviewer, blinder Lauf der verdeckten Tests.
 | Bereich | Projektleiter | Entwickler | Tester | Architekt | Rechercheur | alle Prüfer |
 |---|---|---|---|---|---|---|
 | Programmcode | – | ✅ | – | – | – | – |
@@ -119,12 +119,9 @@ Jeder Bericht (vom Projektleiter und von jedem Agenten) beginnt mit einer **Ampe
 
 Danach: das Wichtigste in einfacher Sprache, höchstens 5 Punkte, jeweils mit „Was kann im schlimmsten Fall passieren?“ und „Was schlage ich vor?“.
 
-## Stolperdraht beim Sitzungsstart
-Lies zu Beginn jeder Sitzung in einem Dev-Team-Projekt `.claude/settings.local.json` und `~/.claude/settings.json` (soweit vorhanden). Steht dort `"disableAllHooks": true`, ist `dev-team@roelz-plugins` auf `false` gesetzt oder `bypassPermissions` eingetragen: **Stopp**, nichts bauen, Simon fragen. Das gilt auch, wenn kein Wächter etwas meldet – genau dann laufen die Schutz-Hooks womöglich nicht.
-
 ## Sichtbarkeit: Simon sieht, wer was macht
 - **Vor jedem Agenten-Aufruf** eine Zeile im Chat: „→ Entwickler 2 baut P3 (Rabatt)“. **Danach** eine Zeile mit Ampel: „← Entwickler 2: 🟢 P3 fertig, 14 Tests grün“.
-- `docs/AGENTEN_LOG.md` wird automatisch geschrieben (Wächter und Hook), inklusive blockierter Versuche (⛔). Jeder vollständige Agentenbericht liegt in `docs/pruefberichte/`, eine Kennzahl je Lauf in `.dev-team/kennzahlen.jsonl`. Nicht von Hand bearbeiten (technisch gesperrt).
+- `docs/AGENTEN_LOG.md` wird automatisch geschrieben (Hooks). Jeder vollständige Agentenbericht liegt in `docs/pruefberichte/`, eine Kennzahl je Lauf in `.dev-team/kennzahlen.jsonl`. Nicht von Hand bearbeiten.
 - `docs/STATUS.md` zeigt oben immer die aktuelle Phase und **jeden laufenden Agenten**, z. B. „Phase 7: Bauen – Entwickler P3 ⏳, Entwickler P4 ⏳, Reviewer P2 ✅“.
 
 ## Eigenständig bauen
@@ -151,7 +148,7 @@ Eigenständig heißt: selbst arbeiten innerhalb dieser Grenzen, nicht: alles dü
 
 ## Große Aufträge und Kontextverlust
 - Mehr als 5 Arbeitspakete oder mehrere Phasen → **Meilensteine**. Jeder Meilenstein: Bauen, Prüfen, Bericht in `docs/STATUS.md`. Simons Freigabe des Plans gilt für alle Meilensteine; angehalten wird zwischen ihnen nur bei Rot, bei harten Stopps oder wenn Simon es so will.
-- **Ein ⛔ des Wächters hält den Lauf nicht an:** anderen erlaubten Weg nehmen oder das Paket zurückstellen, dokumentieren, weiterbauen.
+- **Ein ⛔ des Wächters hält den Lauf nicht an:** das Paket zurückstellen oder anders schneiden, dokumentieren, weiterbauen.
 - Der Stand liegt **in Dateien, nicht im Gedächtnis**: `docs/STATUS.md` (Phase, Pakete, laufende Agenten, Basis-Commits, zurückgestellte Befunde), `docs/plan.md`, `docs/ENTSCHEIDUNGEN.md`, `docs/OFFENE_FRAGEN.md`, `docs/TESTNACHWEIS.md`. Nach `/compact`, `/clear` oder Sitzungsende liest du zuerst diese Dateien.
 - Lange Ausgaben zusammenfassen, nicht komplett im Gespräch behalten.
 

@@ -32,14 +32,18 @@ class Einstellungen(unittest.TestCase):
         return r.returncode, r.stdout, neu
 
     def test_fremdes_bleibt_dev_team_kommt_dazu(self):
-        alt = {"permissions": {"deny": ["Read(./geheim/**)"], "allow": ["Bash(npm test)"]},
+        alt = {"permissions": {"deny": ["Read(./geheim/**)", "Agent(Explore)", "Bash(git push origin main*)"],
+                               "allow": ["Bash(npm test)"]},
                "hooks": {"PreToolUse": [{"matcher": "Bash", "hooks": [{"type": "command", "command": "eigener.sh"}]},
                                         {"matcher": "Agent|Task", "hooks": [{"type": "command", "command": "bash .claude/dev-team-start.sh log-start"}]}]},
                "disableAllHooks": True, "env": {"MEIN": "1"}}
         code, aus, neu = self.lauf(alt)
         self.assertEqual(code, 0, aus)
         self.assertIn("Read(./geheim/**)", neu["permissions"]["deny"])
-        self.assertIn("Agent(Explore)", neu["permissions"]["deny"])
+        # 3.11: alte Bremsen werden entfernt (Teamzwang-Sperren, main* traf auch Branches wie main-1tg5m0)
+        self.assertNotIn("Agent(Explore)", neu["permissions"]["deny"])
+        self.assertNotIn("Bash(git push origin main*)", neu["permissions"]["deny"])
+        self.assertIn("Bash(git push origin main)", neu["permissions"]["deny"])
         self.assertEqual(neu["permissions"]["allow"], ["Bash(npm test)"])
         self.assertFalse(neu["disableAllHooks"])
         self.assertEqual(neu["worktree"]["baseRef"], "head")
@@ -48,7 +52,8 @@ class Einstellungen(unittest.TestCase):
         befehle = [h["command"] for e in neu["hooks"]["PreToolUse"] for h in e["hooks"]]
         self.assertIn("eigener.sh", befehle)
         self.assertNotIn("bash .claude/dev-team-start.sh log-start", befehle)
-        self.assertEqual(sum("waechter" in b for b in befehle), 2)  # 3.11: Lese- und Rest-Hook
+        self.assertEqual(sum("waechter" in b for b in befehle), 1)
+        self.assertNotIn("ConfigChange", neu["hooks"])
 
     def test_ohne_schreiben_bleibt_datei_gleich(self):
         code, aus, neu = self.lauf({"env": {}}, schreiben=False)
@@ -90,7 +95,7 @@ class Einstellungen(unittest.TestCase):
                         "--ziel", ziel, "--schreiben"], capture_output=True)
         with open(ziel) as f:
             neu = json.load(f)
-        self.assertEqual(set(neu), {"model", "permissions", "disableWorkflows", "worktree"})
+        self.assertEqual(set(neu), {"model", "permissions", "worktree"})
         self.assertEqual(neu["worktree"], {"baseRef": "head"})  # 3.11: Worktrees vom aktuellen Stand
 
     def test_ziel_nur_settings_json(self):
@@ -108,11 +113,10 @@ class Vorlagen(unittest.TestCase):
             with open(os.path.join(PLUGIN, "vorlagen", n), encoding="utf-8") as f:
                 json.load(f)
 
-    def test_settings_sperrt_alle_eingebauten_helfer(self):
+    def test_settings_ohne_bremsen(self):
         with open(VORLAGE) as f:
             s = json.load(f)
-        for name in ("Explore", "Plan", "general-purpose"):
-            self.assertIn("Agent(%s)" % name, s["permissions"]["deny"])
+        self.assertFalse([r for r in s["permissions"]["deny"] if r.startswith(("Agent(", "Workflow"))])
         self.assertEqual(s["worktree"]["baseRef"], "head")
 
     def test_gitignore_schuetzt_verdeckte_tests(self):

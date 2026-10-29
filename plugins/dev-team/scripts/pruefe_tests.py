@@ -35,9 +35,9 @@ from datetime import datetime
 HIER = os.path.dirname(os.path.abspath(__file__))
 PLUGIN = os.path.dirname(HIER)
 
-_spec = importlib.util.spec_from_file_location("waechter", os.path.join(HIER, "waechter.py"))
-waechter = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(waechter)
+_spec = importlib.util.spec_from_file_location("bereiche", os.path.join(HIER, "bereiche.py"))
+bereiche = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(bereiche)
 
 SKIP_MUSTER = [
     # JavaScript/TypeScript (Jest, Vitest, Mocha, Playwright, node:test) inkl. Ketten wie it.skip.each
@@ -288,22 +288,6 @@ def testkonfig_teile(pfad, text):
     return None
 
 
-def einstellungen_pruefen(e, hauptordner):
-    """Stolperdraht ohne Hooks: Sind Schutz-Hooks per Einstellung abgeschaltet oder umgelenkt, ist die
-    Schranke rot – sie läuft auch dann, wenn die Hooks schon aus sind."""
-    spec = importlib.util.spec_from_file_location("einstellungs_schutz",
-                                                  os.path.join(PLUGIN, "scripts", "einstellungs_schutz.py"))
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    heim = os.path.expanduser("~")
-    for quelle, pfad in (("lokal", os.path.join(hauptordner, ".claude", "settings.local.json")),
-                         ("projekt", os.path.join(hauptordner, ".claude", "settings.json")),
-                         ("benutzer", os.path.join(heim, ".claude", "settings.json")),
-                         ("benutzer", os.path.join(heim, ".claude", "settings.local.json"))):
-        for text, _ in mod.befunde(mod.lade(pfad), quelle, True):
-            e.f("Einstellung schaltet den Dev-Team-Schutz ab oder lenkt ihn um: %s (%s). Stopp – Simon fragen." % (text, pfad))
-
-
 def pruefsummen_pruefen(e, hauptordner, wurzel, fg, rolle="projektleiter"):
     spec = importlib.util.spec_from_file_location("abnahme_pruefsummen",
                                                   os.path.join(PLUGIN, "scripts", "abnahme_pruefsummen.py"))
@@ -412,8 +396,8 @@ class Freigabe:
     def deckt(self, ziel):
         if not self.zeile:
             return False
-        z = waechter.norm(ziel)
-        return any(g.lower() == z.lower() or waechter.passt(z, [g]) for g in self.geltung)
+        z = bereiche.norm(ziel)
+        return any(g.lower() == z.lower() or bereiche.passt(z, [g]) for g in self.geltung)
 
     def text(self, ziel):
         return " – Freigabe: " + self.zeile if self.deckt(ziel) else ""
@@ -427,8 +411,8 @@ def pruefe_diff(e, wurzel, basis, rolle, team, fg):
     if not liste:
         e.o("Keine Dateiänderungen gegenüber %s." % basis[:10])
     for status, pfad in liste:
-        p = waechter.norm(pfad)
-        bereich = waechter.bereich_von(p, team)
+        p = bereiche.norm(pfad)
+        bereich = bereiche.bereich_von(p, team)
         if p.startswith(".dev-team/"):
             continue
         if bereich in ("nachweis",) or (rolle == "merge" and bereich == "prozess"):
@@ -630,7 +614,7 @@ def main():
         e.f("Keine .claude/dev-team.json gefunden (Projekt nicht im Dev-Team aufgenommen).")
 
     liste = pruefe_diff(e, wurzel, basis, arg.rolle, team, fg)
-    if any(MANIFESTE.search(waechter.norm(p)) for _, p in liste or []):
+    if any(MANIFESTE.search(bereiche.norm(p)) for _, p in liste or []):
         abh = sh([sys.executable, "-X", "utf8", os.path.join(PLUGIN, "scripts", "pruefe_abhaengigkeiten.py"),
                   "--basis", basis], wurzel)
         letzte = "\n".join(((abh.stdout or "") + (abh.stderr or "")).strip().splitlines()[-12:])
@@ -653,7 +637,6 @@ def main():
             e.f("HEAD ist kein Merge-Commit. Zusammenführen nur mit 'git merge --no-ff', sonst prüft --basis HEAD^1 "
                 "nur den letzten Commit des Pakets.")
     pruefsummen_pruefen(e, hauptordner, wurzel, fg, arg.rolle)
-    einstellungen_pruefen(e, hauptordner)
     if arg.rolle == "projektleiter":
         abdeckung_pruefen(e, wurzel, hauptordner, konfig, fg)
     wt_ordner = os.path.join(wurzel, ".claude", "worktrees")

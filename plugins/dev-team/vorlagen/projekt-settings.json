@@ -17,29 +17,14 @@
   },
   "env": {
     "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1",
-    "CLAUDE_CODE_DISABLE_EXPLORE_PLAN_AGENTS": "1",
-    "CLAUDE_CODE_FORK_SUBAGENT": "0",
-    "CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS": "0",
-    "CLAUDE_CODE_DISABLE_WORKFLOWS": "1"
+    "CLAUDE_CODE_FORK_SUBAGENT": "0"
   },
   "permissions": {
     "deny": [
-      "Workflow",
-      "Agent(Explore)",
-      "Agent(Plan)",
-      "Agent(general-purpose)",
-      "Agent(claude-code-guide)",
-      "Agent(statusline-setup)",
-      "Agent(name:*)",
-      "Edit(**/.claude/agents/**)",
-      "Edit(~/.claude/agents/**)",
-      "Edit(**/.claude/skills/**)",
-      "Edit(**/.claude/hooks/**)",
-      "Edit(/.claude/settings.json)",
       "Bash(git push --force*)",
       "Bash(git push -f*)",
-      "Bash(git push origin main*)",
-      "Bash(git push origin master*)",
+      "Bash(git push origin main)",
+      "Bash(git push origin master)",
       "Read(**/.env)",
       "Read(**/.env.*)",
       "Read(**/*.pem)",
@@ -71,23 +56,22 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Read|Grep|Glob|LS|NotebookRead",
+        "matcher": "Agent|Task",
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" waechter",
-            "timeout": 30
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" log-start",
+            "timeout": 10
           }
         ]
       },
       {
-        "matcher": "^(?!(Read|Grep|Glob|LS|NotebookRead)$).*",
+        "matcher": "Agent|Task|SendMessage|Write|Edit|MultiEdit|NotebookEdit|Read|Grep|Glob|Bash|PowerShell|Monitor",
         "hooks": [
           {
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" waechter",
-            "timeout": 60,
-            "onFailure": "block"
+            "timeout": 10
           }
         ]
       }
@@ -107,19 +91,6 @@
           }
         ]
       }
-    ],
-    "ConfigChange": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" einstellungen",
-            "timeout": 20
-          }
-        ]
-      }
     ]
-  },
-  "disableWorkflows": true
+  }
 }
