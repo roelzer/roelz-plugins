@@ -8,5 +8,8 @@
       "Read(**/*.key)"
     ]
   },
-  "disableWorkflows": true
+  "disableWorkflows": true,
+  "worktree": {
+    "baseRef": "head"
+  }
 }

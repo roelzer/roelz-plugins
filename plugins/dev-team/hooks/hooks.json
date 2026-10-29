@@ -1,5 +1,5 @@
 {
-  "description": "Dev-Team: Grundgesetz in jeder Sitzung (auch Cloud), Pfade für jeden Agenten, Wächter (Teamzwang, Schreibrechte, verdeckte Abnahmetests, Schutzschalter), Fertig-Prüfung der Entwickler und automatisches Agenten-Protokoll in docs/AGENTEN_LOG.md.",
+  "description": "Dev-Team: Grundgesetz in jeder Sitzung (auch Cloud), Pfade für jeden Agenten, Wächter (nur lesende Werkzeuge blockieren bei Zeitüberschreitung nicht; Teamzwang, Schreibrechte, verdeckte Abnahmetests, Schutzschalter), Fertig-Prüfung der Entwickler und automatisches Agenten-Protokoll in docs/AGENTEN_LOG.md.",
   "hooks": {
     "SessionStart": [
       {
@@ -25,12 +25,22 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "*",
+        "matcher": "Read|Grep|Glob|LS|NotebookRead",
         "hooks": [
           {
             "type": "command",
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/waechter.sh\"",
-            "timeout": 20,
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "^(?!(Read|Grep|Glob|LS|NotebookRead)$).*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/waechter.sh\"",
+            "timeout": 60,
             "onFailure": "block"
           }
         ]

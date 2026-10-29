@@ -98,6 +98,19 @@ if [ -d "$projekt/.git" ] || [ -n "$(ls -A "$projekt" 2>/dev/null)" ]; then
   if [ ! -f "$projekt/.claude/settings.json" ] || ! grep -q 'roelz-plugins' "$projekt/.claude/settings.json" 2>/dev/null; then
     echo
     echo "Hinweis an den Projektleiter: Im Projekt fehlt .claude/settings.json mit dem Dev-Team. Ohne sie gilt das Dev-Team in Cloud-Sitzungen dieses Projekts nicht. Wird bei /dev-team:projekt-aufnehmen bzw. /dev-team:neues-projekt angelegt."
+  elif grep -q '"timeout": *20,' "$projekt/.claude/settings.json" 2>/dev/null && grep -q 'waechter' "$projekt/.claude/settings.json" 2>/dev/null; then
+    echo
+    echo "Hinweis an den Projektleiter: Die Projekteinstellungen haben noch den alten Wächter-Hook (20 s, blockiert bei Last alles, auch Lesen). Sag Simon das in einem Satz und schlage vor: /dev-team:projekt-aufnehmen erneut ausführen (zeigt die Änderung, schreibt erst nach seinem OK)."
+  fi
+fi
+
+# Versionswechsel mitten im Auftrag (Plugin aktualisiert sich automatisch von GitHub)
+version="$(sed -n 's/^[[:space:]]*"version":[[:space:]]*"\([^"]*\)".*/\1/p' "$plugin/team.json" 2>/dev/null | head -n 1)"
+if [ -n "$version" ] && [ -f "$projekt/.dev-team/plugin-version" ]; then
+  auftrag_version="$(head -n 1 "$projekt/.dev-team/plugin-version" 2>/dev/null)"
+  if [ -n "$auftrag_version" ] && [ "$auftrag_version" != "$version" ]; then
+    echo
+    echo "⚠ Versionswechsel: Der laufende Auftrag begann mit Dev-Team $auftrag_version, jetzt ist $version installiert (automatisches Update). Projektleiter: Sag Simon das zu Beginn in einem Satz mit dem wichtigsten Unterschied aus $plugin_fwd/CHANGELOG.md, arbeite dann am dokumentierten Schritt weiter und trage die neue Version in .dev-team/plugin-version ein."
   fi
 fi
 exit 0

@@ -7,15 +7,21 @@
 # Darf die Sitzung nie blockieren: bei Fehlern still beenden.
 
 modus="${1:-start}"
-eingabe="$(cat 2>/dev/null)"
 projekt="${CLAUDE_PROJECT_DIR:-$PWD}"
 
 # Plugin lokal installiert? Dann übernimmt das Plugin.
 # Nur wenn es installiert UND nicht abgeschaltet ist (in den Einstellungen "dev-team@roelz-plugins": true).
-if grep -q 'dev-team@roelz-plugins' "$HOME/.claude/plugins/installed_plugins.json" 2>/dev/null \
-   && ! grep -Eq '"dev-team@roelz-plugins"[[:space:]]*:[[:space:]]*false' "$HOME/.claude/settings.json" "$projekt/.claude/settings.local.json" 2>/dev/null; then
-  exit 0
+# Läuft vor jedem Werkzeugaufruf: deshalb nur Bash-Bordmittel, keine zusätzlichen Prozesse (grep, cat).
+lies() { local x=""; [ -f "$1" ] && { IFS= read -r -d '' x < "$1" || true; }; printf -v "$2" '%s' "$x"; }
+lies "$HOME/.claude/plugins/installed_plugins.json" _installiert
+if [[ "$_installiert" == *dev-team@roelz-plugins* ]]; then
+  lies "$HOME/.claude/settings.json" _s1; lies "$projekt/.claude/settings.local.json" _s2
+  aus_re='"dev-team@roelz-plugins"[[:space:]]*:[[:space:]]*false'
+  if ! [[ "$_s1" =~ $aus_re ]] && ! [[ "$_s2" =~ $aus_re ]]; then
+    exit 0
+  fi
 fi
+IFS= read -r -d '' eingabe || true
 
 # Lieferkette: Wer das Dev-Team auf einen geprüften Stand festnageln will, setzt DEV_TEAM_REF (Tag oder Commit)
 # in der Cloud-Umgebung oder "plugin_stand" in .claude/dev-team.json. Ohne Angabe: aktueller Stand von main (mit Warnung).

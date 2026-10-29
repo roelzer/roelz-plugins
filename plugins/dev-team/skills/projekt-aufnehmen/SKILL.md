@@ -15,7 +15,7 @@ Du stehst im Hauptordner eines bestehenden Projekts. Prüfe zuerst mit `git stat
 - Gibt es schon eine `CLAUDE.md`? Welche Regeln stehen drin?
 
 ## 2. Struktur ergänzen
-Nur anlegen, was fehlt. **Nichts Bestehendes überschreiben oder löschen.**
+Nur anlegen, was fehlt. **Nichts Bestehendes überschreiben oder löschen.** Ob eine Datei schon da ist, prüfst du **ohne Rücksicht auf Groß-/Kleinschreibung** (unter Windows sind `docs/status.md` und `docs/STATUS.md` dieselbe Datei). Gibt es sie in anderer Schreibweise: Inhalt behalten, fehlende Abschnitte der Vorlage ergänzen, nicht ersetzen.
 ```
 docs/
   lastenheft.md      ← aus ${CLAUDE_PLUGIN_ROOT}/vorlagen/lastenheft.md, mit dem befüllt, was aus Code und CLAUDE.md erkennbar ist (als „rekonstruiert, bitte prüfen“ markieren)
@@ -32,7 +32,7 @@ tests/referenz/      ← bei fachlichen Ergebnissen
 ```
 
 **Dev-Team-Dateien:**
-- `.claude/dev-team-start.sh` aus `${CLAUDE_PLUGIN_ROOT}/vorlagen/projekt-dev-team-start.sh` (holt das Team in Cloud-Sitzungen, tut lokal nichts).
+- `.claude/dev-team-start.sh` aus `${CLAUDE_PLUGIN_ROOT}/vorlagen/projekt-dev-team-start.sh` (holt das Team in Cloud-Sitzungen, tut lokal nichts). Gibt es sie schon in älterer Fassung: mit Write **genau** den Inhalt der Vorlage schreiben (der Wächter lässt das nur bei identischem Inhalt zu). Die alte Fassung startete vor jedem Werkzeugaufruf zusätzliche Prozesse und bremste.
 - `.claude/dev-team.json` aus `${CLAUDE_PLUGIN_ROOT}/vorlagen/dev-team.json`: Profil, Setup-, Test- und Zusatzbefehle aus der Bestandsaufnahme eintragen und Simon zeigen. Den Testbefehl einmal ausführen: Er muss laufen, bevor gebaut wird. Erst committen, wenn alles stimmt – danach ändert sie nur noch `scripts/geschuetzt_schreiben.py` mit Simons Freigabe.
 - `.worktreeinclude` mit einer Zeile `.env`, falls das Projekt eine `.env` nutzt.
 - `.gitignore`: die Zeilen `.dev-team/` und `.claude/worktrees/` ergänzen.
@@ -40,7 +40,7 @@ tests/referenz/      ← bei fachlichen Ergebnissen
 - `docs/ENTSCHEIDUNGEN.md` aus `${CLAUDE_PLUGIN_ROOT}/vorlagen/entscheidungen.md`, falls nicht vorhanden.
 - `.claude/settings.json` (Claude schreibt Einstellungsdateien nie direkt, ob neu oder bestehend):
   `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/settings_zusammenfuehren.py" --vorlage "${CLAUDE_PLUGIN_ROOT}/vorlagen/projekt-settings.json" --ziel .claude/settings.json`
-  zeigt den Unterschied. Simon zeigen, nach seinem OK denselben Befehl mit `--schreiben`. Fremde Einstellungen und Hooks bleiben erhalten.
+  zeigt den Unterschied. Simon zeigen, nach seinem OK denselben Befehl mit `--schreiben`. Fremde Einstellungen und Hooks bleiben erhalten. Auch bei schon aufgenommenen Projekten nach jedem Dev-Team-Update ausführen: Ältere Fassungen hatten einen Wächter-Hook mit 20 s Zeitgrenze, der bei Last **alles** blockierte (seit 3.11: Lesen blockiert nie, Rest 60 s).
 Diese Dateien werden mit committet, damit Teamzwang und Dev-Team in jeder Sitzung dieses Repos gelten, auch in der Cloud.
 
 Gibt es zum Fachgebiet eine Datei in `${CLAUDE_PLUGIN_ROOT}/wissen/fachwissen/`: deren bestätigte Regeln in `fachwissen/regeln.md` übernehmen (Quelle: „aus Bibliothek“).

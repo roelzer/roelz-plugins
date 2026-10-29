@@ -1,6 +1,6 @@
 # Dev-Team – Anleitung
 
-Stand: Oktober 2026 · Version 3.10
+Stand: Oktober 2026 · Version 3.11
 
 Dieses Repo enthält zwei Plugins für Claude Code: **`dev-team`** und **`tool-scout`**. Beide enthalten kein Firmen- oder Kundenwissen und dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
 
@@ -236,6 +236,8 @@ claude plugin update dev-team@roelz-plugins
 ```
 Danach VS Code neu starten.
 
+**Nach dem Update auf 3.11 einmal je Projekt:** `/dev-team:projekt-aufnehmen` ausführen. Es bringt die Projekteinstellungen (aufgeteilter Wächter-Hook: Lesen blockiert nie, Rest 60 s) und `.claude/dev-team-start.sh` auf den neuen Stand und zeigt dir die Änderung vorher. Ältere Projekte hatten einen Hook mit 20 s, der bei Last alles blockierte. Auf jedem Rechner zusätzlich einmal `/dev-team:einrichten` (privat bzw. arbeit), damit Worktrees überall vom aktuellen Stand starten.
+
 **Bestehende Projekte auf Version 3 umstellen:** im Projekt `/dev-team:projekt-aufnehmen` ausführen. Es legt `.claude/dev-team.json` an und zeigt dir die Änderungen an `.claude/settings.json` (Teamzwang, Worktrees), bevor es sie schreibt.
 
 **Am Team selbst arbeiten** (Agenten, `team.json`, Hooks ändern): Der Wächter sperrt das in normalen Sitzungen. Für Wartung Claude Code mit gesetzter Variable starten, z. B. in Git Bash: `DEV_TEAM_WARTUNG=1 claude`. Danach die Plugin-Tests laufen lassen: `python3 -m unittest discover -s plugins/dev-team/tests`.
@@ -243,14 +245,15 @@ Danach VS Code neu starten.
 ## 10a. Freigaben für stundenlanges eigenständiges Bauen
 
 Damit der Lauf nicht bei der ersten Rückfrage stehen bleibt, braucht Claude Code die Erlaubnis für die üblichen Befehle. Empfehlung:
-- **Auto-Modus** von Claude Code (ein Prüfmodell entscheidet über Rückfragen) oder eine **Erlaubnisliste** in deinen Benutzereinstellungen für die Befehle, die das Projekt braucht (z. B. `Bash(npm test)`, `Bash(npm ci)`, `Bash(git status)`, `Bash(git merge *)`, `Bash(git worktree *)`).
+- **Auto-Modus** von Claude Code (ein Prüfmodell entscheidet über Rückfragen) oder eine **Erlaubnisliste** in deinen Benutzereinstellungen für die Befehle, die das Projekt braucht (z. B. `Bash(npm test)`, `Bash(npm ci)`, `Bash(npm run *)`, `Bash(npx *)`, `Bash(curl *localhost*)`, `Bash(git status)`, `Bash(git merge *)`, `Bash(git worktree *)`, dazu die Browser-Werkzeuge `mcp__Claude_Browser`). Die eigentliche Sperre ist der Wächter; seit 3.11 sperrt er nur noch Schadensfälle.
+- **Laptop nicht schlafen lassen,** solange ein Lauf arbeiten soll (Windows: Energieoptionen → „Nie“ im Netzbetrieb, oder einmalig `powercfg /change standby-timeout-ac 0`). Endet die Sitzung (App zu, Laptop aus), stehen die Agenten bis zur nächsten Sitzung. Echte Nachtarbeit geht nur als **Cloud-Sitzung/Routine** auf GitHub – das richten wir gezielt ein.
 - **Nicht** `bypassPermissions`: Dann gelten nur noch Wächter und Sperrregeln, alle anderen Rückfragen fallen weg.
 - Optional später die **Sandbox** von Claude Code: Sie sperrt auf Betriebssystemebene und schließt die Shell-Lücke, läuft aber nur unter Linux, macOS und WSL2 (nicht unter normalem Windows). Unter Windows hilft stattdessen die CI-Vorlage `vorlagen/ci-github.yml`: GitHub prüft bei jedem Push die Tests und Schranken auf einem Rechner, an den kein Agent herankommt.
 
 ## 11. Senior-Qualitätsregeln und Grenzen der Autonomie
 
 - Gebaut wird eigenständig, aber auf einem eigenen Branch. Kein Push auf `main`, kein Löschen, keine Datenbank-Migration, kein Release, keine Schlüssel in der Sitzung und keine Daten an externe Dienste ohne dein Ja. Die vollständige Liste steht im Grundgesetz („Grenzen der Autonomie“).
-- Technische Grenzen: höchstens drei Entwickler und drei Prüfer gleichzeitig, jeder mit Schrittobergrenze, Nachbesserung höchstens fünf Runden. Große Aufträge werden in Meilensteine mit eigenem Stopp geteilt. Der Stand steht in Dateien (`docs/STATUS.md`), damit nach `/clear` nichts verloren geht.
+- Technische Grenzen: höchstens drei Entwickler und drei Prüfer gleichzeitig, jeder mit Schrittobergrenze, Nachbesserung höchstens fünf Runden. Große Aufträge werden in Meilensteine mit höchstens 5 Paketen geteilt; deine Freigabe gilt für alle, angehalten wird nur bei Rot oder harten Stopps. Der Stand steht in Dateien (`docs/STATUS.md`), damit nach `/clear` nichts verloren geht.
 - Gibt dein Auftrag eigene Phasen vor („nur analysieren, noch nichts ändern“), gilt das vor dem Standardablauf.
 - Selbstprüfung des Plugins: `bash plugins/dev-team/scripts/pruefe-plugin.sh` (findet widersprüchliche Namen, tote Verweise, uneinheitliche Versionen, Abweichungen zwischen `team.json` und den Agentendateien und führt die Plugin-Tests aus).
 

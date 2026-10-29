@@ -1,5 +1,25 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.11.0 – Ermöglichen statt sperren
+
+Anlass: Pilot „Unöder Haus“ (28./29.10.2026). Der Wächter blockierte bei Rechnerlast alles, der Projektleiter konnte die App nicht starten oder zeigen, Worktrees starteten falsch, das Team stand stundenlang. Neuer Grundsatz (Simon): Das Team soll Vorteile bringen. Der Wächter sperrt nur noch, was Schaden anrichtet, nicht umkehrbar ist oder den Kern der Qualität bricht.
+
+- **Wächter schneller:** Das bewährte Python wird gemerkt (ein Programmstart statt bis zu sechs je Werkzeugaufruf), nur noch Bash-Bordmittel, Projekt-Startskript ohne Zusatzprozesse. Dauert ein Lauf länger als 2 s, steht ⏱ im Agenten-Log.
+- **Hook aufgeteilt:** Lesen (Read, Grep, Glob) blockiert bei Zeitüberschreitung nie mehr; alles andere hat 60 s statt 20 s und blockiert im Zweifel weiter.
+- **Projektleiter ohne Erlaubnisliste:** Er darf die App starten und zeigen (Dev-Server, `npx` mit installierten Paketen, Projektskripte, `curl` an localhost auch mit POST), die Browser-Werkzeuge der App nutzen und `.claude/launch.json` schreiben. Gesperrt bleiben Code-Schreiben, neue Abhängigkeiten (das macht der Entwickler) und alle Schadensfälle.
+- **Entwickler:** darf Abhängigkeiten installieren (die Abhängigkeits-Schranke prüft sie beim Merge) und neue Testkonfiguration anlegen; bestehende Tests und Testkonfiguration bleiben tabu. Lesezugriff auf Paket-Caches und Temp. `cd` mit absolutem Worktree-Pfad und Grep mit Regex-Mustern werden nicht mehr fälschlich gesperrt.
+- **Werkzeuge:** Unbekannte Werkzeuge laufen mit Hinweis (ℹ) durch; gesperrt bleiben Werkzeuge, die Helfer, Sitzungen oder Zeitpläne anlegen, Shell auf einem Rechner ausführen oder nach außen wirken. Zusatz-Werkzeuge (MCP) für alle Rollen nach denselben Regeln. Claude in Chrome (echter Browser mit Simons Anmeldungen) nur zum Ansehen und für localhost.
+- **Schutzschalter** zählen nur noch in Einstellungsdateien bzw. beim Setzen; Doku oder Commit-Texte, die sie erwähnen, sind kein Schalter mehr.
+- **PowerShell:** Windows-Pfade werden richtig gelesen (vorher Fehlsperren und eine Lücke beim Löschen); `Start-Process` erlaubt.
+- **Höchstens 3 Entwickler:** nur noch Hinweis, keine Sperre (abgebrochene Sitzungen blockierten sonst stundenlang).
+- **Worktrees:** `worktree.baseRef: head` auch in den Benutzereinstellungen; neues `scripts/worktree_vorbereiten.py` übernimmt `node_modules` aus dem Hauptordner, wenn die Lockdatei gleich ist (spart `npm ci` je Paket).
+- **Auftrag ohne Leerlauf:** Aufnahme-Prüfung als Allererstes; höchstens 5 Pakete je Meilenstein, kein Stopp zwischen Meilensteinen (Simons Freigabe gilt für den ganzen Plan); kein einzelnes Vorab-Paket; Testkonfiguration über den Tester vor der Paketvergabe; ein ⛔ hält den Lauf nie an; neue Abhängigkeit mit grüner Schranke ist kein harter Stopp mehr; Dev-Server im Hintergrund.
+- **Versionswarnung:** Ändert sich die Dev-Team-Version mitten im Auftrag (automatisches Update), meldet das der Sitzungsstart.
+- **Projekt-Aufnahme:** prüft Dateinamen ohne Rücksicht auf Groß-/Kleinschreibung (STATUS.md/status.md), bringt Startskript und Hooks bestehender Projekte auf den neuen Stand.
+- **Reibungstests** (`tests/test_reibung.py`): Ein ganzer Auftrag wird mit allen Rollen nachgespielt. Jeder normale Arbeitsschritt, den der Wächter sperrt, macht den Test rot; die Gegenprobe hält die Schadensfälle gesperrt.
+- Forks bleiben gesperrt (Simons Entscheidung).
+- **Nachprüfung durch einen unabhängigen Reviewer** (vor dem Merge geschlossen, alle mit Test): Wächter-Python ist nur aus festen Kandidaten wählbar und läuft isoliert (`-I`); `python-pfad` ist über jeden Weg gesperrt; ein Entwickler kann nicht durch die `node_modules`-Verknüpfung in den Hauptordner schreiben (echter Pfad zählt), `npm install` und das Aufräumen verlangen vorher `--trennen`; die localhost-Ausnahme für curl gilt nicht mit Proxy-/Umleitungsoptionen; lokale Netz-Einzeiler nur als wörtliches `fetch('http://localhost…')`; der Projektleiter startet keine Skripte aus seinen eigenen Schreiborten (docs/, .dev-team/, ~/.claude/, Temp); MCP-Werkzeuge, die schreiben, committen, migrieren oder Geheimnisse setzen, bleiben gesperrt; `perl -pi`/`ruby -i` zählen als Schreiben; verdeckte Tests werden für Entwickler schon vor dem Python-Start gesperrt.
+
 ## 3.10.0 – Jede Frage hat einen Besitzer
 
 - **Grundgesetz „Wer prüft was“:** Sicherheit/Betrieb → Sicherheitsprüfer, Komplexität → Pragmatiker, Struktur → Architekt/Reviewer, Testqualität → Tester, Fachliches → Fachprüfer, Plan → Kritiker.

@@ -449,8 +449,8 @@ class ShellUmgehungen(Basis):
     def test_lesende_einzeiler_erlaubt(self):
         self.assertEqual(self.bash("python3 -c \"import json; print(json.load(open('package.json')))\"", "architekt"), 0)
         self.assertEqual(self.bash("node -e \"console.log(1 > 0)\"", "architekt"), 0)
-        # Projektleiter: Einzeiler stehen nicht auf seiner Erlaubnisliste
-        self.assertEqual(self.bash("node -e \"console.log(1 > 0)\""), 2)
+        # 3.11: Projektleiter darf lesende Einzeiler ausführen (keine Erlaubnisliste mehr)
+        self.assertEqual(self.bash("node -e \"console.log(1 > 0)\""), 0)
 
     def test_neue_claude_sitzung_blockiert(self):
         for befehl in ("claude -p 'bau das'", "npx @anthropic-ai/claude-code -p x", "cd src && claude"):
@@ -459,14 +459,19 @@ class ShellUmgehungen(Basis):
     def test_pakete_nicht_per_befehl(self):
         for befehl in ("npm install lodash", "npm i -D left-pad", "pip install requests", "yarn add x",
                        "uv pip install httpx", "poetry add x"):
-            self.assertEqual(self.bash(befehl, "entwickler"), 2, befehl)
+            self.assertEqual(self.bash(befehl), 2, befehl)  # Projektleiter: Abhängigkeiten kommen über ein Paket
+            self.assertEqual(self.bash(befehl, "entwickler"), 0, befehl)  # 3.11: Schranke prüft beim Merge
         for befehl in ("npm ci", "npm install", "pip install -r requirements.txt", "pip install -e ."):
             self.assertEqual(self.bash(befehl, "entwickler"), 0, befehl)
 
     def test_schutzschalter_in_shell(self):
-        for befehl in ("python -c \"x='bypassPermissions'\"", "echo '{\"defaultMode\": \"x\"}' > a.json",
-                       "claude --dangerously-skip-permissions"):
+        for befehl in ("python -c \"open('a','w').write('bypassPermissions')\"",
+                       "echo '{\"defaultMode\": \"x\"}' > a.json", "claude --dangerously-skip-permissions",
+                       "export DEV_TEAM_WARTUNG=1"):
             self.assertEqual(self.bash(befehl), 2, befehl)
+        # 3.11: Nur Erwähnen ist kein Schalter
+        for befehl in ("python -c \"x='bypassPermissions'\"", "grep -rn disableAllHooks docs"):
+            self.assertEqual(self.bash(befehl), 0, befehl)
 
     def test_teamkonfig_nicht_loeschbar(self):
         self.assertEqual(self.bash("rm .claude/dev-team.json"), 2)
@@ -554,10 +559,16 @@ class Robustheit(Basis):
                       os.path.join(PLUGIN, "vorlagen", "projekt-settings.json")):
             with open(datei, encoding="utf-8") as f:
                 d = json.load(f)
+            # 3.11: Nur lesende Werkzeuge blockieren bei Zeitüberschreitung nicht; alles andere (auch neue
+            # Werkzeuge) läuft über den Rest-Matcher und blockiert im Zweifel.
+            lesen = "Read|Grep|Glob|LS|NotebookRead"
             for eintrag in d["hooks"]["PreToolUse"]:
                 for h in eintrag["hooks"]:
-                    self.assertEqual(h.get("onFailure"), "block", datei)
-                self.assertEqual(eintrag["matcher"], "*", datei)  # alle Werkzeuge, auch neue
+                    self.assertEqual(h.get("onFailure"), None if eintrag["matcher"] == lesen else "block", datei)
+            import re as _re
+            rest = [e["matcher"] for e in d["hooks"]["PreToolUse"] if e["matcher"] != lesen]
+            for w in ("Bash", "Write", "Workflow", "NeuesWerkzeug2027", "mcp__a__b"):
+                self.assertTrue(any(_re.search(m, w) for m in rest), w)
 
 
 class Audit31Luecken(Basis):
@@ -593,8 +604,11 @@ class Audit31Luecken(Basis):
     def test_projektleiter_fuehrt_keine_projektskripte_aus(self):
         open(self.p("mach.sh"), "w").write("echo x > src/a.js\n")
         open(self.p("mach.py"), "w").write("open('src/a.js','w')\n")
-        self.assertEqual(self.bash("bash mach.sh"), 2)
-        self.assertEqual(self.bash("python3 mach.py"), 2)
+        # 3.11: Der Projektleiter darf Projektskripte ausführen (App starten, Werkzeuge). Restrisiko: Ein Skript
+        # könnte Code schreiben – das sieht der Gesamtreview im Diff. Direktes Code-Schreiben bleibt gesperrt.
+        self.assertEqual(self.bash("bash mach.sh"), 0)
+        self.assertEqual(self.bash("python3 mach.py"), 0)
+        self.assertEqual(self.bash("echo x > src/a.js"), 2)
         self.assertEqual(self.bash("bash %s/scripts/pruefe-tests.sh --basis HEAD" % PLUGIN), 0)
 
     def test_plugin_skript_nur_als_erster_befehl(self):
@@ -602,8 +616,10 @@ class Audit31Luecken(Basis):
 
     def test_paket_ausfuehrer(self):
         for befehl in ("npx cowsay hi", "bunx x", "uvx ruff", "pnpm dlx x", "npm exec x", "pipx run x",
-                       "python3 -m pip install requests", "py -m pip install httpx"):
+                       ):
             self.assertEqual(self.bash(befehl, "entwickler"), 2, befehl)
+        for befehl in ("python3 -m pip install requests", "py -m pip install httpx"):
+            self.assertEqual(self.bash(befehl, "entwickler"), 0, befehl)  # 3.11
         with open(self.p("package.json"), "w") as f:
             json.dump({"devDependencies": {"vitest": "1.0.0"}}, f)
         self.assertEqual(self.bash("npx vitest run", "entwickler"), 0)
@@ -708,7 +724,12 @@ class Audit32(Basis):
 
     def test_entwickler_legt_keine_testkonfig_an(self):
         e = self.schreiben(os.path.join(self.projekt, "conftest.py"), "entwickler")
-        self.assertEqual(self.lauf(e)[0], 2)
+        self.assertEqual(self.lauf(e)[0], 0)  # 3.11: neue Testkonfig darf er anlegen
+        with open(os.path.join(self.projekt, "conftest.py"), "w") as f:
+            f.write("x")
+        git(self.projekt, "add", "conftest.py")
+        git(self.projekt, "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "conftest")
+        self.assertEqual(self.lauf(e)[0], 2)  # bestehende nicht
         e = self.schreiben(os.path.join(self.projekt, "conftest.py"), "tester")
         self.assertEqual(self.lauf(e)[0], 0)
 
@@ -769,7 +790,7 @@ class Audit33(Basis):
 
     def test_befehlsersetzung_wird_geprueft(self):
         for befehl in ('echo "$(echo y > src/a.py)"', "echo `rm src/rechnung.js`", 'git commit -m "$(claude -p hi)"',
-                       "cat <(curl x)", "diff a >(tee src/a.js)"):
+                       "cat <(git push --force)", "diff a >(tee src/a.js)"):
             self.assertEqual(self.bash(befehl), 2, befehl)
         for befehl in ('echo "$(git rev-parse HEAD)"', "echo '$(rm src/x)'"):
             self.assertEqual(self.bash(befehl), 0, befehl)
@@ -780,13 +801,14 @@ class Audit33(Basis):
 
     def test_workflow_und_unbekannte_werkzeuge(self):
         self.assertEqual(self.lauf({"tool_name": "Workflow", "tool_input": {"script": "x"}})[0], 2)
-        self.assertEqual(self.lauf({"tool_name": "NeuesWerkzeug2027", "tool_input": {}})[0], 2)
+        self.assertEqual(self.lauf({"tool_name": "NeuesWerkzeug2027", "tool_input": {}})[0], 0)  # 3.11: ℹ statt Sperre
+        self.assertEqual(self.lauf({"tool_name": "TeamCreate", "tool_input": {}})[0], 2)
         self.assertEqual(self.lauf({"tool_name": "TodoWrite", "tool_input": {}})[0], 0)
         self.assertEqual(self.lauf({"tool_name": "mcp__memory__memory_read", "tool_input": {}})[0], 0)
         self.assertEqual(self.lauf({"tool_name": "mcp__ide__executeCode", "tool_input": {}})[0], 2)
         e = {"tool_name": "mcp__memory__memory_read", "tool_input": {}, "agent_type": "dev-team:entwickler",
              "agent_id": "a"}
-        self.assertEqual(self.lauf(e)[0], 2)
+        self.assertEqual(self.lauf(e)[0], 0)  # 3.11: lesende Zusatz-Werkzeuge für alle Rollen
 
     def test_getarnter_heredoc(self):
         for befehl in ("echo '<<X'\necho y > src/a.py\nX=1", "echo \"<<X\"\nbash -c 'claude -p x'\nX=1"):
@@ -806,8 +828,13 @@ class Audit33(Basis):
         skript = os.path.join(self.temp, "h.py")
         with open(skript, "w") as f:
             f.write("open('src/a.py','w')\n")
-        for befehl in ("python3 " + skript, "node " + skript, "curl -s https://x.example", "sort -o src/a.js x",
-                       "make build", "perl -e 1", "awk '{system(\"rm x\")}' x", "sed -i 1d src/rechnung.js", "vim -es x",
+        # 3.11: keine Erlaubnisliste mehr – Skripte, curl GET, make laufen; Code-Schreiben bleibt gesperrt.
+        for befehl in ("curl -s https://x.example", "make build", "perl -e 1"):
+            self.assertEqual(self.bash(befehl), 0, befehl)
+        # Skripte an eigenen Schreiborten (hier Temp) startet der Projektleiter nicht (Review 3.11)
+        for befehl in ("python3 " + skript, "node " + skript):
+            self.assertEqual(self.bash(befehl), 2, befehl)
+        for befehl in ("sort -o src/a.js x", "awk '{system(\"rm x\")}' x", "sed -i 1d src/rechnung.js", "vim -es x",
                        "script -c 'echo' /dev/null", "setsid bash -c 'echo x > src/a.js'"):
             self.assertEqual(self.bash(befehl), 2, befehl)
         for befehl in ("git status", "ls -la", "cat docs/STATUS.md", "grep -rn summe src", "npm test",
@@ -938,7 +965,7 @@ class Audit34P0(Basis):
 
     def test_mcp_nur_lesend(self):
         for name, erwartet in (("mcp__github__push_files", 2), ("mcp__github__create_pull_request", 2),
-                               ("mcp__github__merge_pull_request", 2), ("mcp__memory__memory_write", 2),
+                               ("mcp__github__merge_pull_request", 2), ("mcp__memory__memory_write", 0),
                                ("mcp__github__get_file_contents", 0), ("mcp__github__list_issues", 0),
                                ("mcp__memory__memory_read", 0), ("mcp__claude_ai__conversation_search", 0)):
             self.assertEqual(self.lauf({"tool_name": name, "tool_input": {}})[0], erwartet, name)
@@ -968,7 +995,7 @@ class PilotReibung(Basis):
 
     def test_schleifen_fuer_projektleiter(self):
         self.assertEqual(self.bash("for f in docs/STATUS.md docs/lastenheft.md; do echo \"== $f\"; cat $f; done"), 0)
-        self.assertEqual(self.bash("for f in a b; do python3 x.py; done"), 2)
+        self.assertEqual(self.bash("for f in a b; do python3 x.py; done"), 0)  # 3.11
         self.assertEqual(self.bash("if [ -f docs/STATUS.md ]; then cat docs/STATUS.md; fi"), 0)
 
     def test_neue_harmlose_werkzeuge(self):
@@ -1037,7 +1064,8 @@ class Audit35(Basis):
     def test_projektleiter_liest_mit_sed_awk(self):
         for befehl in ("sed -n 1,20p docs/STATUS.md", "awk 'NR<5' docs/STATUS.md", "sed 's/a/b/' docs/STATUS.md"):
             self.assertEqual(self.bash(befehl), 0, befehl)
-        for befehl in ("sed -i 's/a/b/' docs/STATUS.md", "sed 's/a/b/w src/x.js' docs/STATUS.md",
+        self.assertEqual(self.bash("sed -i 's/a/b/' docs/STATUS.md"), 0)  # 3.11: eigene Prozessdatei
+        for befehl in ("sed -i 's/a/b/' src/rechnung.js", "sed 's/a/b/w src/x.js' docs/STATUS.md",
                        "awk '{print > \"src/x.js\"}' docs/STATUS.md"):
             self.assertEqual(self.bash(befehl), 2, befehl)
 
@@ -1052,7 +1080,10 @@ class Audit35(Basis):
             f.write("| Zeit | | Agent | Auftrag |\n|---|---|---|---|\n")
             for i in range(3):
                 f.write("| %s | ▶ | entwickler | P%d [sonnet] |\n" % (zeit, i))
-        self.assertEqual(self.lauf(self.agent("dev-team:entwickler", isolation="worktree"))[0], 2)
+        # 3.11: kein Sperren mehr (abgebrochene Sitzungen ließen sonst stundenlang keinen Entwickler zu), nur Hinweis
+        self.assertEqual(self.lauf(self.agent("dev-team:entwickler", isolation="worktree"))[0], 0)
+        with open(self.p("docs/AGENTEN_LOG.md"), encoding="utf-8") as f:
+            self.assertIn("Richtwert", f.read())
         with open(self.p("docs/AGENTEN_LOG.md"), "a", encoding="utf-8") as f:
             f.write("| %s | ■ 🟢 | entwickler | fertig |\n" % zeit)
         self.assertEqual(self.lauf(self.agent("dev-team:entwickler", isolation="worktree"))[0], 0)
