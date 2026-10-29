@@ -17,6 +17,7 @@ rolle=""
 if [[ "$eingabe" =~ \"agent_type\"[[:space:]]*:[[:space:]]*\"([^\"]*)\" ]]; then
   rolle="${BASH_REMATCH[1]##*:}"
   rolle="${rolle,,}"
+  rolle="${rolle#dev-team-}"   # Cloud-Kopien heißen evtl. dev-team-entwickler
 fi
 [[ "$rolle" == "entwickler" || "$rolle" == "tester" ]] || exit 0
 

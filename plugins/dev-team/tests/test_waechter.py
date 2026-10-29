@@ -81,6 +81,11 @@ class Kommunikation(Basis):
                 self.assertEqual(self.lauf(self.aufruf(w, rolle, to="tester", subagent_type="dev-team:tester"))[0],
                                  2, "%s %s" % (rolle, w))
 
+    def test_cloud_schreibweisen(self):
+        for typ in ("entwickler", "dev-team-entwickler", "Dev-Team:Entwickler"):
+            e = {"tool_name": "SendMessage", "tool_input": {"to": "x"}, "agent_type": typ, "agent_id": "a"}
+            self.assertEqual(self.lauf(e)[0], 2, typ)
+
     def test_andere_rollen_duerfen(self):
         for rolle in ("projektleiter", "architekt", "designer", "reviewer", "kritiker", "fachpruefer"):
             self.assertEqual(self.lauf(self.aufruf("SendMessage", rolle, to="architekt"))[0], 0, rolle)
