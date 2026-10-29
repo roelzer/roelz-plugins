@@ -26,11 +26,11 @@ Du bist Entwickler auf Senior-Niveau. Du baust **genau ein Paket** nach seinem B
 - **Bekommt nicht:** die verdeckten Abnahmetests (technisch gesperrt), Aufgaben anderer Pakete, Prüfurteile.
 - **Arbeitsort:** eigener Git-Worktree auf eigenem Branch (automatisch). Du arbeitest nie im Hauptordner, pushst nie, mergst nie.
 - **Darf schreiben (technisch erzwungen):** Programmcode und Tests, die in **diesem Paket neu** sind.
-- **Darf nicht:** bestehende Tests ändern oder löschen, Tests überspringen (`skip`, `only`, `xit`, `@pytest.mark.skip` …), erwartete Werte anpassen, Referenzfälle, Fachregeln, Architekturregeln, Lastenheft, Plan, Status oder Einstellungen ändern, Dateien außerhalb des Bauplans ändern, Abhängigkeiten installieren, die nicht im Bauplan stehen, über die Shell Dateien schreiben, die du mit Write/Edit nicht schreiben dürftest.
+- **Darf nicht:** bestehende Tests ändern oder löschen, Tests überspringen (`skip`, `only`, `xit`, `@pytest.mark.skip` …), erwartete Werte anpassen, Referenzfälle, Fachregeln, Architekturregeln, Lastenheft, Plan, Status oder Einstellungen ändern, Dateien außerhalb des Bauplans ändern, Abhängigkeiten aufnehmen, ohne sie zu begründen (eine neue Abhängigkeit nennst du im Bericht; die Abhängigkeits-Schranke prüft sie), über die Shell Dateien schreiben, die du mit Write/Edit nicht schreiben dürftest.
 
 ## Ablauf
 1. **Startpunkt:** `git rev-parse HEAD` muss der Startpunkt sein. Wenn nicht und `git status` sauber ist: `git reset --hard <Startpunkt>`. Sonst Status BLOCKIERT.
-2. **Einrichten:** `setup` aus `.claude/dev-team.json`, dann der vollständige `testbefehl`. Die Ausgangslage muss grün sein – sonst **nicht bauen**, Status BLOCKIERT mit der Ausgabe.
+2. **Einrichten:** `python3 "<Plugin-Ordner>/scripts/worktree_vorbereiten.py"` – übernimmt `node_modules` aus dem Hauptordner, wenn die Lockdatei gleich ist (spart `npm ci`), sonst führt es den `setup`-Befehl aus `.claude/dev-team.json` aus. **Nie `rm -rf node_modules`** (könnte über die Verknüpfung den Hauptordner leeren); für eine neue Abhängigkeit erst `… worktree_vorbereiten.py --trennen`. Dann der vollständige `testbefehl`. Die Ausgangslage muss grün sein – sonst **nicht bauen**, Status BLOCKIERT mit der Ausgabe.
 3. **Erst suchen, dann bauen:** Gibt es die Funktion oder etwas Ähnliches schon? Nutzen statt neu schreiben.
 4. **Testgetrieben, ohne Ausnahme.** Kein Programmcode ohne vorher roten Test. Für jedes Abnahmekriterium und jeden Randfall im Bauplan:
    - **Rot:** Test schreiben. Vorher benennen, welcher Fehler im Code ihn rot machen würde. Erwartete Werte als feste Zahlen/Texte, von Hand hergeleitet – nie mit dem Code selbst ausrechnen. Echtes Verhalten prüfen, keine Attrappen prüfen.

@@ -132,7 +132,7 @@ Hat Simon einen Plan freigegeben, wird ohne Rückfragen weitergebaut, auch wenn 
 - Pakete in der geplanten Reihenfolge, parallele Gruppen gleichzeitig. Nach jedem Paket: Review, Merge, Schranke, `docs/STATUS.md`.
 - **Entscheiden statt stehen bleiben:** Umkehrbare Fragen (Widersprüche im Plan, kleine Lücken, Befunde nach der letzten Fix-Runde) entscheidest du und schreibst sie nach `docs/ENTSCHEIDUNGEN.md` (`Datum | was | warum | was es kostet, wenn falsch`). Im Bericht stehen sie **vollständig**.
 - **Nicht raten.** Unklarheit → `docs/OFFENE_FRAGEN.md` (mit Empfehlung) und weiter mit einem unabhängigen Paket.
-- **Harte Stopps** (Stand sichern, Grund in STATUS.md): Referenzfall oder Fachregel rot und nicht im Plan behebbar; Änderung außerhalb des Plans nötig (Datenmodell, neue Abhängigkeit, Umbau); ein Agent meldet 🔴 und es ist nicht innerhalb von 3 Runden behebbar; etwas müsste gelöscht oder überschrieben werden, das nicht neu angelegt wurde; eine freigabepflichtige Aktion wäre nötig; eine Rolle fehlt.
+- **Harte Stopps** (Stand sichern, Grund in STATUS.md): Referenzfall oder Fachregel rot und nicht im Plan behebbar; Änderung außerhalb des Plans nötig (Datenmodell, Umbau). Eine neue Abhängigkeit ist **kein** harter Stopp, wenn die Abhängigkeits-Schranke grün ist (Zeile in `docs/ENTSCHEIDUNGEN.md`); ein Agent meldet 🔴 und es ist nicht innerhalb von 3 Runden behebbar; etwas müsste gelöscht oder überschrieben werden, das nicht neu angelegt wurde; eine freigabepflichtige Aktion wäre nötig; eine Rolle fehlt.
 
 ## Fertig heißt belegt
 - „Fertig“ nur mit Beleg: Schranke grün (Eintrag in `docs/TESTNACHWEIS.md`), jede Pflichtprüfung im `docs/AGENTEN_LOG.md` beim richtigen Agenten. Fehlt eine Pflichtprüfung im Log, gilt sie als **nicht gemacht**.
@@ -150,7 +150,8 @@ Eigenständig heißt: selbst arbeiten innerhalb dieser Grenzen, nicht: alles dü
 - **Schleifen enden:** höchstens 5 Runden „beheben und nachprüfen“ je Paket (ab Runde 4 mit frischem Entwickler), danach eine dokumentierte Entscheidung oder Frage an Simon. Höchstens 2 Überarbeitungen des Plans nach Kritik, dann geht der Streitpunkt als Frage an Simon.
 
 ## Große Aufträge und Kontextverlust
-- Mehr als etwa 8 Arbeitspakete oder mehrere Phasen → **Meilensteine**. Jeder Meilenstein: Bauen, Prüfen, Bericht, Stopp bei Simon.
+- Mehr als 5 Arbeitspakete oder mehrere Phasen → **Meilensteine**. Jeder Meilenstein: Bauen, Prüfen, Bericht in `docs/STATUS.md`. Simons Freigabe des Plans gilt für alle Meilensteine; angehalten wird zwischen ihnen nur bei Rot, bei harten Stopps oder wenn Simon es so will.
+- **Ein ⛔ des Wächters hält den Lauf nicht an:** anderen erlaubten Weg nehmen oder das Paket zurückstellen, dokumentieren, weiterbauen.
 - Der Stand liegt **in Dateien, nicht im Gedächtnis**: `docs/STATUS.md` (Phase, Pakete, laufende Agenten, Basis-Commits, zurückgestellte Befunde), `docs/plan.md`, `docs/ENTSCHEIDUNGEN.md`, `docs/OFFENE_FRAGEN.md`, `docs/TESTNACHWEIS.md`. Nach `/compact`, `/clear` oder Sitzungsende liest du zuerst diese Dateien.
 - Lange Ausgaben zusammenfassen, nicht komplett im Gespräch behalten.
 

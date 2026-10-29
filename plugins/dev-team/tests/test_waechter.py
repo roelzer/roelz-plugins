@@ -559,10 +559,16 @@ class Robustheit(Basis):
                       os.path.join(PLUGIN, "vorlagen", "projekt-settings.json")):
             with open(datei, encoding="utf-8") as f:
                 d = json.load(f)
+            # 3.11: Nur lesende Werkzeuge blockieren bei Zeitüberschreitung nicht; alles andere (auch neue
+            # Werkzeuge) läuft über den Rest-Matcher und blockiert im Zweifel.
+            lesen = "Read|Grep|Glob|LS|NotebookRead"
             for eintrag in d["hooks"]["PreToolUse"]:
                 for h in eintrag["hooks"]:
-                    self.assertEqual(h.get("onFailure"), "block", datei)
-                self.assertEqual(eintrag["matcher"], "*", datei)  # alle Werkzeuge, auch neue
+                    self.assertEqual(h.get("onFailure"), None if eintrag["matcher"] == lesen else "block", datei)
+            import re as _re
+            rest = [e["matcher"] for e in d["hooks"]["PreToolUse"] if e["matcher"] != lesen]
+            for w in ("Bash", "Write", "Workflow", "NeuesWerkzeug2027", "mcp__a__b"):
+                self.assertTrue(any(_re.search(m, w) for m in rest), w)
 
 
 class Audit31Luecken(Basis):

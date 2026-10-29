@@ -268,5 +268,53 @@ class Gegenprobe(Auftrag):
             self.darf_nicht(self.aufruf(w), "MCP " + w)
 
 
+
+class Tempo(Auftrag):
+    """waechter.sh merkt sich das bewährte Python und misst langsame Läufe."""
+
+    def test_python_wird_gemerkt_und_gefaelschtes_faellt_auf(self):
+        merk = os.path.join(self.heim, ".claude", "dev-team", "python-pfad")
+        self.assertEqual(self.lauf(self.aufruf("Read", file_path="x"), skript="sh")[0], 0)
+        self.assertTrue(os.path.isfile(merk))
+        falsch = os.path.join(self.tmp, "falsch-python")
+        with open(falsch, "w") as f:
+            f.write("#!/bin/sh\necho ok\nexit 0\n")
+        os.chmod(falsch, 0o755)
+        with open(merk, "w") as f:
+            f.write(falsch + "\n")
+        # Gefälschtes Python liefert keinen Beleg → echtes wird gesucht, Code-Schreiben bleibt gesperrt
+        self.assertEqual(self.lauf(self.schreiben(os.path.join(self.projekt, "src", "a.js")), skript="sh")[0], 2)
+        with open(merk) as f:
+            self.assertNotIn("falsch", f.read())
+
+    def test_merkdatei_ist_geschuetzt(self):
+        merk = os.path.join(self.heim, ".claude", "dev-team", "python-pfad")
+        self.darf_nicht(self.schreiben(merk), "PL schreibt python-pfad")
+        self.darf_nicht(self.shell("echo /tmp/x > %s" % merk), "PL Shell python-pfad")
+        self.darf(self.schreiben(os.path.join(self.heim, ".claude", "dev-team", "lessons-arbeit.md")), "Lessons")
+
+    def test_langsamer_lauf_wird_protokolliert(self):
+        import time
+        self.lauf(self.aufruf("Read", file_path="x"), env_zusatz={"DEV_TEAM_HOOK_START": "%.6f" % (time.time() - 5)})
+        with open(os.path.join(self.projekt, "docs", "AGENTEN_LOG.md"), encoding="utf-8") as f:
+            self.assertIn("⏱", f.read())
+
+    def test_hooks_aufgeteilt(self):
+        with open(os.path.join(PLUGIN, "hooks", "hooks.json"), encoding="utf-8") as f:
+            pre = json.load(f)["hooks"]["PreToolUse"]
+        lesen = [h for h in pre if h["matcher"] == "Read|Grep|Glob|LS|NotebookRead"]
+        rest = [h for h in pre if h["matcher"] != "Read|Grep|Glob|LS|NotebookRead"]
+        self.assertEqual(len(lesen), 1)
+        self.assertNotIn("onFailure", lesen[0]["hooks"][0])  # Zeitüberschreitung beim Lesen: durchlassen
+        self.assertEqual(rest[0]["hooks"][0]["onFailure"], "block")
+        self.assertGreaterEqual(rest[0]["hooks"][0]["timeout"], 60)
+        import re
+        m = re.compile(rest[0]["matcher"])
+        for w in ("Bash", "Write", "Agent", "mcp__x__y", "Edit", "Readme"):
+            self.assertTrue(m.search(w), w)
+        for w in ("Read", "Grep", "Glob", "LS", "NotebookRead"):
+            self.assertFalse(m.search(w), w)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -38,6 +38,7 @@ import fnmatch
 import subprocess
 import sys
 import tempfile
+import time
 from datetime import datetime
 
 BLOCK = 2
@@ -437,6 +438,9 @@ def pruefe_ziel(absolut, team, projekt, plugin, rolle, art="schreiben", ueber_sh
         if rel_heim == "CLAUDE.md":
             blockieren("~/.claude/CLAUDE.md (Grundgesetz-Verknüpfung, Baukasten-Pfad) wird nur über "
                        "scripts/claude_md_block.py nach Simons OK geschrieben%s." % weg)
+        if rel_heim == "dev-team/python-pfad":
+            blockieren("~/.claude/dev-team/python-pfad legt fest, mit welchem Python der Wächter läuft, und wird "
+                       "nur vom Wächter selbst geschrieben%s." % weg)
         if re.match(r"projects/[^/]+/memory(/|$)", rel_heim):
             return  # Projekt-Gedächtnis von Claude Code
         if not rel_heim.startswith("dev-team/"):
@@ -518,6 +522,15 @@ def pruefe_schreiben(eingabe, team, projekt, plugin, rolle):
     cwd = eingabe.get("cwd") or projekt or os.getcwd()
     absolut = absolut_aus(cwd, pfad)
 
+    if plugin and norm(absolut).endswith("/.claude/dev-team-start.sh") and rolle == "projektleiter":
+        try:
+            with open(os.path.join(plugin, "vorlagen", "projekt-dev-team-start.sh"), encoding="utf-8") as f:
+                vorlage = f.read()
+        except OSError:
+            vorlage = None
+        if vorlage is not None and ti.get("content") is not None and \
+                str(ti.get("content")).replace("\r\n", "\n") == vorlage.replace("\r\n", "\n"):
+            return  # Startskript auf den aktuellen Stand der Plugin-Vorlage bringen (projekt-aufnehmen)
     inhalt = " ".join(str(ti.get(k) or "") for k in ("content", "new_string", "new_source"))
     for e in ti.get("edits") or []:
         if isinstance(e, dict):
@@ -1522,6 +1535,7 @@ def lauf(roh, plugin):
     _KONTEXT["team"] = team
     _KONTEXT["cwd"] = eingabe.get("cwd") if isinstance(eingabe.get("cwd"), str) else None
     werkzeug = str(eingabe.get("tool_name") or "")
+    _KONTEXT["werkzeug"] = werkzeug
     rolle = rolle_aus(eingabe.get("agent_type"), team, projekt)
     _KONTEXT["rolle"] = rolle or str(eingabe.get("agent_type"))
 
@@ -1588,7 +1602,22 @@ def pruefe_unbekannt(werkzeug, team, rolle, ti=None):
     log_zeile(_KONTEXT["projekt"], "ℹ", _KONTEXT["rolle"] or rolle, "Unbekanntes Werkzeug %s benutzt" % werkzeug)
 
 
+def zeit_melden():
+    """Dauert ein Wächter-Lauf (ab Start des Hooks) länger als 2 s, eine Zeile ⏱ ins Agenten-Log – so sieht
+    man, ob der Rechner unter Last den Wächter ausbremst."""
+    roh = (os.environ.get("DEV_TEAM_HOOK_START") or "").replace(",", ".")
+    try:
+        dauer = time.time() - float(roh)
+    except ValueError:
+        return
+    if dauer > 2 and _KONTEXT["projekt"]:
+        log_zeile(_KONTEXT["projekt"], "⏱", _KONTEXT["rolle"] or "projektleiter",
+                  "Wächter brauchte %.1f s (%s)" % (dauer, _KONTEXT.get("werkzeug") or "?"))
+
+
 def main():
+    if sys.version_info < (3, 8):
+        sys.exit(1)  # zu altes Python: waechter.sh sucht ein anderes
     utf8_einrichten()
     plugin = sys.argv[1] if len(sys.argv) > 1 else os.environ.get("CLAUDE_PLUGIN_ROOT", "")
     plugin = os.path.abspath(plugin) if plugin else ""
@@ -1596,6 +1625,7 @@ def main():
         roh = sys.stdin.read()
         lauf(roh, plugin)
     except Blockiert:
+        zeit_melden()
         sys.exit(BLOCK)
     except Exception as fehler:  # interner Fehler: im Projekt sicher blockieren
         if _KONTEXT["projekt"] or ist_dev_team_projekt(os.environ.get("CLAUDE_PROJECT_DIR", "")):
@@ -1606,6 +1636,7 @@ def main():
                 pass
             sys.exit(BLOCK)
         sys.exit(0)
+    zeit_melden()
     nonce = os.environ.get("DEV_TEAM_WAECHTER_NONCE")
     if nonce:
         # Beleg für den Startskript-Wrapper, dass wirklich dieser Wächter gelaufen ist (nicht ein falsches python)

@@ -48,7 +48,7 @@ class Einstellungen(unittest.TestCase):
         befehle = [h["command"] for e in neu["hooks"]["PreToolUse"] for h in e["hooks"]]
         self.assertIn("eigener.sh", befehle)
         self.assertNotIn("bash .claude/dev-team-start.sh log-start", befehle)
-        self.assertEqual(sum("waechter" in b for b in befehle), 1)
+        self.assertEqual(sum("waechter" in b for b in befehle), 2)  # 3.11: Lese- und Rest-Hook
 
     def test_ohne_schreiben_bleibt_datei_gleich(self):
         code, aus, neu = self.lauf({"env": {}}, schreiben=False)
@@ -90,7 +90,8 @@ class Einstellungen(unittest.TestCase):
                         "--ziel", ziel, "--schreiben"], capture_output=True)
         with open(ziel) as f:
             neu = json.load(f)
-        self.assertEqual(set(neu), {"model", "permissions", "disableWorkflows"})
+        self.assertEqual(set(neu), {"model", "permissions", "disableWorkflows", "worktree"})
+        self.assertEqual(neu["worktree"], {"baseRef": "head"})  # 3.11: Worktrees vom aktuellen Stand
 
     def test_ziel_nur_settings_json(self):
         d = tempfile.mkdtemp()

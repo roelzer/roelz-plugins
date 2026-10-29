@@ -71,12 +71,22 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "*",
+        "matcher": "Read|Grep|Glob|LS|NotebookRead",
         "hooks": [
           {
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" waechter",
-            "timeout": 20,
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "^(?!(Read|Grep|Glob|LS|NotebookRead)$).*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" waechter",
+            "timeout": 60,
             "onFailure": "block"
           }
         ]

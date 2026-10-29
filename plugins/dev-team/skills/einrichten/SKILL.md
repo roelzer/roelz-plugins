@@ -37,10 +37,10 @@ Verwende im nächsten Schritt den vollständigen, absoluten Pfad mit Schrägstri
 `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/claude_md_block.py" --modus <privat|arbeit> --lessons <Lessons-Pfad> [--baukasten <Baukasten-Repo>] [--gehirn <Gehirn-Ordner>]`
 und führe nach seinem OK denselben Befehl mit `--schreiben` aus. Das Skript ersetzt nur den Block zwischen `<!-- dev-team START -->` und `<!-- dev-team END -->`; alles andere bleibt. Im Block stehen Modus, Plugin-Ordner, Lessons-Datei, ggf. Baukasten und Gehirn und die Verknüpfungen `@…/grundgesetz.md` und `@<Lessons>`.
 
-## 4. Schutzregeln für Geheimnisse
+## 4. Schutzregeln für Geheimnisse und Worktree-Start
 Benutzereinstellungen schreibt Claude nicht direkt. Zeige Simon die Änderung mit
 `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/settings_zusammenfuehren.py" --vorlage "${CLAUDE_PLUGIN_ROOT}/vorlagen/benutzer-settings.json" --ziel ~/.claude/settings.json`
-(ergänzt nur Lese-Sperren für Geheimnisse, bestehende Einträge bleiben) und führe nach seinem OK denselben Befehl mit `--schreiben` aus.
+(ergänzt Lese-Sperren für Geheimnisse und `worktree.baseRef: head` – neue Entwickler-Worktrees starten damit in **jedem** Projekt vom aktuellen Stand statt von `main`; bestehende Einträge bleiben) und führe nach seinem OK denselben Befehl mit `--schreiben` aus.
 
 ## 5. Abschluss
 Sag Simon in drei Zeilen:
