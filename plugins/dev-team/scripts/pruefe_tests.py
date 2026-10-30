@@ -679,6 +679,22 @@ def main():
             print("Hinweis: Worktree hat nicht committete Änderungen – erst committen, dann Schranke erneut, "
                   "sonst gilt das Paket nicht als fertig.")
 
+    if gruen and not ist_worktree:
+        # Grün-Nachweis für den Stand im Hauptordner (z. B. nach einem Merge). Der nächste Entwickler-Worktree
+        # startet genau hier und spart sich dann den vollen Ausgangslauf (worktree_vorbereiten.py). Nur wenn
+        # außer Prozessdateien unter docs/ nichts uncommittet ist – sonst wurde nicht der Commit geprüft.
+        offen = [z[3:] for z in git(wurzel, "status", "--porcelain").splitlines() if z.strip()]
+        if all(o.startswith("docs/") for o in offen):
+            try:
+                ordner = os.path.join(hauptordner, ".dev-team", "gruen")
+                os.makedirs(ordner, exist_ok=True)
+                voll = git(wurzel, "rev-parse", "HEAD").strip()
+                with open(os.path.join(ordner, voll), "w", encoding="utf-8") as f:
+                    f.write("%s rolle=%s bestanden=%s\n" % (datetime.now().isoformat(timespec="minutes"), arg.rolle,
+                                                            zahl if zahl is not None else "?"))
+            except OSError:
+                pass
+
     if not ist_worktree and not arg.ohne_lauf:
         try:
             docs = os.path.join(hauptordner, "docs")

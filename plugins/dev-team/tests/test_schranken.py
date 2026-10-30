@@ -462,6 +462,16 @@ class TestSchranke(unittest.TestCase):
         self.assertIn("NICHT ERKANNT", aus)
         self.assertEqual(open(os.path.join(self.p, "src", "extra.py")).read(), "def g(x):\n    return x * 2\n")
 
+    def test_gruen_nachweis_im_hauptordner(self):
+        self.assertEqual(self.lauf("--rolle", "tester")[0], 0)
+        kopf = git(self.p, "rev-parse", "HEAD").strip()
+        self.assertTrue(os.path.isfile(os.path.join(self.p, ".dev-team", "gruen", kopf)))
+        # Uncommittete Codeänderung: geprüft wurde nicht der Commit → kein Nachweis
+        shutil.rmtree(os.path.join(self.p, ".dev-team", "gruen"))
+        self.schreibe("tests/hilfsdaten.txt", "neu\n")
+        self.assertEqual(self.lauf("--rolle", "tester")[0], 0)
+        self.assertFalse(os.path.exists(os.path.join(self.p, ".dev-team", "gruen", kopf)))
+
     def test_fehlerprobe_nutzt_node_modules(self):
         # node_modules ist ignoriert und wird nicht kopiert; ohne Verknüpfung scheiterte jeder Lauf am Import
         # und wurde fälschlich als ERKANNT gemeldet (Pilot 2026-10).

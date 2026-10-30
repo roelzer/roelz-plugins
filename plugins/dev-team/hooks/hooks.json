@@ -1,5 +1,5 @@
 {
-  "description": "Dev-Team: Grundgesetz in jeder Sitzung (auch Cloud), Pfade für jeden Agenten, minimaler Wächter (nur: Entwickler/Tester reden nicht miteinander, Entwickler ändert keine bestehenden Tests und rührt verdeckte Tests nicht an), Fertig-Prüfung der Entwickler und automatisches Agenten-Protokoll in docs/AGENTEN_LOG.md.",
+  "description": "Dev-Team: Grundgesetz in jeder Sitzung (auch Cloud), Pfade für jeden Agenten, minimaler Wächter (nur: Entwickler/Tester reden nicht miteinander, Entwickler ändert keine bestehenden Tests und rührt verdeckte Tests nicht an), Fertig-Prüfung der Entwickler und automatisches Agenten-Protokoll in docs/AGENTEN_LOG.md, Durchlauf-Wächter (Projektleiter hält während eines freigegebenen Auftrags nicht ohne festen Stopp an).",
   "hooks": {
     "SessionStart": [
       {
@@ -57,6 +57,17 @@
             "type": "command",
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/agenten-log.sh\" ende",
             "timeout": 15
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/durchlauf.sh\"",
+            "timeout": 10
           }
         ]
       }

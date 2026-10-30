@@ -101,6 +101,10 @@ case "$modus" in
     [ -d "$plugin" ] || exit 0
     printf '%s' "$eingabe" | CLAUDE_PROJECT_DIR="$projekt" bash "$plugin/scripts/fertig-pruefung.sh"
     ;;
+  durchlauf)
+    [ -d "$plugin" ] || exit 0
+    printf '%s' "$eingabe" | CLAUDE_PROJECT_DIR="$projekt" bash "$plugin/scripts/durchlauf.sh"
+    ;;
   log-start|log-ende)
     [ -d "$plugin" ] || exit 0
     printf '%s' "$eingabe" | CLAUDE_PROJECT_DIR="$projekt" bash "$plugin/scripts/agenten-log.sh" "${modus#log-}"

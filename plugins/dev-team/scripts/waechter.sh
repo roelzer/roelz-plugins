@@ -35,7 +35,7 @@ esac
 [ "$rolle" = "entwickler" ] || exit 0
 
 # 2a. Verdeckte Abnahmetests: nicht lesen, nicht suchen, nicht anfassen.
-if [[ "$eingabe" == *".dev-team/"* || "$eingabe" == *'.dev-team\\'* || "$eingabe" == *"dev-team-blind"* ]]; then
+if [[ "$eingabe" == *".dev-team/"* || "$eingabe" == *'.dev-team\\'* || "$eingabe" == *"dev-team-blind"* || "$eingabe" == *"dev-team-verdeckt"* ]]; then
   sperre "Die verdeckten Abnahmetests (.dev-team/) sind für den Entwickler tabu."
 fi
 

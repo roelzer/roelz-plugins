@@ -55,6 +55,17 @@ class WorktreeVorbereiten(unittest.TestCase):
         r = subprocess.run(["git", "status", "--porcelain"], cwd=self.wt, capture_output=True, text=True)
         self.assertNotIn("node_modules", r.stdout)
 
+    def test_ausgangslage_belegt_gruen(self):
+        # Wurde der Startpunkt nach dem Merge im Hauptordner grün geprüft, entfällt der zweite volle Lauf.
+        self.assertNotIn("BELEGT GRÜN", self.lauf()[1])
+        kopf = subprocess.run(["git", "rev-parse", "HEAD"], cwd=self.wt, capture_output=True, text=True).stdout.strip()
+        self.schreibe(self.haupt, ".dev-team/gruen/" + kopf, "2026-10-30T10:00 rolle=merge bestanden=12")
+        code, aus = self.lauf()
+        self.assertEqual(code, 0, aus)
+        self.assertIn("AUSGANGSLAGE BELEGT GRÜN", aus)
+        self.schreibe(self.wt, "neu.txt", "x")  # nicht sauber → kein Beleg
+        self.assertNotIn("BELEGT GRÜN", self.lauf()[1])
+
     def test_andere_lockdatei_fuehrt_setup_aus(self):
         self.schreibe(self.wt, "package-lock.json", '{"lockfileVersion": 3, "x": 1}')
         code, aus = self.lauf()

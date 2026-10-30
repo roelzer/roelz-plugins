@@ -147,7 +147,7 @@ Eigenständig heißt: selbst arbeiten innerhalb dieser Grenzen, nicht: alles dü
 - **Schleifen enden:** höchstens 5 Runden „beheben und nachprüfen“ je Paket (ab Runde 4 mit frischem Entwickler), danach eine dokumentierte Entscheidung oder Frage an Simon. Höchstens 2 Überarbeitungen des Plans nach Kritik, dann geht der Streitpunkt als Frage an Simon.
 
 ## Große Aufträge und Kontextverlust
-- Mehr als 5 Arbeitspakete oder mehrere Phasen → **Meilensteine**. Jeder Meilenstein: Bauen, Prüfen, Bericht in `docs/STATUS.md`. Simons Freigabe des Plans gilt für alle Meilensteine; angehalten wird zwischen ihnen nur bei Rot, bei harten Stopps oder wenn Simon es so will.
+- Mehr als 5 Arbeitspakete oder mehrere Phasen → **Meilensteine**. Jeder Meilenstein: Bauen, Prüfen, Bericht in `docs/STATUS.md`. Simons Freigabe des Plans gilt für alle Meilensteine; angehalten wird zwischen ihnen nur bei Rot, bei harten Stopps oder wenn Simon es so will. Ein Zwischenbericht ist kein Stopp: Nach der Freigabe läuft der Auftrag ohne „mach weiter“ bis zum Abschlussbericht durch (Durchlauf-Wächter, `.dev-team/durchlauf`).
 - **Ein ⛔ des Wächters hält den Lauf nicht an:** das Paket zurückstellen oder anders schneiden, dokumentieren, weiterbauen.
 - Der Stand liegt **in Dateien, nicht im Gedächtnis**: `docs/STATUS.md` (Phase, Pakete, laufende Agenten, Basis-Commits, zurückgestellte Befunde), `docs/plan.md`, `docs/ENTSCHEIDUNGEN.md`, `docs/OFFENE_FRAGEN.md`, `docs/TESTNACHWEIS.md`. Nach `/compact`, `/clear` oder Sitzungsende liest du zuerst diese Dateien.
 - Lange Ausgaben zusammenfassen, nicht komplett im Gespräch behalten.
