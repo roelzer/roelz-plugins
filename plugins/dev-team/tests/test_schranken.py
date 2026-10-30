@@ -423,6 +423,25 @@ class TestSchranke(unittest.TestCase):
         self.assertNotIn("F3", aus.split("Fachregeln ohne")[1].split("\n")[0])
         self.assertIn("ohne Mutationstest", aus)  # 'echo mutation' zählt nicht
 
+    def test_vorgeschlagene_fachregeln_zaehlen_nicht(self):
+        # „Vorgeschlagen (… noch nicht bestätigt)“ enthält das Wort „bestätigt“ – früher Fehlalarm.
+        k = json.load(open(os.path.join(self.p, ".claude", "dev-team.json")))
+        k["profil"] = "fachsoftware"
+        self.konfig(k)
+        self.schreibe("fachwissen/regeln.md", "# Fachregeln\n## Bestätigt\n| Nr. | Regel | Quelle |\n|---|---|---|\n"
+                      "| F2 | v <= 2 m/s | Simon |\n## Offen (Regel klar, Werte fehlen noch)\n| F3 | x | |\n"
+                      "## Vorgeschlagen (aus Recherche oder Fachprüfer, noch nicht bestätigt)\n"
+                      "| Nr. | Regel | Sicherheit |\n|---|---|---|\n| F1 | Kostenbetrag | Annahme |\n"
+                      "| F4 | Frist am Stichtag | mittel |\n")
+        git(self.p, "add", "-A")
+        git(self.p, "commit", "-qm", "f")
+        self.basis = git(self.p, "rev-parse", "HEAD").strip()
+        code, aus = self.lauf("--rolle", "projektleiter")
+        zeile = aus.split("Fachregeln ohne")[1].split("\n")[0]
+        self.assertIn("F2", zeile)
+        for nr in ("F1", "F3", "F4"):
+            self.assertNotIn(nr, zeile)
+
     def test_blind_merkt_nicht_mitgelaufen(self):
         k = json.load(open(os.path.join(self.p, ".claude", "dev-team.json")))
         k["testbefehl"] = "%s -m unittest discover -s tests -t . -p 'test_rechnung.py' -v" % sys.executable
@@ -681,6 +700,18 @@ class TestAbhaengigkeiten(unittest.TestCase):
         code, aus = self.lauf({"pypi.org": urllib.error.URLError("offline")})
         self.assertEqual(code, 1)
         self.assertIn("nicht erreichbar", aus)
+
+    def test_nicht_utf8_dateien(self):
+        # Früher Absturz mit UnicodeDecodeError, die Schranke lief gar nicht (Pilot 2026-10).
+        with open(os.path.join(self.p, "requirements.txt"), "wb") as f:
+            f.write("requests==2.32.3\nhuggingface-magic-tools==1.0\n".encode("utf-16"))   # PowerShell-Umleitung
+        with open(os.path.join(self.p, "package.json"), "wb") as f:
+            f.write(json.dumps({"description": "Größe", "dependencies": {"react": "18.3.1"}}).encode("cp1252"))
+        code, aus = self.lauf({})
+        self.assertEqual(code, 1, aus)
+        self.assertIn("huggingface-magic-tools", aus)
+        self.assertIn("existiert nicht", aus)
+        self.assertNotIn("requests", aus.split("existiert nicht")[0].splitlines()[-1])
 
     def test_pypi_erfunden_und_ungepinnt(self):
         self.schreibe("requirements.txt", "requests==2.32.3\nhuggingface-magic-tools\n")

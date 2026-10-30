@@ -354,15 +354,17 @@ def abdeckung_pruefen(e, wurzel, hauptordner, konfig, fg):
         abschnitt = ""
         for zeile in regeln_text.splitlines():
             if zeile.startswith("#"):
-                abschnitt = zeile.lower()
+                # Nur ein Abschnitt, der mit „Bestätigt“ beginnt, zählt – „Vorgeschlagen (… noch nicht
+                # bestätigt)“ enthält das Wort auch und wurde früher fälschlich mitgezählt.
+                titel = zeile.lstrip("#").strip().lower()
+                abschnitt = titel if re.match(r"(bestätigt|bestaetigt)\b", titel) and "nicht" not in titel else ""
                 continue
             m = re.match(r"^\s*\|?\s*([FR]\d+)\s*\|", zeile)
             if not m:
                 continue
             spalten = [c.strip().lower() for c in zeile.strip().strip("|").split("|")]
             leer = len([c for c in spalten[1:2] if c]) == 0  # Vorlagenzeile ohne Regeltext
-            if not leer and ("bestätigt" in abschnitt or "bestaetigt" in abschnitt or
-                             any(c in ("bestätigt", "bestaetigt") for c in spalten)):
+            if not leer and (abschnitt or any(c in ("bestätigt", "bestaetigt") for c in spalten)):
                 regeln.append(m.group(1))
     if not anf and not regeln:
         return

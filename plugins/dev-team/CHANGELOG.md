@@ -8,8 +8,10 @@ Anlass: Auswertung von Meilenstein 2 in `ichkannalles` (30.10.2026). Fast jedes 
 - **`fehlerprobe.py` repariert:** `node_modules` wird aus Worktree bzw. Hauptordner verknüpft statt weggelassen (vorher scheiterte jeder Lauf am Import und galt als „ERKANNT“). Neu: Leerlauf ohne Ersetzung muss grün sein; rot nur wegen Lade- oder Syntaxfehler ergibt „UNGÜLTIG“ (Exit 2) statt eines Treffers; `--befehl` für einen schnellen Lauf nur der passenden Testdateien; Zeitgrenze wird sauber gemeldet. Ersetzt das projekt-eigene `gegenprobe.sh` aus dem Pilot.
 - **Vollständige Berichte:** `agenten-log.sh` und die Fertig-Prüfung lesen den Bericht aus dem Agenten-Protokoll (`agent_transcript_path`), wenn `last_assistant_message` leer ist (Hintergrund-Agenten). Ereignisse ohne Agententyp (in Cloud-Sitzungen kam dort Simons Chatnachricht an, „? | mach weiter“) werden nicht mehr protokolliert. Neues Hilfsskript `scripts/letzte_nachricht.py`. Damit greift die Fertig-Prüfung der Entwickler auch bei Hintergrund-Agenten wieder.
 - **Auftrag:** Bauplan-Änderungen an bestehenden Tests sind Tester-Vorarbeit in einem eigenen Commit vor der Paketvergabe; neue Testfälle als neue Testdatei. Jeder Entwickler-Auftrag nennt die Selbstprüfung; Aufträge klein und klar begrenzt.
+- **Abhängigkeits-Schranke stürzt nicht mehr ab** bei Manifesten, die nicht UTF-8 sind (UTF-16 aus `pip freeze >` in der PowerShell, cp1252): vorher `UnicodeDecodeError`, die Schranke lief gar nicht. UTF-16 wird erkannt und richtig gelesen.
+- **Test-Schranke:** Fachregeln unter „Vorgeschlagen (… noch nicht bestätigt)“ zählen nicht mehr als bestätigt (das Wort „bestätigt“ in der Überschrift löste einen Fehlalarm in der Abschluss-Schranke aus). Bestätigt ist nur ein Abschnitt, dessen Überschrift mit „Bestätigt“ beginnt, oder eine Zeile mit Spalte „bestätigt“.
 - **Lektionen** (Rückfall-Datei): Selbstprüfung, Tester-Vorarbeit als eigener Commit, gültige Gegenprobe.
-- Tests: `tests/test_bericht.py` neu, drei neue Fehlerprobe-Tests.
+- Tests: `tests/test_bericht.py` neu, drei neue Fehlerprobe-Tests, je ein Test für Nicht-UTF-8-Manifeste und vorgeschlagene Fachregeln.
 
 ## 3.11.0 – Minimaler Wächter, Team ohne Selbstblockade
 

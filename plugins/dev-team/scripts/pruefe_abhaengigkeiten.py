@@ -35,16 +35,23 @@ MIN_VERSIONEN = 3
 ZEITLIMIT = 15
 
 
+def text_aus(roh):
+    """Manifeste sind nicht immer UTF-8: `pip freeze > requirements.txt` in der Windows-PowerShell schreibt
+    UTF-16, ältere Dateien sind manchmal cp1252. Früher brach die Schranke dann mit UnicodeDecodeError ab."""
+    if roh.startswith((b"\xff\xfe", b"\xfe\xff")):
+        return roh.decode("utf-16", errors="replace")
+    return roh.decode("utf-8-sig", errors="replace")
+
+
 def git_datei(wurzel, commit, pfad):
-    r = subprocess.run(["git", "show", "%s:%s" % (commit, pfad)], cwd=wurzel,
-                       capture_output=True, text=True, encoding="utf-8", errors="replace")
-    return r.stdout if r.returncode == 0 else None
+    r = subprocess.run(["git", "show", "%s:%s" % (commit, pfad)], cwd=wurzel, capture_output=True)
+    return text_aus(r.stdout) if r.returncode == 0 else None
 
 
 def lies(wurzel, pfad):
     try:
-        with open(os.path.join(wurzel, pfad), encoding="utf-8") as f:
-            return f.read()
+        with open(os.path.join(wurzel, pfad), "rb") as f:
+            return text_aus(f.read())
     except OSError:
         return None
 
@@ -316,15 +323,15 @@ def main():
     a.add_argument("--basis", required=True)
     arg = a.parse_args()
     wurzel = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True,
-                            text=True).stdout.strip() or os.getcwd()
+                            text=True, encoding="utf-8", errors="replace").stdout.strip() or os.getcwd()
     fehler, warn, ok = [], [], []
     del DIREKT[:]
     alle = subprocess.run(["git", "ls-files", "--cached", "--others", "--exclude-standard"],
-                          cwd=wurzel, capture_output=True, text=True).stdout.splitlines()
+                          cwd=wurzel, capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.splitlines()
 
     # npm
     for pfad in subprocess.run(["git", "ls-files", "--cached", "--others", "--exclude-standard"],
-                               cwd=wurzel, capture_output=True, text=True).stdout.splitlines():
+                               cwd=wurzel, capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.splitlines():
         if not pfad.endswith("package.json") or "node_modules/" in pfad:
             continue
         neu = npm_namen(lies(wurzel, pfad))
@@ -343,7 +350,7 @@ def main():
             locks = [os.path.join(ordner, l) for l in ("package-lock.json", "pnpm-lock.yaml", "yarn.lock")]
             vorhanden = [l for l in locks if os.path.exists(os.path.join(wurzel, l))]
             geaendert = subprocess.run(["git", "diff", "--name-only", arg.basis, "--"] + vorhanden,
-                                       cwd=wurzel, capture_output=True, text=True).stdout.strip()
+                                       cwd=wurzel, capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.strip()
             if not vorhanden:
                 fehler.append("%s: neue Abhängigkeiten, aber kein Lockfile (package-lock.json o. ä.)." % pfad)
             elif not geaendert and all(git_datei(wurzel, arg.basis, l) is not None for l in vorhanden):
@@ -354,7 +361,7 @@ def main():
 
     # Python
     for pfad in subprocess.run(["git", "ls-files", "--cached", "--others", "--exclude-standard"],
-                               cwd=wurzel, capture_output=True, text=True).stdout.splitlines():
+                               cwd=wurzel, capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.splitlines():
         basis_name = os.path.basename(pfad)
         alt_direkt = len(DIREKT)
         if re.match(r"requirements.*\.txt$", basis_name):
