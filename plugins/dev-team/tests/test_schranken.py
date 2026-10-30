@@ -443,6 +443,33 @@ class TestSchranke(unittest.TestCase):
         self.assertIn("NICHT ERKANNT", aus)
         self.assertEqual(open(os.path.join(self.p, "src", "extra.py")).read(), "def g(x):\n    return x * 2\n")
 
+    def test_fehlerprobe_nutzt_node_modules(self):
+        # node_modules ist ignoriert und wird nicht kopiert; ohne Verknüpfung scheiterte jeder Lauf am Import
+        # und wurde fälschlich als ERKANNT gemeldet (Pilot 2026-10).
+        self.schreibe("node_modules/hilfe/__init__.py", "def doppelt(x):\n    return x * 2\n")
+        self.schreibe(".gitignore", ".dev-team/\n__pycache__/\n.claude/worktrees/\nnode_modules/\n")
+        self.schreibe("src/extra.py", "def g(x):\n    return x + 1\n")
+        befehl = "test -f node_modules/hilfe/__init__.py && %s -m unittest discover -s tests -t . -v" % sys.executable
+        code, aus = self.skript("fehlerprobe.py", "--datei", "src/extra.py", "--alt", "x + 1", "--neu", "x + 2",
+                                "--befehl", befehl)
+        self.assertEqual(code, 1, aus)
+        self.assertIn("NICHT ERKANNT", aus)
+        self.assertTrue(os.path.isfile(os.path.join(self.p, "node_modules", "hilfe", "__init__.py")))
+
+    def test_fehlerprobe_leerlauf_rot_ist_ungueltig(self):
+        self.schreibe("src/rechnung.py", "def summe(w):\n    return 0\n")
+        code, aus = self.skript("fehlerprobe.py", "--datei", "src/rechnung.py", "--alt", "0", "--neu", "1")
+        self.assertEqual(code, 2, aus)
+        self.assertIn("UNGÜLTIG", aus)
+        self.assertNotIn("ERKANNT", aus)
+
+    def test_fehlerprobe_ladefehler_ist_kein_treffer(self):
+        code, aus = self.skript("fehlerprobe.py", "--datei", "src/rechnung.py", "--alt", "def summe(w):",
+                                "--neu", "def summe(w)")
+        self.assertEqual(code, 2, aus)
+        self.assertIn("UNGÜLTIG", aus)
+        self.assertIn("Lade- oder Syntaxfehler", aus)
+
     def test_rote_tests(self):
         self.schreibe("src/rechnung.py", "def summe(w):\n    return 0\n")
         code, aus = self.lauf()

@@ -61,7 +61,7 @@ Du bist der unabhängige Testingenieur. Du prüfst, ob das beobachtbare Verhalte
 | niedrig | kosmetisch | nur notieren |
 
 ## Fehlerproben
-Ob eine Stelle wirklich durch Tests abgesichert ist, belegst du mit einer Fehlerprobe statt mit eigenem Code: `python3 "<Plugin-Ordner>/scripts/fehlerprobe.py" --datei <pfad> --alt "<text>" --neu "<falscher text>"` (im Worktree bzw. Projektordner). „NICHT ERKANNT“ ist ein Befund (fehlender Test). Reine Nachrechnungen gehen als Python-Heredoc ohne Dateizugriff (`python3 - <<'EOF' … EOF`).
+Ob eine Stelle wirklich durch Tests abgesichert ist, belegst du mit einer Fehlerprobe statt mit eigenem Code: `python3 "<Plugin-Ordner>/scripts/fehlerprobe.py" --datei <pfad> --alt "<text>" --neu "<falscher text>"` (im Worktree bzw. Projektordner; schneller mit `--befehl "<Testbefehl nur für die passenden Testdateien>"`). „NICHT ERKANNT“ ist ein Befund (fehlender Test). „UNGÜLTIG“ ist kein Ergebnis (Tests schon vorher rot oder nur Lade-/Syntaxfehler) – andere Ersetzung wählen. Reine Nachrechnungen gehen als Python-Heredoc ohne Dateizugriff (`python3 - <<'EOF' … EOF`).
 
 ## Pflichtfragen (alle beantworten)
 1. Hat jedes Abnahmekriterium mindestens einen Test? (Tabelle Kriterium → Test)

@@ -8,3 +8,6 @@ Pflege: Bei über 40 Einträgen zusammenfassen; doppelte zusammenlegen; wiederke
 
 ## Lektionen
 - [Allgemein] Vor dem Bauen prüfen, ob die Lösung schon im Baukasten existiert. (Startregel, 2026-10)
+- [Prozess/Effizienz] Entwickler arbeiten vor FERTIG die Selbstprüfung ab (Plan-Treue, Gegenproben, Grenzfälle, Sichtprüfung, Duplikate) – spart je Paket 1–2 Review-Runden. (Pilot-Auswertung, 2026-10-30)
+- [Prozess] Änderungen an bestehenden Tests, die ein Bauplan braucht, macht der Tester vorab in einem eigenen Commit – nie im Merge-Commit eines Entwicklerpakets. (Merge-Schranke meldete Tester-Änderung, 2026-10-30)
+- [Werkzeuge] Eine Gegenprobe zählt nur, wenn der Leerlauf grün war und der Test an einer Prüfung scheitert, nicht an einem Lade- oder Syntaxfehler. (Schein-„ERKANNT“ ohne node_modules, 2026-10-30)

@@ -1,5 +1,16 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.12.0 – Selbstprüfung vor dem Review, ehrliche Gegenproben, vollständige Berichte
+
+Anlass: Auswertung von Meilenstein 2 in `ichkannalles` (30.10.2026). Fast jedes Paket brauchte 1–2 Nachbesserungsrunden für dieselben Punkte; Gegenproben meldeten in Node-Projekten immer „ERKANNT“; viele Berichte in `docs/pruefberichte/` enthielten nur die Kopfzeile. Simons Vorgabe: „Effizienz ohne Qualitätsverlust – bau das so um.“
+
+- **Selbstprüfung vor dem Review** (Steckbrief `entwickler`, Pflichtfrage 10): Plan-Treue, Gegenproben, Grenzfälle, Sichtprüfung bei allem Sichtbaren, keine Duplikate, Texte und Werte mit Herkunft, bestehende Tests nicht ändern, Schranke. Je Punkt erledigt / nicht zutreffend / Grund im Bericht. Eine projekt-eigene `docs/SELBSTPRUEFUNG.md` gilt zusätzlich. Der `reviewer` prüft sie stichprobenartig nach (wiederholt Gegenproben, sieht Bildschirmfotos an; Pflichtfrage 13).
+- **`fehlerprobe.py` repariert:** `node_modules` wird aus Worktree bzw. Hauptordner verknüpft statt weggelassen (vorher scheiterte jeder Lauf am Import und galt als „ERKANNT“). Neu: Leerlauf ohne Ersetzung muss grün sein; rot nur wegen Lade- oder Syntaxfehler ergibt „UNGÜLTIG“ (Exit 2) statt eines Treffers; `--befehl` für einen schnellen Lauf nur der passenden Testdateien; Zeitgrenze wird sauber gemeldet. Ersetzt das projekt-eigene `gegenprobe.sh` aus dem Pilot.
+- **Vollständige Berichte:** `agenten-log.sh` und die Fertig-Prüfung lesen den Bericht aus dem Agenten-Protokoll (`agent_transcript_path`), wenn `last_assistant_message` leer ist (Hintergrund-Agenten). Ereignisse ohne Agententyp (in Cloud-Sitzungen kam dort Simons Chatnachricht an, „? | mach weiter“) werden nicht mehr protokolliert. Neues Hilfsskript `scripts/letzte_nachricht.py`. Damit greift die Fertig-Prüfung der Entwickler auch bei Hintergrund-Agenten wieder.
+- **Auftrag:** Bauplan-Änderungen an bestehenden Tests sind Tester-Vorarbeit in einem eigenen Commit vor der Paketvergabe; neue Testfälle als neue Testdatei. Jeder Entwickler-Auftrag nennt die Selbstprüfung; Aufträge klein und klar begrenzt.
+- **Lektionen** (Rückfall-Datei): Selbstprüfung, Tester-Vorarbeit als eigener Commit, gültige Gegenprobe.
+- Tests: `tests/test_bericht.py` neu, drei neue Fehlerprobe-Tests.
+
 ## 3.11.0 – Minimaler Wächter, Team ohne Selbstblockade
 
 Anlass: Pilot „Unöder Haus“ (28./29.10.2026) und eine Cloud-Sitzung in `ichkannalles`, die sogar `git push` nicht mehr ausführen durfte. Der alte Wächter (1.500 Zeilen Python, vor jedem Werkzeugaufruf) blockierte bei Last alles, sperrte normale Arbeit (App starten, Browser, npx, Speicherorte) und legte ganze Läufe lahm. Simons Vorgabe: Das Team soll Vorteile bringen – der Wächter so minimal wie möglich.

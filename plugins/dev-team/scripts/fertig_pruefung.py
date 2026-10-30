@@ -19,6 +19,9 @@ import subprocess
 import sys
 from datetime import datetime
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import letzte_nachricht  # noqa: E402
+
 
 def log(projekt, text):
     datei = os.path.join(projekt, "docs", "AGENTEN_LOG.md")
@@ -134,7 +137,7 @@ def main():
     projekt = os.environ.get("CLAUDE_PROJECT_DIR") or eingabe.get("cwd") or ""
     if not os.path.isfile(os.path.join(projekt, ".claude", "dev-team.json")):
         return 0
-    text = str(eingabe.get("last_assistant_message") or "")
+    text = letzte_nachricht.bericht(eingabe)
     status = status_von(text)
     if status in ("BLOCKIERT", "BRAUCHT_KONTEXT"):
         return 0
