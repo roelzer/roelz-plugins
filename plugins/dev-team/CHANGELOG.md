@@ -19,6 +19,7 @@ Messung im Pilot (Agenten-Log 28.–30.10.): Simon musste rund 80-mal „mach we
 - **Auftrag:** Bauplan-Änderungen an bestehenden Tests sind Tester-Vorarbeit in einem eigenen Commit vor der Paketvergabe; neue Testfälle als neue Testdatei. Jeder Entwickler-Auftrag nennt die Selbstprüfung; Aufträge klein und klar begrenzt.
 - **Abhängigkeits-Schranke stürzt nicht mehr ab** bei Manifesten, die nicht UTF-8 sind (UTF-16 aus `pip freeze >` in der PowerShell, cp1252): vorher `UnicodeDecodeError`, die Schranke lief gar nicht. UTF-16 wird erkannt und richtig gelesen.
 - **Test-Schranke:** Fachregeln unter „Vorgeschlagen (… noch nicht bestätigt)“ zählen nicht mehr als bestätigt (das Wort „bestätigt“ in der Überschrift löste einen Fehlalarm in der Abschluss-Schranke aus). Bestätigt ist nur ein Abschnitt, dessen Überschrift mit „Bestätigt“ beginnt, oder eine Zeile mit Spalte „bestätigt“.
+- **Test-Schranke, parallele Pakete:** Der Vergleich „weniger bestandene Tests als beim letzten grünen Lauf“ gilt nur noch, wenn der gemerkte Stand ein Vorgänger des geprüften ist. Vorher blockierte ein gemergtes Nachbarpaket (mit neuen Tests) jedes parallel gestartete Paket (Pilot: M3-1 blockierte M3-2).
 - **Lektionen** (Rückfall-Datei): Selbstprüfung, Tester-Vorarbeit als eigener Commit, gültige Gegenprobe.
 - Tests: `tests/test_bericht.py` neu, drei neue Fehlerprobe-Tests, je ein Test für Nicht-UTF-8-Manifeste und vorgeschlagene Fachregeln, `tests/test_durchlauf.py` (Durchlauf-Wächter, Sicherung der verdeckten Tests), Grün-Nachweis und Ausgangslage.
 

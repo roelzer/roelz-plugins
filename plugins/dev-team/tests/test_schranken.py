@@ -512,6 +512,19 @@ class TestSchranke(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("Weniger bestandene Tests", aus)
 
+    def test_testzahl_paralleles_paket_nicht_blockiert(self):
+        # Paket B startet auf dem alten Stand; Paket A wird mit einem zusätzlichen Test gemergt. B hat diesen
+        # Test noch nicht – das ist kein Testverlust (Pilot: M3-1 blockierte M3-2).
+        wt = os.path.join(self.tmp, "wt-b")
+        git(self.p, "worktree", "add", "-q", "-b", "paket-b", wt)
+        self.schreibe("tests/test_extra.py", "import unittest\nfrom src.rechnung import summe\nclass E(unittest.TestCase):\n"
+                      "    def test_e(self):\n        self.assertEqual(summe([4, 5]), 9)\n")
+        git(self.p, "add", "-A")
+        git(self.p, "commit", "-qm", "Paket A gemergt")
+        self.assertEqual(self.lauf("--rolle", "tester")[0], 0)   # merkt sich 3 für den neuen Stand
+        code, aus = self.lauf("--rolle", "entwickler", ordner=wt)
+        self.assertNotIn("Weniger bestandene Tests", aus)
+
     def test_null_tests(self):
         self.konfig({"testbefehl": "%s -m unittest discover -s src -v" % sys.executable,
                      "testzahl_muster": r"Ran (\d+) tests?"})

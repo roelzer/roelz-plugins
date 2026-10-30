@@ -541,7 +541,14 @@ def lauf(e, wurzel, hauptordner, konfig, ist_worktree, fg, rolle):
                 e.f("Es wurden 0 Tests ausgeführt. Ein leerer Testlauf ist nicht grün.")
             try:
                 with open(letzter_lauf_pfad(hauptordner), encoding="utf-8") as f:
-                    vorher = json.load(f).get("bestanden")
+                    gemerkt = json.load(f)
+                vorher = gemerkt.get("bestanden")
+                # Nur gegen einen Vorgänger des geprüften Stands vergleichen. Ein paralleles Paket, das auf einem
+                # älteren Stand gestartet ist, hat die Tests des inzwischen gemergten Nachbarn noch nicht – das
+                # ist kein Testverlust (im Pilot blockierte so M3-1 das Paket M3-2).
+                stand = str(gemerkt.get("commit") or "")
+                if stand and sh(["git", "merge-base", "--is-ancestor", stand, "HEAD"], wurzel).returncode != 0:
+                    vorher = None
                 if vorher is not None and zahl < vorher:
                     (e.w if fg.deckt("testzahl") else e.f)(
                         "Weniger bestandene Tests als beim letzten grünen Lauf (%d statt %d)%s." % (
