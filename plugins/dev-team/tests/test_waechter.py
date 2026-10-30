@@ -117,7 +117,8 @@ class Tests(Basis):
         for e in (self.aufruf("Read", "entwickler", self.wt, file_path=verdeckt),
                   self.aufruf("Grep", "entwickler", self.wt, pattern="x", path=os.path.dirname(verdeckt)),
                   self.aufruf("Glob", "entwickler", self.wt, pattern=".dev-team/**"),
-                  self.aufruf("Bash", "entwickler", self.wt, command="cat ../../../.dev-team/verdeckt/a1.test.ts")):
+                  self.aufruf("Bash", "entwickler", self.wt, command="cat ../../../.dev-team/verdeckt/a1.test.ts"),
+                  self.aufruf("Bash", "entwickler", self.wt, command="git show origin/dev-team-verdeckt:verdeckt/a1")):
             self.assertEqual(self.lauf(e)[0], 2, e["tool_input"])
 
     def test_tester_und_projektleiter_frei(self):

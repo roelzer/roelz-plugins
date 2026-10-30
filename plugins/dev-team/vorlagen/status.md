@@ -2,6 +2,8 @@
 
 **Auftrag:** [Plan-Titel] · **Zuletzt aktualisiert:** [Datum, Uhrzeit]
 
+> **Jetzt:** [ein Satz, was gerade passiert] · **Zuletzt fertig:** [Paket/Schritt, Ampel] · **Als Nächstes:** [Schritt] · **Geschätzt fertig:** [Meilenstein – Uhrzeit/Tag] · **Fortschritt:** [n von m Paketen gemergt]
+
 ## Gerade läuft
 Phase [Nr – Name] · [jeder laufende Agent]
 z. B. „Phase 7: Bauen – Entwickler P3 ⏳, Entwickler P4 ⏳, Reviewer P2 ✅“

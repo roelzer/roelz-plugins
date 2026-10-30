@@ -354,15 +354,17 @@ def abdeckung_pruefen(e, wurzel, hauptordner, konfig, fg):
         abschnitt = ""
         for zeile in regeln_text.splitlines():
             if zeile.startswith("#"):
-                abschnitt = zeile.lower()
+                # Nur ein Abschnitt, der mit „Bestätigt“ beginnt, zählt – „Vorgeschlagen (… noch nicht
+                # bestätigt)“ enthält das Wort auch und wurde früher fälschlich mitgezählt.
+                titel = zeile.lstrip("#").strip().lower()
+                abschnitt = titel if re.match(r"(bestätigt|bestaetigt)\b", titel) and "nicht" not in titel else ""
                 continue
             m = re.match(r"^\s*\|?\s*([FR]\d+)\s*\|", zeile)
             if not m:
                 continue
             spalten = [c.strip().lower() for c in zeile.strip().strip("|").split("|")]
             leer = len([c for c in spalten[1:2] if c]) == 0  # Vorlagenzeile ohne Regeltext
-            if not leer and ("bestätigt" in abschnitt or "bestaetigt" in abschnitt or
-                             any(c in ("bestätigt", "bestaetigt") for c in spalten)):
+            if not leer and (abschnitt or any(c in ("bestätigt", "bestaetigt") for c in spalten)):
                 regeln.append(m.group(1))
     if not anf and not regeln:
         return
@@ -539,7 +541,14 @@ def lauf(e, wurzel, hauptordner, konfig, ist_worktree, fg, rolle):
                 e.f("Es wurden 0 Tests ausgeführt. Ein leerer Testlauf ist nicht grün.")
             try:
                 with open(letzter_lauf_pfad(hauptordner), encoding="utf-8") as f:
-                    vorher = json.load(f).get("bestanden")
+                    gemerkt = json.load(f)
+                vorher = gemerkt.get("bestanden")
+                # Nur gegen einen Vorgänger des geprüften Stands vergleichen. Ein paralleles Paket, das auf einem
+                # älteren Stand gestartet ist, hat die Tests des inzwischen gemergten Nachbarn noch nicht – das
+                # ist kein Testverlust (im Pilot blockierte so M3-1 das Paket M3-2).
+                stand = str(gemerkt.get("commit") or "")
+                if stand and sh(["git", "merge-base", "--is-ancestor", stand, "HEAD"], wurzel).returncode != 0:
+                    vorher = None
                 if vorher is not None and zahl < vorher:
                     (e.w if fg.deckt("testzahl") else e.f)(
                         "Weniger bestandene Tests als beim letzten grünen Lauf (%d statt %d)%s." % (
@@ -676,6 +685,22 @@ def main():
         else:
             print("Hinweis: Worktree hat nicht committete Änderungen – erst committen, dann Schranke erneut, "
                   "sonst gilt das Paket nicht als fertig.")
+
+    if gruen and not ist_worktree:
+        # Grün-Nachweis für den Stand im Hauptordner (z. B. nach einem Merge). Der nächste Entwickler-Worktree
+        # startet genau hier und spart sich dann den vollen Ausgangslauf (worktree_vorbereiten.py). Nur wenn
+        # außer Prozessdateien unter docs/ nichts uncommittet ist – sonst wurde nicht der Commit geprüft.
+        offen = [z[3:] for z in git(wurzel, "status", "--porcelain").splitlines() if z.strip()]
+        if all(o.startswith("docs/") for o in offen):
+            try:
+                ordner = os.path.join(hauptordner, ".dev-team", "gruen")
+                os.makedirs(ordner, exist_ok=True)
+                voll = git(wurzel, "rev-parse", "HEAD").strip()
+                with open(os.path.join(ordner, voll), "w", encoding="utf-8") as f:
+                    f.write("%s rolle=%s bestanden=%s\n" % (datetime.now().isoformat(timespec="minutes"), arg.rolle,
+                                                            zahl if zahl is not None else "?"))
+            except OSError:
+                pass
 
     if not ist_worktree and not arg.ohne_lauf:
         try:

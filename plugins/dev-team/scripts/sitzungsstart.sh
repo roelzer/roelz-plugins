@@ -98,10 +98,23 @@ if [ -d "$projekt/.git" ] || [ -n "$(ls -A "$projekt" 2>/dev/null)" ]; then
   if [ ! -f "$projekt/.claude/settings.json" ] || ! grep -q 'roelz-plugins' "$projekt/.claude/settings.json" 2>/dev/null; then
     echo
     echo "Hinweis an den Projektleiter: Im Projekt fehlt .claude/settings.json mit dem Dev-Team. Ohne sie gilt das Dev-Team in Cloud-Sitzungen dieses Projekts nicht. Wird bei /dev-team:projekt-aufnehmen bzw. /dev-team:neues-projekt angelegt."
-  elif grep -q '"timeout": *20,' "$projekt/.claude/settings.json" 2>/dev/null && grep -q 'waechter' "$projekt/.claude/settings.json" 2>/dev/null; then
+  elif grep -q 'waechter' "$projekt/.claude/settings.json" 2>/dev/null && { grep -q '"onFailure"' "$projekt/.claude/settings.json" \
+       || grep -q '"ConfigChange"' "$projekt/.claude/settings.json" || ! grep -q 'log-start' "$projekt/.claude/settings.json" \
+       || ! grep -q 'durchlauf' "$projekt/.claude/settings.json"; } 2>/dev/null; then
     echo
-    echo "Hinweis an den Projektleiter: Die Projekteinstellungen haben noch den alten Wächter-Hook (20 s, blockiert bei Last alles, auch Lesen). Sag Simon das in einem Satz und schlage vor: /dev-team:projekt-aufnehmen erneut ausführen (zeigt die Änderung, schreibt erst nach seinem OK)."
+    echo "Hinweis an den Projektleiter: Die Projekteinstellungen sind veraltet (alter Wächter vor jedem Werkzeugaufruf mit Sperre bei Fehlern, fehlende Laufzeitmessung oder fehlender Durchlauf-Wächter). Das kostet bei jedem Schritt Zeit. Sag Simon das in einem Satz und schlage vor: /dev-team:projekt-aufnehmen erneut ausführen (zeigt die Änderung, schreibt erst nach seinem OK)."
   fi
+fi
+
+# Cloud-Sitzung: Container ist flüchtig, .dev-team/ (verdeckte Tests) liegt nicht im Repo.
+if [ "${CLAUDE_CODE_REMOTE:-}" = "true" ] && [ -f "$projekt/docs/ABNAHME_PRUEFSUMMEN.txt" ] && [ ! -d "$projekt/.dev-team/verdeckt" ]; then
+  for py in python3 python; do
+    if command -v "$py" >/dev/null 2>&1; then
+      echo
+      echo "Verdeckte Abnahmetests: $(cd "$projekt" && timeout 10 "$py" "$plugin/scripts/verdeckt_sichern.py" --holen 2>&1 | tail -n 1)"
+      break
+    fi
+  done
 fi
 
 # Versionswechsel mitten im Auftrag (Plugin aktualisiert sich automatisch von GitHub)

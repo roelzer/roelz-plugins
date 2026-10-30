@@ -423,6 +423,25 @@ class TestSchranke(unittest.TestCase):
         self.assertNotIn("F3", aus.split("Fachregeln ohne")[1].split("\n")[0])
         self.assertIn("ohne Mutationstest", aus)  # 'echo mutation' zählt nicht
 
+    def test_vorgeschlagene_fachregeln_zaehlen_nicht(self):
+        # „Vorgeschlagen (… noch nicht bestätigt)“ enthält das Wort „bestätigt“ – früher Fehlalarm.
+        k = json.load(open(os.path.join(self.p, ".claude", "dev-team.json")))
+        k["profil"] = "fachsoftware"
+        self.konfig(k)
+        self.schreibe("fachwissen/regeln.md", "# Fachregeln\n## Bestätigt\n| Nr. | Regel | Quelle |\n|---|---|---|\n"
+                      "| F2 | v <= 2 m/s | Simon |\n## Offen (Regel klar, Werte fehlen noch)\n| F3 | x | |\n"
+                      "## Vorgeschlagen (aus Recherche oder Fachprüfer, noch nicht bestätigt)\n"
+                      "| Nr. | Regel | Sicherheit |\n|---|---|---|\n| F1 | Kostenbetrag | Annahme |\n"
+                      "| F4 | Frist am Stichtag | mittel |\n")
+        git(self.p, "add", "-A")
+        git(self.p, "commit", "-qm", "f")
+        self.basis = git(self.p, "rev-parse", "HEAD").strip()
+        code, aus = self.lauf("--rolle", "projektleiter")
+        zeile = aus.split("Fachregeln ohne")[1].split("\n")[0]
+        self.assertIn("F2", zeile)
+        for nr in ("F1", "F3", "F4"):
+            self.assertNotIn(nr, zeile)
+
     def test_blind_merkt_nicht_mitgelaufen(self):
         k = json.load(open(os.path.join(self.p, ".claude", "dev-team.json")))
         k["testbefehl"] = "%s -m unittest discover -s tests -t . -p 'test_rechnung.py' -v" % sys.executable
@@ -443,6 +462,43 @@ class TestSchranke(unittest.TestCase):
         self.assertIn("NICHT ERKANNT", aus)
         self.assertEqual(open(os.path.join(self.p, "src", "extra.py")).read(), "def g(x):\n    return x * 2\n")
 
+    def test_gruen_nachweis_im_hauptordner(self):
+        self.assertEqual(self.lauf("--rolle", "tester")[0], 0)
+        kopf = git(self.p, "rev-parse", "HEAD").strip()
+        self.assertTrue(os.path.isfile(os.path.join(self.p, ".dev-team", "gruen", kopf)))
+        # Uncommittete Codeänderung: geprüft wurde nicht der Commit → kein Nachweis
+        shutil.rmtree(os.path.join(self.p, ".dev-team", "gruen"))
+        self.schreibe("tests/hilfsdaten.txt", "neu\n")
+        self.assertEqual(self.lauf("--rolle", "tester")[0], 0)
+        self.assertFalse(os.path.exists(os.path.join(self.p, ".dev-team", "gruen", kopf)))
+
+    def test_fehlerprobe_nutzt_node_modules(self):
+        # node_modules ist ignoriert und wird nicht kopiert; ohne Verknüpfung scheiterte jeder Lauf am Import
+        # und wurde fälschlich als ERKANNT gemeldet (Pilot 2026-10).
+        self.schreibe("node_modules/hilfe/__init__.py", "def doppelt(x):\n    return x * 2\n")
+        self.schreibe(".gitignore", ".dev-team/\n__pycache__/\n.claude/worktrees/\nnode_modules/\n")
+        self.schreibe("src/extra.py", "def g(x):\n    return x + 1\n")
+        befehl = "test -f node_modules/hilfe/__init__.py && %s -m unittest discover -s tests -t . -v" % sys.executable
+        code, aus = self.skript("fehlerprobe.py", "--datei", "src/extra.py", "--alt", "x + 1", "--neu", "x + 2",
+                                "--befehl", befehl)
+        self.assertEqual(code, 1, aus)
+        self.assertIn("NICHT ERKANNT", aus)
+        self.assertTrue(os.path.isfile(os.path.join(self.p, "node_modules", "hilfe", "__init__.py")))
+
+    def test_fehlerprobe_leerlauf_rot_ist_ungueltig(self):
+        self.schreibe("src/rechnung.py", "def summe(w):\n    return 0\n")
+        code, aus = self.skript("fehlerprobe.py", "--datei", "src/rechnung.py", "--alt", "0", "--neu", "1")
+        self.assertEqual(code, 2, aus)
+        self.assertIn("UNGÜLTIG", aus)
+        self.assertNotIn("ERKANNT", aus)
+
+    def test_fehlerprobe_ladefehler_ist_kein_treffer(self):
+        code, aus = self.skript("fehlerprobe.py", "--datei", "src/rechnung.py", "--alt", "def summe(w):",
+                                "--neu", "def summe(w)")
+        self.assertEqual(code, 2, aus)
+        self.assertIn("UNGÜLTIG", aus)
+        self.assertIn("Lade- oder Syntaxfehler", aus)
+
     def test_rote_tests(self):
         self.schreibe("src/rechnung.py", "def summe(w):\n    return 0\n")
         code, aus = self.lauf()
@@ -455,6 +511,19 @@ class TestSchranke(unittest.TestCase):
         code, aus = self.lauf("--rolle", "tester")
         self.assertEqual(code, 1)
         self.assertIn("Weniger bestandene Tests", aus)
+
+    def test_testzahl_paralleles_paket_nicht_blockiert(self):
+        # Paket B startet auf dem alten Stand; Paket A wird mit einem zusätzlichen Test gemergt. B hat diesen
+        # Test noch nicht – das ist kein Testverlust (Pilot: M3-1 blockierte M3-2).
+        wt = os.path.join(self.tmp, "wt-b")
+        git(self.p, "worktree", "add", "-q", "-b", "paket-b", wt)
+        self.schreibe("tests/test_extra.py", "import unittest\nfrom src.rechnung import summe\nclass E(unittest.TestCase):\n"
+                      "    def test_e(self):\n        self.assertEqual(summe([4, 5]), 9)\n")
+        git(self.p, "add", "-A")
+        git(self.p, "commit", "-qm", "Paket A gemergt")
+        self.assertEqual(self.lauf("--rolle", "tester")[0], 0)   # merkt sich 3 für den neuen Stand
+        code, aus = self.lauf("--rolle", "entwickler", ordner=wt)
+        self.assertNotIn("Weniger bestandene Tests", aus)
 
     def test_null_tests(self):
         self.konfig({"testbefehl": "%s -m unittest discover -s src -v" % sys.executable,
@@ -654,6 +723,18 @@ class TestAbhaengigkeiten(unittest.TestCase):
         code, aus = self.lauf({"pypi.org": urllib.error.URLError("offline")})
         self.assertEqual(code, 1)
         self.assertIn("nicht erreichbar", aus)
+
+    def test_nicht_utf8_dateien(self):
+        # Früher Absturz mit UnicodeDecodeError, die Schranke lief gar nicht (Pilot 2026-10).
+        with open(os.path.join(self.p, "requirements.txt"), "wb") as f:
+            f.write("requests==2.32.3\nhuggingface-magic-tools==1.0\n".encode("utf-16"))   # PowerShell-Umleitung
+        with open(os.path.join(self.p, "package.json"), "wb") as f:
+            f.write(json.dumps({"description": "Größe", "dependencies": {"react": "18.3.1"}}).encode("cp1252"))
+        code, aus = self.lauf({})
+        self.assertEqual(code, 1, aus)
+        self.assertIn("huggingface-magic-tools", aus)
+        self.assertIn("existiert nicht", aus)
+        self.assertNotIn("requests", aus.split("existiert nicht")[0].splitlines()[-1])
 
     def test_pypi_erfunden_und_ungepinnt(self):
         self.schreibe("requirements.txt", "requests==2.32.3\nhuggingface-magic-tools\n")

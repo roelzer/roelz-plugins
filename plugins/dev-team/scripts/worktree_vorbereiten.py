@@ -94,6 +94,22 @@ def setup_ausfuehren(worktree, grund):
     return 0
 
 
+def ausgangslage(worktree, haupt):
+    """Wurde genau dieser Startpunkt im Hauptordner schon grün geprüft (Schranke nach dem Merge), ist ein
+    zweiter voller Testlauf im frischen Worktree nur Wartezeit. Gibt eine Zeile aus, wenn er entfallen darf."""
+    if not haupt:
+        return False
+    code, kopf = git(worktree, "rev-parse", "HEAD")
+    _, offen = git(worktree, "status", "--porcelain")
+    nachweis = os.path.join(haupt, ".dev-team", "gruen", kopf)
+    if code != 0 or offen or not os.path.isfile(nachweis):
+        return False
+    with open(nachweis, encoding="utf-8", errors="replace") as f:
+        print("AUSGANGSLAGE BELEGT GRÜN – Startpunkt %s wurde im Hauptordner geprüft (%s). Der volle Ausgangslauf "
+              "entfällt." % (kopf[:10], f.read().strip()))
+    return True
+
+
 def main():
     a = argparse.ArgumentParser()
     a.add_argument("--trennen", action="store_true")
@@ -120,6 +136,7 @@ def main():
         return setup_ausfuehren(worktree, "Verknüpfung gelöst, eigene Installation")
 
     haupt = hauptordner(worktree)
+    ausgangslage(worktree, haupt)
     if ist_verknuepfung(nm) or (os.path.isdir(nm) and os.listdir(nm)):
         print("OK – node_modules ist schon da.")
         return 0

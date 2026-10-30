@@ -68,8 +68,16 @@ if [ "$ereignis" = "start" ]; then
 else
   agent="$(feld agent_type)"
   agent="${agent#dev-team:}"
-  [ -n "$agent" ] || agent="?"
-  nachricht="$(feld last_assistant_message)"
+  # Ohne Agententyp ist es kein Agentenlauf (in Cloud-Sitzungen kam hier Simons letzte Chatnachricht an).
+  [ -n "$agent" ] || exit 0
+  nachricht=""
+  for py in python3 python; do
+    if command -v "$py" >/dev/null 2>&1; then
+      nachricht="$(printf '%s' "$eingabe" | "$py" "$(dirname "$0")/letzte_nachricht.py" 2>/dev/null)" && break
+    fi
+  done
+  # Ohne Python: nur das direkte Feld (bei Hintergrund-Agenten oft leer).
+  [ -n "$nachricht" ] || nachricht="$(feld last_assistant_message)"
   # Vollständigen Bericht aufbewahren (Nachweis: welcher Agent hat was geprüft und gefunden).
   kennung="$(feld agent_id | tr -cd 'A-Za-z0-9_-' | cut -c1-24)"
   berichte="$projekt/docs/pruefberichte"
