@@ -66,7 +66,7 @@ Steht in `.claude/dev-team.json` (`"profil"`):
 
 ## Ablauf (Stufe Normal und Groß) – Details im Skill `/dev-team:auftrag`
 1. **Verstehen:** Anforderungen A1 … → **Stopp 1**, Simon bestätigt.
-2. **Planen:** du schreibst `docs/plan.md`, der `architekt` entwirft das Architektur-Rückgrat, die Architekturtests, den Paketschnitt und einen **Bauplan je Paket** (Dateien, exakte Schnittstellen, Tests, Randfälle). Tragende Architekturentscheidungen legt er Simon mit Alternativen vor.
+2. **Planen:** du schreibst `docs/plan.md`, der `architekt` entwirft das Architektur-Rückgrat, die Architekturtests, den Paketschnitt und einen **Bauplan je Paket** (Dateien, exakte Schnittstellen, Tests, Randfälle). Tragende Architekturentscheidungen schreibt er mit Alternativen und Empfehlung auf; wer sie entscheidet, regelt „Wer entscheidet was“ unten.
 3. **Planprüfung:** `kritiker`, `fachpruefer` (fachliche Folgen), `sicherheitspruefer` (bei Normal und Groß immer, bei Klein mit Auslöser); bei Wissenslücken `rechercheur`. Dazu Pflicht: Auslöser-Checkliste im Plan und bei Fachsoftware die Fachwissen-Inventur.
 4. **Abwägungsrunde:** `fachexperte`, `pragmatiker`, `langfrist-architekt`, unabhängig und parallel.
 5. **Freigabe** durch Simon → **Stopp 2**. Erst dann wird gebaut.
@@ -128,7 +128,8 @@ Danach: das Wichtigste in einfacher Sprache, höchstens 5 Punkte, jeweils mit �
 Hat Simon einen Plan freigegeben, wird ohne Rückfragen weitergebaut, auch wenn er stundenlang nicht da ist:
 - Pakete in der geplanten Reihenfolge, parallele Gruppen gleichzeitig. Nach jedem Paket: Review, Merge, Schranke, `docs/STATUS.md`.
 - **Entscheiden statt stehen bleiben:** Umkehrbare Fragen (Widersprüche im Plan, kleine Lücken, Befunde nach der letzten Fix-Runde) entscheidest du und schreibst sie nach `docs/ENTSCHEIDUNGEN.md` (`Datum | was | warum | was es kostet, wenn falsch`). Im Bericht stehen sie **vollständig**.
-- **Nicht raten.** Unklarheit → `docs/OFFENE_FRAGEN.md` (mit Empfehlung) und weiter mit einem unabhängigen Paket.
+- **Wer entscheidet was** (Simons Vorgabe, Pilot 31.10.2026: „davon keine Ahnung, bitte für mich entscheiden“): Fragen, die Fachwissen verlangen, das Simon nicht hat – Technik, Architektur, Sicherheit, Recht, Prozess –, entscheidest **du** nach der Empfehlung der zuständigen Rolle (siehe „Wer prüft was“), auch tragende Architekturentscheidungen. Zeile in `docs/ENTSCHEIDUNGEN.md`, Simon wird informiert, weiter. Simon bekommt nur, was ihm gehört: Produkt und Aussehen (was soll es können, wie soll es wirken), Geld, seine Daten, und was technisch nur er tun kann (Konten, Netzwerk, echtes Gerät, Einträge in `.claude/freigaben.md`). Angehalten wird außerdem, wenn Geld oder Daten unwiderruflich betroffen wären. Unbestätigte Fachregeln bleiben „vorläufig“; Freigaben und geschützte Dateien bleiben Simons Sache. Will Simon in einem Projekt mehr selbst entscheiden, steht das in dessen `CLAUDE.md`.
+- **Nicht raten.** Unklarheit, die nicht dir gehört → `docs/OFFENE_FRAGEN.md` (mit Empfehlung) und weiter mit einem unabhängigen Paket.
 - **Harte Stopps** (Stand sichern, Grund in STATUS.md): Referenzfall oder Fachregel rot und nicht im Plan behebbar; Änderung außerhalb des Plans nötig (Datenmodell, Umbau). Eine neue Abhängigkeit ist **kein** harter Stopp, wenn die Abhängigkeits-Schranke grün ist (Zeile in `docs/ENTSCHEIDUNGEN.md`); ein Agent meldet 🔴 und es ist nicht innerhalb von 3 Runden behebbar; etwas müsste gelöscht oder überschrieben werden, das nicht neu angelegt wurde; eine freigabepflichtige Aktion wäre nötig; eine Rolle fehlt.
 
 ## Fertig heißt belegt

@@ -1,5 +1,19 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.13.0 – Simon entscheidet nur noch, was ihm gehört; Prüftiefe nach Risiko
+
+Anlass: Pilot `ichkannalles`, Meilensteine M3–M6 (30./31.10.2026). Übernommen, was Simon dort festgelegt und das Team gelernt hat.
+
+- **Wer entscheidet was** (Grundgesetz, Skill `auftrag`): Fragen, die Fachwissen verlangen (Technik, Architektur, Sicherheit, Recht, Prozess), entscheidet der Projektleiter nach Empfehlung der zuständigen Rolle – auch tragende Architekturentscheidungen – und informiert Simon. Simon bekommt nur Produkt, Aussehen, Geld, seine Daten und was technisch nur er kann (Konten, Netzwerk, Gerät, Freigaben); angehalten wird auch, wenn Geld oder Daten unwiderruflich betroffen wären. Unbestätigte Fachregeln bleiben vorläufig. Ein Projekt kann in seiner `CLAUDE.md` mehr Mitsprache festlegen. (Simon: „davon keine Ahnung, bitte für mich entscheiden“)
+- **Prüftiefe nach Risiko:** volle Prüfung (Reviewer + Sicherheit, bei Oberfläche Designer) für Pakete mit Daten-, Eingabe-, Zugangs- oder Fachregel-Risiko; reine Oberflächen-Pakete nur Reviewer, Designer einmal gesamt am Meilenstein-Ende; kleine Befunde gesammelt statt eigener Runde; kleiner Folge-Meilenstein mit gemeinsamer Gesamtprüfung.
+- **Entwickler: Opus für `mittel` und `schwer`**, Sonnet nur für `einfach` (Ergebnis des Versuchs aus 3.12: Opus eine Nachbesserungsrunde je mittlerem Paket, Sonnet ein bis zwei). Standardmodell im Steckbrief jetzt Opus.
+- **Prüfsummen ohne Dauerfreigabe:** `abnahme_pruefsummen.py --schreiben` ergänzt neue Abnahmetests ohne Freigabe und lässt festgehaltene Einträge stehen (schützt auch aufgedeckte Tests). Die Schranke prüft, dass kein je versionierter Eintrag geändert oder gestrichen wurde (gestrichen zählt nicht, solange der Test unverändert aufgedeckt vorliegt) – statt Textvergleich mit der ersten Fassung, der nach jedem Meilenstein rot war und ein Freigabe-Stichwort in jeder Schranke erzwang.
+- **Mehrere Freigaben** je Schranken-Lauf: `--freigabe a --freigabe b` oder `--freigabe a,b`.
+- **Bericht-Hook:** liest den Bericht nur lesender Prüfer aus ihrer Berichtsübergabe (SubagentHandback); vorher stand dort nur „Bericht übergeben“.
+- **fehlerprobe.py:** nennt bei „UNGÜLTIG“ die Zeile mit dem Ladefehler (gemeldeter happy-dom-Fall ließ sich mit 3.12 im Haupt-, Worktree- und Cloud-Aufbau nicht nachstellen).
+- **Auftrag:** Tester-Vorarbeit mit roten Tests nie in den Startpunkt eines parallelen Pakets; Referenzdateien legt der Tester an; eigene Commits nur mit ausdrücklichen Pfaden; Merge-Schranke rot nur durch Zeitüberschreitung einmal ohne parallele Testläufe wiederholen; Zwischenstand-Branches am Sitzungsende, löschen kann nur Simon.
+- **Lektionen** (Rückfall-Datei): Gleitkomma-Grenzwerte, Gegenprobe-Suchtext, userEvent mit Fake-Timern, Sichtprüfung von Überlagerungen.
+
 ## 3.12.0 – Schneller ohne Qualitätsverlust: Durchlauf, eine Prüfrunde, Selbstprüfung, ehrliche Gegenproben
 
 Anlass: Auswertung von Meilenstein 2 in `ichkannalles` (30.10.2026). Fast jedes Paket brauchte 1–2 Nachbesserungsrunden für dieselben Punkte; Gegenproben meldeten in Node-Projekten immer „ERKANNT“; viele Berichte in `docs/pruefberichte/` enthielten nur die Kopfzeile. Simons Vorgabe: „Effizienz ohne Qualitätsverlust – bau das so um.“

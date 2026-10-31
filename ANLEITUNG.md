@@ -1,6 +1,6 @@
 # Dev-Team – Anleitung
 
-Stand: Oktober 2026 · Version 3.12
+Stand: Oktober 2026 · Version 3.13
 
 Dieses Repo enthält zwei Plugins für Claude Code: **`dev-team`** und **`tool-scout`**. Beide enthalten kein Firmen- oder Kundenwissen und dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
 
@@ -76,7 +76,8 @@ Start mit: `/dev-team:auftrag <was gebaut werden soll>`
    - je Paket ein Entwickler in eigenem Arbeitsordner (Git-Worktree), bis zu drei parallel
    - jedes Paket geht durch den Reviewer, bevor es zusammengeführt wird; Nachbesserung höchstens 5 Runden
    - nach jedem Zusammenführen müssen **alle Tests grün** sein
-   - kleine Entscheidungen trifft der Projektleiter selbst und schreibt sie mit Begründung auf; im Bericht stehen **alle** („Entscheidungen, die ich für dich getroffen habe“)
+   - Fragen, die Fachwissen verlangen (Technik, Architektur, Sicherheit, Recht, Abläufe), entscheidet der Projektleiter selbst nach der Empfehlung des Teams und schreibt sie mit Begründung auf; im Bericht stehen **alle** („Entscheidungen, die ich für dich getroffen habe“). Dich fragt er nur noch zu Produkt, Aussehen, Geld, deinen Daten und zu dem, was nur du tun kannst (Konten, Netzwerk, Geräte, Freigaben). Willst du in einem Projekt mehr selbst entscheiden, schreib es in dessen `CLAUDE.md`.
+   - Prüftiefe nach Risiko: Pakete, die Daten speichern, Eingaben von außen verarbeiten oder mit Fachregeln rechnen, prüfen Reviewer und Sicherheitsprüfer (bei Oberfläche auch der Designer); reine Oberflächen-Pakete nur der Reviewer, der Designer sieht sie gesammelt am Meilenstein-Ende
    - Stand jederzeit in `docs/STATUS.md`, Fragen in `docs/OFFENE_FRAGEN.md`
 7. **Prüfen** je Meilenstein: Tester (deckt Abnahmetests auf) → Fachprüfer → Architekt → Reviewer → Sicherheitsprüfer → Produktprüfer.
 8. ⏸ **Bericht** mit Abnahmeliste, Testnachweis und Teamnachweis.
