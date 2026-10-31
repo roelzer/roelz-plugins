@@ -58,6 +58,22 @@ class TestBericht(unittest.TestCase):
                              "agent_transcript_path": pfad})
         self.assertIn("Bericht direkt", open(dateien[0], encoding="utf-8").read())
 
+    def test_bericht_aus_berichtsuebergabe(self):
+        # Nur lesende Prüfer übergeben ihren Bericht per SubagentHandback; die letzte Textzeile ist dann nur
+        # „Bericht übergeben“ – früher stand nur diese Zeile in docs/pruefberichte/ (Pilot 31.10.).
+        pfad = self.protokoll(
+            {"type": "assistant", "message": {"content": [
+                {"type": "tool_use", "name": "SubagentHandback",
+                 "input": {"report": "🟡 Kritiker-Urteil\n1. Wichtig: Randfall fehlt"}}]}},
+            {"type": "assistant", "message": {"content": [{"type": "text", "text": "Bericht übergeben."}]}},
+        )
+        dateien = self.ende({"agent_type": "kritiker", "agent_id": "k1", "last_assistant_message": "Bericht übergeben.",
+                             "agent_transcript_path": pfad})
+        inhalt = open(dateien[0], encoding="utf-8").read()
+        self.assertIn("Randfall fehlt", inhalt)
+        log = open(os.path.join(self.p, "docs", "AGENTEN_LOG.md"), encoding="utf-8").read()
+        self.assertIn("| ■ 🟡 | kritiker |", log)
+
     def test_ohne_agententyp_kein_eintrag(self):
         # In Cloud-Sitzungen kamen Ereignisse ohne Agententyp mit Simons Chatnachricht an („? | mach weiter“).
         dateien = self.ende({"agent_type": "", "last_assistant_message": "Gut mach weiter"})

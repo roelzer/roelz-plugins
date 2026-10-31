@@ -135,6 +135,24 @@ class TestSchranke(unittest.TestCase):
         self.assertEqual(code, 0, aus)
         self.assertIn("Freigabe verwendet", aus)
 
+    def test_mehrere_freigaben(self):
+        # Ein Meilenstein hat oft mehrere Freigaben; früher nahm die Schranke nur ein Stichwort (Pilot M5).
+        self.schreibe("tests/referenz/fall2.json", '{"ein": [2,2], "aus": 4}')
+        git(self.p, "add", "-A")
+        git(self.p, "commit", "-qm", "fall2")
+        self.basis = git(self.p, "rev-parse", "HEAD").strip()
+        self.schreibe("tests/referenz/fall1.json", '{"ein": [1,2], "aus": 4}')
+        self.schreibe("tests/referenz/fall2.json", '{"ein": [2,2], "aus": 5}')
+        self.schreibe(".claude/freigaben.md", "# Freigaben\n2026-10-30 | eins | tests/referenz/fall1.json | a\n"
+                      "2026-10-30 | zwei | tests/referenz/fall2.json | b\n")
+        self.assertEqual(self.lauf("--freigabe", "eins")[0], 1)
+        code, aus = self.lauf("--freigabe", "eins", "--freigabe", "zwei")
+        self.assertEqual(code, 0, aus)
+        self.assertEqual(self.lauf("--freigabe", "eins,zwei")[0], 0)
+        code, aus = self.lauf("--freigabe", "eins,fehlt")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("'fehlt' steht nicht", aus)
+
     def merge_paket(self, dateien, nachricht="P1"):
         git(self.p, "checkout", "-qb", "paket-" + nachricht)
         for rel, inhalt in dateien.items():
@@ -277,6 +295,26 @@ class TestSchranke(unittest.TestCase):
         code, aus = self.skript("abnahme_pruefsummen.py", "--schreiben")
         self.assertEqual(code, 1, aus)
 
+    def test_pruefsummen_naechster_meilenstein_ohne_freigabe(self):
+        # M1-Test ist aufgedeckt (nicht mehr verdeckt), M2 bringt neue verdeckte Tests: Ergänzen geht ohne
+        # Freigabe, der M1-Eintrag bleibt stehen und schützt den aufgedeckten Test weiter (Pilot: jedes Mal Freigabe).
+        self.schreibe(".dev-team/verdeckt/test_m1.py", "def test_a1():\n    assert 1 + 1 == 2\n")
+        self.assertEqual(self.skript("abnahme_pruefsummen.py", "--schreiben")[0], 0)
+        os.makedirs(os.path.join(self.p, "tests", "abnahme"), exist_ok=True)
+        shutil.move(os.path.join(self.p, ".dev-team", "verdeckt", "test_m1.py"),
+                    os.path.join(self.p, "tests", "abnahme", "test_m1.py"))
+        self.schreibe(".dev-team/verdeckt/test_m2.py", "def test_a2():\n    assert 2 * 2 == 4\n")
+        code, aus = self.skript("abnahme_pruefsummen.py", "--schreiben")
+        self.assertEqual(code, 0, aus)
+        self.assertIn("1 neu, 1 schon festgehalten", aus)
+        liste = open(os.path.join(self.p, "docs", "ABNAHME_PRUEFSUMMEN.txt"), encoding="utf-8").read()
+        self.assertIn("test_m1.py", liste)
+        self.assertIn("test_m2.py", liste)
+        self.schreibe("tests/abnahme/test_m1.py", "def test_a1():\n    assert True\n")   # abgeschwächt → rot
+        code, aus = self.lauf("--rolle", "tester", "--ohne-lauf")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("weicht von der festgehaltenen Fassung ab", aus)
+
     def test_pruefsummen_ohne_endung_verdeckt(self):
         self.schreibe(".dev-team/verdeckt/test_abnahme_a1.py", "def test_a1():\n    assert 1 + 1 == 2\n")
         self.schreibe(".dev-team/verdeckt/README.md", "Erklärung\n")
@@ -388,11 +426,50 @@ class TestSchranke(unittest.TestCase):
         code, aus = self.lauf("--rolle", "projektleiter", "--ohne-lauf")
         self.assertEqual(code, 1, aus)
         self.assertIn("gelöscht", aus)
-        # Liste neu berechnet → weicht von der versionierten ersten Fassung ab
+        # Eintrag aus der Liste gestrichen → rot
         self.schreibe("docs/ABNAHME_PRUEFSUMMEN.txt", "# leer\n")
         code, aus = self.lauf("--rolle", "tester", "--ohne-lauf")
         self.assertEqual(code, 1, aus)
-        self.assertIn("ersten versionierten Fassung", aus)
+        self.assertIn("geändert oder gestrichen (test_abn_a1.py)", aus)
+
+    def test_pruefsummen_ergaenzt_ohne_dauerfreigabe(self):
+        # Pilot: nach jedem neuen Meilenstein wich die Liste von ihrer ersten Fassung ab, und jede Schranke
+        # brauchte ein Freigabe-Stichwort. Ergänzen ist erlaubt, Ändern eines je festgehaltenen Eintrags nicht.
+        self.schreibe(".dev-team/verdeckt/test_m1.py", "def test_a1():\n    assert 1 + 1 == 2\n")
+        self.assertEqual(self.skript("abnahme_pruefsummen.py", "--schreiben")[0], 0)
+        git(self.p, "add", "-f", "docs/ABNAHME_PRUEFSUMMEN.txt")
+        git(self.p, "commit", "-qm", "M1")
+        self.schreibe(".dev-team/verdeckt/test_m2.py", "def test_a2():\n    assert 2 * 2 == 4\n")
+        self.assertEqual(self.skript("abnahme_pruefsummen.py", "--schreiben")[0], 0)
+        git(self.p, "add", "-f", "docs/ABNAHME_PRUEFSUMMEN.txt")
+        git(self.p, "commit", "-qm", "M2")
+        self.basis = git(self.p, "rev-parse", "HEAD").strip()
+        code, aus = self.lauf("--rolle", "tester", "--ohne-lauf")
+        self.assertEqual(code, 0, aus)
+        # M2-Eintrag nachträglich geändert (auch ein später ergänzter Eintrag ist geschützt) → rot
+        liste = open(os.path.join(self.p, "docs", "ABNAHME_PRUEFSUMMEN.txt"), encoding="utf-8").read()
+        zeile = [z for z in liste.splitlines() if z.endswith("test_m2.py")][0]
+        self.schreibe("docs/ABNAHME_PRUEFSUMMEN.txt", liste.replace(zeile, "0" * 64 + "  test_m2.py"))
+        code, aus = self.lauf("--rolle", "tester", "--ohne-lauf")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("test_m2.py", aus)
+
+    def test_pruefsummen_gestrichen_aber_unveraendert_aufgedeckt(self):
+        # Liste beim nächsten Meilenstein ersetzt (alte Fassung): Der gestrichene Eintrag zählt nicht, solange sein
+        # Test unverändert aufgedeckt vorliegt; wird der aufgedeckte Test später abgeschwächt, ist es wieder rot.
+        self.schreibe(".dev-team/verdeckt/test_m1.py", "def test_a1():\n    assert 1 + 1 == 2\n")
+        self.assertEqual(self.skript("abnahme_pruefsummen.py", "--schreiben")[0], 0)
+        git(self.p, "add", "-f", "docs/ABNAHME_PRUEFSUMMEN.txt")
+        git(self.p, "commit", "-qm", "M1")
+        self.schreibe("tests/abnahme/test_m1.py", "def test_a1():\n    assert 1 + 1 == 2\n")
+        os.remove(os.path.join(self.p, ".dev-team", "verdeckt", "test_m1.py"))
+        self.schreibe("docs/ABNAHME_PRUEFSUMMEN.txt", "# ersetzt\n")
+        self.schreibe(".dev-team/verdeckt/test_m2.py", "def test_a2():\n    assert 2 * 2 == 4\n")
+        code, aus = self.lauf("--rolle", "tester", "--ohne-lauf")
+        self.assertNotIn("geändert oder gestrichen", aus)
+        self.schreibe("tests/abnahme/test_m1.py", "def test_a1():\n    assert True\n")
+        code, aus = self.lauf("--rolle", "tester", "--ohne-lauf")
+        self.assertIn("geändert oder gestrichen (test_m1.py)", aus)
 
     def test_verdeckt_ohne_liste_rot_beim_merge(self):
         self.schreibe(".dev-team/verdeckt/test_abn_a1.py", "def test_a1():\n    assert 1 + 1 == 2\n")
@@ -498,6 +575,7 @@ class TestSchranke(unittest.TestCase):
         self.assertEqual(code, 2, aus)
         self.assertIn("UNGÜLTIG", aus)
         self.assertIn("Lade- oder Syntaxfehler", aus)
+        self.assertIn("Ladefehler: ", aus)   # nennt die Ursache, damit sie sich nachstellen lässt
 
     def test_rote_tests(self):
         self.schreibe("src/rechnung.py", "def summe(w):\n    return 0\n")

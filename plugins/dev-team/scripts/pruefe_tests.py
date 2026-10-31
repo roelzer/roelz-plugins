@@ -101,12 +101,6 @@ def lade_konfig(wurzel, hauptordner):
     return None, None
 
 
-def git_erste_fassung(wurzel, pfad):
-    r = sh(["git", "log", "--diff-filter=A", "--format=%H", "--reverse", "--", pfad], wurzel)
-    commit = (r.stdout or "").split()
-    return git_datei_text(wurzel, commit[0], pfad) if commit else None
-
-
 def git_datei_text(wurzel, commit, pfad):
     r = sh(["git", "show", "%s:%s" % (commit, pfad)], wurzel)
     return r.stdout if r.returncode == 0 else None
@@ -300,11 +294,12 @@ def pruefsummen_pruefen(e, hauptordner, wurzel, fg, rolle="projektleiter"):
             e.f("Verdeckte Abnahmetests vorhanden, aber keine festgehaltenen Prüfsummen (%s). Erst "
                 "abnahme_pruefsummen.py --schreiben und committen." % mod.DATEI)
         return
-    erste = git_erste_fassung(hauptordner, mod.DATEI)
-    jetzt_text = datei_text(hauptordner, mod.DATEI) or ""
-    if erste is not None and erste != jetzt_text and not fg.deckt("docs/ABNAHME_PRUEFSUMMEN.txt"):
-        e.f("Die Prüfsummen-Liste weicht von ihrer ersten versionierten Fassung ab – Abnahmetests werden nie "
-            "nachträglich angepasst (nur mit Simons Freigabe).")
+    # Neue Einträge (nächster Meilenstein) sind erlaubt; früher galt schon das Ergänzen als Abweichung von der
+    # ersten Fassung, und jede Schranke brauchte danach eine Freigabe (Pilot).
+    veraendert = mod.veraenderte_eintraege(hauptordner, wurzel)
+    if veraendert and not fg.deckt("docs/ABNAHME_PRUEFSUMMEN.txt"):
+        e.f("Festgehaltene Prüfsummen wurden geändert oder gestrichen (%s) – Abnahmetests werden nie nachträglich "
+            "angepasst (nur mit Simons Freigabe)." % ", ".join(veraendert[:5]))
     funde = mod.pruefen(hauptordner, wurzel, vollstaendig=(rolle == "projektleiter"))
     for t in funde:
         (e.w if fg.deckt("docs/ABNAHME_PRUEFSUMMEN.txt") else e.f)(t + (fg.text("docs/ABNAHME_PRUEFSUMMEN.txt") or
@@ -592,7 +587,8 @@ def main():
     a.add_argument("--rolle", default="projektleiter",
                    choices=["entwickler", "merge", "tester", "reviewer", "projektleiter", "architekt"])
     a.add_argument("--ohne-lauf", action="store_true")
-    a.add_argument("--freigabe", default="")
+    a.add_argument("--freigabe", action="append", default=[],
+                   help="Stichwort aus .claude/freigaben.md; mehrere: wiederholen oder mit Komma trennen")
     arg = a.parse_args()
 
     e = Ergebnis()
@@ -610,8 +606,13 @@ def main():
     team = lade_team()
     konfig, _ = lade_konfig(wurzel, hauptordner)
     fg = Freigabe()
-    if arg.freigabe:
-        fg = pruefe_freigabe(e, hauptordner, arg.freigabe)
+    # Mehrere Freigaben eines Meilensteins zusammen (früher nur ein Stichwort je Lauf, Pilot M5).
+    stichworte = [w.strip() for f in arg.freigabe for w in f.split(",") if w.strip()]
+    if stichworte:
+        einzeln = [pruefe_freigabe(e, hauptordner, w) for w in stichworte]
+        gueltig = [f for f in einzeln if f.zeile]
+        if gueltig:
+            fg = Freigabe(" + ".join(f.zeile for f in gueltig), [g for f in gueltig for g in f.geltung])
     freigabe = fg.zeile
     if ist_worktree and arg.rolle == "entwickler":
         haupt_kopf = git(hauptordner, "rev-parse", "HEAD").strip()

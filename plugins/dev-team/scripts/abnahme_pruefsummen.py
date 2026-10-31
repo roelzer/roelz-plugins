@@ -6,8 +6,10 @@ unverändert aufgedeckt werden.
   python3 abnahme_pruefsummen.py --pruefen                               (macht die Test-Schranke selbst)
 
 Liste: docs/ABNAHME_PRUEFSUMMEN.txt (Nachweis-Bereich, kein Agent kann sie schreiben; wird mit dem
-Commit „Plan freigegeben“ versioniert). Ist sie schon da und würde sich ändern, braucht es eine
-Freigabe von Simon, deren Geltung „docs/ABNAHME_PRUEFSUMMEN.txt“ nennt.
+Commit „Plan freigegeben“ versioniert). Neue Abnahmetests (nächster Meilenstein) werden ergänzt, ohne
+Freigabe; festgehaltene Einträge bleiben stehen, auch wenn ihr Test inzwischen aufgedeckt ist – so bleibt
+er geschützt. Nur wenn sich ein festgehaltener Eintrag ändern würde, braucht es eine Freigabe von Simon,
+deren Geltung „docs/ABNAHME_PRUEFSUMMEN.txt“ nennt.
 """
 
 import argparse
@@ -47,16 +49,42 @@ def verdeckte(hauptordner):
     return aus
 
 
+def liste_aus_text(text):
+    liste = {}
+    for zeile in (text or "").splitlines():
+        teile = zeile.strip().split("  ", 1)
+        if len(teile) == 2 and len(teile[0]) == 64 and not zeile.startswith("#"):
+            liste[teile[1].strip()] = teile[0]
+    return liste
+
+
 def lies_liste(hauptordner):
     pfad = os.path.join(hauptordner, DATEI)
-    liste = {}
-    if os.path.isfile(pfad):
-        with open(pfad, encoding="utf-8") as f:
-            for zeile in f:
-                teile = zeile.strip().split("  ", 1)
-                if len(teile) == 2 and len(teile[0]) == 64 and not zeile.startswith("#"):
-                    liste[teile[1].strip()] = teile[0]
-    return liste
+    if not os.path.isfile(pfad):
+        return {}
+    with open(pfad, encoding="utf-8") as f:
+        return liste_aus_text(f.read())
+
+
+def veraenderte_eintraege(hauptordner, wurzel=None):
+    """Einträge, die in irgendeiner versionierten Fassung der Liste standen und jetzt eine andere Prüfsumme haben
+    oder fehlen. Ergänzen ist erlaubt (nächster Meilenstein). Ein gestrichener Eintrag zählt nicht, solange sein
+    Test unverändert aufgedeckt unter tests/abnahme/ liegt – ändert sich der Test später, fällt es wieder auf."""
+    jetzt = lies_liste(hauptordner)
+    aufgedeckt = aufgedeckt_mit_summe(wurzel or hauptordner)
+    r = subprocess.run(["git", "log", "--format=%H", "--", DATEI.replace(os.sep, "/")], cwd=hauptordner,
+                       capture_output=True, text=True, encoding="utf-8", errors="replace")
+    funde = set()
+    for commit in (r.stdout or "").split():
+        alt = subprocess.run(["git", "show", "%s:%s" % (commit, DATEI.replace(os.sep, "/"))], cwd=hauptordner,
+                             capture_output=True, text=True, encoding="utf-8", errors="replace")
+        for rel, summe_alt in liste_aus_text(alt.stdout if alt.returncode == 0 else "").items():
+            if rel in jetzt:
+                if jetzt[rel] != summe_alt:
+                    funde.add(rel)
+            elif summe_alt not in aufgedeckt:
+                funde.add(rel)
+    return sorted(funde)
 
 
 def aufgedeckt_finden(wurzel, rel):
@@ -129,14 +157,15 @@ def main():
         print("FEHLER: Keine verdeckten Tests unter %s gefunden. Nichts geschrieben." % VERDECKT)
         sys.exit(1)
     alt = lies_liste(hauptordner)
-    if alt and alt != jetzt:
+    geaendert = sorted(rel for rel in jetzt if rel in alt and alt[rel] != jetzt[rel])
+    if geaendert:
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         import pruefe_tests
         e = pruefe_tests.Ergebnis()
         fg = pruefe_tests.pruefe_freigabe(e, hauptordner, arg.freigabe) if arg.freigabe else pruefe_tests.Freigabe()
         if not fg.deckt("docs/ABNAHME_PRUEFSUMMEN.txt"):
-            print("FEHLER: Die Prüfsummen sind schon festgehalten und würden sich ändern. Das braucht Simons "
-                  "Freigabe (Geltung: docs/ABNAHME_PRUEFSUMMEN.txt). Nichts geschrieben.")
+            print("FEHLER: Festgehaltene Abnahmetests würden sich ändern (%s). Das braucht Simons Freigabe "
+                  "(Geltung: docs/ABNAHME_PRUEFSUMMEN.txt). Nichts geschrieben." % ", ".join(geaendert))
             for t in e.fehler:
                 print("FEHLER: " + t)
             sys.exit(1)
@@ -145,9 +174,12 @@ def main():
     with open(pfad, "w", encoding="utf-8", newline="\n") as f:
         f.write("# Prüfsummen der verdeckten Abnahmetests (sha256, Zeilenenden vereinheitlicht)\n")
         f.write("# Automatisch geschrieben von abnahme_pruefsummen.py – nicht von Hand ändern.\n")
-        for rel in sorted(jetzt):
-            f.write("%s  %s\n" % (jetzt[rel], rel))
-    print("GESCHRIEBEN: %s (%d Abnahmetests). Jetzt mit dem Commit „Plan freigegeben“ versionieren." % (DATEI, len(jetzt)))
+        gesamt = dict(alt, **jetzt)
+        for rel in sorted(gesamt):
+            f.write("%s  %s\n" % (gesamt[rel], rel))
+    neu = len([r for r in jetzt if r not in alt])
+    print("GESCHRIEBEN: %s (%d Abnahmetests: %d neu, %d schon festgehalten). Jetzt mit dem Commit „Plan freigegeben“ "
+          "versionieren." % (DATEI, len(gesamt), neu, len(alt)))
 
 
 if __name__ == "__main__":
