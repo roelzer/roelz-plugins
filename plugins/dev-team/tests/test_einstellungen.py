@@ -131,6 +131,8 @@ class Vorlagen(unittest.TestCase):
         with open(VORLAGE) as f:
             v = json.load(f)
         self.assertEqual(p["hooks"]["PreToolUse"][0]["matcher"], v["hooks"]["PreToolUse"][0]["matcher"])
+        self.assertEqual(p["hooks"]["PostToolUse"][0]["matcher"], v["hooks"]["PostToolUse"][0]["matcher"])
+        self.assertEqual(sorted(p["hooks"]), sorted(v["hooks"]))
 
 
 class Agenten(unittest.TestCase):

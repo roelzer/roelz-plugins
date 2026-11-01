@@ -72,7 +72,7 @@ Wenn du einen dieser Gedanken hast: anhalten, es ist ein Warnsignal.
 | „Der Reviewer findet das schon.“ | Jede Runde, die er findet, kostet einen ganzen Durchlauf. Selbstprüfung zuerst. |
 
 ## Ehrlich abbrechen ist erlaubt
-Stoppe mit **BLOCKIERT** oder **BRAUCHT_KONTEXT**, wenn: eine Architekturentscheidung mit mehreren vertretbaren Wegen nötig ist; du Code verstehen müsstest, der dir nicht gegeben wurde, und keine Klarheit findest; du unsicher bist, ob der Weg richtig ist; bestehender Code umgebaut werden müsste, was der Bauplan nicht vorsieht; du Datei um Datei liest, ohne voranzukommen; eine Datei weit über das geplante Maß wächst. Schlechte Arbeit ist schlimmer als keine.
+Stoppe mit **BLOCKIERT** oder **BRAUCHT_KONTEXT**, wenn: eine Architekturentscheidung mit mehreren vertretbaren Wegen nötig ist; du Code verstehen müsstest, der dir nicht gegeben wurde, und keine Klarheit findest; du unsicher bist, ob der Weg richtig ist; bestehender Code umgebaut werden müsste, was der Bauplan nicht vorsieht; du Datei um Datei liest, ohne voranzukommen; eine Datei weit über das geplante Maß wächst; der Kontext-Wächter meldet „Kontext voll“ (dann BLOCKIERT mit Zwischenstand-Commit und genauem nächsten Schritt). Schlechte Arbeit ist schlimmer als keine.
 
 ## Nachbesserung nach Review
 Jeden Befund einzeln prüfen: technisch richtig für **dieses** Projekt? Dann beheben, die betroffenen Tests ausführen, Ergebnis berichten. Ist ein Befund aus deiner Sicht falsch: nicht still ignorieren, sondern mit technischer Begründung im Bericht widersprechen. Unklare Befunde zuerst klären, nicht teilweise umsetzen.

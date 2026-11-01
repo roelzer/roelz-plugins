@@ -5,6 +5,7 @@
 # bis er sich meldete. Solange .dev-team/durchlauf existiert (der Projektleiter legt die Datei nach Simons
 # Freigabe an und löscht sie vor einem festen Stopp), schickt dieser Hook ihn einmal zurück an die Arbeit.
 # Läuft gerade ein Agent im Hintergrund, darf er anhalten – dessen Ergebnis weckt ihn von selbst.
+# Ist der Kontext voll (kontext.sh), schickt er ihn stattdessen in den Sitzungswechsel.
 # Nie blockierend bei Fehlern; stop_hook_active verhindert Endlosschleifen.
 
 IFS= read -r -d '' eingabe || true
@@ -29,6 +30,13 @@ if [ -f "$kz" ]; then
   [ "$offen" -gt 0 ] && exit 0
 fi
 
-grund="Durchlauf aktiv (Simon hat den Auftrag freigegeben): nicht auf „mach weiter“ warten. Beantworte eine Frage von Simon kurz und arbeite dann am nächsten Schritt laut docs/STATUS.md weiter. Ein Zwischenbericht ist kein Stopp. Anhalten nur bei einem festen Stopp (Abschlussbericht, harter Stopp, Frage, ohne die nichts Unabhängiges mehr weitergeht, Simon sagt stopp) – dann zuerst die Datei .dev-team/durchlauf löschen. Laufen Agenten im Hintergrund, beende die Runde einfach erneut."
+# Kontext voll: statt weiterzuarbeiten sauber in eine neue Sitzung übergeben (scripts/kontext.sh).
+if [ "$(printf '%s' "$eingabe" | bash "$(dirname "$0")/kontext.sh" stufe 2>/dev/null)" = "2" ]; then
+  grund="Durchlauf aktiv, aber der Kontext dieser Sitzung ist voll: Sitzungswechsel statt Weiterarbeiten. Keine neuen Agenten starten. docs/SITZUNGSUEBERGABE.md schreiben (Vorlage vorlagen/sitzungsuebergabe.md im Plugin-Ordner), docs/STATUS.md aktualisieren, committen (Cloud: Arbeitsbranch pushen), dann .dev-team/durchlauf löschen und Simon in einer Zeile bitten, eine neue Sitzung zu starten und dort „weiter“ zu schreiben."
+  printf '{"decision":"block","reason":"%s"}\n' "$grund"
+  exit 0
+fi
+
+grund="Durchlauf aktiv (Simon hat den Auftrag freigegeben): nicht auf „mach weiter“ warten. Beantworte eine Frage von Simon kurz und arbeite dann am nächsten Schritt laut docs/STATUS.md weiter. Ein Zwischenbericht ist kein Stopp. Anhalten nur bei einem festen Stopp (Abschlussbericht, harter Stopp, Frage, ohne die nichts Unabhängiges mehr weitergeht, Simon sagt stopp, Sitzungswechsel wegen vollem Kontext) – dann zuerst die Datei .dev-team/durchlauf löschen. Laufen Agenten im Hintergrund, beende die Runde einfach erneut."
 printf '{"decision":"block","reason":"%s"}\n' "$grund"
 exit 0

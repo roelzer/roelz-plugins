@@ -1,5 +1,17 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.13.0 – Sitzungswechsel bei vollem Kontext
+
+Anlass: Simons Wunsch, dass der Projektleiter (und die Agenten) selbst erkennen, wann es besser ist, in einer neuen Sitzung weiterzuarbeiten – statt dass das Kontextfenster vollläuft, die Qualität sinkt und Claude Code am Rand automatisch zusammenfasst und dabei Einzelheiten verliert.
+
+- **Kontext-Wächter** (`scripts/kontext.sh`, reines Bash, rund 20 ms): liest die letzte Token-Abrechnung aus dem Sitzungsprotokoll (input + cache_creation + cache_read = was das Modell tatsächlich sieht). Läuft als Hook bei Nachrichten von Simon (UserPromptSubmit) und nach Werkzeugaufrufen (PostToolUse: nach jedem Agenten-Aufruf, sonst etwa jeder vierte Aufruf). Ab 80 % der Grenze ein Hinweis (STATUS aktuell halten, nichts mehr komplett lesen), ab der Grenze die Aufforderung zum Wechsel – je Stufe einmal, nach `/compact` zurückgesetzt. Grenze Standard 150.000 Tokens, einstellbar mit `kontext_grenze` in `.claude/dev-team.json` oder `DEV_TEAM_KONTEXT_GRENZE`. Sperrt nie.
+- **Projektleiter:** keine neuen Agenten mehr, laufende fertig werden lassen, `docs/SITZUNGSUEBERGABE.md` nach neuer Vorlage `vorlagen/sitzungsuebergabe.md` (Stand, nächster Schritt, Pakete, nur mündlich Entschiedenes, Fallstricke), committen, in der Cloud pushen, Durchlauf aus, eine Zeile an Simon: neue Sitzung starten, „weiter“ schreiben. Der **Durchlauf-Wächter** schickt bei vollem Kontext in den Sitzungswechsel statt zurück an die Arbeit.
+- **Neue Sitzung:** Der Sitzungsstart zeigt die Übergabe, der Projektleiter prüft den Stand mit git, schaltet den Durchlauf wieder ein (Simons Freigabe gilt weiter), macht am nächsten Schritt weiter und löscht die Datei.
+- **Agenten:** Bei vollem eigenen Kontext sauber abschließen – Zwischenstand committen, BLOCKIERT mit Grund „Kontext voll“, was fertig ist, was fehlt. Der Projektleiter gibt den Rest an einen frischen Agenten (zählt nicht als Fix-Runde; zweimal im selben Paket → Architekt teilt).
+- Grundgesetz: neuer Abschnitt „Sitzungswechsel bei vollem Kontext“; „Tokens sparen“ verweist darauf statt auf `/compact`. Skill `auftrag` und Steckbrief `entwickler` ergänzt.
+- Projekteinstellungen (`vorlagen/projekt-settings.json`, `dev-team-start.sh kontext`) bekommen die beiden neuen Hooks; der Sitzungsstart meldet Projekte ohne Kontext-Wächter als veraltet.
+- Tests: `TestKontext` in `tests/test_durchlauf.py` (Stufen, Grenze aus dem Projekt, Agenten-Schritte zählen nicht, einmal je Stufe, eigenes Agenten-Protokoll, Durchlauf → Sitzungswechsel, Sitzungsstart zeigt Übergabe); Plugin- und Projekt-Hooks decken dieselben Ereignisse ab.
+
 ## 3.12.0 – Schneller ohne Qualitätsverlust: Durchlauf, eine Prüfrunde, Selbstprüfung, ehrliche Gegenproben
 
 Anlass: Auswertung von Meilenstein 2 in `ichkannalles` (30.10.2026). Fast jedes Paket brauchte 1–2 Nachbesserungsrunden für dieselben Punkte; Gegenproben meldeten in Node-Projekten immer „ERKANNT“; viele Berichte in `docs/pruefberichte/` enthielten nur die Kopfzeile. Simons Vorgabe: „Effizienz ohne Qualitätsverlust – bau das so um.“

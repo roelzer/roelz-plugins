@@ -16,6 +16,8 @@ PLUGIN = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 DURCHLAUF = os.path.join(PLUGIN, "scripts", "durchlauf.sh")
 SICHERN = os.path.join(PLUGIN, "scripts", "verdeckt_sichern.py")
 PRUEFSUMMEN = os.path.join(PLUGIN, "scripts", "abnahme_pruefsummen.py")
+KONTEXT = os.path.join(PLUGIN, "scripts", "kontext.sh")
+SITZUNGSSTART = os.path.join(PLUGIN, "scripts", "sitzungsstart.sh")
 
 
 def git(cwd, *args):
@@ -61,6 +63,116 @@ class TestDurchlauf(unittest.TestCase):
         self.assertIsNone(self.stop())
         self.kennzahl("ende")
         self.assertEqual(self.stop()["decision"], "block")
+
+
+def usage_zeile(tokens, sidechain=False):
+    """Eine Assistenten-Zeile wie im Sitzungsprotokoll von Claude Code."""
+    return json.dumps({"type": "assistant", "isSidechain": sidechain, "message": {"role": "assistant", "usage": {
+        "input_tokens": 2, "cache_creation_input_tokens": 1000, "cache_read_input_tokens": tokens - 1002,
+        "output_tokens": 50, "server_tool_use": {"web_search_requests": 0}}}}) + "\n"
+
+
+class TestKontext(unittest.TestCase):
+    def setUp(self):
+        self.p = tempfile.mkdtemp(prefix="kontext-")
+        os.makedirs(os.path.join(self.p, "docs"))
+        os.makedirs(os.path.join(self.p, ".dev-team"))
+        self.protokoll = os.path.join(self.p, "sitzung.jsonl")
+        self.env = dict(os.environ, CLAUDE_PROJECT_DIR=self.p)
+        self.env.pop("DEV_TEAM_KONTEXT_GRENZE", None)
+
+    def tearDown(self):
+        shutil.rmtree(self.p, ignore_errors=True)
+
+    def schreibe(self, *zeilen, datei=None):
+        with open(datei or self.protokoll, "a") as f:
+            f.write("".join(zeilen))
+
+    def lauf(self, modus, **felder):
+        eingabe = {"session_id": "s1", "transcript_path": self.protokoll, "hook_event_name": "PostToolUse",
+                   "tool_name": "Agent"}
+        eingabe.update(felder)
+        r = subprocess.run(["bash", KONTEXT, modus], input=json.dumps(eingabe), text=True, capture_output=True,
+                           env=self.env)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        return r.stdout.strip()
+
+    def hinweis(self, **felder):
+        aus = self.lauf("hinweis", **felder)
+        return json.loads(aus)["hookSpecificOutput"]["additionalContext"] if aus else None
+
+    def test_stufen(self):
+        self.schreibe(usage_zeile(50000))
+        self.assertEqual(self.lauf("stufe"), "0")
+        self.schreibe(usage_zeile(125000))
+        self.assertEqual(self.lauf("stufe"), "1")
+        self.schreibe(usage_zeile(160000))
+        self.assertEqual(self.lauf("stufe"), "2")
+
+    def test_grenze_aus_projekt(self):
+        os.makedirs(os.path.join(self.p, ".claude"))
+        with open(os.path.join(self.p, ".claude", "dev-team.json"), "w") as f:
+            json.dump({"kontext_grenze": 400000}, f)
+        self.schreibe(usage_zeile(160000))
+        self.assertEqual(self.lauf("stufe"), "0")
+
+    def test_agenten_schritte_im_sitzungsprotokoll_zaehlen_nicht(self):
+        self.schreibe(usage_zeile(60000), usage_zeile(190000, sidechain=True))
+        self.assertEqual(self.lauf("stufe"), "0")
+
+    def test_hinweis_einmal_je_stufe_und_zuruecksetzen(self):
+        self.schreibe(usage_zeile(125000))
+        self.assertIn("STATUS.md", self.hinweis())
+        self.assertIsNone(self.hinweis())
+        self.schreibe(usage_zeile(155000))
+        text = self.hinweis()
+        self.assertIn("SITZUNGSUEBERGABE.md", text)
+        self.assertIn("vorlagen/sitzungsuebergabe.md", text)
+        self.assertIsNone(self.hinweis())
+        self.schreibe(usage_zeile(30000))      # nach /compact
+        self.assertIsNone(self.hinweis())
+        self.schreibe(usage_zeile(125000))
+        self.assertIsNotNone(self.hinweis())
+
+    def test_nachricht_von_simon(self):
+        self.schreibe(usage_zeile(155000))
+        aus = json.loads(self.lauf("hinweis", hook_event_name="UserPromptSubmit", tool_name=""))
+        self.assertEqual(aus["hookSpecificOutput"]["hookEventName"], "UserPromptSubmit")
+
+    def test_agent_eigenes_protokoll(self):
+        self.schreibe(usage_zeile(40000))
+        ordner = os.path.join(self.p, "sitzung", "subagents")
+        os.makedirs(ordner)
+        self.schreibe(usage_zeile(155000, sidechain=True), datei=os.path.join(ordner, "agent-a1.jsonl"))
+        text = self.hinweis(agent_type="dev-team:entwickler", agent_id="a1", tool_name="Agent")
+        self.assertIn("BLOCKIERT", text)
+        self.assertIn("Kontext voll", text)
+        self.assertIsNone(self.hinweis())     # Projektleiter selbst ist frei
+
+    def test_ohne_dev_team_projekt_still(self):
+        shutil.rmtree(os.path.join(self.p, "docs"))
+        self.schreibe(usage_zeile(190000))
+        self.assertEqual(self.lauf("hinweis"), "")
+        self.assertEqual(self.lauf("stufe"), "0")
+
+    def test_durchlauf_schickt_in_den_sitzungswechsel(self):
+        with open(os.path.join(self.p, ".dev-team", "durchlauf"), "w") as f:
+            f.write("an\n")
+        self.schreibe(usage_zeile(155000))
+        r = subprocess.run(["bash", DURCHLAUF], input=json.dumps({"stop_hook_active": False, "session_id": "s1",
+                           "transcript_path": self.protokoll}), text=True, capture_output=True, env=self.env)
+        antwort = json.loads(r.stdout)
+        self.assertEqual(antwort["decision"], "block")
+        self.assertIn("SITZUNGSUEBERGABE.md", antwort["reason"])
+
+    def test_sitzungsstart_zeigt_uebergabe(self):
+        with open(os.path.join(self.p, "docs", "SITZUNGSUEBERGABE.md"), "w") as f:
+            f.write("# Sitzungsübergabe\n\n## Nächster Schritt\nP4 an einen entwickler geben.\n")
+        r = subprocess.run(["bash", SITZUNGSSTART], input="{}", text=True, capture_output=True,
+                           env=dict(self.env, CLAUDE_PLUGIN_ROOT=PLUGIN, HOME=self.p))
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn("Fortsetzung nach Sitzungswechsel", r.stdout)
+        self.assertIn("P4 an einen entwickler geben.", r.stdout)
 
 
 class TestVerdecktSichern(unittest.TestCase):

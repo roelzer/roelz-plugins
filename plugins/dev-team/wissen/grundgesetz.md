@@ -152,6 +152,13 @@ Eigenständig heißt: selbst arbeiten innerhalb dieser Grenzen, nicht: alles dü
 - Der Stand liegt **in Dateien, nicht im Gedächtnis**: `docs/STATUS.md` (Phase, Pakete, laufende Agenten, Basis-Commits, zurückgestellte Befunde), `docs/plan.md`, `docs/ENTSCHEIDUNGEN.md`, `docs/OFFENE_FRAGEN.md`, `docs/TESTNACHWEIS.md`. Nach `/compact`, `/clear` oder Sitzungsende liest du zuerst diese Dateien.
 - Lange Ausgaben zusammenfassen, nicht komplett im Gespräch behalten.
 
+## Sitzungswechsel bei vollem Kontext
+- Der **Kontext-Wächter** (`scripts/kontext.sh`) misst nach Agenten-Aufrufen, Nachrichten von Simon und Stopps die echte Kontextgröße der Sitzung und jedes Agenten. Ab 80 % der Grenze (Standard 150.000 Tokens, `kontext_grenze` in `.claude/dev-team.json`) kommt ein Hinweis, ab der Grenze die Aufforderung zum Wechsel.
+- **Hinweis:** `docs/STATUS.md` nach jedem Schritt aktuell halten, Entscheidungen sofort in die Dateien, lange Ausgaben nicht mehr komplett lesen.
+- **Wechsel (Projektleiter):** keine neuen Agenten starten; laufende fertig werden lassen und einarbeiten. Dann `docs/SITZUNGSUEBERGABE.md` nach der Vorlage `vorlagen/sitzungsuebergabe.md` schreiben, `docs/STATUS.md` aktualisieren, committen (Cloud: Arbeitsbranch pushen), `.dev-team/durchlauf` löschen und Simon in einer Zeile bitten, eine neue Sitzung zu starten und „weiter“ zu schreiben. Der Sitzungswechsel ist ein fester Stopp, kein Fehler. Lieber früh übergeben als automatisch zusammengefasst werden.
+- **Neue Sitzung:** Der Sitzungsstart zeigt die Übergabe. Lesen, Stand mit git prüfen, Durchlauf wieder einschalten, wenn er an war (Simons Freigabe gilt weiter), am nächsten Schritt weitermachen, Übergabedatei löschen.
+- **Wechsel (Agent):** Ein Agent mit vollem Kontext schließt sauber ab (Zwischenstand committen, Status BLOCKIERT, Grund „Kontext voll“, was fertig ist, was fehlt, nächster Schritt). Der Projektleiter gibt den Rest an einen frischen Agenten, Startpunkt = letzter Commit des Vorgängers. Das zählt nicht als Fix-Runde.
+
 ## Fachregeln
 - Jedes Projekt mit fachlichen Ergebnissen hat `fachwissen/regeln.md`: Regeln, die ein Ergebnis **niemals** verletzen darf.
 - Bestätigte Regeln werden als **automatische Plausibilitätsprüfung im Code** umgesetzt und über jedes berechnete Ergebnis geprüft (Referenzfälle und erzeugte Fälle).
@@ -191,7 +198,7 @@ Das Gehirn ist Simons privater Obsidian-Tresor (Repo `roelzer/brain`, Pfad in de
 - Wiederholt sich eine Lektion, wird sie zur festen Regel in diesem Grundgesetz.
 
 ## Tokens sparen
-- Eine Aufgabe pro Sitzung. Danach `/clear`. Bei langen Sitzungen `/compact`.
+- Eine Aufgabe pro Sitzung. Danach `/clear`. Bei langen Sitzungen sauber übergeben (siehe „Sitzungswechsel bei vollem Kontext“) statt `/compact`.
 - Jedem Agenten nur den nötigen Kontext und eine klare Frage geben.
 - Unabhängige Prüfer parallel starten (höchstens 3).
 

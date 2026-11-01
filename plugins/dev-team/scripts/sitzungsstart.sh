@@ -100,9 +100,9 @@ if [ -d "$projekt/.git" ] || [ -n "$(ls -A "$projekt" 2>/dev/null)" ]; then
     echo "Hinweis an den Projektleiter: Im Projekt fehlt .claude/settings.json mit dem Dev-Team. Ohne sie gilt das Dev-Team in Cloud-Sitzungen dieses Projekts nicht. Wird bei /dev-team:projekt-aufnehmen bzw. /dev-team:neues-projekt angelegt."
   elif grep -q 'waechter' "$projekt/.claude/settings.json" 2>/dev/null && { grep -q '"onFailure"' "$projekt/.claude/settings.json" \
        || grep -q '"ConfigChange"' "$projekt/.claude/settings.json" || ! grep -q 'log-start' "$projekt/.claude/settings.json" \
-       || ! grep -q 'durchlauf' "$projekt/.claude/settings.json"; } 2>/dev/null; then
+       || ! grep -q 'durchlauf' "$projekt/.claude/settings.json" || ! grep -q 'kontext' "$projekt/.claude/settings.json"; } 2>/dev/null; then
     echo
-    echo "Hinweis an den Projektleiter: Die Projekteinstellungen sind veraltet (alter Wächter vor jedem Werkzeugaufruf mit Sperre bei Fehlern, fehlende Laufzeitmessung oder fehlender Durchlauf-Wächter). Das kostet bei jedem Schritt Zeit. Sag Simon das in einem Satz und schlage vor: /dev-team:projekt-aufnehmen erneut ausführen (zeigt die Änderung, schreibt erst nach seinem OK)."
+    echo "Hinweis an den Projektleiter: Die Projekteinstellungen sind veraltet (alter Wächter vor jedem Werkzeugaufruf mit Sperre bei Fehlern, fehlende Laufzeitmessung, fehlender Durchlauf- oder Kontext-Wächter). Das kostet bei jedem Schritt Zeit. Sag Simon das in einem Satz und schlage vor: /dev-team:projekt-aufnehmen erneut ausführen (zeigt die Änderung, schreibt erst nach seinem OK)."
   fi
 fi
 
@@ -115,6 +115,15 @@ if [ "${CLAUDE_CODE_REMOTE:-}" = "true" ] && [ -f "$projekt/docs/ABNAHME_PRUEFSU
       break
     fi
   done
+fi
+
+# Fortsetzung nach einem Sitzungswechsel (Kontext-Wächter): Übergabe zuerst lesen.
+if [ -f "$projekt/docs/SITZUNGSUEBERGABE.md" ]; then
+  echo
+  echo "## Fortsetzung nach Sitzungswechsel"
+  echo "Die vorige Sitzung hat wegen vollem Kontext übergeben. Projektleiter: Lies docs/SITZUNGSUEBERGABE.md (Auszug unten) und docs/STATUS.md, prüfe den Stand mit git (Branch, letzter Commit, offene Worktrees), mach am dort genannten nächsten Schritt weiter. Stand dort „Durchlauf: an“, gilt Simons Freigabe weiter: Durchlauf wieder einschalten (mkdir -p .dev-team && date > .dev-team/durchlauf), ohne auf ein weiteres OK zu warten. Sobald du die Übergabe übernommen hast: Datei löschen und das mit dem nächsten Statusstand committen."
+  echo
+  head -n 80 "$projekt/docs/SITZUNGSUEBERGABE.md" 2>/dev/null
 fi
 
 # Versionswechsel mitten im Auftrag (Plugin aktualisiert sich automatisch von GitHub)
