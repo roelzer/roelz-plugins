@@ -1,6 +1,6 @@
 import { expect, test } from 'claude-code/testing'
 
-import { auswerten, kasten, kurzname, modellname, offeneFragen } from './register'
+import { auswerten, balken, fortschritt, kasten, kurzname, modellname, offeneFragen, zustand } from './register'
 
 const PANE = {
   plugin: 'dev-team-tafel',
@@ -34,7 +34,7 @@ test('Status, Log und Testnachweis werden gelesen', async () => {
   expect(t.phase).toBe('Phase 7: Bauen – P3 ⏳')
   expect(t.ampel).toBe('🟢 läuft')
   expect(t.ergebnisse.length).toBe(1)
-  expect(t.ergebnisse[0]).toBe('10:09 🟢 reviewer: 🟢 Paket P2 sauber')
+  expect(t.ergebnisse[0]).toBe('10:09 🟢 reviewer: Paket P2 sauber')
   expect(t.sperren[0]).toBe('10:05 ⛔ entwickler: Schreiben außerhalb des Worktrees')
   expect(t.test).toBe('🟢 42 bestanden, 0 Fehler · tester · 10:10 (abc123)')
 })
@@ -73,14 +73,15 @@ test('ein gestarteter Agent erscheint auf der Tafel, auf jeder Oberfläche', asy
   for (const surface of ['terminal', 'desktop', 'vscode', 'mobile'] as const) {
     const ui = await $.ui.mount({ ...PANE, surface })
     const zeile = await ui.find({ type: 'Text', text: /entwickler/ })
-    expect(zeile?.text.startsWith('⏳ entwickler · sonnet')).toBe(true)
+    expect(zeile?.text.includes('entwickler')).toBe(true)
+    expect(zeile?.text.includes('sonnet')).toBe(true)
     await ui.unmount()
   }
 })
 
 test('leere Tafel ohne Projektdateien', async ($, on) => {
   const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
-  const zeile = await ui.find({ type: 'Text', text: /Niemand/ })
+  const zeile = await ui.find({ type: 'Text', text: /kein Agent/ })
   expect(zeile !== undefined).toBe(true)
   await ui.unmount()
 })
@@ -103,8 +104,20 @@ test('angehaltener Lauf steht oben, auf jeder Oberfläche', async ($, on) => {
   await $.command.run({ command: 'tafel' } as any)
   for (const surface of ['terminal', 'desktop', 'vscode', 'mobile'] as const) {
     const ui = await $.ui.mount({ ...PANE, surface })
-    const zeile = await ui.find({ type: 'Text', text: /Braucht dich/ })
-    expect(zeile?.text.includes('Zahlung freigeben')).toBe(true)
+    const kopf = await ui.find({ type: 'Text', text: /Braucht dich/ })
+    expect(kopf !== undefined).toBe(true)
+    const zeile = await ui.find({ type: 'Text', text: /Zahlung freigeben/ })
+    expect(zeile !== undefined).toBe(true)
     await ui.unmount()
   }
+})
+
+test('Fortschritt, Balken und Zustand', async () => {
+  expect(fortschritt('3 von 5 Paketen gemergt')).toEqual({ anteil: 0.6, text: '3 / 5' })
+  expect(fortschritt('noch offen')).toBe(null)
+  expect(balken(0.5, 10)).toBe('━━━━━╌╌╌╌╌')
+  const leer = auswerten('', '', '')
+  expect(zustand(leer, 0).text).toBe('Bereit')
+  expect(zustand({ ...leer, durchlauf: true }, 0).text).toBe('Läuft')
+  expect(zustand({ ...leer, angehalten: 'x' }, 2).text).toBe('Braucht dich')
 })
