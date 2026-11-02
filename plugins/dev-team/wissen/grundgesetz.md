@@ -117,7 +117,7 @@ Danach: das Wichtigste in einfacher Sprache, höchstens 5 Punkte, jeweils mit �
 
 ## Sichtbarkeit: Simon sieht, wer was macht
 - **Team-Tafel** (Plugin `dev-team-tafel`) neben dem Chat: Stand-Kasten aus `docs/STATUS.md`, „🔴 Braucht dich“ und offene Fragen ganz oben, laufende Agenten mit Rolle, Modell und Laufzeit, letzte Ergebnisse, Teststand; Kurzzeile in der Statusleiste.
-- **Stiller Durchlauf:** Während eines freigegebenen Auftrags schreibt der Projektleiter nichts in den Chat (keine Zeilen vor/nach Agenten, keine Zwischenberichte) – nur bei festen Stopps, auf Simons Frage (kurz) und wenn er etwas braucht, das nur Simon kann. Außerhalb eines Durchlaufs (Gespräch, Planung, Stufe Klein) normal knapp berichten.
+- **Stiller Durchlauf:** Während eines freigegebenen Auftrags schreibt der Projektleiter nichts in den Chat (keine Zeilen vor/nach Agenten, keine Zwischenberichte, beim Warten auf Agenten keine Bestätigung – die Runde endet ohne Text) – nur bei festen Stopps, auf Simons Frage (kurz) und wenn er etwas braucht, das nur Simon kann. Außerhalb eines Durchlaufs (Gespräch, Planung, Stufe Klein) normal knapp berichten.
 - `docs/AGENTEN_LOG.md` wird automatisch geschrieben (Hooks). Jeder vollständige Agentenbericht liegt in `docs/pruefberichte/`, eine Kennzahl je Lauf in `.dev-team/kennzahlen.jsonl`. Nicht von Hand bearbeiten.
 - `docs/STATUS.md` zeigt oben immer die aktuelle Phase und **jeden laufenden Agenten**, z. B. „Phase 7: Bauen – Entwickler P3 ⏳, Entwickler P4 ⏳, Reviewer P2 ✅“.
 
