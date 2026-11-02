@@ -57,6 +57,7 @@ Eingeführt nach dem Pilot 2026-10: Fast jedes Paket brauchte 1–2 Nachbesserun
 6. **Texte und Werte:** Sprache und Anrede wie im Projekt festgelegt; jede Zahl mit Herkunft; Kennzeichnungen aus den Projektregeln (`CLAUDE.md`, `docs/ARCHITEKTUR.md`) überall, auch in Fehlermeldungen.
 7. **Bestehende Tests nicht ändern.** Verlangt der Bauplan das, sofort BRAUCHT_KONTEXT – das ist Tester-Aufgabe.
 8. **Schranke** für den letzten Commit „OK – alles grün“, letzte Zeile wörtlich im Bericht.
+9. **Sicherheit – Gegenfrage:** Für jede Stelle, an der Daten von außen ankommen (Eingabe, Anfrage, Datei, Import, fremde Schnittstelle), schreibst du in den Bericht: Was würde ein Angreifer hier eingeben? Was passiert dann? Was verhindert den Schaden (Prüfung, Test)? „Ist harmlos“ ohne diese drei Antworten gilt nicht. Jede Warnung der Sicherheits-Schranke und jedes `dev-team: sicher` in deinem Paket mit diesen drei Antworten – ob es stimmt, entscheidet der Reviewer, nicht du.
 
 ## Ausreden, die nicht zählen
 Wenn du einen dieser Gedanken hast: anhalten, es ist ein Warnsignal.
@@ -87,14 +88,14 @@ Jeden Befund einzeln prüfen: technisch richtig für **dieses** Projekt? Dann be
 7. Was gab es schon und wurde wiederverwendet?
 8. Neue Abhängigkeiten? (Name, Version, Grund, Schranken-Ergebnis)
 9. Fehler überall sichtbar behandelt, nichts verschluckt?
-10. Selbstprüfung 1–8 vollständig? (je Punkt erledigt / nicht zutreffend / Grund)
+10. Selbstprüfung 1–9 vollständig? (je Punkt erledigt / nicht zutreffend / Grund)
 
 ## Ausgabe
 1. **Status:** FERTIG | FERTIG_MIT_BEDENKEN | BLOCKIERT | BRAUCHT_KONTEXT – und die Ampel (🟢 / 🟡 / 🔴 / 🔴).
 2. **Branch, Commit, Worktree-Pfad** (`git rev-parse --abbrev-ref HEAD`, `git rev-parse HEAD`, `pwd`).
 3. Pflichtfragen 1–10.
 4. **Beleg testgetrieben:** je Kriterium: Test → Befehl → rote Ausgabe (kurz) → grüne Ausgabe (kurz).
-4b. **Selbstprüfung:** Punkte 1–8 mit Ergebnis; Gegenproben als Liste (Stelle → ERKANNT); Pfade der Bildschirmfotos.
+4b. **Selbstprüfung:** Punkte 1–9 mit Ergebnis; Gegenproben als Liste (Stelle → ERKANNT); Pfade der Bildschirmfotos.
 5. **Test-Schranke:** letzte Zeile „ERGEBNIS …“ wörtlich.
 6. Geänderte Dateien; was wiederverwendet wurde; neue Abhängigkeiten.
 7. Wo das Paket mit anderen Teilen kollidieren oder falsch zusammenspielen könnte.

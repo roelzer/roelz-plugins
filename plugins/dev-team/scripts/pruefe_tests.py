@@ -616,35 +616,45 @@ def pruefe_freigabe(e, hauptordner, stichwort):
 
 def sicherheit_pruefen(e, wurzel, basis, rolle, konfig, fg):
     """Sicherheits-Schranke (pruefe_sicherheit.py): Geheimnisse, Browser-Variablen, gefährliche Muster in den
-    neuen Zeilen – für jede Rolle. Am Meilenstein (projektleiter) zusätzlich der ausgelieferte Build und der
-    Scanner für bekannte Lücken in Abhängigkeiten (sicherheitsbefehl). Eine Freigabe mit Geltung „sicherheit“
-    macht Fehler zu Warnungen."""
-    spec = importlib.util.spec_from_file_location("pruefe_sicherheit", os.path.join(HIER, "pruefe_sicherheit.py"))
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    funde = mod.pruefe_basis(wurzel, basis)
-    if rolle == "projektleiter":
-        funde += [f for f in mod.pruefe_build(wurzel) if not f[1].startswith("Kein Build-Ordner")]
+    neuen Zeilen – für jede Rolle. Rot nur, was fast sicher falsch ist; Warnungen bewertet der Reviewer einzeln.
+    Am Meilenstein (projektleiter) zusätzlich der ausgelieferte Build und der Scanner für bekannte Lücken in
+    Abhängigkeiten (sicherheitsbefehl). Eine Freigabe mit Geltung „sicherheit“ macht Fehler zu Warnungen."""
+    try:
+        spec = importlib.util.spec_from_file_location("pruefe_sicherheit", os.path.join(HIER, "pruefe_sicherheit.py"))
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        funde = mod.pruefe_basis(wurzel, basis)
+        if rolle == "projektleiter":
+            funde += [f for f in mod.pruefe_build(wurzel) if not f[1].startswith("Kein Build-Ordner")]
+    except Exception as fehler:  # die Schranke selbst darf daran nie scheitern – aber es fällt auf
+        e.f("Sicherheits-Schranke konnte nicht laufen (%s) – NICHT GEPRÜFT." % fehler)
+        funde = []
     for stufe, text in funde:
         if stufe == "f" and not fg.deckt("sicherheit"):
             e.f("Sicherheit: " + text)
         else:
             e.w("Sicherheit: " + text + (fg.text("sicherheit") if stufe == "f" else ""))
     if not any(s == "f" for s, _ in funde):
-        e.o("Sicherheits-Schranke ohne Fehler (Geheimnisse, Browser-Variablen, gefährliche Muster).")
+        e.o("Sicherheits-Schranke ohne Fehler%s." % (" (%d Warnungen zum Bewerten)" % len(funde) if funde else ""))
     befehl = ((konfig or {}).get("sicherheitsbefehl") or "").strip()
     if rolle == "projektleiter" and befehl:
-        r = sh(befehl, wurzel)
-        aus = ((r.stdout or "") + (r.stderr or "")).strip()
-        if r.returncode == 0:
+        try:
+            bash = shutil.which("bash") if os.name == "nt" else None
+            r = subprocess.run([bash, "-c", befehl] if bash else befehl, cwd=wurzel, shell=not bash,
+                               capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=300)
+            code, aus = r.returncode, ((r.stdout or "") + (r.stderr or "")).strip()
+        except subprocess.TimeoutExpired:
+            code, aus = None, "Zeitgrenze 300 s"
+        befund = re.search(r"\d+\s+(?:low|moderate|medium|high|critical)\b|vulnerabilit|Found \d+ known|severity",
+                           aus, re.IGNORECASE)
+        if code == 0:
             e.o("Scanner für Abhängigkeiten grün (%s)." % befehl)
-        elif re.search(r"ENOTFOUND|EAI_AGAIN|ECONNREFUSED|ETIMEDOUT|network|getaddrinfo|Could not resolve|"
-                       r"unable to get local issuer|proxy", aus, re.IGNORECASE):
-            e.w("Scanner für Abhängigkeiten konnte nicht laufen (kein Netz?) – NICHT GEPRÜFT, vor der Übergabe "
-                "nachholen: %s" % befehl)
-        else:
+        elif befund:
             (e.w if fg.deckt("sicherheit") else e.f)(
                 "Scanner für Abhängigkeiten meldet Lücken (%s):\n%s" % (befehl, "\n".join(aus.splitlines()[-12:])))
+        else:
+            e.w("Scanner für Abhängigkeiten konnte nicht laufen (kein Netz oder Werkzeug fehlt) – NICHT GEPRÜFT, vor "
+                "der Übergabe nachholen: %s (%s)" % (befehl, (aus.splitlines() or ["?"])[-1][:120]))
 
 
 def letzter_lauf_pfad(hauptordner):
