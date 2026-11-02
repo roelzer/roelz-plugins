@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Liefert den Abschlussbericht eines Agenten aus der SubagentStop-Eingabe (JSON auf stdin).
 
-`last_assistant_message` ist bei Hintergrund-Agenten oft leer – dann standen in docs/pruefberichte/
-nur Kopfzeilen. In dem Fall wird die letzte Textantwort aus dem Agenten-Protokoll
-(`agent_transcript_path`, JSONL) gelesen. Gibt nichts aus, wenn nichts zu finden ist.
+`last_assistant_message` ist bei Hintergrund-Agenten oft leer oder nur die letzte Zeile („Bericht übergeben.“),
+wenn der Agent seinen Bericht über das Werkzeug SubagentHandback abgibt. Dann wird aus dem Agenten-Protokoll
+(`agent_transcript_path`, JSONL) gelesen: der Handback-Bericht, sonst die letzte Textantwort – es gilt der längere.
+Gibt nichts aus, wenn nichts zu finden ist.
 """
 import io
 import json
@@ -18,8 +19,19 @@ def text_aus_inhalt(inhalt):
     return ""
 
 
+def _texte(wert):
+    if isinstance(wert, str):
+        return [wert]
+    if isinstance(wert, dict):
+        return [t for v in wert.values() for t in _texte(v)]
+    if isinstance(wert, list):
+        return [t for v in wert for t in _texte(v)]
+    return []
+
+
 def aus_protokoll(pfad):
-    letzter = ""
+    """-> (letzte Textantwort, letzter Handback-Bericht)"""
+    letzter, handback = "", ""
     try:
         with open(pfad, encoding="utf-8", errors="replace") as f:
             for zeile in f:
@@ -30,20 +42,28 @@ def aus_protokoll(pfad):
                 if not isinstance(e, dict) or e.get("type") != "assistant":
                     continue
                 m = e.get("message") or {}
-                t = text_aus_inhalt(m.get("content") if isinstance(m, dict) else "").strip()
+                inhalt = m.get("content") if isinstance(m, dict) else ""
+                t = text_aus_inhalt(inhalt).strip()
                 if t:
                     letzter = t
+                for teil in inhalt if isinstance(inhalt, list) else []:
+                    if isinstance(teil, dict) and teil.get("type") == "tool_use" and "handback" in str(teil.get("name", "")).lower():
+                        h = "\n\n".join(x for x in _texte(teil.get("input")) if x.strip()).strip()
+                        if h:
+                            handback = h
     except OSError:
-        return ""
-    return letzter
+        return "", ""
+    return letzter, handback
 
 
 def bericht(eingabe):
     text = str(eingabe.get("last_assistant_message") or "").strip()
-    if text:
-        return text
     pfad = eingabe.get("agent_transcript_path")
-    return aus_protokoll(pfad) if isinstance(pfad, str) and pfad else ""
+    if isinstance(pfad, str) and pfad:
+        letzter, handback = aus_protokoll(pfad)
+        kandidaten = [text, handback, letzter]
+        return max(kandidaten, key=len)
+    return text
 
 
 def main():

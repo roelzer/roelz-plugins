@@ -101,78 +101,92 @@ class TestKontext(unittest.TestCase):
         aus = self.lauf("hinweis", **felder)
         return json.loads(aus)["hookSpecificOutput"]["additionalContext"] if aus else None
 
-    def test_stufen(self):
+    def test_stufen_projektleiter(self):
         self.schreibe(usage_zeile(50000))
         self.assertEqual(self.lauf("stufe"), "0")
-        self.schreibe(usage_zeile(125000))
+        self.schreibe(usage_zeile(300000))          # ab 70 % von 400000
         self.assertEqual(self.lauf("stufe"), "1")
-        self.schreibe(usage_zeile(160000))
+        self.schreibe(usage_zeile(350000))          # ab 85 %: Übergabe vor dem Zusammenfassen
         self.assertEqual(self.lauf("stufe"), "2")
 
-    def test_grenze_aus_projekt(self):
+    def test_grenze_aus_einstellungen_und_projekt(self):
         os.makedirs(os.path.join(self.p, ".claude"))
+        with open(os.path.join(self.p, ".claude", "settings.json"), "w") as f:
+            json.dump({"autoCompactWindow": 200000}, f)
+        self.schreibe(usage_zeile(175000))
+        self.assertEqual(self.lauf("stufe"), "2")
         with open(os.path.join(self.p, ".claude", "dev-team.json"), "w") as f:
-            json.dump({"kontext_grenze": 400000}, f)
-        self.schreibe(usage_zeile(160000))
+            json.dump({"kontext_grenze": 600000}, f)
         self.assertEqual(self.lauf("stufe"), "0")
 
     def test_agenten_schritte_im_sitzungsprotokoll_zaehlen_nicht(self):
-        self.schreibe(usage_zeile(60000), usage_zeile(190000, sidechain=True))
+        self.schreibe(usage_zeile(60000), usage_zeile(390000, sidechain=True))
         self.assertEqual(self.lauf("stufe"), "0")
 
     def test_hinweis_einmal_je_stufe_und_zuruecksetzen(self):
-        self.schreibe(usage_zeile(125000))
+        self.schreibe(usage_zeile(300000))
         self.assertIn("STATUS.md", self.hinweis())
         self.assertIsNone(self.hinweis())
-        self.schreibe(usage_zeile(155000))
+        self.schreibe(usage_zeile(350000))
         text = self.hinweis()
         self.assertIn("SITZUNGSUEBERGABE.md", text)
         self.assertIn("vorlagen/sitzungsuebergabe.md", text)
+        self.assertIn("nicht anhalten", text)
         self.assertIsNone(self.hinweis())
-        self.schreibe(usage_zeile(30000))      # nach /compact
+        self.schreibe(usage_zeile(30000))      # nach dem Zusammenfassen
         self.assertIsNone(self.hinweis())
-        self.schreibe(usage_zeile(125000))
+        self.schreibe(usage_zeile(300000))
         self.assertIsNotNone(self.hinweis())
 
     def test_nachricht_von_simon(self):
-        self.schreibe(usage_zeile(155000))
+        self.schreibe(usage_zeile(350000))
         aus = json.loads(self.lauf("hinweis", hook_event_name="UserPromptSubmit", tool_name=""))
         self.assertEqual(aus["hookSpecificOutput"]["hookEventName"], "UserPromptSubmit")
 
-    def test_agent_eigenes_protokoll(self):
+    def test_agent_eigenes_protokoll_und_eigene_grenze(self):
         self.schreibe(usage_zeile(40000))
         ordner = os.path.join(self.p, "sitzung", "subagents")
         os.makedirs(ordner)
-        self.schreibe(usage_zeile(155000, sidechain=True), datei=os.path.join(ordner, "agent-a1.jsonl"))
-        text = self.hinweis(agent_type="dev-team:entwickler", agent_id="a1", tool_name="Agent")
+        agent = os.path.join(ordner, "agent-a1.jsonl")
+        self.schreibe(usage_zeile(170000, sidechain=True), datei=agent)
+        self.assertIn("baldigen Abschluss", self.hinweis(agent_type="dev-team:entwickler", agent_id="a1"))
+        self.schreibe(usage_zeile(205000, sidechain=True), datei=agent)
+        text = self.hinweis(agent_type="dev-team:entwickler", agent_id="a1")
         self.assertIn("BLOCKIERT", text)
         self.assertIn("Kontext voll", text)
         self.assertIsNone(self.hinweis())     # Projektleiter selbst ist frei
 
     def test_ohne_dev_team_projekt_still(self):
         shutil.rmtree(os.path.join(self.p, "docs"))
-        self.schreibe(usage_zeile(190000))
+        self.schreibe(usage_zeile(390000))
         self.assertEqual(self.lauf("hinweis"), "")
         self.assertEqual(self.lauf("stufe"), "0")
 
-    def test_durchlauf_schickt_in_den_sitzungswechsel(self):
+    def test_voller_kontext_ist_kein_stopp(self):
         with open(os.path.join(self.p, ".dev-team", "durchlauf"), "w") as f:
             f.write("an\n")
-        self.schreibe(usage_zeile(155000))
+        self.schreibe(usage_zeile(390000))
         r = subprocess.run(["bash", DURCHLAUF], input=json.dumps({"stop_hook_active": False, "session_id": "s1",
                            "transcript_path": self.protokoll}), text=True, capture_output=True, env=self.env)
         antwort = json.loads(r.stdout)
         self.assertEqual(antwort["decision"], "block")
-        self.assertIn("SITZUNGSUEBERGABE.md", antwort["reason"])
+        self.assertIn("kein Stopp", antwort["reason"])
+
+    def sitzungsstart(self, quelle):
+        r = subprocess.run(["bash", SITZUNGSSTART], input=json.dumps({"source": quelle}), text=True,
+                           capture_output=True, env=dict(self.env, CLAUDE_PLUGIN_ROOT=PLUGIN, HOME=self.p))
+        self.assertEqual(r.returncode, 0, r.stderr)
+        return r.stdout
 
     def test_sitzungsstart_zeigt_uebergabe(self):
         with open(os.path.join(self.p, "docs", "SITZUNGSUEBERGABE.md"), "w") as f:
             f.write("# Sitzungsübergabe\n\n## Nächster Schritt\nP4 an einen entwickler geben.\n")
-        r = subprocess.run(["bash", SITZUNGSSTART], input="{}", text=True, capture_output=True,
-                           env=dict(self.env, CLAUDE_PLUGIN_ROOT=PLUGIN, HOME=self.p))
-        self.assertEqual(r.returncode, 0, r.stderr)
-        self.assertIn("Fortsetzung nach Sitzungswechsel", r.stdout)
-        self.assertIn("P4 an einen entwickler geben.", r.stdout)
+        aus = self.sitzungsstart("compact")
+        self.assertIn("automatisch zusammengefasst", aus)
+        self.assertIn("P4 an einen entwickler geben.", aus)
+        aus = self.sitzungsstart("startup")
+        self.assertIn("Durchlauf wieder einschalten", aus)
+        self.assertNotIn("automatisch zusammengefasst", aus)
 
 
 class TestVerdecktSichern(unittest.TestCase):

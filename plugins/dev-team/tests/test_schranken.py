@@ -376,6 +376,121 @@ class TestSchranke(unittest.TestCase):
         self.assertEqual(code, 1, aus)
         self.assertIn("überlebt", aus)
 
+    def test_einstellungen_verschaerfen_ohne_freigabe(self):
+        self.konfig({"testbefehl": "%s -m unittest discover -s tests -t . -v" % sys.executable,
+                     "testzahl_muster": r"Ran (\d+) tests?", "meilensteinbefehle": ["echo mutation"]})
+        code, aus = self.lauf("--rolle", "projektleiter", "--ohne-lauf")
+        self.assertNotIn("Dev-Team-Einstellungen (.claude/dev-team.json) geändert", aus)
+        self.assertIn("nur verschärft", aus)
+        self.konfig({"testbefehl": "echo nichts", "testzahl_muster": r"Ran (\d+) tests?"})
+        code, aus = self.lauf("--rolle", "projektleiter", "--ohne-lauf")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("Dev-Team-Einstellungen (.claude/dev-team.json) geändert", aus)
+
+    def test_pruefsummen_nur_ergaenzen_ohne_freigabe(self):
+        self.schreibe(".dev-team/verdeckt/m1/test_a1.py", "def test_a1():\n    assert 1 + 1 == 2\n")
+        self.assertEqual(self.skript("abnahme_pruefsummen.py", "--schreiben")[0], 0)
+        git(self.p, "add", "-f", "docs/ABNAHME_PRUEFSUMMEN.txt")
+        git(self.p, "commit", "-qm", "Plan freigegeben")
+        # Meilenstein 1 aufgedeckt (verdeckte Datei weg), Meilenstein 2 neu: ohne Freigabe ergänzt
+        self.schreibe("tests/abnahme/test_a1.py", "def test_a1():\n    assert 1 + 1 == 2\n")
+        os.remove(os.path.join(self.p, ".dev-team", "verdeckt", "m1", "test_a1.py"))
+        self.schreibe(".dev-team/verdeckt/m2/test_a2.py", "def test_a2():\n    assert 2 * 2 == 4\n")
+        code, aus = self.skript("abnahme_pruefsummen.py", "--schreiben")
+        self.assertEqual(code, 0, aus)
+        self.assertIn("NEU: m2/test_a2.py", aus)
+        with open(os.path.join(self.p, "docs", "ABNAHME_PRUEFSUMMEN.txt")) as f:
+            liste = f.read()
+        self.assertIn("m1/test_a1.py", liste)
+        self.assertIn("m2/test_a2.py", liste)
+        code, aus = self.lauf("--rolle", "tester", "--ohne-lauf")
+        self.assertEqual(code, 0, aus)
+        git(self.p, "add", "-A")
+        git(self.p, "add", "-f", "docs/ABNAHME_PRUEFSUMMEN.txt")
+        git(self.p, "commit", "-qm", "Abnahmetests M2")
+        self.basis = git(self.p, "rev-parse", "HEAD").strip()
+        self.assertEqual(self.lauf("--rolle", "tester", "--ohne-lauf")[0], 0)
+        # bestehender Eintrag geändert → rot; mit Simons Freigabe vermerkt → danach ohne Freigabe grün
+        self.schreibe(".dev-team/verdeckt/m2/test_a2.py", "def test_a2():\n    assert 2 * 3 == 6\n")
+        code, aus = self.skript("abnahme_pruefsummen.py", "--schreiben")
+        self.assertEqual(code, 1, aus)
+        self.schreibe(".claude/freigaben.md", "2026-11-02 | a2-neu | docs/ABNAHME_PRUEFSUMMEN.txt | A2 geändert\n")
+        code, aus = self.skript("abnahme_pruefsummen.py", "--schreiben", "--freigabe", "a2-neu")
+        self.assertEqual(code, 0, aus)
+        git(self.p, "add", "-A")
+        git(self.p, "add", "-f", "docs/ABNAHME_PRUEFSUMMEN.txt")
+        git(self.p, "commit", "-qm", "A2 mit Freigabe")
+        code, aus = self.lauf("--rolle", "tester", "--ohne-lauf")
+        self.assertEqual(code, 0, aus)
+        # Vermerk mit erfundenem Stichwort zählt nicht
+        with open(os.path.join(self.p, "docs", "ABNAHME_PRUEFSUMMEN.txt")) as f:
+            text = f.read()
+        self.schreibe("docs/ABNAHME_PRUEFSUMMEN.txt", text.replace("a2-neu", "erfunden"))
+        self.assertEqual(self.lauf("--rolle", "tester", "--ohne-lauf")[0], 1)
+
+    def test_freigabe_ordner_und_mehrere_stichwoerter(self):
+        self.schreibe("tests/referenz/fall1.json", '{"ein": [1,2], "aus": 4}')
+        self.schreibe("tests/referenz/neu/x.json", "{}")
+        git(self.p, "add", "-A")
+        git(self.p, "commit", "-qm", "x")
+        self.schreibe("tests/referenz/neu/x.json", '{"a": 1}')
+        self.schreibe(".claude/freigaben.md", "2026-11-02 | ordner | tests/referenz/neu/ | Ordner\n"
+                                            "2026-11-02 | fall | tests/referenz/fall1.json | Fall\n")
+        code, aus = self.lauf("--freigabe", "ordner", "--ohne-lauf")
+        self.assertEqual(code, 1, aus)            # fall1 fehlt
+        code, aus = self.lauf("--freigabe", "ordner,fall", "--ohne-lauf")
+        self.assertEqual(code, 0, aus)
+        code, aus = self.lauf("--freigabe", "ordner", "--freigabe", "fall", "--ohne-lauf")
+        self.assertEqual(code, 0, aus)
+
+    def test_tester_legt_neue_referenzdaten_an(self):
+        self.schreibe("tests/referenz/format-v1/beispiel.json", '{"version": 1}')
+        self.schreibe("tests/referenz/format-v1/LIESMICH.md", "Eingefroren am 02.11. aus Stand abc\n")
+        code, aus = self.lauf("--rolle", "tester", "--ohne-lauf")
+        self.assertEqual(code, 0, aus)
+
+    def vorarbeit_paket(self, vorarbeit, entwickler, betreff="Tester-Vorarbeit P1: Bedienregel umgestellt"):
+        git(self.p, "checkout", "-qb", "p1")
+        for rel, inhalt in vorarbeit.items():
+            self.schreibe(rel, inhalt)
+        git(self.p, "add", "-A")
+        git(self.p, "commit", "-qm", betreff)
+        for rel, inhalt in entwickler.items():
+            self.schreibe(rel, inhalt)
+        git(self.p, "add", "-A")
+        git(self.p, "commit", "-qm", "P1 gebaut")
+        git(self.p, "checkout", "-q", "-")
+        git(self.p, "merge", "-q", "--no-ff", "p1", "-m", "P1")
+        r = subprocess.run(["bash", TESTS_SKRIPT, "--basis", "HEAD^1", "--rolle", "merge", "--ohne-lauf"],
+                           cwd=self.p, capture_output=True, text=True)
+        return r.returncode, r.stdout
+
+    def test_tester_vorarbeit_ist_kein_entwicklerverstoss(self):
+        code, aus = self.vorarbeit_paket({"tests/test_rechnung.py": TEST_GRUEN + "\n# Tester stellt um\n"},
+                                         {"src/rabatt.py": "def rabatt(x):\n    return x\n"})
+        self.assertEqual(code, 0, aus)
+        self.assertIn("Vorarbeit erkannt", aus)
+
+    def test_entwickler_aendert_vorarbeit_danach_rot(self):
+        code, aus = self.vorarbeit_paket({"tests/test_rechnung.py": TEST_GRUEN + "\n# Tester\n"},
+                                         {"tests/test_rechnung.py": TEST_GRUEN + "\n# Tester\n# Entwickler\n"})
+        self.assertEqual(code, 1, aus)
+        self.assertIn("bestehende Testdatei", aus)
+
+    def test_vorarbeit_mit_programmcode_rot(self):
+        code, aus = self.vorarbeit_paket({"tests/test_rechnung.py": TEST_GRUEN + "\n# T\n",
+                                          "src/rechnung.py": "def summe(w):\n    return 0\n"},
+                                         {"src/rabatt.py": "def rabatt(x):\n    return x\n"})
+        self.assertEqual(code, 1, aus)
+        self.assertIn("Vorarbeit darf nur", aus)
+
+    def test_entwickler_darf_anleitungen_unter_docs(self):
+        self.schreibe("docs/anleitung/update.md", "# Update\n")
+        self.schreibe("src/rabatt.py", "def rabatt(x):\n    return x\n")
+        self.assertEqual(self.lauf("--rolle", "entwickler", "--ohne-lauf")[0], 0)
+        self.schreibe("docs/STATUS.md", "# Status\n")
+        self.assertEqual(self.lauf("--rolle", "entwickler", "--ohne-lauf")[0], 1)
+
     def test_pruefsummen_umbenennen_loeschen_liste(self):
         self.schreibe(".dev-team/verdeckt/test_abn_a1.py", "def test_a1():\n    assert 1 + 1 == 2\n")
         self.assertEqual(self.skript("abnahme_pruefsummen.py", "--schreiben")[0], 0)
@@ -392,7 +507,7 @@ class TestSchranke(unittest.TestCase):
         self.schreibe("docs/ABNAHME_PRUEFSUMMEN.txt", "# leer\n")
         code, aus = self.lauf("--rolle", "tester", "--ohne-lauf")
         self.assertEqual(code, 1, aus)
-        self.assertIn("ersten versionierten Fassung", aus)
+        self.assertIn("wurde entfernt", aus)
 
     def test_verdeckt_ohne_liste_rot_beim_merge(self):
         self.schreibe(".dev-team/verdeckt/test_abn_a1.py", "def test_a1():\n    assert 1 + 1 == 2\n")

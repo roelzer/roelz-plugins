@@ -2,7 +2,7 @@
 """Führt die Dev-Team-Einstellungen in eine bestehende .claude/settings.json zusammen.
 
 Bestehende Einträge bleiben erhalten. Ergänzt bzw. setzt: Marktplatz, Plugins,
-disableAllHooks=false, worktree.baseRef=head, env-Werte des Dev-Teams,
+disableAllHooks=false, worktree.baseRef=head, autoCompactWindow (nur wenn noch keiner gesetzt), env-Werte des Dev-Teams,
 Sperrregeln (permissions.deny, Vereinigung) und die Dev-Team-Hooks (alte
 Dev-Team-Hooks werden ersetzt, fremde Hooks bleiben).
 
@@ -48,6 +48,8 @@ def zusammenfuehren(alt, vorlage):
         (neu.get("env") or {}).pop(k, None)
     if "worktree" in vorlage:
         neu.setdefault("worktree", {}).update(vorlage["worktree"])
+    if "autoCompactWindow" in vorlage and "autoCompactWindow" not in neu:
+        neu["autoCompactWindow"] = vorlage["autoCompactWindow"]   # eigener Wert des Projekts bleibt
     if vorlage.get("env"):
         neu.setdefault("env", {}).update(vorlage["env"])
     perm = neu.setdefault("permissions", {})

@@ -158,5 +158,17 @@ class Minimal(Basis):
             self.assertNotIn("ConfigChange", d["hooks"], datei)
 
 
+class PaketbefehlImVerknuepftenWorktree(Basis):
+    def test_npm_ci_bei_verknuepftem_node_modules_gesperrt(self):
+        os.makedirs(os.path.join(self.projekt, "node_modules"))
+        os.symlink(os.path.join(self.projekt, "node_modules"), os.path.join(self.wt, "node_modules"))
+        for rolle in ("projektleiter", "entwickler", "tester"):
+            code, fehler = self.lauf(self.aufruf("Bash", rolle, cwd=self.wt, command="npm ci"))
+            self.assertEqual(code, 2, rolle)
+            self.assertIn("--trennen", fehler)
+        self.assertEqual(self.lauf(self.aufruf("Bash", "entwickler", cwd=self.wt, command="npm run build"))[0], 0)
+        self.assertEqual(self.lauf(self.aufruf("Bash", "projektleiter", command="npm ci"))[0], 0)   # Hauptordner
+
+
 if __name__ == "__main__":
     unittest.main()

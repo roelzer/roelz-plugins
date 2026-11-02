@@ -19,7 +19,7 @@ Das Team ist **fest**: genau die Agenten in `team.json`. Jede Datei in `agents/`
 | `fachexperte` | Alltagstauglichkeit aus Anwendersicht (Abwägungsrunde) | Architektur- oder Sicherheitsfreigabe |
 | `pragmatiker` | Aufwand/Nutzen, kleinste tragfähige Lösung (Abwägungsrunde) | Anforderungen oder Sicherheit aus Bequemlichkeit streichen |
 | `langfrist-architekt` | unabhängige Prüfung des Architektur-Entwurfs auf Jahre (Abwägungsrunde) | selbst entwerfen; ohne Beleg Neubau verlangen |
-| `tester` | verdeckte Abnahmetests vor dem Bauen, vollständige Testläufe, Testlücken | Produktivlogik oder Referenzwerte ändern; Tests abschwächen |
+| `tester` | verdeckte Abnahmetests vor dem Bauen, Tester-Vorarbeit auf dem Paketzweig, neue Referenzdateien (mit Herkunft), vollständige Testläufe, Testlücken | Produktivlogik oder bestehende Referenzwerte ändern; Tests abschwächen |
 | `reviewer` | Paket-Review vor jedem Merge (1. Plan-Treue, 2. Qualität), Nachprüfung je Befund, Gesamt-Review je Meilenstein; glaubt dem Entwicklerbericht nicht | Befunde selbst beheben; ungeprüfte Tests als grün melden |
 | `sicherheitspruefer` | Angriffswege, Rechte, Datenflüsse, Abhängigkeiten, Betrieb | Penetrationstest behaupten, wenn nur Code gelesen wurde |
 | `produktpruefer` | Abnahme jeder Anforderung, echte Abläufe, Aussehen Desktop + Handy | technische oder Sicherheitsfreigabe |

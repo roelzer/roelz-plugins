@@ -101,12 +101,6 @@ def lade_konfig(wurzel, hauptordner):
     return None, None
 
 
-def git_erste_fassung(wurzel, pfad):
-    r = sh(["git", "log", "--diff-filter=A", "--format=%H", "--reverse", "--", pfad], wurzel)
-    commit = (r.stdout or "").split()
-    return git_datei_text(wurzel, commit[0], pfad) if commit else None
-
-
 def git_datei_text(wurzel, commit, pfad):
     r = sh(["git", "show", "%s:%s" % (commit, pfad)], wurzel)
     return r.stdout if r.returncode == 0 else None
@@ -300,11 +294,10 @@ def pruefsummen_pruefen(e, hauptordner, wurzel, fg, rolle="projektleiter"):
             e.f("Verdeckte Abnahmetests vorhanden, aber keine festgehaltenen Prüfsummen (%s). Erst "
                 "abnahme_pruefsummen.py --schreiben und committen." % mod.DATEI)
         return
-    erste = git_erste_fassung(hauptordner, mod.DATEI)
-    jetzt_text = datei_text(hauptordner, mod.DATEI) or ""
-    if erste is not None and erste != jetzt_text and not fg.deckt("docs/ABNAHME_PRUEFSUMMEN.txt"):
-        e.f("Die Prüfsummen-Liste weicht von ihrer ersten versionierten Fassung ab – Abnahmetests werden nie "
-            "nachträglich angepasst (nur mit Simons Freigabe).")
+    # Neue Einträge (Abnahmetests des nächsten Meilensteins) sind ohne Freigabe erlaubt. Ein einmal
+    # versionierter Eintrag darf sich nie ändern oder verschwinden – außer mit Simons Freigabe (Vermerk in der Liste).
+    for t in mod.liste_pruefen(hauptordner, wurzel):
+        (e.w if fg.deckt("docs/ABNAHME_PRUEFSUMMEN.txt") else e.f)(t + fg.text("docs/ABNAHME_PRUEFSUMMEN.txt"))
     funde = mod.pruefen(hauptordner, wurzel, vollstaendig=(rolle == "projektleiter"))
     for t in funde:
         (e.w if fg.deckt("docs/ABNAHME_PRUEFSUMMEN.txt") else e.f)(t + (fg.text("docs/ABNAHME_PRUEFSUMMEN.txt") or
@@ -389,26 +382,106 @@ def ist_testdatei(bereich):
 
 
 class Freigabe:
-    """Eine Freigabe aus .claude/freigaben.md: gilt nur für die genannten Pfade bzw. Prüfungen."""
+    """Eine oder mehrere Freigaben aus .claude/freigaben.md: gelten nur für die genannten Pfade bzw. Prüfungen.
+    Ein Ordner in der Geltung („tests/referenz/x/“ oder „tests/referenz/x“) deckt alle Dateien darin."""
 
     def __init__(self, zeile="", geltung=()):
         self.zeile = zeile
-        self.geltung = [g for g in geltung if g]
+        self.geltung = [bereiche.norm(g).strip() for g in geltung if g and g.strip()]
 
     def deckt(self, ziel):
         if not self.zeile:
             return False
         z = bereiche.norm(ziel)
-        return any(g.lower() == z.lower() or bereiche.passt(z, [g]) for g in self.geltung)
+        for g in self.geltung:
+            ordner = g.rstrip("/")
+            if g.lower() == z.lower() or bereiche.passt(z, [g]):
+                return True
+            if not any(c in g for c in "*?") and z.lower().startswith(ordner.lower() + "/"):
+                return True
+        return False
+
+    def dazu(self, andere):
+        if not andere.zeile:
+            return self
+        if not self.zeile:
+            return andere
+        return Freigabe(self.zeile + " ; " + andere.zeile, self.geltung + andere.geltung)
 
     def text(self, ziel):
         return " – Freigabe: " + self.zeile if self.deckt(ziel) else ""
 
 
+VORARBEIT = re.compile(r"^(Tester|Architekt)-Vorarbeit\b", re.IGNORECASE)
+VORARBEIT_BEREICHE = {"tester": ("tests", "testkonfig", "referenz", "abnahme"), "architekt": ("architektur",)}
+
+
+def vorarbeit_dateien(e, wurzel, basis, team):
+    """Dateien aus Tester- oder Architekt-Vorarbeit am Anfang des Pakets (Commit-Betreff „Tester-Vorarbeit …“
+    bzw. „Architekt-Vorarbeit …“). Sie zählen nicht als Entwickler-Änderung, solange der Entwickler sie danach
+    nicht mehr verändert hat. Vorarbeit nach dem ersten Entwickler-Commit zählt nicht."""
+    r = sh(["git", "log", "--reverse", "--topo-order", "--no-merges", "--format=%H%x09%s", "%s..HEAD" % basis], wurzel)
+    vorarbeit, letzter = {}, None
+    for zeile in (r.stdout or "").splitlines():
+        commit, _, betreff = zeile.partition("\t")
+        m = VORARBEIT.match(betreff.strip())
+        if not m:
+            break
+        rolle = m.group(1).lower()
+        for z in git(wurzel, "diff-tree", "--no-commit-id", "--name-status", "--no-renames", "-r", commit).splitlines():
+            teile = z.split("\t")
+            if len(teile) < 2:
+                continue
+            p = bereiche.norm(teile[-1])
+            b = bereiche.bereich_von(p, team)
+            if b not in VORARBEIT_BEREICHE[rolle] and b not in ("nachweis", "prozess"):
+                e.f("%s-Vorarbeit %s ändert %s (Bereich %s) – Vorarbeit darf nur %s enthalten." % (
+                    m.group(1), commit[:10], p, b, ", ".join(VORARBEIT_BEREICHE[rolle])))
+                continue
+            vorarbeit[p] = rolle
+        letzter = commit
+    if not letzter:
+        return set()
+    unveraendert = set()
+    for p in vorarbeit:
+        soll = sh(["git", "rev-parse", "-q", "--verify", "%s:%s" % (letzter, p)], wurzel).stdout.strip()
+        ist = sh(["git", "hash-object", "--", p], wurzel).stdout.strip() if os.path.isfile(os.path.join(wurzel, p)) else ""
+        if soll == ist:
+            unveraendert.add(p)
+    if unveraendert:
+        e.w("Vorarbeit erkannt (bis %s): %d Datei(en) zählen nicht als Entwickler-Änderung." % (letzter[:10], len(unveraendert)))
+    return unveraendert
+
+
+VERSCHAERFBAR = ("zusatzbefehle", "meilensteinbefehle")
+FREI_EINSTELLBAR = ("kontext_grenze", "kontext_grenze_agent", "_hilfe")
+
+
+def nur_verschaerft(vorher, nachher):
+    """True, wenn .claude/dev-team.json nur strenger wurde: Befehle in zusatzbefehle/meilensteinbefehle ergänzt
+    (keiner entfernt oder geändert) oder Kontextgrenzen gesetzt. Testbefehl, Zählmuster, Setup, plugin_stand usw.
+    bleiben freigabepflichtig."""
+    try:
+        alt, neu = json.loads(vorher or ""), json.loads(nachher or "")
+    except ValueError:
+        return False
+    if not isinstance(alt, dict) or not isinstance(neu, dict):
+        return False
+    for k in set(alt) | set(neu):
+        a, n = alt.get(k), neu.get(k)
+        if a == n or k in FREI_EINSTELLBAR:
+            continue
+        if k in VERSCHAERFBAR and isinstance(n, list) and isinstance(a or [], list) and n[:len(a or [])] == (a or []):
+            continue
+        return False
+    return True
+
+
 def pruefe_diff(e, wurzel, basis, rolle, team, fg):
     """fg: Freigabe (gilt nur für ihre Pfade/Prüfungen). Rolle 'merge' = Entwickler-Regeln
     für den zusammengeführten Stand im Hauptordner, ohne die Unterlagen des Projektleiters."""
-    entwicklerregeln = rolle in ("entwickler", "merge")
+    entwickler_rolle = rolle in ("entwickler", "merge")
+    vorarbeit = vorarbeit_dateien(e, wurzel, basis, team) if entwickler_rolle else set()
     liste = aenderungen(wurzel, basis)
     if not liste:
         e.o("Keine Dateiänderungen gegenüber %s." % basis[:10])
@@ -417,6 +490,7 @@ def pruefe_diff(e, wurzel, basis, rolle, team, fg):
         bereich = bereiche.bereich_von(p, team)
         if p.startswith(".dev-team/"):
             continue
+        entwicklerregeln = entwickler_rolle and p not in vorarbeit
         if bereich in ("nachweis",) or (rolle == "merge" and bereich == "prozess"):
             continue
         if bereich == "referenz" and status in "MD":
@@ -458,7 +532,9 @@ def pruefe_diff(e, wurzel, basis, rolle, team, fg):
             for zeile in neue_zeilen(wurzel, basis, p):
                 if LEERE_PRUEFUNG_JS.search(zeile):
                     e.f("Prüfung, die immer stimmt, in %s: %s" % (p, zeile.strip()[:120]))
-        if bereich == "teamkonfig" and status in "AMD":
+        if bereich == "teamkonfig" and status == "M" and nur_verschaerft(git_datei_text(wurzel, basis, p), datei_text(wurzel, p)):
+            e.w("Dev-Team-Einstellungen nur verschärft (Prüfbefehle ergänzt bzw. Kontextgrenzen) – ohne Freigabe erlaubt.")
+        elif bereich == "teamkonfig" and status in "AMD":
             (e.w if fg.deckt(".claude/dev-team.json") else e.f)(
                 "Dev-Team-Einstellungen (.claude/dev-team.json) geändert%s." % (
                     fg.text(".claude/dev-team.json") or
@@ -592,7 +668,8 @@ def main():
     a.add_argument("--rolle", default="projektleiter",
                    choices=["entwickler", "merge", "tester", "reviewer", "projektleiter", "architekt"])
     a.add_argument("--ohne-lauf", action="store_true")
-    a.add_argument("--freigabe", default="")
+    a.add_argument("--freigabe", action="append", default=[],
+                   help="Stichwort aus .claude/freigaben.md; mehrfach oder mit Komma getrennt möglich")
     arg = a.parse_args()
 
     e = Ergebnis()
@@ -610,8 +687,8 @@ def main():
     team = lade_team()
     konfig, _ = lade_konfig(wurzel, hauptordner)
     fg = Freigabe()
-    if arg.freigabe:
-        fg = pruefe_freigabe(e, hauptordner, arg.freigabe)
+    for stichwort in [w.strip() for f in arg.freigabe for w in f.split(",") if w.strip()]:
+        fg = fg.dazu(pruefe_freigabe(e, hauptordner, stichwort))
     freigabe = fg.zeile
     if ist_worktree and arg.rolle == "entwickler":
         haupt_kopf = git(hauptordner, "rev-parse", "HEAD").strip()

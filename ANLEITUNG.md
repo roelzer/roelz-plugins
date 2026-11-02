@@ -154,7 +154,7 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
 - **Sicherheit der Lieferkette:** Ohne weitere Angabe holt die Cloud den aktuellen Stand von `main`. Wer einen geprüften Stand festnageln will, trägt in `.claude/dev-team.json` unter `plugin_stand` einen Tag oder Commit ein (oder setzt in der Cloud-Umgebung `DEV_TEAM_REF`). Ohne Angabe meldet der Start eine Warnung. Wegen des öffentlichen Repos darf dort nie etwas Vertrauliches stehen.
 - Lektionen aus Cloud-Sitzungen landen als Vorschlag in `docs/LEKTIONEN_VORSCHLAEGE.md` des Projekts. Übernommen werden sie später, wenn du dabei bist.
 - **Seit 3.12 in der Cloud:** Nach deiner Freigabe läuft der Auftrag durch, ohne dass du „mach weiter“ schreiben musst (Durchlauf-Wächter). Den Stand siehst du jederzeit oben in `docs/STATUS.md`, jede Nachricht endet mit dem Link; nach jedem Merge wird der Arbeitsbranch gepusht. Die verdeckten Abnahmetests sichert der Projektleiter auf dem Branch `dev-team-verdeckt` (nie zusammenführen); eine neue Sitzung holt sie automatisch zurück.
-- **Seit 3.13: Sitzungswechsel bei vollem Kontext.** Der Kontext-Wächter misst, wie voll das Kontextfenster des Projektleiters und jedes Agenten ist. Kurz vor der Grenze (Standard 150.000 Tokens) übergibt der Projektleiter sauber: Er lässt laufende Agenten fertig werden, schreibt `docs/SITZUNGSUEBERGABE.md`, committet und pusht und sagt dir in einer Zeile Bescheid. Du startest dann eine neue Sitzung und schreibst „weiter“ – sie liest die Übergabe und läuft ohne neue Freigabe weiter. Agenten mit vollem Kontext melden „BLOCKIERT – Kontext voll“, und ein frischer Agent macht weiter.
+- **Seit 3.13 läuft ein Auftrag ohne Handstopps durch:** Wird der Kontext voll, schreibt der Projektleiter selbst eine Übergabe, Claude Code fasst bei 400.000 Tokens automatisch zusammen und der Lauf geht weiter – du musst keine neue Sitzung starten. Neue Abnahmetests und neue Referenzdateien (z. B. eingefrorene Altdaten) legt das Team ohne Freigabe an; du wirst nur noch gefragt, wenn bestehende Referenzwerte oder Abnahmetests geändert werden sollen, bei Produktentscheidungen und bei Dingen, die nur du kannst.
 
 ## 8. Befehle
 
@@ -214,7 +214,7 @@ Danach VS Code neu starten.
 
 **Nach dem Update auf 3.12 einmal je Projekt** (auch für Cloud-Projekte): `/dev-team:projekt-aufnehmen`. Das bringt den Durchlauf-Wächter und die Laufzeitmessung in die Projekteinstellungen und entfernt den alten Wächter, der vor jedem Schritt bis zu 60 s prüfen durfte. Der Sitzungsstart erinnert daran.
 
-**Nach dem Update auf 3.13 einmal je Projekt:** `/dev-team:projekt-aufnehmen`. Das bringt den Kontext-Wächter (Sitzungswechsel bei vollem Kontext) in die Projekteinstellungen, damit er auch in Cloud-Sitzungen läuft. Der Sitzungsstart erinnert daran.
+**Nach dem Update auf 3.13 einmal je Projekt:** `/dev-team:projekt-aufnehmen`. Das bringt das vorgezogene Zusammenfassen und den Kontext-Wächter in die Projekteinstellungen (auch für Cloud-Sitzungen). Der Sitzungsstart erinnert daran.
 
 **Bestehende Projekte auf Version 3 umstellen:** im Projekt `/dev-team:projekt-aufnehmen` ausführen. Es legt `.claude/dev-team.json` an und zeigt dir die Änderungen an `.claude/settings.json` (Teamzwang, Worktrees), bevor es sie schreibt.
 

@@ -15,6 +15,7 @@
   "worktree": {
     "baseRef": "head"
   },
+  "autoCompactWindow": 400000,
   "env": {
     "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1",
     "CLAUDE_CODE_FORK_SUBAGENT": "0"

@@ -55,7 +55,9 @@
       "phase": "Wow-Ideen vor dem Bauen, Nachschliff nach dem Bauen",
       "schreibt": [],
       "modell": "opus",
-      "modelle": ["opus"]
+      "modelle": [
+        "opus"
+      ]
     },
     "fachexperte": {
       "phase": "Abwägungsrunde",
@@ -170,6 +172,7 @@
       "quellen",
       "projektdateien",
       "prozess",
+      "doku",
       "testkonfig",
       "tests",
       "code"
@@ -218,8 +221,21 @@
       ".claude/launch.json"
     ],
     "prozess": [
-      "docs/**",
+      "docs/STATUS.md",
+      "docs/plan*.md",
+      "docs/ENTSCHEIDUNGEN.md",
+      "docs/OFFENE_FRAGEN.md",
+      "docs/risiko-log.md",
+      "docs/LEKTIONEN_VORSCHLAEGE.md",
+      "docs/GEHIRN_NACHTRAG.md",
+      "docs/SITZUNGSUEBERGABE.md",
+      "docs/SELBSTPRUEFUNG.md",
+      "docs/wow-briefing.md",
+      "docs/uebergabe/**",
       ".dev-team/**"
+    ],
+    "doku": [
+      "docs/**"
     ],
     "tests": [
       "tests/**",

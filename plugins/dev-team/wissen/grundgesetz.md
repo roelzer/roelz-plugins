@@ -30,19 +30,22 @@ Die Tabelle ist die Arbeitsteilung, an die sich jede Rolle hält. Technisch gesp
 | Bereich | Projektleiter | Entwickler | Tester | Architekt | Rechercheur | alle Prüfer |
 |---|---|---|---|---|---|---|
 | Programmcode | – | ✅ | – | – | – | – |
-| Tests | – | **neue** (und im Paket selbst angelegte weiter bearbeiten) | ✅ | – | – | – |
+| Tests | – | **neue** (und im Paket selbst angelegte weiter bearbeiten) | ✅ (Änderungen, die ein Paket braucht, als **Tester-Vorarbeit**, siehe unten) | – | – | – |
 | Abnahmetests (verdeckt in `.dev-team/verdeckt/`, nach dem Aufdecken `tests/abnahme/`) | – | – (vor dem Aufdecken nicht lesen; der direkte Weg ist gesperrt, mit einem eigenen Skript aber möglich – deshalb Prüfsummen und blinder Lauf) | ✅ | – | – | – |
 | Architektur (`docs/ARCHITEKTUR.md`, `tests/architektur/`) | – | – | – | ✅ | – | – |
 | Design (`docs/DESIGN.md`, `design/`) | – | – | – | – (nur der Designer) | – | – |
-| Referenzfälle (`tests/referenz/`) | nur über `scripts/geschuetzt_schreiben.py` mit Simons Freigabe | – | – | – | – | – |
-| Fachregeln, Lastenheft, Plan, Status, `docs/` | ✅ | – | – | – | – | – |
+| Referenzfälle (`tests/referenz/`) | bestehende ändern/löschen nur über `scripts/geschuetzt_schreiben.py` mit Simons Freigabe | – | **neue** Dateien anlegen ✅ (eingefrorene Daten wie alte Speicherformate, oder Werte mit unabhängiger Herleitung; je Ordner ein `LIESMICH.md` mit Herkunft) | – | – | – |
+| Fachregeln, Lastenheft, Plan, Status und Prozessdateien unter `docs/` | ✅ | – | – | – | – | – |
+| Weitere Unterlagen unter `docs/` (Anleitungen, Hilfetexte), wenn der Bauplan sie nennt | ✅ | ✅ | – | – | – | – |
 | Recherche (`fachwissen/recherche/`) | ✅ | – | – | – | ✅ | – |
-| Dev-Team-Einstellungen (`.claude/dev-team.json`) | anlegen ✅; ändern nur über `scripts/geschuetzt_schreiben.py` mit Simons Freigabe | – | – | – | – | – |
+| Dev-Team-Einstellungen (`.claude/dev-team.json`) | anlegen ✅; **verschärfen** ✅ (Befehle in `zusatzbefehle`/`meilensteinbefehle` ergänzen, Kontextgrenzen); alles andere (Testbefehl, Zählmuster, Setup, `plugin_stand`, Befehle entfernen) nur über `scripts/geschuetzt_schreiben.py` mit Simons Freigabe | – | – | – | – | – |
 | Einstellungsdateien (`.claude/settings*.json`, `~/.claude/settings.json`) | nur über `scripts/settings_zusammenfuehren.py` nach Simons OK | – | – | – | – | – |
 | Freigaben (`.claude/freigaben.md`) | **nur Simon von Hand** | – | – | – | – | – |
 | Agenten-, Skill-, Hook-Dateien | – | – | – | – | – | – |
 
-Referenzwerte ändert nur Simon. Bestehende Tests ändert nur der Tester, nie, um sie grün zu machen.
+Bestehende Referenzwerte ändert nur Simon. Erwartete fachliche Rechenwerte, die nur Simon kennen kann, legt nie das Team fest. Bestehende Tests ändert nur der Tester, nie, um sie grün zu machen.
+
+**Tester- und Architekt-Vorarbeit:** Braucht ein Paket geänderte bestehende Tests (umgestellte Bedienregel, festgeschriebener Text, Gerüst-Test mit Platzhalter) oder geänderte Architekturtests (tote Ausnahmen streichen), erledigt das der Tester bzw. Architekt **auf dem Paketzweig**, bevor der Entwickler startet – als eigener Commit mit dem Betreff `Tester-Vorarbeit P3: …` bzw. `Architekt-Vorarbeit P3: …`. Nie auf dem Arbeitsbranch: rote Vorarbeit-Tests würden parallele Pakete blockieren. Die Schranke erkennt diese Commits am Anfang des Pakets und rechnet sie nicht dem Entwickler zu; ändert der Entwickler die Dateien danach, ist es wieder sein Verstoß. Die Tests der Vorarbeit dürfen am Startpunkt rot sein – sie sind das Ziel des Pakets.
 
 ## Vollständigkeit: nichts geht verloren
 - Jede Anforderung von Simon wird **einzeln mit Nummer** festgehalten (A1, A2 …), mit Simons eigenen Worten und einem Abnahmekriterium. Auch Nebensätze und „übrigens …“.
@@ -91,8 +94,8 @@ Damit nichts doppelt oder dreifach geprüft wird, fragt je Thema genau eine Roll
 
 ## Alle Tests grün – mechanisch belegt
 - „Grün“ heißt: Die **Test-Schranke** (`scripts/pruefe-tests.sh`) meldet „OK – alles grün“. Sie führt den Testbefehl und die Zusatzbefehle aus `.claude/dev-team.json` aus und prüft außerdem: keine übersprungenen oder exklusiven Tests, keine geänderten Referenzfälle, keine gelöschten Tests, nicht weniger Tests als beim letzten grünen Lauf, keine 0-Tests-Läufe, Entwickler hat keine bestehenden Tests oder Testkonfiguration angefasst. Nach jedem Merge prüft der Projektleiter das mit `--rolle merge --basis HEAD^1`. Tests, die das Testwerkzeug selbst verändern (assert-Methoden überschreiben, `except AssertionError`, `sys.exit` im Test), und geänderte Testeinstellungen in `pyproject.toml`/`package.json` sind ebenfalls rot. Bei geänderten Manifesten oder Lockfiles läuft die Abhängigkeits-Schranke automatisch mit.
-- Übersprungene oder offene Tests im Testlauf, neue Tests ohne eine einzige Prüfung und Änderungen an `.claude/dev-team.json` sind ebenfalls rot. Geänderte Abnahmetests (gegen `docs/ABNAHME_PRUEFSUMMEN.txt`) sind rot. Am Meilenstein-Ende (`--rolle projektleiter`) zusätzlich: jede Anforderung (A-Nummer) und bei Fachsoftware jede bestätigte Fachregel (F-Nummer, auch R-Nummer wird erkannt) hat einen Test, und die `meilensteinbefehle` (Mutationstest) sind grün.
-- Ausnahmen (`--freigabe <Stichwort>`) gelten nur, wenn Simon die Freigabe **von Hand** in `.claude/freigaben.md` eingetragen hat (`Datum | Stichwort | Geltung | Grund`). Das Stichwort muss genau passen, und die Freigabe gilt nur für die Pfade oder Prüfungen in „Geltung“ (z. B. `tests/referenz/fall3.json` oder `testzahl`). Claude kann diese Datei über die Datei-Werkzeuge nicht schreiben; über die Shell ist es gesperrt, aber nicht unmöglich – deshalb steht jede verwendete Freigabe im Testnachweis und im Bericht, und Simon prüft sie.
+- Übersprungene oder offene Tests im Testlauf, neue Tests ohne eine einzige Prüfung und Änderungen an `.claude/dev-team.json` sind ebenfalls rot. Geänderte Abnahmetests (gegen `docs/ABNAHME_PRUEFSUMMEN.txt`) sind rot. Die Prüfsummen-Liste wird nur ergänzt: neue Abnahmetests eines Meilensteins kommen ohne Freigabe dazu, ein versionierter Eintrag ändert sich nie (außer mit Simons Freigabe, die dann in der Liste vermerkt wird). Am Meilenstein-Ende (`--rolle projektleiter`) zusätzlich: jede Anforderung (A-Nummer) und bei Fachsoftware jede bestätigte Fachregel (F-Nummer, auch R-Nummer wird erkannt) hat einen Test, und die `meilensteinbefehle` (Mutationstest) sind grün.
+- Ausnahmen (`--freigabe <Stichwort>`) gelten nur, wenn Simon die Freigabe **von Hand** in `.claude/freigaben.md` eingetragen hat (`Datum | Stichwort | Geltung | Grund`). Das Stichwort muss genau passen, und die Freigabe gilt nur für die Pfade oder Prüfungen in „Geltung“ (z. B. `tests/referenz/fall3.json`, ein Ordner wie `tests/referenz/format-v1/` mit allem darin, oder `testzahl`). Mehrere Freigaben: `--freigabe a,b`. Claude kann diese Datei über die Datei-Werkzeuge nicht schreiben; über die Shell ist es gesperrt, aber nicht unmöglich – deshalb steht jede verwendete Freigabe im Testnachweis und im Bericht, und Simon prüft sie.
 - Kein Merge, kein Meilenstein-Abschluss, kein Bericht „fertig“ ohne grüne Schranke. Ergebnisse stehen automatisch in `docs/TESTNACHWEIS.md`.
 - Erwartete Testwerte (besonders Referenzfälle) werden **nie** angepasst, damit ein Test grün wird. Ändert sich ein Referenzergebnis: Stopp, Simon entscheidet (`--freigabe`).
 - Grüne Tests beweisen weder Sicherheit noch fachliche Richtigkeit noch gutes Aussehen. Dafür gibt es die anderen Prüfer.
@@ -129,6 +132,7 @@ Hat Simon einen Plan freigegeben, wird ohne Rückfragen weitergebaut, auch wenn 
 - Pakete in der geplanten Reihenfolge, parallele Gruppen gleichzeitig. Nach jedem Paket: Review, Merge, Schranke, `docs/STATUS.md`.
 - **Entscheiden statt stehen bleiben:** Umkehrbare Fragen (Widersprüche im Plan, kleine Lücken, Befunde nach der letzten Fix-Runde) entscheidest du und schreibst sie nach `docs/ENTSCHEIDUNGEN.md` (`Datum | was | warum | was es kostet, wenn falsch`). Im Bericht stehen sie **vollständig**.
 - **Nicht raten.** Unklarheit → `docs/OFFENE_FRAGEN.md` (mit Empfehlung) und weiter mit einem unabhängigen Paket.
+- **Simon nur fragen, was nur Simon kann.** Fragen, für die er kein Fachwissen braucht oder hat (Technik, Werkzeuge, Prozess, Sicherheitsdetails, Formulierungen), entscheidest du nach der Empfehlung des zuständigen Agenten, schreibst sie in `docs/ENTSCHEIDUNGEN.md` und informierst ihn im nächsten Bericht. Vorgelegt werden nur: Produkt- und Fachentscheidungen, die seine Anforderungen verändern; was technisch ausschließlich er kann (Konten, Netzwerk, echtes Gerät, Zahlungen); geänderte bestehende Referenzwerte oder Abnahmetests; Unumkehrbares. Unbestätigte Fachregeln bleiben dabei „vorläufig“.
 - **Harte Stopps** (Stand sichern, Grund in STATUS.md): Referenzfall oder Fachregel rot und nicht im Plan behebbar; Änderung außerhalb des Plans nötig (Datenmodell, Umbau). Eine neue Abhängigkeit ist **kein** harter Stopp, wenn die Abhängigkeits-Schranke grün ist (Zeile in `docs/ENTSCHEIDUNGEN.md`); ein Agent meldet 🔴 und es ist nicht innerhalb von 3 Runden behebbar; etwas müsste gelöscht oder überschrieben werden, das nicht neu angelegt wurde; eine freigabepflichtige Aktion wäre nötig; eine Rolle fehlt.
 
 ## Fertig heißt belegt
@@ -152,12 +156,11 @@ Eigenständig heißt: selbst arbeiten innerhalb dieser Grenzen, nicht: alles dü
 - Der Stand liegt **in Dateien, nicht im Gedächtnis**: `docs/STATUS.md` (Phase, Pakete, laufende Agenten, Basis-Commits, zurückgestellte Befunde), `docs/plan.md`, `docs/ENTSCHEIDUNGEN.md`, `docs/OFFENE_FRAGEN.md`, `docs/TESTNACHWEIS.md`. Nach `/compact`, `/clear` oder Sitzungsende liest du zuerst diese Dateien.
 - Lange Ausgaben zusammenfassen, nicht komplett im Gespräch behalten.
 
-## Sitzungswechsel bei vollem Kontext
-- Der **Kontext-Wächter** (`scripts/kontext.sh`) misst nach Agenten-Aufrufen, Nachrichten von Simon und Stopps die echte Kontextgröße der Sitzung und jedes Agenten. Ab 80 % der Grenze (Standard 150.000 Tokens, `kontext_grenze` in `.claude/dev-team.json`) kommt ein Hinweis, ab der Grenze die Aufforderung zum Wechsel.
-- **Hinweis:** `docs/STATUS.md` nach jedem Schritt aktuell halten, Entscheidungen sofort in die Dateien, lange Ausgaben nicht mehr komplett lesen.
-- **Wechsel (Projektleiter):** keine neuen Agenten starten; laufende fertig werden lassen und einarbeiten. Dann `docs/SITZUNGSUEBERGABE.md` nach der Vorlage `vorlagen/sitzungsuebergabe.md` schreiben, `docs/STATUS.md` aktualisieren, committen (Cloud: Arbeitsbranch pushen), `.dev-team/durchlauf` löschen und Simon in einer Zeile bitten, eine neue Sitzung zu starten und „weiter“ zu schreiben. Der Sitzungswechsel ist ein fester Stopp, kein Fehler. Lieber früh übergeben als automatisch zusammengefasst werden.
-- **Neue Sitzung:** Der Sitzungsstart zeigt die Übergabe. Lesen, Stand mit git prüfen, Durchlauf wieder einschalten, wenn er an war (Simons Freigabe gilt weiter), am nächsten Schritt weitermachen, Übergabedatei löschen.
-- **Wechsel (Agent):** Ein Agent mit vollem Kontext schließt sauber ab (Zwischenstand committen, Status BLOCKIERT, Grund „Kontext voll“, was fertig ist, was fehlt, nächster Schritt). Der Projektleiter gibt den Rest an einen frischen Agenten, Startpunkt = letzter Commit des Vorgängers. Das zählt nicht als Fix-Runde.
+## Voller Kontext: automatisch weiter, ohne Wissensverlust
+- Claude Code fasst das Gespräch automatisch zusammen, wenn der Kontext voll ist. Das Dev-Team zieht das vor: `autoCompactWindow: 400000` in `.claude/settings.json` (bei 1-Mio-Modellen sonst erst bei rund 967.000). Grund: Jeder Schritt liest den ganzen Kontext neu (Kosten), und sehr lange Kontexte machen ungenauer. Der eigentliche Stand liegt ohnehin in Dateien.
+- Der **Kontext-Wächter** (`scripts/kontext.sh`) misst die echte Kontextgröße. Ab 70 % des Fensters: `docs/STATUS.md` nach jedem Schritt aktuell halten. Ab 85 %: sofort `docs/SITZUNGSUEBERGABE.md` nach `vorlagen/sitzungsuebergabe.md` schreiben, STATUS aktualisieren, beides committen – dann **weiterarbeiten**. Kein Stopp, keine Frage an Simon.
+- Nach dem Zusammenfassen lädt der Sitzungsstart Grundgesetz und Übergabe wieder; der Durchlauf bleibt an. In einer neuen Sitzung genauso (Durchlauf wieder einschalten, wenn die Übergabe „an“ sagt). Am Ende des Auftrags die Übergabedatei löschen.
+- **Agenten** haben eine eigene Grenze (200.000, `kontext_grenze_agent`): Wer sie erreicht, hat ein zu großes Paket. Er schließt sauber ab (Zwischenstand committen, BLOCKIERT, Grund „Kontext voll“, was fertig ist, was fehlt, nächster Schritt). Der Projektleiter gibt den Rest an einen frischen Agenten (Startpunkt = letzter Commit des Vorgängers; zählt nicht als Fix-Runde; zweimal im selben Paket → Architekt teilt).
 
 ## Fachregeln
 - Jedes Projekt mit fachlichen Ergebnissen hat `fachwissen/regeln.md`: Regeln, die ein Ergebnis **niemals** verletzen darf.
@@ -198,7 +201,7 @@ Das Gehirn ist Simons privater Obsidian-Tresor (Repo `roelzer/brain`, Pfad in de
 - Wiederholt sich eine Lektion, wird sie zur festen Regel in diesem Grundgesetz.
 
 ## Tokens sparen
-- Eine Aufgabe pro Sitzung. Danach `/clear`. Bei langen Sitzungen sauber übergeben (siehe „Sitzungswechsel bei vollem Kontext“) statt `/compact`.
+- Eine Aufgabe pro Sitzung. Danach `/clear`. Lange Sitzungen regelt der Kontext-Wächter (siehe „Voller Kontext“).
 - Jedem Agenten nur den nötigen Kontext und eine klare Frage geben.
 - Unabhängige Prüfer parallel starten (höchstens 3).
 

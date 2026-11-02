@@ -1,16 +1,36 @@
 # Änderungsprotokoll Dev-Team
 
-## 3.13.0 – Sitzungswechsel bei vollem Kontext
+## 3.13.0 – Vollautomatisch: voller Kontext und Freigaben halten den Lauf nicht mehr an
 
-Anlass: Simons Wunsch, dass der Projektleiter (und die Agenten) selbst erkennen, wann es besser ist, in einer neuen Sitzung weiterzuarbeiten – statt dass das Kontextfenster vollläuft, die Qualität sinkt und Claude Code am Rand automatisch zusammenfasst und dabei Einzelheiten verliert.
+Anlass: Simons Vorgaben „das Team soll eigenständig alles fertig bringen“ und „nicht noch 20 Verbesserungsrunden“. Ausgewertet: die Lektionsvorschläge aus `ichkannalles` (Meilensteine M3–M6), die Freigabe-Zeilen, die Simon von Hand eintragen musste (vier in drei Tagen, zuletzt `m6-referenz-format`, das wegen „ordner/“ statt „ordner/**“ zusätzlich nicht griff), und die Doku von Claude Code zu Zusammenfassung, Hooks und Agenten.
 
-- **Kontext-Wächter** (`scripts/kontext.sh`, reines Bash, rund 20 ms): liest die letzte Token-Abrechnung aus dem Sitzungsprotokoll (input + cache_creation + cache_read = was das Modell tatsächlich sieht). Läuft als Hook bei Nachrichten von Simon (UserPromptSubmit) und nach Werkzeugaufrufen (PostToolUse: nach jedem Agenten-Aufruf, sonst etwa jeder vierte Aufruf). Ab 80 % der Grenze ein Hinweis (STATUS aktuell halten, nichts mehr komplett lesen), ab der Grenze die Aufforderung zum Wechsel – je Stufe einmal, nach `/compact` zurückgesetzt. Grenze Standard 150.000 Tokens, einstellbar mit `kontext_grenze` in `.claude/dev-team.json` oder `DEV_TEAM_KONTEXT_GRENZE`. Sperrt nie.
-- **Projektleiter:** keine neuen Agenten mehr, laufende fertig werden lassen, `docs/SITZUNGSUEBERGABE.md` nach neuer Vorlage `vorlagen/sitzungsuebergabe.md` (Stand, nächster Schritt, Pakete, nur mündlich Entschiedenes, Fallstricke), committen, in der Cloud pushen, Durchlauf aus, eine Zeile an Simon: neue Sitzung starten, „weiter“ schreiben. Der **Durchlauf-Wächter** schickt bei vollem Kontext in den Sitzungswechsel statt zurück an die Arbeit.
-- **Neue Sitzung:** Der Sitzungsstart zeigt die Übergabe, der Projektleiter prüft den Stand mit git, schaltet den Durchlauf wieder ein (Simons Freigabe gilt weiter), macht am nächsten Schritt weiter und löscht die Datei.
-- **Agenten:** Bei vollem eigenen Kontext sauber abschließen – Zwischenstand committen, BLOCKIERT mit Grund „Kontext voll“, was fertig ist, was fehlt. Der Projektleiter gibt den Rest an einen frischen Agenten (zählt nicht als Fix-Runde; zweimal im selben Paket → Architekt teilt).
-- Grundgesetz: neuer Abschnitt „Sitzungswechsel bei vollem Kontext“; „Tokens sparen“ verweist darauf statt auf `/compact`. Skill `auftrag` und Steckbrief `entwickler` ergänzt.
-- Projekteinstellungen (`vorlagen/projekt-settings.json`, `dev-team-start.sh kontext`) bekommen die beiden neuen Hooks; der Sitzungsstart meldet Projekte ohne Kontext-Wächter als veraltet.
-- Tests: `TestKontext` in `tests/test_durchlauf.py` (Stufen, Grenze aus dem Projekt, Agenten-Schritte zählen nicht, einmal je Stufe, eigenes Agenten-Protokoll, Durchlauf → Sitzungswechsel, Sitzungsstart zeigt Übergabe); Plugin- und Projekt-Hooks decken dieselben Ereignisse ab.
+**Voller Kontext – automatisch weiter**
+- `autoCompactWindow: 400000` in den Projekteinstellungen: Claude Code fasst bei 400.000 statt rund 967.000 Tokens zusammen (1-Mio-Modelle). Jeder Schritt liest den ganzen Kontext neu, sehr lange Kontexte machen ungenauer; der Stand liegt ohnehin in Dateien. Eigener Wert eines Projekts bleibt.
+- **Kontext-Wächter** (`scripts/kontext.sh`, reines Bash, rund 20 ms) misst die echte Kontextgröße (letzte Token-Abrechnung im Sitzungsprotokoll). Projektleiter: ab 70 % „STATUS aktuell halten“, ab 85 % „jetzt `docs/SITZUNGSUEBERGABE.md` schreiben (neue Vorlage), committen, weiterarbeiten“. Kein Stopp, keine Frage an Simon.
+- Nach dem Zusammenfassen (SessionStart, Quelle `compact`) lädt der Sitzungsstart Grundgesetz und Übergabe wieder; der Durchlauf bleibt an. In einer neuen Sitzung genauso.
+- Agenten: eigene Grenze 200.000 (`kontext_grenze_agent`). Wer sie erreicht, schließt sauber ab (BLOCKIERT „Kontext voll“), ein frischer Agent macht weiter – zählt nicht als Fix-Runde.
+
+**Keine Handstopps mehr für Routine-Freigaben**
+- **Prüfsummen der Abnahmetests werden nur ergänzt:** neue Abnahmetests eines Meilensteins kommen ohne Freigabe dazu. Vorher ersetzte `abnahme_pruefsummen.py --schreiben` die Liste und verlangte deshalb bei jedem Meilenstein eine Freigabe (und jede Schranke danach `--freigabe cockpit-welle3`). Ein versionierter Eintrag ändert sich weiter nie ohne Simon; eine freigegebene Änderung wird in der Liste vermerkt und danach ohne erneute Freigabe anerkannt. Einträge schon aufgedeckter Tests, die alte Versionen entfernt hatten, sind kein Fehler (am Stand von `ichkannalles` nachgeprüft: grün ohne Freigabe).
+- **Neue Referenzdateien legt der Tester an** (eingefrorene Altdaten, unabhängig hergeleitete Werte, `LIESMICH.md` mit Herkunft). Nur bestehende Referenzwerte ändern/löschen braucht Simon.
+- **Einstellungen verschärfen ohne Freigabe:** Prüfbefehle in `zusatzbefehle`/`meilensteinbefehle` ergänzen (z. B. den Pflicht-Mutationstest der Fachsoftware) und Kontextgrenzen setzen. Testbefehl, Zählmuster, Setup, `plugin_stand` und Entfernen bleiben freigabepflichtig.
+- Freigaben: ein Ordner in der Geltung (`tests/referenz/x/` oder `tests/referenz/x`) deckt alle Dateien darin; mehrere Stichwörter mit `--freigabe a,b` oder mehrfach `--freigabe`.
+- Grundgesetz: **Simon nur fragen, was nur Simon kann** (Produkt-/Fachentscheidungen, Konten/Geräte/Zahlungen, geänderte bestehende Referenzwerte oder Abnahmetests, Unumkehrbares). Alles andere entscheidet der Projektleiter nach Empfehlung des zuständigen Agenten und informiert.
+
+**Reibung aus dem Pilot beseitigt**
+- **Tester- und Architekt-Vorarbeit** auf dem Paketzweig (Commit-Betreff `Tester-Vorarbeit P3: …` / `Architekt-Vorarbeit P3: …`): Die Schranke rechnet sie nicht dem Entwickler zu, solange er die Dateien danach nicht ändert; Vorarbeit mit Programmcode ist rot. Vorher: rote Vorarbeit auf dem Arbeitsbranch blockierte parallele Pakete, und Vorarbeit im Entwickler-Worktree galt als Entwickler-Verstoß (M6-1/M6-2/M6-3/M6-4). Entwickler: Tests der Vorarbeit dürfen am Startpunkt rot sein. Architekt: Bauplan hat einen eigenen Punkt „Vorarbeit“. Tester: Modus `vorarbeit`.
+- Entwickler dürfen Anleitungen und Hilfetexte unter `docs/` schreiben, die der Bauplan nennt (neuer Bereich `doku`); die Prozessdateien des Projektleiters bleiben gesperrt.
+- **Wächter:** `npm ci`/`npm install` (auch pnpm/yarn) in einem Worktree mit verknüpftem `node_modules` ist für alle Rollen gesperrt – leerte im Pilot den Hauptordner. Reines Bash, kein Programmstart.
+- **Prüfberichte:** Berichte, die ein Agent über SubagentHandback abgibt, landen vollständig in `docs/pruefberichte/` (vorher nur „Bericht übergeben.“).
+- Projektleiter committet eigene Dateien nur mit ausdrücklichen Pfaden.
+
+**Geprüft und bewusst nicht gemacht**
+- Skills fest in Agenten laden (`skills:` im Steckbrief): Die Dev-Team-Skills sind Abläufe für den Projektleiter; ihr voller Text käme bei jedem Agentenstart mit (Tokens) und würde Agenten Projektleiter-Schritte vorgeben. Die einzige Checkliste für einen Agenten (`sicherheit`) bekommt der Sicherheitsprüfer schon als Datei.
+- `effort`/`color`/`memory` je Agent: kein messbarer Nutzen gegenüber den Modellregeln, `memory` würde projektübergreifend Wissen am Gehirn vorbei sammeln.
+
+**Einmal je Projekt:** `/dev-team:projekt-aufnehmen` (bringt `autoCompactWindow` und die Hooks des Kontext-Wächters; der Sitzungsstart erinnert).
+
+Tests: Kontext-Wächter (Stufen, Grenzen aus Einstellungen/Projekt, Agenten-Protokoll, Zurücksetzen, Sitzungsstart nach `compact`), Prüfsummen nur ergänzen inkl. Vermerk, Ordner-Freigabe und mehrere Stichwörter, neue Referenzdateien durch den Tester, Vorarbeit (erkannt / danach geändert / mit Programmcode), Anleitungen unter `docs/`, Einstellungen verschärfen, Handback-Bericht, `npm ci` im verknüpften Worktree.
 
 ## 3.12.0 – Schneller ohne Qualitätsverlust: Durchlauf, eine Prüfrunde, Selbstprüfung, ehrliche Gegenproben
 

@@ -12,6 +12,18 @@
 
 IFS= read -r -d '' eingabe || true
 
+# Für alle Rollen (ein Schadensfall, kein Teamzwang): npm ci/install in einem Worktree, dessen node_modules mit dem
+# Hauptordner verknüpft ist, leert den Hauptordner (Pilot M6-4). Nur Bash-Bordmittel, kein Programmstart.
+paketbefehl='"command"[[:space:]]*:[[:space:]]*"[^"]*(npm[[:space:]]+(ci|install|i|uninstall|update|prune)|pnpm[[:space:]]+(install|i|add|remove)|yarn[[:space:]]+(install|add|remove)|yarn)([[:space:];&|"]|$)'
+if [[ "$eingabe" == *'"tool_name"'*'"Bash"'* && "$eingabe" =~ $paketbefehl ]]; then
+  ort=""
+  [[ "$eingabe" =~ \"cwd\"[[:space:]]*:[[:space:]]*\"([^\"]*)\" ]] && ort="${BASH_REMATCH[1]//\\\\//}"
+  if [ -n "$ort" ] && [ -L "$ort/node_modules" ]; then
+    echo "⛔ Dev-Team-Wächter: node_modules ist hier mit dem Hauptordner verknüpft – npm ci/install würde den Hauptordner leeren. Erst trennen: python3 \"<Plugin-Ordner>/scripts/worktree_vorbereiten.py\" --trennen" >&2
+    exit 2
+  fi
+fi
+
 # Wer ruft? Projektleiter und alle anderen Rollen: sofort durchlassen.
 rolle=""
 if [[ "$eingabe" =~ \"agent_type\"[[:space:]]*:[[:space:]]*\"([^\"]*)\" ]]; then
