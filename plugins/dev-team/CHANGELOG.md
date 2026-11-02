@@ -1,5 +1,24 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.14.0 – Sicherheit: einfache Lücken kommen nicht mehr durch
+
+Anlass: Simons Vorgabe „man darf sich nicht durch einfache Lücken hacken lassen – gerade bei Kundenprojekten“ und seine Liste der zwölf häufigsten Schwachstellen bei KI-Entwicklung. Bisher hing Sicherheit vollständig am Urteil des Sicherheitsprüfers und des Reviewers; es gab keine technische Sperre im Projektcode, keine Regel für den Browser-Code und keine echten Angriffsversuche.
+
+- **Sicherheits-Schranke** (`scripts/pruefe_sicherheit.py`, ohne Zusatzpakete und ohne Netz), läuft in der Test-Schranke bei jedem Paket und Merge für jede Rolle:
+  - Schlüssel bekannter Anbieter (AWS, GitHub, Stripe, Google, OpenAI, Anthropic, Slack, SendGrid, Azure) und private Schlüssel – ohne Ausnahme, mit Hinweis „beim Anbieter sperren und neu erzeugen“; feste Passwörter/Schlüssel im Code; Zugangsdaten in Adressen; versionierte `.env`-, Schlüssel- und Zertifikatsdateien. Gefundene Werte werden nie ausgegeben.
+  - **Browser-Code:** Variablen mit `VITE_`, `NEXT_PUBLIC_`, `REACT_APP_`, `PUBLIC_` usw., deren Name nach Geheimnis klingt (öffentliche wie `…PUBLISHABLE_KEY`/`…ANON_KEY` ausgenommen).
+  - **Gefährliche Muster:** zusammengesetztes SQL, Shell mit eingesetzten Werten, Pfad/Adresse/Weiterleitung aus der Anfrage (Path Traversal, SSRF, Open Redirect), Anfrage-Daten ungefiltert ins Datenmodell, `innerHTML`/`eval`, verschluckte Fehler, interne Fehlerdetails an Nutzer, schwache Verfahren für Passwörter/Zufallswerte, JWT ohne Signatur, abgeschaltete Zertifikatsprüfung, CORS „*“, unsichere Deserialisierung, Debug an, Anmeldedaten im Browser-Speicher. Bewusste Ausnahme nur mit `dev-team: sicher – <Grund>` in der Zeile (Warnung, wird einzeln bewertet).
+  - Am Meilenstein: ausgelieferter Build (Schlüssel und Werte aus der lokalen `.env` im Browser-Code, Quellkarten) und der Scanner für Lücken in Abhängigkeiten (`sicherheitsbefehl`, ohne Netz „nicht geprüft“ statt rot). Vor der Übergabe die ganze Git-Historie.
+  - Unterlagen und Entwürfe (`docs/`, `design/`) nur auf Geheimnisse geprüft. Am Stand von `ichkannalles` nachgeprüft: drei Stellen zum Bewerten, keine Geheimnisse.
+- **Sicherheitsprüfer:** neuer Modus `angriff` – einfache Angriffe gegen die lokal laufende Anwendung wirklich ausprobieren (fremde ID, ohne Anmeldung, Injection, XSS, Pfade/interne Adressen, Massenanmeldung, große Eingaben, Fehlerseiten, Header, Cookies, Browser-Code), mit Beleg. Pflichtfragen 9–12 (Werkzeuge selbst ausgeführt, Browser-Code, Gleichzeitigkeit/Fehler/Backup, Angriffsversuche). Läuft am Meilenstein und vor jeder Übergabe.
+- **Tester:** Pflicht-Fälle Sicherheit und Fehler (fremde Daten, ohne Anmeldung, bösartige Eingaben, gleichzeitige Änderung, Fehlschlag, doppelt absenden) und eine Fall-Matrix je Anforderung.
+- **Architekt:** Sicherheits-Grundgerüst bei jedem Risiko-Auslöser (Geheimnisse nur auf dem Server, Berechtigung an einer Stelle mit Architekturtest, Eingaben an der Grenze, Fehler-Konvention, Gleichzeitigkeit, bewährte Anmeldung, Sicherheits-Header, Sicherheits-Linter und Scanner, Backup, signierte Updates).
+- **Reviewer:** Pflichtfrage 8 prüft Sicherheits-Schranke, jede `dev-team: sicher`-Stelle und für jede neue Operation Berechtigung plus Test mit fremder ID.
+- **Übergabe:** Sicherheits-Tor (Schranke mit Historie und Build, Scanner, Angriffsversuche ohne „kritisch“/„hoch“); Betriebs-Checkliste mit getesteter Wiederherstellung für jede Anwendung mit Daten.
+- **Grundgesetz:** Übersicht „Die häufigsten Schwachstellen und wer sie abfängt“ – alle zwölf Punkte aus Simons Liste plus weitere, je mit technischer Prüfung und Besitzer. Befunde „kritisch“/„hoch“ werden nie zurückgestellt. Neue Risiko-Auslöser: mehrere Nutzer an denselben Daten, Daten von außen (Upload/Import), Zahlungen, externe Dienste. Checkliste `sicherheit` mit Mindeststandard für Kundenprojekte.
+- Tests: `tests/test_sicherheit.py` (Anbieter-Schlüssel ohne Ausnahme, Platzhalter, Browser-Variablen, Muster JS und Python, Ausnahme mit Begründung, Tests und Unterlagen, versionierte `.env`, Build mit Server-Geheimnis, Historie, Schranke sperrt jede Rolle).
+
+
 ## 3.13.0 – Vollautomatisch: voller Kontext und Freigaben halten den Lauf nicht mehr an
 
 Anlass: Simons Vorgaben „das Team soll eigenständig alles fertig bringen“ und „nicht noch 20 Verbesserungsrunden“. Ausgewertet: die Lektionsvorschläge aus `ichkannalles` (Meilensteine M3–M6), die Freigabe-Zeilen, die Simon von Hand eintragen musste (vier in drei Tagen, zuletzt `m6-referenz-format`, das wegen „ordner/“ statt „ordner/**“ zusätzlich nicht griff), und die Doku von Claude Code zu Zusammenfassung, Hooks und Agenten.

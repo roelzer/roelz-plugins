@@ -614,6 +614,39 @@ def pruefe_freigabe(e, hauptordner, stichwort):
     return Freigabe()
 
 
+def sicherheit_pruefen(e, wurzel, basis, rolle, konfig, fg):
+    """Sicherheits-Schranke (pruefe_sicherheit.py): Geheimnisse, Browser-Variablen, gefährliche Muster in den
+    neuen Zeilen – für jede Rolle. Am Meilenstein (projektleiter) zusätzlich der ausgelieferte Build und der
+    Scanner für bekannte Lücken in Abhängigkeiten (sicherheitsbefehl). Eine Freigabe mit Geltung „sicherheit“
+    macht Fehler zu Warnungen."""
+    spec = importlib.util.spec_from_file_location("pruefe_sicherheit", os.path.join(HIER, "pruefe_sicherheit.py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    funde = mod.pruefe_basis(wurzel, basis)
+    if rolle == "projektleiter":
+        funde += [f for f in mod.pruefe_build(wurzel) if not f[1].startswith("Kein Build-Ordner")]
+    for stufe, text in funde:
+        if stufe == "f" and not fg.deckt("sicherheit"):
+            e.f("Sicherheit: " + text)
+        else:
+            e.w("Sicherheit: " + text + (fg.text("sicherheit") if stufe == "f" else ""))
+    if not any(s == "f" for s, _ in funde):
+        e.o("Sicherheits-Schranke ohne Fehler (Geheimnisse, Browser-Variablen, gefährliche Muster).")
+    befehl = ((konfig or {}).get("sicherheitsbefehl") or "").strip()
+    if rolle == "projektleiter" and befehl:
+        r = sh(befehl, wurzel)
+        aus = ((r.stdout or "") + (r.stderr or "")).strip()
+        if r.returncode == 0:
+            e.o("Scanner für Abhängigkeiten grün (%s)." % befehl)
+        elif re.search(r"ENOTFOUND|EAI_AGAIN|ECONNREFUSED|ETIMEDOUT|network|getaddrinfo|Could not resolve|"
+                       r"unable to get local issuer|proxy", aus, re.IGNORECASE):
+            e.w("Scanner für Abhängigkeiten konnte nicht laufen (kein Netz?) – NICHT GEPRÜFT, vor der Übergabe "
+                "nachholen: %s" % befehl)
+        else:
+            (e.w if fg.deckt("sicherheit") else e.f)(
+                "Scanner für Abhängigkeiten meldet Lücken (%s):\n%s" % (befehl, "\n".join(aus.splitlines()[-12:])))
+
+
 def letzter_lauf_pfad(hauptordner):
     return os.path.join(hauptordner, ".dev-team", "letzter-gruener-lauf.json")
 
@@ -734,6 +767,7 @@ def main():
             e.f("Abhängigkeits-Schranke (automatisch, weil Manifest/Lockfile geändert):\n%s" % letzte)
         else:
             e.o("Abhängigkeits-Schranke grün (automatisch).")
+    sicherheit_pruefen(e, wurzel, basis, arg.rolle, konfig, fg)
     if basis == git(wurzel, "rev-parse", "HEAD").strip() and arg.rolle in ("projektleiter", "merge", "reviewer"):
         e.w("Basis = aktueller Stand: Es werden keine Änderungen geprüft, nur der Testlauf.")
     if (konfig or {}).get("profil") == "fachsoftware" and arg.rolle == "projektleiter" and not any(

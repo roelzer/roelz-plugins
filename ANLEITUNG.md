@@ -1,6 +1,6 @@
 # Dev-Team – Anleitung
 
-Stand: November 2026 · Version 3.13
+Stand: November 2026 · Version 3.14
 
 Dieses Repo enthält zwei Plugins für Claude Code: **`dev-team`** und **`tool-scout`**. Beide enthalten kein Firmen- oder Kundenwissen und dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
 
@@ -213,6 +213,8 @@ Danach VS Code neu starten.
 **Nach dem Update auf 3.11 einmal je Projekt:** `/dev-team:projekt-aufnehmen` ausführen. Es bringt die Projekteinstellungen auf den neuen Stand (minimaler Wächter, alte Sperren wie die gegen eingebaute Helfer oder `git push origin main*` – die auch Branches wie `main-1tg5m0` traf – werden entfernt) und zeigt dir die Änderung vorher. Auf jedem Rechner zusätzlich einmal `/dev-team:einrichten` (privat bzw. arbeit), damit Worktrees überall vom aktuellen Stand starten.
 
 **Nach dem Update auf 3.12 einmal je Projekt** (auch für Cloud-Projekte): `/dev-team:projekt-aufnehmen`. Das bringt den Durchlauf-Wächter und die Laufzeitmessung in die Projekteinstellungen und entfernt den alten Wächter, der vor jedem Schritt bis zu 60 s prüfen durfte. Der Sitzungsstart erinnert daran.
+
+**Seit 3.14 – Sicherheit:** Bei jedem Paket prüft die Schranke automatisch auf Schlüssel und Passwörter im Code, auf Geheimnisse im Browser-Code und auf typische Lücken (SQL- und Shell-Injection, fremde Pfade und Adressen, verschluckte Fehler …). Rot heißt: kein Merge. Vor jeder Übergabe probiert der Sicherheitsprüfer einfache Angriffe gegen die laufende Anwendung aus. Für Kundenprojekte mit sensiblen Daten ersetzt das keinen externen Penetrationstest – der Projektleiter sagt dir, wann einer sinnvoll ist.
 
 **Nach dem Update auf 3.13 einmal je Projekt:** `/dev-team:projekt-aufnehmen`. Das bringt das vorgezogene Zusammenfassen und den Kontext-Wächter in die Projekteinstellungen (auch für Cloud-Sitzungen). Der Sitzungsstart erinnert daran.
 

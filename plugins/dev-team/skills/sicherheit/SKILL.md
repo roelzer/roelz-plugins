@@ -13,6 +13,18 @@ Wende die Punkte risikobasiert an. Markiere nicht relevante Punkte ausdrücklich
 - [ ] Datenminimierung, Aufbewahrung, Löschung und Zugriff nachvollziehbar geregelt.
 - [ ] Echte Daten werden nur in freigegebenen Umgebungen und mit passenden Schutzmaßnahmen verwendet.
 
+## 0. Mindeststandard für Kundenprojekte (nie unterschreiten)
+- [ ] Sicherheits-Schranke ohne Fehler: `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/pruefe_sicherheit.py" --alles --historie` und nach dem Build `--build`.
+- [ ] Jede Operation auf Daten prüft serverseitig, ob genau dieser Nutzer genau diesen Datensatz darf – an einer zentralen Stelle, mit Test „fremde ID“.
+- [ ] Kein Geheimnis im Browser-Code: keine Schlüssel in Browser-Variablen (`VITE_`, `NEXT_PUBLIC_`, `REACT_APP_` …), Aufrufe zu Diensten mit Schlüssel laufen über den eigenen Server.
+- [ ] Anmeldung über bewährte Bibliothek/Dienst; Passwörter mit bcrypt/scrypt/Argon2; Anmeldeversuche begrenzt; Sitzungs-Cookies `HttpOnly`, `Secure`, `SameSite`; Zurücksetzen-Links einmalig und befristet.
+- [ ] Sicherheits-Header: Content-Security-Policy, HSTS, `X-Content-Type-Options: nosniff`, `frame-ancestors`/`X-Frame-Options`, `Referrer-Policy`.
+- [ ] Eingaben an der Grenze geprüft (Schema, erlaubte Felder, Größen), Uploads nach Typ/Größe geprüft und nicht ausführbar abgelegt.
+- [ ] Fehlerseiten ohne Stacktrace, Pfade oder Versionen; Protokolle ohne Passwörter, Tokens und unnötige Personendaten.
+- [ ] Abhängigkeiten ohne bekannte hohe Lücken (`sicherheitsbefehl`), Lockfile eingecheckt.
+- [ ] Sicherung automatisch, Wiederherstellung einmal ausprobiert.
+- [ ] Angriffsversuche des Sicherheitsprüfers (Modus `angriff`) ohne Befund „kritisch“/„hoch“.
+
 ## 2. Geheimnisse und Konfiguration
 - [ ] Keine Passwörter, Tokens, privaten Schlüssel oder produktiven Verbindungsstrings im Quellcode, in Logs, Screenshots oder Builds.
 - [ ] `.env`/lokale Geheimnisse ignoriert; Beispielkonfiguration enthält nur Platzhalter.

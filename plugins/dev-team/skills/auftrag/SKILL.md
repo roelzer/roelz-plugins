@@ -132,7 +132,7 @@ Und weiter.
 ## Phase 8 – Prüfen (je Meilenstein)
 1. → `tester` Modus `pruefen` (deckt die verdeckten Tests auf, voller Testlauf, Lücken nach Wichtigkeit). Danach `git status`: nur Testdateien neu oder geändert.
 2. Parallel (höchstens 3): `fachpruefer` Modus `ergebnis` (bei fachlichen Folgen), `reviewer` Modus `gesamt` (`<Meilenstein-Basis>..HEAD`, mit der Liste zurückgestellter Befunde; prüft auch die Architekturtests und `docs/ARCHITEKTUR.md`). `architekt` Modus `struktur` nur bei Stufe Groß oder wenn der Meilenstein die Struktur geändert hat (neue Bausteine, geänderte Schnittstellen, `docs/ARCHITEKTUR.md` im Diff) oder ein Paketreview Strukturbefunde hatte; sonst entfällt er und du schreibst in den Bericht, warum.
-3. `sicherheitspruefer` bei Stufe Normal und Groß immer, bei Klein mit Risiko-Auslöser, und vor jedem größeren Release.
+3. `sicherheitspruefer` bei Stufe Normal und Groß immer, bei Klein mit Risiko-Auslöser, und vor jedem größeren Release: Modus `code`, und sobald die Anwendung lokal läuft zusätzlich Modus `angriff` (Anwendung im Hintergrund starten, Adresse und zwei Testnutzer mitgeben). Befunde „kritisch“ und „hoch“ werden **nie** zurückgestellt: sie gehen sofort in eine Fix-Schleife, der Meilenstein ist erst danach fertig.
 3b. Bei Oberfläche: `designer` Modus `treue` – vergleicht per Screenshot, ob gebaut wurde, was entworfen war.
 3c. Stufe Groß mit Nutzern: `gastgeber` Modus `nachschliff` (mit den Berichten von Produktprüfer und Designer, nach dem Produktprüfer) – Vorschläge für den nächsten Auftrag, blockiert nichts.
 4. `produktpruefer` zuletzt: jede Anforderung einzeln, Anwendung starten, Screenshots Desktop + Handy bei Web-Oberflächen, Bedienbarkeit nach sieben Punkten.

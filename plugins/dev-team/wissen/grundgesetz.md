@@ -60,7 +60,7 @@ Das ist die **einzige verbindliche Definition**. Sag Simon vor dem Start, welche
 | **Normal** | Feature über mehrere Dateien, begrenzter Umbau | voller Ablauf (`/dev-team:auftrag`) inklusive Abwägungsrunde |
 | **Groß** | Berechnung, Datenmodell, neues Modul, fachliche Folgen, Mehrbenutzer, Schnittstellen | voller Ablauf mit allen Instanzen, Abwägungsrunde immer, Meilensteine |
 
-**Risiko-Auslöser** stufen automatisch auf mindestens **Normal**, bei mehreren oder bei Daten/Updates auf **Groß**: Anmeldung/Rechte, personenbezogene oder vertrauliche Daten, Datenbank oder Datenmigration, Serverbetrieb, Netzwerk/Schnittstellen, Updates/Signierung/Release, Geheimnisse/Schlüssel, Löschen oder Überschreiben von Daten, Desktop-Berechtigungen, neue fremde Abhängigkeiten. Bei Auslösern prüft zusätzlich der `sicherheitspruefer`.
+**Risiko-Auslöser** stufen automatisch auf mindestens **Normal**, bei mehreren oder bei Daten/Updates auf **Groß**: Anmeldung/Rechte, personenbezogene oder vertrauliche Daten, Datenbank oder Datenmigration, Serverbetrieb, Netzwerk/Schnittstellen, Updates/Signierung/Release, Geheimnisse/Schlüssel, Löschen oder Überschreiben von Daten, Desktop-Berechtigungen, neue fremde Abhängigkeiten, mehrere Nutzer bearbeiten dieselben Daten, Dateien oder Daten von außen (Upload, Import), Zahlungen, Anbindung an KI- oder andere externe Dienste. Bei Auslösern prüft zusätzlich der `sicherheitspruefer`.
 
 ## Profile
 Steht in `.claude/dev-team.json` (`"profil"`):
@@ -93,26 +93,38 @@ Damit nichts doppelt oder dreifach geprüft wird, fragt je Thema genau eine Roll
 **Wer miteinander reden darf:** Entwickler und Tester nie; prüfende Rollen (Kritiker, Reviewer, Sicherheitsprüfer, Produktprüfer) nie untereinander. Rückfragen des Entwicklers an den Architekten und Absprachen der Planungsgruppe (Architekt, Designer, Fachprüfer, Rechercheur) beantwortet der Projektleiter **sofort im selben Schritt** (siehe Skill auftrag), ohne den Ablauf neu zu starten. Die Abwägungsrunde hat eine Aussprache (Skill auftrag, Phase 4).
 
 ## Alle Tests grün – mechanisch belegt
-- „Grün“ heißt: Die **Test-Schranke** (`scripts/pruefe-tests.sh`) meldet „OK – alles grün“. Sie führt den Testbefehl und die Zusatzbefehle aus `.claude/dev-team.json` aus und prüft außerdem: keine übersprungenen oder exklusiven Tests, keine geänderten Referenzfälle, keine gelöschten Tests, nicht weniger Tests als beim letzten grünen Lauf, keine 0-Tests-Läufe, Entwickler hat keine bestehenden Tests oder Testkonfiguration angefasst. Nach jedem Merge prüft der Projektleiter das mit `--rolle merge --basis HEAD^1`. Tests, die das Testwerkzeug selbst verändern (assert-Methoden überschreiben, `except AssertionError`, `sys.exit` im Test), und geänderte Testeinstellungen in `pyproject.toml`/`package.json` sind ebenfalls rot. Bei geänderten Manifesten oder Lockfiles läuft die Abhängigkeits-Schranke automatisch mit.
+- „Grün“ heißt: Die **Test-Schranke** (`scripts/pruefe-tests.sh`) meldet „OK – alles grün“. Sie führt den Testbefehl und die Zusatzbefehle aus `.claude/dev-team.json` aus und prüft außerdem: keine übersprungenen oder exklusiven Tests, keine geänderten Referenzfälle, keine gelöschten Tests, nicht weniger Tests als beim letzten grünen Lauf, keine 0-Tests-Läufe, Entwickler hat keine bestehenden Tests oder Testkonfiguration angefasst. Nach jedem Merge prüft der Projektleiter das mit `--rolle merge --basis HEAD^1`. Tests, die das Testwerkzeug selbst verändern (assert-Methoden überschreiben, `except AssertionError`, `sys.exit` im Test), und geänderte Testeinstellungen in `pyproject.toml`/`package.json` sind ebenfalls rot. Bei geänderten Manifesten oder Lockfiles läuft die Abhängigkeits-Schranke automatisch mit. Die **Sicherheits-Schranke** (`scripts/pruefe_sicherheit.py`) läuft immer mit: Geheimnisse, Browser-Variablen, gefährliche Muster in neuen Zeilen; am Meilenstein zusätzlich der ausgelieferte Build und der Scanner für Lücken in Abhängigkeiten (`sicherheitsbefehl`).
 - Übersprungene oder offene Tests im Testlauf, neue Tests ohne eine einzige Prüfung und Änderungen an `.claude/dev-team.json` sind ebenfalls rot. Geänderte Abnahmetests (gegen `docs/ABNAHME_PRUEFSUMMEN.txt`) sind rot. Die Prüfsummen-Liste wird nur ergänzt: neue Abnahmetests eines Meilensteins kommen ohne Freigabe dazu, ein versionierter Eintrag ändert sich nie und verschwindet nie (außer mit Simons Freigabe für die Liste und genau diesen Test; sie wird in der Liste vermerkt und bei jeder Schranke im Testnachweis genannt). Am Meilenstein-Ende (`--rolle projektleiter`) zusätzlich: jede Anforderung (A-Nummer) und bei Fachsoftware jede bestätigte Fachregel (F-Nummer, auch R-Nummer wird erkannt) hat einen Test, und die `meilensteinbefehle` (Mutationstest) sind grün.
 - Ausnahmen (`--freigabe <Stichwort>`) gelten nur, wenn Simon die Freigabe **von Hand** in `.claude/freigaben.md` eingetragen hat (`Datum | Stichwort | Geltung | Grund`). Das Stichwort muss genau passen, und die Freigabe gilt nur für die Pfade oder Prüfungen in „Geltung“ (z. B. `tests/referenz/fall3.json`, ein Ordner wie `tests/referenz/format-v1/` mit allem darin, oder `testzahl`). Mehrere Freigaben: `--freigabe a,b`. Claude kann diese Datei über die Datei-Werkzeuge nicht schreiben; über die Shell ist es gesperrt, aber nicht unmöglich – deshalb steht jede verwendete Freigabe im Testnachweis und im Bericht, und Simon prüft sie.
 - Kein Merge, kein Meilenstein-Abschluss, kein Bericht „fertig“ ohne grüne Schranke. Ergebnisse stehen automatisch in `docs/TESTNACHWEIS.md`.
 - Erwartete Testwerte (besonders Referenzfälle) werden **nie** angepasst, damit ein Test grün wird. Ändert sich ein Referenzergebnis: Stopp, Simon entscheidet (`--freigabe`).
 - Grüne Tests beweisen weder Sicherheit noch fachliche Richtigkeit noch gutes Aussehen. Dafür gibt es die anderen Prüfer.
 
-## KI-Schwachstellen und wer sie abfängt
-| Schwachstelle | Gegenmaßnahme |
-|---|---|
-| Tests werden ausgetrickst (Sonderfälle für Testwerte, Funktionen nur einzeln geprüft, Tests abgeschaltet oder leer) | verdeckte Abnahmetests mit Zusammenspiel-Tests und anderen Werten; Entwickler darf bestehende Tests nicht ändern (Wächter + Schranke, nach jedem Merge unabhängig geprüft); Schranke erkennt übersprungene und leere Tests; Reviewer-Pflichtfrage „Testdaten-Sonderfälle“ |
-| erfundene Pakete | Abhängigkeits-Schranke (`scripts/pruefe-abhaengigkeiten.sh`): existiert, alt genug, verbreitet, Lockfile |
-| unsicherer Code | Sicherheitsprüfer mit Scannern; Reviewer-Pflichtfrage Sicherheitsmuster |
-| doppelter Code statt Wiederverwendung | Entwickler sucht vor dem Bauen; Architekt und Reviewer prüfen Duplikate |
-| falsches „fertig“ | fester Status des Entwicklers; ein Hook weist „FERTIG“ ohne grünen Schranken-Nachweis für genau diesen Commit zurück; nur Belege zählen: Schranke, Testnachweis, Agenten-Log |
-| Abdriften bei langen Läufen, Teile passen nicht zusammen | frischer Entwickler pro Paket, Bauplan mit exakten Schnittstellen, Architekturtests, Meilensteine, Stand in Dateien |
-| verschluckte Fehler | Reviewer- und Architekt-Pflichtfrage, Tester prüft Fehlerfälle |
-| Rauschen in Prüfberichten | Sicherheit 0–100 pro Befund, unter 80 nicht in die Befundliste |
-| Optik kaputt trotz grüner Tests | Produktprüfer mit Screenshots Desktop + Handy |
-| gleiche blinde Flecken aller Agenten | Modellmix, Werkzeuge ohne KI (Tests, Linter, Scanner), menschliche Abnahme. **Nicht vollständig lösbar** – ehrlich so berichten |
+## Die häufigsten Schwachstellen und wer sie abfängt
+Jede Zeile hat eine **technische Prüfung** (läuft ohne Urteil eines Agenten) und einen **Besitzer**. Rote Technik heißt: kein Merge.
+
+| Schwachstelle | Technisch (ohne KI) | Besitzer und Pflicht |
+|---|---|---|
+| 1. Fehlende Berechtigungsprüfung (fremde ID → fremde Daten) | Muster „Anfrage-Daten ungefiltert ins Datenmodell“; verdeckte Abnahmetests mit fremder ID und ohne Anmeldung | Architekt: Berechtigung an einer Stelle + Architekturtest. Tester: Fall „fremde Daten“ je Operation. Reviewer: jede neue Operation hat Prüfung und Test. Sicherheitsprüfer: Angriff „fremde ID“ |
+| 2. Geheimnisse im Code oder im ausgelieferten Browser-Code | Sicherheits-Schranke bei jedem Paket (Anbieter-Schlüssel, feste Passwörter, Browser-Variablen wie `VITE_…KEY`, versionierte `.env`); am Meilenstein der Build; vor der Übergabe die ganze Git-Historie | Architekt: Geheimnisse nur auf dem Server. Gefundener Schlüssel: beim Anbieter sperren und neu erzeugen |
+| 3. Injection (SQL, Shell, Pfade, Adressen, HTML) | Muster für zusammengesetztes SQL, Shell mit eingesetzten Werten, Pfad/Adresse/Weiterleitung aus der Anfrage, `innerHTML`/`eval` | Architekt: Eingaben an der Grenze prüfen, nur parametrisiert. Tester und Sicherheitsprüfer: bösartige Eingaben |
+| 4. Unvollständige Tests (nur Normalfall) | verdeckte Abnahmetests; Schranke erkennt leere, übersprungene, immer-wahre Tests; Fehlerprobe; Mutationstest bei Fachsoftware | Tester: Fall-Matrix je Anforderung (leer, Grenze, ungültig, fremde Daten, gleichzeitig, Fehlschlag) |
+| 5. Gleichzeitige Zugriffe überschreiben sich | Test mit zwei gleichzeitigen Schreibern (verdeckter Abnahmetest) | Architekt: Versionsnummer/Transaktion festlegen. Sicherheitsprüfer Pflichtfrage 11 |
+| 6. Fehler werden verschluckt oder verraten Interna | Muster „Fehler verschluckt“ (`catch {}`, `except: pass`, `.catch(() => {})`) und „interne Fehlerdetails an den Nutzer“ | Architekt: Fehler-Konvention. Tester: Fall „Fehlschlag → sichtbare Meldung, kein ‚gespeichert‘“ |
+| 7. Unsichere oder erfundene Bibliotheken | Abhängigkeits-Schranke (existiert, alt genug, verbreitet, Lockfile); Scanner für bekannte Lücken am Meilenstein automatisch | Architekt: Scanner als `sicherheitsbefehl`, Sicherheits-Linter in `zusatzbefehle` |
+| 8. Fehlende oder ungetestete Backups | – (Betrieb) | Architekt: Sicherung und Rückweg. Übergabe: Betriebs-Checkliste mit **einmal ausprobierter** Wiederherstellung, Pflicht bei jeder Anwendung mit Daten |
+| 9. Schlechte Architektur, Sonderlösungen | Architekturtests (verbotene Abhängigkeiten, Kreise) | Architekt (Rückgrat, Struktur-Prüfung), Reviewer (Duplikate), Langfrist-Architekt |
+| 10. Falsche Geschäftslogik | Fachregeln als Prüfung über jedes Ergebnis, Referenzfälle, Mutationstest | Fachprüfer, Fachregeln nur von Simon bestätigt |
+| 11. Unsichere Updates und Installation | – | Architekt: signierte Updates aus kontrollierter Quelle. Sicherheitsprüfer Pflichtfrage 7, Checkliste Abschnitt 6 |
+| 12. KI prüft sich selbst | Wächter, Test- und Sicherheits-Schranke, Prüfsummen, blinder Lauf – alles ohne KI | Entwickler sieht die Abnahmetests nie; jede Prüfung macht eine andere Rolle mit frischem Kontext |
+| Weitere: verschluckte Rechte im Browser (Token im `localStorage`), CORS „*“, abgeschaltete Zertifikatsprüfung, JWT ohne Signatur, schwache Zufallswerte, unsichere Deserialisierung, Debug an | Muster der Sicherheits-Schranke | Sicherheitsprüfer (Checkliste, Angriffsversuche) |
+| Tests werden ausgetrickst, falsches „fertig“, Abdriften bei langen Läufen | Schranke, Fertig-Prüfung, Kontext-Wächter | siehe „Alle Tests grün“ und „Voller Kontext“ |
+
+**Sicherheitsregeln:**
+- Die Sicherheits-Schranke läuft in der Test-Schranke mit, für jede Rolle. Eine Stelle, die bewusst so sein muss, bekommt in derselben Zeile `dev-team: sicher – <Grund>`; das ist eine Warnung, die Reviewer und Sicherheitsprüfer einzeln bewerten. Schlüssel bekannter Anbieter haben keine Ausnahme.
+- Befunde „kritisch“ und „hoch“ werden nie zurückgestellt und nie als Entscheidung des Projektleiters abgehakt.
+- Keine Übergabe ohne Sicherheits-Tor (Skill `uebergabe`). Für Kundenprojekte mit sensiblen Daten empfiehlt der Projektleiter Simon zusätzlich einen externen Penetrationstest – das Team ersetzt ihn nicht.
+- Was Werkzeuge nicht sehen (Logikfehler in Berechtigungen, gleiche blinde Flecken aller Agenten), ist **nicht vollständig lösbar** – ehrlich so berichten.
 
 ## Berichte an Simon
 Jeder Bericht (vom Projektleiter und von jedem Agenten) beginnt mit einer **Ampel**:
