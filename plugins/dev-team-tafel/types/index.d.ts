@@ -9,6 +9,14 @@ export type Lauf = {
 }
 
 export type Tafel = {
+  /** Kasten oben in docs/STATUS.md: [Bezeichnung, Wert] (Jetzt, Zuletzt fertig, Als Nächstes, Geschätzt fertig, Fortschritt) */
+  kasten: [string, string][]
+  /** Grund aus „Angehalten wegen“, wenn die Ampel rot ist – dann braucht der Lauf Simon */
+  angehalten: string
+  /** .dev-team/durchlauf vorhanden: der Auftrag läuft ohne Nachfragen durch */
+  durchlauf: boolean
+  /** offene Fragen an Simon laut docs/OFFENE_FRAGEN.md */
+  fragen: number
   phase: string
   ampel: string
   test: string

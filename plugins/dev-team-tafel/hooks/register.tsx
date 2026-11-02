@@ -5,10 +5,10 @@ import type { Lauf, Tafel } from '../types'
 
 const PANE = 'dev-team-tafel'
 const TITEL = 'Dev-Team'
-const leer: Tafel = { phase: '', ampel: '', test: '', ergebnisse: [], sperren: [] }
+const leer: Tafel = { kasten: [], angehalten: '', durchlauf: false, fragen: 0, phase: '', ampel: '', test: '', ergebnisse: [], sperren: [] }
 
 const laeufe = atom({ plugin: 'dev-team-tafel', key: 'laeufe' } as const, [] as Lauf[], { shape: 'laeufe-1' })
-const tafel = atom({ plugin: 'dev-team-tafel', key: 'tafel' } as const, leer, { shape: 'tafel-1' })
+const tafel = atom({ plugin: 'dev-team-tafel', key: 'tafel' } as const, leer, { shape: 'tafel-2' })
 
 /** "dev-team:entwickler" → "entwickler" */
 export const kurzname = (typ: string): string => typ.replace(/^dev-team:/, '')
@@ -25,8 +25,27 @@ export const dauer = (ms: number): string => {
   return s < 60 ? `${s} s` : s < 3600 ? `${Math.floor(s / 60)} min` : `${Math.floor(s / 3600)} h ${Math.floor((s % 3600) / 60)} min`
 }
 
+/** "> **Jetzt:** P3 baut · **Als Nächstes:** P4" → [["Jetzt", "P3 baut"], ["Als Nächstes", "P4"]] */
+export const kasten = (status: string): [string, string][] => {
+  const zeile = status.split('\n').find(l => /^>\s*\*\*Jetzt:\*\*/.test(l))
+  if (!zeile) return []
+  return zeile
+    .replace(/^>\s*/, '')
+    .split(/\s+·\s+(?=\*\*)/)
+    .map(teil => /^\*\*([^*]+?):\*\*\s*(.*)$/.exec(teil.trim()))
+    .filter((m): m is RegExpExecArray => m !== null && !/^\[.*\]$/.test(m[2].trim()))
+    .map(m => [m[1].trim(), m[2].trim().slice(0, 160)] as [string, string])
+}
+
+/** Offene Fragen: Listenpunkte in docs/OFFENE_FRAGEN.md, die nicht als erledigt markiert sind. */
+export const offeneFragen = (text: string): number =>
+  text
+    .split('\n')
+    .filter(l => /^\s*[-*]\s+\S/.test(l))
+    .filter(l => !/~~|✅|\[x\]|erledigt|beantwortet|entschieden/i.test(l)).length
+
 /** Liest die Tafel-Daten aus den Dateien, die das Dev-Team im Projekt führt. */
-export const auswerten = (status: string, log: string, test: string): Tafel => {
+export const auswerten = (status: string, log: string, test: string, fragen = '', durchlauf = false): Tafel => {
   const z = status.split('\n')
   let phase = ''
   const i = z.findIndex(l => /^##\s+Gerade läuft/.test(l))
@@ -59,7 +78,23 @@ export const auswerten = (status: string, log: string, test: string): Tafel => {
     const c = zelle(t)
     testText = `${c[4] ?? ''} ${c[5] ?? ''} bestanden, ${c[6] ?? '?'} Fehler · ${c[3] ?? ''} · ${c[1]?.slice(11) ?? ''} (${c[2] ?? ''})`
   }
-  return { phase: phase.slice(0, 220), ampel: ampel.slice(0, 120), test: testText, ergebnisse, sperren }
+  let angehalten = ''
+  if (ampel.includes('🔴')) {
+    const k = z.findIndex(l => /^##\s+Angehalten/.test(l))
+    const grund = k >= 0 ? z.slice(k + 1).find(l => l.trim() !== '' && !l.startsWith('#') && !/^\(nur bei/.test(l.trim())) : ''
+    angehalten = (grund ?? '').trim().slice(0, 220) || 'Ampel rot – siehe docs/STATUS.md'
+  }
+  return {
+    kasten: kasten(status),
+    angehalten,
+    durchlauf,
+    fragen: offeneFragen(fragen),
+    phase: phase.slice(0, 220),
+    ampel: ampel.slice(0, 120),
+    test: testText,
+    ergebnisse,
+    sperren,
+  }
 }
 
 const lies = async ($: any, pfad: string): Promise<string> => {
@@ -70,14 +105,33 @@ const lies = async ($: any, pfad: string): Promise<string> => {
   }
 }
 
+const da = async ($: any, pfad: string): Promise<boolean> => {
+  try {
+    return await $.fs.exists(pfad)
+  } catch {
+    return false
+  }
+}
+
 const auffrischen = async ($: any) => {
-  const [s, l, t] = await Promise.all([
+  const [s1, s2, l, t, f, d] = await Promise.all([
     lies($, 'docs/STATUS.md'),
+    lies($, 'docs/status.md'), // unter Linux (Cloud) zählt die Schreibweise
     lies($, 'docs/AGENTEN_LOG.md'),
     lies($, 'docs/TESTNACHWEIS.md'),
+    lies($, 'docs/OFFENE_FRAGEN.md'),
+    da($, '.dev-team/durchlauf'),
   ])
-  const neu = auswerten(s, l, t)
+  const neu = auswerten(s1 || s2, l, t, f, d)
   await update($, tafel, alt => (JSON.stringify(alt) === JSON.stringify(neu) ? alt : neu))
+  // Kurzzeile in der Statusleiste, auch wenn die Tafel zu ist
+  try {
+    const fortschritt = neu.kasten.find(([k]) => k === 'Fortschritt')?.[1] ?? ''
+    const kurz = neu.angehalten !== '' ? '🔴 braucht dich' : `${neu.ampel.slice(0, 2)}${fortschritt !== '' ? ' ' + fortschritt : ''}`
+    $.ui.status(s1 || s2 ? `Dev-Team: ${kurz.trim() || 'läuft'}${neu.fragen > 0 ? ` · ${neu.fragen} Fragen` : ''}` : undefined)
+  } catch {
+    // ohne Statusleiste weiter
+  }
   // Laufende Agenten mit der Liste des Motors abgleichen.
   let liste: { id: string; status: string }[] = []
   try {
@@ -145,6 +199,14 @@ export const register: Register = on => {
     const fertig = alle.filter(x => x.status !== 'laeuft').slice(-5).reverse()
     return (
       <Box flexDirection="column">
+        {t.angehalten !== '' && <Text bold color="error" wrap="wrap">🔴 Braucht dich: {t.angehalten}</Text>}
+        {t.fragen > 0 && <Text color="warning" wrap="wrap">❓ {t.fragen} offene Frage(n) an dich (docs/OFFENE_FRAGEN.md)</Text>}
+        {t.kasten.map(([k, v]) => (
+          <Text wrap="wrap">
+            <Text bold>{k}:</Text> {v}
+          </Text>
+        ))}
+        <Text dimColor>{t.durchlauf ? '▶ Durchlauf aktiv – das Team arbeitet ohne Nachfragen' : '⏸ kein Durchlauf aktiv'}</Text>
         {t.phase !== '' && <Text bold wrap="wrap">{t.phase}</Text>}
         {t.ampel !== '' && <Text wrap="wrap">{t.ampel}</Text>}
         <Text bold>Arbeitet gerade ({aktiv.length})</Text>

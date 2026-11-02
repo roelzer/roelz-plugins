@@ -214,6 +214,8 @@ Danach VS Code neu starten.
 
 **Nach dem Update auf 3.12 einmal je Projekt** (auch für Cloud-Projekte): `/dev-team:projekt-aufnehmen`. Das bringt den Durchlauf-Wächter und die Laufzeitmessung in die Projekteinstellungen und entfernt den alten Wächter, der vor jedem Schritt bis zu 60 s prüfen durfte. Der Sitzungsstart erinnert daran.
 
+**Seit 3.14 – stiller Durchlauf mit Team-Tafel:** Nach deiner Freigabe schreibt der Projektleiter nichts mehr in den Chat, bis ein fester Stopp kommt oder du fragst. Den Stand siehst du auf der Team-Tafel neben dem Chat: oben rot „Braucht dich“, falls der Lauf dich braucht, dann Jetzt / Als Nächstes / Fortschritt, wer gerade arbeitet und die letzten Ergebnisse. Einschalten (einmal je Rechner): `claude plugin install dev-team-tafel@roelz-plugins`, danach Claude Code neu starten; in Projekten schaltet `/dev-team:projekt-aufnehmen` sie ein. Falls sie zu ist: `/tafel`.
+
 **Seit 3.14 – Sicherheit:** Bei jedem Paket prüft die Schranke automatisch auf Schlüssel und Passwörter im Code, auf Geheimnisse im Browser-Code und auf typische Lücken (SQL- und Shell-Injection, fremde Pfade und Adressen, verschluckte Fehler …). Rot heißt: kein Merge. Vor jeder Übergabe probiert der Sicherheitsprüfer einfache Angriffe gegen die laufende Anwendung aus. Für Kundenprojekte mit sensiblen Daten ersetzt das keinen externen Penetrationstest – der Projektleiter sagt dir, wann einer sinnvoll ist.
 
 **Nach dem Update auf 3.13 einmal je Projekt:** `/dev-team:projekt-aufnehmen`. Das bringt das vorgezogene Zusammenfassen und den Kontext-Wächter in die Projekteinstellungen (auch für Cloud-Sitzungen). Der Sitzungsstart erinnert daran.

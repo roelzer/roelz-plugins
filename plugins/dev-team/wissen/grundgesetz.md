@@ -100,33 +100,12 @@ Damit nichts doppelt oder dreifach geprüft wird, fragt je Thema genau eine Roll
 - Erwartete Testwerte (besonders Referenzfälle) werden **nie** angepasst, damit ein Test grün wird. Ändert sich ein Referenzergebnis: Stopp, Simon entscheidet (`--freigabe`).
 - Grüne Tests beweisen weder Sicherheit noch fachliche Richtigkeit noch gutes Aussehen. Dafür gibt es die anderen Prüfer.
 
-## Die häufigsten Schwachstellen und wer sie abfängt
-Jede Zeile hat einen **Besitzer** und, wo es technisch geht, eine **Prüfung ohne KI**. Rot heißt: kein Merge. Die Sicherheits-Schranke meldet nur fast Sicheres als rot; Unscharfes ist eine Warnung, die der Reviewer einzeln bewertet. Ein Muster-Scanner sieht keine Datenflüsse über mehrere Zeilen und keine Logikfehler in Berechtigungen – das decken die verdeckten Tests und die Angriffsversuche ab.
-
-| Schwachstelle | Technisch (ohne KI) | Besitzer und Pflicht |
-|---|---|---|
-| 1. Fehlende Berechtigungsprüfung (fremde ID → fremde Daten) | kein Muster möglich – verdeckte Abnahmetests mit fremder ID und ohne Anmeldung (laufen ohne KI); Warnung bei ungefilterten Anfrage-Daten im Datenmodell | Architekt: Berechtigung an einer Stelle + Architekturtest. Tester: Fall „fremde Daten“ je Operation. Reviewer: jede neue Operation hat Prüfung und Test. Sicherheitsprüfer: Angriff „fremde ID“ |
-| 2. Geheimnisse im Code oder im ausgelieferten Browser-Code | Sicherheits-Schranke bei jedem Paket (Anbieter-Schlüssel, feste Passwörter, Browser-Variablen wie `VITE_…KEY`, versionierte `.env`); am Meilenstein der Build; vor der Übergabe die ganze Git-Historie | Architekt: Geheimnisse nur auf dem Server. Gefundener Schlüssel: beim Anbieter sperren und neu erzeugen |
-| 3. Injection (SQL, Shell, Pfade, Adressen, HTML) | Muster für zusammengesetztes SQL, Shell mit eingesetzten Werten, Pfad/Adresse/Weiterleitung aus der Anfrage, `innerHTML`/`eval` | Architekt: Eingaben an der Grenze prüfen, nur parametrisiert. Tester und Sicherheitsprüfer: bösartige Eingaben |
-| 4. Unvollständige Tests (nur Normalfall) | verdeckte Abnahmetests; Schranke erkennt leere, übersprungene, immer-wahre Tests; Fehlerprobe; Mutationstest bei Fachsoftware | Tester: Fall-Matrix je Anforderung (leer, Grenze, ungültig, fremde Daten, gleichzeitig, Fehlschlag) |
-| 5. Gleichzeitige Zugriffe überschreiben sich | Test mit zwei gleichzeitigen Schreibern (verdeckter Abnahmetest) | Architekt: Versionsnummer/Transaktion festlegen. Sicherheitsprüfer Pflichtfrage 11 |
-| 6. Fehler werden verschluckt oder verraten Interna | Muster „Fehler verschluckt“ (`catch {}`, `except: pass`, `.catch(() => {})`) und „interne Fehlerdetails an den Nutzer“ | Architekt: Fehler-Konvention. Tester: Fall „Fehlschlag → sichtbare Meldung, kein ‚gespeichert‘“ |
-| 7. Unsichere oder erfundene Bibliotheken | Abhängigkeits-Schranke (existiert, alt genug, verbreitet, Lockfile); Scanner für bekannte Lücken am Meilenstein automatisch | Architekt: Scanner als `sicherheitsbefehl`, Sicherheits-Linter in `zusatzbefehle` |
-| 8. Fehlende oder ungetestete Backups | – (Betrieb) | Architekt: Sicherung und Rückweg. Übergabe: Betriebs-Checkliste mit **einmal ausprobierter** Wiederherstellung, Pflicht bei jeder Anwendung mit Daten |
-| 9. Schlechte Architektur, Sonderlösungen | Architekturtests (verbotene Abhängigkeiten, Kreise) | Architekt (Rückgrat, Struktur-Prüfung), Reviewer (Duplikate), Langfrist-Architekt |
-| 10. Falsche Geschäftslogik | Fachregeln als Prüfung über jedes Ergebnis, Referenzfälle, Mutationstest | Fachprüfer, Fachregeln nur von Simon bestätigt |
-| 11. Unsichere Updates und Installation | – | Architekt: signierte Updates aus kontrollierter Quelle. Sicherheitsprüfer Pflichtfrage 7, Checkliste Abschnitt 6 |
-| 12. KI prüft sich selbst | Wächter, Test- und Sicherheits-Schranke, Prüfsummen, blinder Lauf – alles ohne KI | Entwickler sieht die Abnahmetests nie; jede Prüfung macht eine andere Rolle mit frischem Kontext |
-| Weitere: verschluckte Rechte im Browser (Token im `localStorage`), CORS „*“, abgeschaltete Zertifikatsprüfung, JWT ohne Signatur, schwache Zufallswerte, unsichere Deserialisierung, Debug an | Muster der Sicherheits-Schranke | Sicherheitsprüfer (Checkliste, Angriffsversuche) |
-| Tests werden ausgetrickst, falsches „fertig“, Abdriften bei langen Läufen | Schranke, Fertig-Prüfung, Kontext-Wächter | siehe „Alle Tests grün“ und „Voller Kontext“ |
-
-**Sicherheitsregeln:**
-- **Harmlos muss belegt werden (Gegenfrage).** Wer bei einer Sicherheitsfrage „harmlos“, „entfällt“ oder „✅“ schreibt, nennt drei Dinge: den Angriffsweg (was würde jemand Böses tun?), warum er scheitert, und den Beleg (Test, ausgeführter Versuch, Code-Stelle). Fehlt eins, gilt die Stelle als **nicht geprüft**. Wer eine Ausnahme schreibt (`dev-team: sicher`), bewertet sie nie selbst: der Reviewer versucht sie zu widerlegen, der Sicherheitsprüfer sieht am Meilenstein alle. Gerade Code, der harmlos aussieht („nur intern“, „nur Anzeige“, „kommt ja aus unserer Datenbank“), wird gefragt: Woher kommen die Daten wirklich, und wer kann sie beeinflussen?
-- **Intern heißt nicht sicher.** Auch bei Anwendungen nur im Firmennetz: Der häufigste Angreifer ist der neugierige oder verärgerte Kollege (fremde ID → fremde Daten), ein Rechner im Netz kann per Phishing übernommen sein, „intern“ wird später oft über VPN oder Cloud erreichbar, und Datenschutz gilt intern genauso. Unterschied nur im Umfang: Bei **intern** prüft der Sicherheitsprüfer Rechte, Injection, Geheimnisse, Fehler, Gleichzeitigkeit und Backup und probiert die Angriffe 1–3 und 7 aus; Sicherheits-Header, Massenanmeldung und externer Penetrationstest entfallen mit Begründung. Bei **öffentlich** alles. Der Plan nennt den Einsatz (intern/öffentlich).
-- Die Sicherheits-Schranke läuft in der Test-Schranke mit, für jede Rolle. Eine Stelle, die bewusst so sein muss, bekommt in derselben Zeile `dev-team: sicher – <Grund>`; das ist eine Warnung, die Reviewer und Sicherheitsprüfer einzeln bewerten. Schlüssel bekannter Anbieter haben keine Ausnahme.
-- Befunde „kritisch“ und „hoch“ werden nie zurückgestellt und nie als Entscheidung des Projektleiters abgehakt.
-- Keine Übergabe ohne Sicherheits-Tor (Skill `uebergabe`). Für Kundenprojekte mit sensiblen Daten empfiehlt der Projektleiter Simon zusätzlich einen externen Penetrationstest – das Team ersetzt ihn nicht.
-- Was Werkzeuge nicht sehen (Logikfehler in Berechtigungen, gleiche blinde Flecken aller Agenten), ist **nicht vollständig lösbar** – ehrlich so berichten.
+## Sicherheit und typische KI-Schwachstellen
+Die Übersicht der häufigsten Schwachstellen (Berechtigungen, Geheimnisse, Injection, unvollständige Tests, gleichzeitige Zugriffe, verschluckte Fehler, Bibliotheken, Backups, Architektur, Geschäftslogik, Updates, Selbstprüfung) mit technischer Prüfung und Besitzer steht in der Checkliste `skills/sicherheit/SKILL.md` im Plugin-Ordner. Für jede Rolle gilt:
+- Die **Sicherheits-Schranke** läuft in der Test-Schranke mit (rot nur fast Sicheres; Warnungen bewertet der Reviewer einzeln). Bewusste Ausnahme nur mit `// dev-team: sicher – <Grund>` in der Zeile; Schlüssel bekannter Anbieter haben keine Ausnahme.
+- **Harmlos muss belegt werden (Gegenfrage):** „harmlos“, „entfällt“ oder „✅“ bei einer Sicherheitsfrage nur mit Angriffsweg, Grund, warum er scheitert, und Beleg (Test, Versuch, Code-Stelle) – sonst „nicht geprüft“. Wer eine Ausnahme schreibt, bewertet sie nie selbst.
+- **Intern heißt nicht sicher:** auch im Firmennetz Rechte, Injection, Geheimnisse, Fehler, Gleichzeitigkeit und Backup voll prüfen (der neugierige Kollege, übernommene Rechner, später doch erreichbar, Datenschutz). Der Plan nennt den Einsatz (intern/öffentlich), danach richtet sich der Umfang der Angriffsversuche.
+- Befunde „kritisch“ und „hoch“ werden nie zurückgestellt. Keine Übergabe ohne Sicherheits-Tor (Skill `uebergabe`). Was Werkzeuge nicht sehen, ist **nicht vollständig lösbar** – ehrlich so berichten.
 
 ## Berichte an Simon
 Jeder Bericht (vom Projektleiter und von jedem Agenten) beginnt mit einer **Ampel**:
@@ -137,7 +116,8 @@ Jeder Bericht (vom Projektleiter und von jedem Agenten) beginnt mit einer **Ampe
 Danach: das Wichtigste in einfacher Sprache, höchstens 5 Punkte, jeweils mit „Was kann im schlimmsten Fall passieren?“ und „Was schlage ich vor?“.
 
 ## Sichtbarkeit: Simon sieht, wer was macht
-- **Vor jedem Agenten-Aufruf** eine Zeile im Chat: „→ Entwickler 2 baut P3 (Rabatt)“. **Danach** eine Zeile mit Ampel: „← Entwickler 2: 🟢 P3 fertig, 14 Tests grün“.
+- **Team-Tafel** (Plugin `dev-team-tafel`) neben dem Chat: Stand-Kasten aus `docs/STATUS.md`, „🔴 Braucht dich“ und offene Fragen ganz oben, laufende Agenten mit Rolle, Modell und Laufzeit, letzte Ergebnisse, Teststand; Kurzzeile in der Statusleiste.
+- **Stiller Durchlauf:** Während eines freigegebenen Auftrags schreibt der Projektleiter nichts in den Chat (keine Zeilen vor/nach Agenten, keine Zwischenberichte) – nur bei festen Stopps, auf Simons Frage (kurz) und wenn er etwas braucht, das nur Simon kann. Außerhalb eines Durchlaufs (Gespräch, Planung, Stufe Klein) normal knapp berichten.
 - `docs/AGENTEN_LOG.md` wird automatisch geschrieben (Hooks). Jeder vollständige Agentenbericht liegt in `docs/pruefberichte/`, eine Kennzahl je Lauf in `.dev-team/kennzahlen.jsonl`. Nicht von Hand bearbeiten.
 - `docs/STATUS.md` zeigt oben immer die aktuelle Phase und **jeden laufenden Agenten**, z. B. „Phase 7: Bauen – Entwickler P3 ⏳, Entwickler P4 ⏳, Reviewer P2 ✅“.
 
