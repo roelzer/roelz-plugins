@@ -57,6 +57,28 @@ class TestDurchlauf(unittest.TestCase):
         self.assertIn("mach weiter", antwort["reason"])
         self.assertIsNone(self.stop(aktiv=True))  # nie eine Endlosschleife
 
+    def zeile(self, ereignis, kennung=None, vor=0):
+        with open(os.path.join(self.p, ".dev-team", "kennzahlen.jsonl"), "a") as f:
+            f.write('{"ereignis":"%s","ts":%d,"agent":"tester"%s}\n' % (
+                ereignis, int(time.time()) - vor, ',"id":"%s"' % kennung if kennung else ""))
+
+    def test_mehrfaches_ende_eines_agenten_zaehlt_einmal(self):
+        # Pilot: die Fertig-Prüfung schickt einen Agenten zurück, er „endet“ zweimal – der andere läuft noch
+        self.an()
+        self.zeile("start")
+        self.zeile("start")
+        self.zeile("ende", "a1")
+        self.zeile("ende", "a1")
+        self.assertIsNone(self.stop())                 # einer läuft noch: still warten
+        self.zeile("ende", "a2")
+        self.assertEqual(self.stop()["decision"], "block")
+        self.assertIn("ohne etwas zu schreiben", self.stop()["reason"])
+
+    def test_haengender_start_blockiert_nicht_ewig(self):
+        self.an()
+        self.zeile("start", vor=3600)                  # seit einer Stunde nichts mehr passiert
+        self.assertEqual(self.stop()["decision"], "block")
+
     def test_laufender_agent_darf_warten(self):
         self.an()
         self.kennzahl("start")
