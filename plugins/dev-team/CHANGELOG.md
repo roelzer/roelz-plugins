@@ -6,12 +6,12 @@ Anlass: Simons Vorgaben „das Team soll eigenständig alles fertig bringen“ u
 
 **Voller Kontext – automatisch weiter**
 - `autoCompactWindow: 400000` in den Projekteinstellungen: Claude Code fasst bei 400.000 statt rund 967.000 Tokens zusammen (1-Mio-Modelle). Jeder Schritt liest den ganzen Kontext neu, sehr lange Kontexte machen ungenauer; der Stand liegt ohnehin in Dateien. Eigener Wert eines Projekts bleibt.
-- **Kontext-Wächter** (`scripts/kontext.sh`, reines Bash, rund 20 ms) misst die echte Kontextgröße (letzte Token-Abrechnung im Sitzungsprotokoll). Projektleiter: ab 70 % „STATUS aktuell halten“, ab 85 % „jetzt `docs/SITZUNGSUEBERGABE.md` schreiben (neue Vorlage), committen, weiterarbeiten“. Kein Stopp, keine Frage an Simon.
+- **Kontext-Wächter** (`scripts/kontext.sh`, Bash mit tail/grep, rund 20 ms) misst die echte Kontextgröße (letzte Token-Abrechnung im Sitzungsprotokoll). Projektleiter: ab 70 % „STATUS aktuell halten“, ab 85 % „jetzt `docs/SITZUNGSUEBERGABE.md` schreiben (neue Vorlage), committen, weiterarbeiten“. Kein Stopp, keine Frage an Simon.
 - Nach dem Zusammenfassen (SessionStart, Quelle `compact`) lädt der Sitzungsstart Grundgesetz und Übergabe wieder; der Durchlauf bleibt an. In einer neuen Sitzung genauso.
 - Agenten: eigene Grenze 200.000 (`kontext_grenze_agent`). Wer sie erreicht, schließt sauber ab (BLOCKIERT „Kontext voll“), ein frischer Agent macht weiter – zählt nicht als Fix-Runde.
 
 **Keine Handstopps mehr für Routine-Freigaben**
-- **Prüfsummen der Abnahmetests werden nur ergänzt:** neue Abnahmetests eines Meilensteins kommen ohne Freigabe dazu. Vorher ersetzte `abnahme_pruefsummen.py --schreiben` die Liste und verlangte deshalb bei jedem Meilenstein eine Freigabe (und jede Schranke danach `--freigabe cockpit-welle3`). Ein versionierter Eintrag ändert sich weiter nie ohne Simon; eine freigegebene Änderung wird in der Liste vermerkt und danach ohne erneute Freigabe anerkannt. Einträge schon aufgedeckter Tests, die alte Versionen entfernt hatten, sind kein Fehler (am Stand von `ichkannalles` nachgeprüft: grün ohne Freigabe).
+- **Prüfsummen der Abnahmetests werden nur ergänzt:** neue Abnahmetests eines Meilensteins kommen ohne Freigabe dazu. Vorher ersetzte `abnahme_pruefsummen.py --schreiben` die Liste und verlangte deshalb bei jedem Meilenstein eine Freigabe (und jede Schranke danach `--freigabe cockpit-welle3`). Ein versionierter Eintrag ändert sich weiter nie ohne Simon; eine freigegebene Änderung wird in der Liste vermerkt und danach ohne erneute Freigabe anerkannt.
 - **Neue Referenzdateien legt der Tester an** (eingefrorene Altdaten, unabhängig hergeleitete Werte, `LIESMICH.md` mit Herkunft). Nur bestehende Referenzwerte ändern/löschen braucht Simon.
 - **Einstellungen verschärfen ohne Freigabe:** Prüfbefehle in `zusatzbefehle`/`meilensteinbefehle` ergänzen (z. B. den Pflicht-Mutationstest der Fachsoftware) und Kontextgrenzen setzen. Testbefehl, Zählmuster, Setup, `plugin_stand` und Entfernen bleiben freigabepflichtig.
 - Freigaben: ein Ordner in der Geltung (`tests/referenz/x/` oder `tests/referenz/x`) deckt alle Dateien darin; mehrere Stichwörter mit `--freigabe a,b` oder mehrfach `--freigabe`.
@@ -23,6 +23,17 @@ Anlass: Simons Vorgaben „das Team soll eigenständig alles fertig bringen“ u
 - **Wächter:** `npm ci`/`npm install` (auch pnpm/yarn) in einem Worktree mit verknüpftem `node_modules` ist für alle Rollen gesperrt – leerte im Pilot den Hauptordner. Reines Bash, kein Programmstart.
 - **Prüfberichte:** Berichte, die ein Agent über SubagentHandback abgibt, landen vollständig in `docs/pruefberichte/` (vorher nur „Bericht übergeben.“).
 - Projektleiter committet eigene Dateien nur mit ausdrücklichen Pfaden.
+
+**Abgesichert nach unabhängiger Prüfung des Umbaus** (frischer Prüf-Agent, 12 Befunde, alle eingearbeitet)
+- Vorarbeit zählt nur, wenn der Projektleiter den Commit unter `.dev-team/vorarbeit/<Hash>` einträgt (für Entwickler gesperrt) – der Betreff allein konnte vom Entwickler selbst geschrieben werden.
+- Prüfsummen-Einträge verschwinden nie; eine Freigabe für einen geänderten Abnahmetest muss die Liste **und** genau diesen Test nennen und steht bei jeder Schranke im Testnachweis. Vermerk-Format erlaubt Leerzeichen im Testnamen.
+- Bereich `doku` nur für Markdown (`docs/**/*.md`) – Testdateien unter `docs/` bleiben geschützt.
+- Entwickler dürfen `.claude/dev-team.json` nie ändern (auch nicht „verschärfen“); ein ergänzter Mutationstest zählt nur mit echtem Aufruf und Schwelle ≥ 60.
+- Kontext-Wächter: Modelle mit 200.000er Fenster werden am Modellnamen erkannt; ab Stufe 1 wird bei jedem Aufruf gemessen; nur Antworten des Modells zählen (nicht Abrechnungen in Werkzeugergebnissen).
+- Jeder feste Stopp entfernt auch die Übergabe – sonst schaltete eine neue Sitzung den Durchlauf wieder ein.
+- Wächter: `yarn test`/`yarn build` bleiben erlaubt; `cd <worktree> && npm ci` und Befehle mit Anführungszeichen werden erkannt.
+
+**Umstieg bestehender Projekte (einmalig, ohne Simon):** Meldet die Schranke „Eintrag … fehlt“, führt der Projektleiter `abnahme_pruefsummen.py --schreiben` aus – das nimmt die Einträge wieder auf, die ältere Versionen beim Neuschreiben entfernt hatten. Wurde ein aufgedeckter Test früher mit Freigabe geändert, mit `--freigabe <dieses Stichwort>` (am Stand von `ichkannalles` geprüft: `--freigabe m5-format-v3`, danach grün).
 
 **Geprüft und bewusst nicht gemacht**
 - Skills fest in Agenten laden (`skills:` im Steckbrief): Die Dev-Team-Skills sind Abläufe für den Projektleiter; ihr voller Text käme bei jedem Agentenstart mit (Tokens) und würde Agenten Projektleiter-Schritte vorgeben. Die einzige Checkliste für einen Agenten (`sicherheit`) bekommt der Sicherheitsprüfer schon als Datei.

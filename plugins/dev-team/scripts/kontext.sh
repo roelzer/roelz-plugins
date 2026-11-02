@@ -19,7 +19,8 @@
 #   kontext.sh stufe     gibt 0 (frei), 1 (Hinweis) oder 2 (Übergabe/Abschluss) aus.
 #
 # Grenzen: Projektleiter = "kontext_grenze" in .claude/dev-team.json, sonst "autoCompactWindow" aus
-# .claude/settings.json, sonst 400000. Agenten = "kontext_grenze_agent", sonst 200000. Umgebung:
+# .claude/settings.json, sonst 400000 – höchstens 95 % des Modellfensters. Agenten = "kontext_grenze_agent",
+# sonst 200000 – höchstens 80 % des Fensters (Modelle mit 200.000er Fenster: aus "model" im Protokoll). Umgebung:
 # DEV_TEAM_KONTEXT_GRENZE / DEV_TEAM_KONTEXT_GRENZE_AGENT. Projektleiter: Stufe 1 ab 70 %, Stufe 2 ab 85 %
 # (vor dem automatischen Zusammenfassen). Agenten: Stufe 1 ab 80 %, Stufe 2 ab 100 %.
 # Nur Bash-Bordmittel plus tail/grep; sperrt nie (immer Exit 0).
@@ -43,10 +44,15 @@ agent_typ="$(feld agent_type)"
 agent_id="$(feld agent_id)"
 sitzung="$(feld session_id)"
 werkzeug="$(feld tool_name)"
+wer="${agent_id:-$sitzung}"
+wer="${wer//[^A-Za-z0-9_-]/}"
+[ -n "$wer" ] || wer="unbekannt"
+marken="$projekt/.dev-team/kontext"
 
 # Messen kostet ein paar Millisekunden: bei jeder Nachricht von Simon, nach jedem Agenten-Aufruf und bei
-# etwa jedem vierten anderen Werkzeugaufruf (der Kontext wächst gleichmäßig, das reicht).
-if [ "$modus" = "hinweis" ] && [ -n "$werkzeug" ]; then
+# etwa jedem vierten anderen Werkzeugaufruf. Ab Stufe 1 bei jedem Aufruf, damit das Fenster bis zur
+# Übergabe nicht übersprungen wird.
+if [ "$modus" = "hinweis" ] && [ -n "$werkzeug" ] && [ ! -e "$marken/$wer-1" ]; then
   case "$werkzeug" in
     Agent|Task|TaskOutput) ;;
     *) (( RANDOM % 4 == 0 )) || exit 0 ;;
@@ -61,14 +67,24 @@ if [ -n "$agent_typ" ]; then
     datei="${haupt%.jsonl}/subagents/agent-${agent_id}.jsonl"
   fi
   [ -n "$agent_id" ] && [ -f "$datei" ] || ende
-  roh="$(tail -c 400000 "$datei" 2>/dev/null | grep -o '"usage":[[:space:]]*{[^}]*' | tail -n 1)"
+  zeilen="$(tail -c 400000 "$datei" 2>/dev/null | grep '"type":[[:space:]]*"assistant"' | grep '"usage"')"
 else
   datei="$(pfad_norm "$(feld transcript_path)")"
   [ -n "$datei" ] && [ -f "$datei" ] || ende
   # Ältere Versionen schreiben Agenten-Schritte mit ins Sitzungsprotokoll (isSidechain) – die zählen nicht.
-  roh="$(tail -c 400000 "$datei" 2>/dev/null | grep -v '"isSidechain":[[:space:]]*true' | grep -o '"usage":[[:space:]]*{[^}]*' | tail -n 1)"
+  zeilen="$(tail -c 400000 "$datei" 2>/dev/null | grep '"type":[[:space:]]*"assistant"' | grep '"usage"' | grep -v '"isSidechain":[[:space:]]*true')"
 fi
+# Nur Antworten des Modells zählen (Werkzeugergebnisse, z. B. eines Agenten, können eigene Abrechnungen enthalten).
+letzte="${zeilen##*$'\n'}"
+roh="$(printf '%s' "$letzte" | grep -o '"usage":[[:space:]]*{[^}]*' | tail -n 1)"
 [ -n "$roh" ] || ende
+# Kontextfenster des Modells: 1 Mio. bei aktuellen Modellen, 200.000 bei älteren oder wenn abgeschaltet.
+fenster=1000000
+modell=""
+[[ "$letzte" =~ \"model\"[[:space:]]*:[[:space:]]*\"([^\"]*)\" ]] && modell="${BASH_REMATCH[1]}"
+if [ "${CLAUDE_CODE_DISABLE_1M_CONTEXT:-}" = "1" ] || { [[ "$modell" =~ claude-(3|opus-4-[0-6]|sonnet-4-[0-6]|haiku-4)([^0-9]|$) ]] && [[ "$modell" != *1m* ]]; }; then
+  fenster=200000
+fi
 
 zahl() { local z; z="$(zahl_aus "$roh" "$1")"; echo "${z:-0}"; }
 tokens=$(( $(zahl input_tokens) + $(zahl cache_creation_input_tokens) + $(zahl cache_read_input_tokens) ))
@@ -77,11 +93,13 @@ cfg="$(lies "$projekt/.claude/dev-team.json")"
 if [ -n "$agent_typ" ]; then
   grenze="${DEV_TEAM_KONTEXT_GRENZE_AGENT:-$(zahl_aus "$cfg" kontext_grenze_agent)}"
   [[ "$grenze" =~ ^[0-9]+$ ]] && (( grenze >= 50000 )) || grenze=200000
+  (( grenze > fenster * 8 / 10 )) && grenze=$(( fenster * 8 / 10 ))   # vor dem eigenen Zusammenfassen
   stufe1=$(( grenze * 8 / 10 )); stufe2=$grenze
 else
   grenze="${DEV_TEAM_KONTEXT_GRENZE:-$(zahl_aus "$cfg" kontext_grenze)}"
   [ -n "$grenze" ] || grenze="$(zahl_aus "$(lies "$projekt/.claude/settings.json")" autoCompactWindow)"
   [[ "$grenze" =~ ^[0-9]+$ ]] && (( grenze >= 50000 )) || grenze=400000
+  (( grenze > fenster * 95 / 100 )) && grenze=$(( fenster * 95 / 100 ))   # Claude Code fasst kurz vor dem Rand zusammen
   stufe1=$(( grenze * 7 / 10 )); stufe2=$(( grenze * 85 / 100 ))
 fi
 
@@ -92,10 +110,6 @@ stufe=0
 if [ "$modus" = "stufe" ]; then echo "$stufe"; exit 0; fi
 
 # Jeder Hinweis einmal je Sitzung bzw. Agent und Stufe. Sinkt der Kontext (nach dem Zusammenfassen), zurücksetzen.
-wer="${agent_id:-$sitzung}"
-wer="${wer//[^A-Za-z0-9_-]/}"
-[ -n "$wer" ] || wer="unbekannt"
-marken="$projekt/.dev-team/kontext"
 if (( stufe == 0 )); then
   [ -e "$marken/$wer-1" ] && rm -f "$marken/$wer-1" "$marken/$wer-2" 2>/dev/null
   exit 0

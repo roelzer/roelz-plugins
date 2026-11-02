@@ -8,8 +8,8 @@ unverändert aufgedeckt werden.
 Liste: docs/ABNAHME_PRUEFSUMMEN.txt (Nachweis-Bereich, wird mit dem Commit „Plan freigegeben“ bzw. den
 Abnahmetests des nächsten Meilensteins versioniert). Die Liste wird nur ergänzt: Neue Abnahmetests (nächster
 Meilenstein) kommen ohne Freigabe dazu. Ein einmal versionierter Eintrag ändert sich nie und verschwindet nie –
-außer mit Simons Freigabe (Geltung „docs/ABNAHME_PRUEFSUMMEN.txt“); die Änderung wird dann in der Liste vermerkt
-(„# freigegeben: <test> <summe> <stichwort>“), damit spätere Schranken sie ohne erneute Freigabe anerkennen.
+außer mit Simons Freigabe (Geltung: die Liste und genau dieser Test); die Änderung wird dann in der Liste vermerkt
+(„# freigegeben: <summe> <stichwort> <test>“), damit spätere Schranken sie anerkennen (und im Testnachweis nennen).
 """
 
 import argparse
@@ -65,12 +65,14 @@ VERMERK = "# freigegeben: "
 
 
 def _parse(text):
+    """-> (liste {test: summe}, vermerke {(test, summe, stichwort)}). Vermerk: „# freigegeben: <summe> <stichwort> <test>“
+    (der Testname steht am Ende und darf Leerzeichen enthalten)."""
     liste, vermerke = {}, set()
     for zeile in (text or "").splitlines():
         if zeile.startswith(VERMERK):
-            teile = zeile[len(VERMERK):].split()
-            if len(teile) >= 3:
-                vermerke.add((teile[0], teile[1], teile[2]))
+            teile = zeile[len(VERMERK):].strip().split(" ", 2)
+            if len(teile) == 3 and len(teile[0]) == 64:
+                vermerke.add((teile[2].strip(), teile[0], teile[1]))
             continue
         teile = zeile.strip().split("  ", 1)
         if len(teile) == 2 and len(teile[0]) == 64 and not zeile.startswith("#"):
@@ -100,39 +102,42 @@ def erste_summen(hauptordner):
     return historie(hauptordner)[0]
 
 
-def freigabe_gueltig(hauptordner, stichwort):
-    """Steht das Stichwort in .claude/freigaben.md (von Simon eingetragen) mit Geltung für die Prüfsummen-Liste?"""
-    try:
-        with open(os.path.join(hauptordner, ".claude", "freigaben.md"), encoding="utf-8") as f:
-            for zeile in f:
-                teile = [t.strip() for t in zeile.strip().strip("|").split("|")]
-                if (not zeile.lstrip().startswith("#") and len(teile) >= 4 and teile[1].lower() == stichwort.lower()
-                        and "abnahme_pruefsummen" in teile[2].lower()):
-                    return True
-    except OSError:
-        pass
-    return False
+def freigabe_fuer(hauptordner, stichwort, rel):
+    """-> Freigabe-Zeile, wenn Simon in .claude/freigaben.md eine Freigabe mit diesem Stichwort eingetragen hat,
+    deren Geltung die Prüfsummen-Liste UND genau diesen Abnahmetest nennt (tests/abnahme/<test>, ein Ordner
+    darüber oder der Dateiname). Sonst ''. Dieselbe Prüfung wie die Test-Schranke (pruefe_tests.Freigabe)."""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import pruefe_tests
+    fg = pruefe_tests.pruefe_freigabe(pruefe_tests.Ergebnis(), hauptordner, stichwort)
+    name = os.path.basename(rel)
+    test_gedeckt = (fg.deckt("tests/abnahme/" + rel) or fg.deckt(".dev-team/verdeckt/" + rel)
+                    or any(g.rstrip("/").endswith(name) for g in fg.geltung))
+    return fg.zeile if fg.deckt(DATEI.replace("\\", "/")) and test_gedeckt else ""
 
 
 def liste_pruefen(hauptordner, wurzel=None):
-    """-> Fehlertexte, wenn ein versionierter Eintrag geändert oder entfernt wurde (ohne gültigen Vermerk).
-    Fehlen darf nur der Eintrag eines schon aufgedeckten Tests (liegt unter tests/abnahme/): Dev-Team-Versionen
-    vor 3.13 haben die Liste je Meilenstein neu geschrieben; aufgedeckte Tests schützt danach die Test-Schranke."""
-    wurzel = wurzel or hauptordner
+    """-> (fehler, genutzte_freigaben). Fehler, wenn ein versionierter Eintrag entfernt oder ohne gültigen
+    Vermerk geändert wurde. Die Liste wird nur ergänzt."""
     pfad = os.path.join(hauptordner, DATEI)
     if not os.path.isfile(pfad):
-        return []
+        return [], []
     with open(pfad, encoding="utf-8") as f:
         jetzt, vermerke = _parse(f.read())
-    fehler = []
+    fehler, genutzt = [], []
     for rel, h0 in erste_summen(hauptordner).items():
-        if rel not in jetzt and not aufgedeckt_finden(wurzel, rel):
-            fehler.append("Prüfsummen-Liste: Eintrag %s wurde entfernt – die Liste wird nur ergänzt." % rel)
-        elif rel in jetzt and jetzt[rel] != h0 and not any(r == rel and h == jetzt[rel] and freigabe_gueltig(hauptordner, w)
-                                          for r, h, w in vermerke):
-            fehler.append("Prüfsummen-Liste: Eintrag %s wurde nachträglich geändert – Abnahmetests werden nie "
-                          "angepasst (nur mit Simons Freigabe, Geltung docs/ABNAHME_PRUEFSUMMEN.txt)." % rel)
-    return fehler
+        if rel not in jetzt:
+            fehler.append("Prüfsummen-Liste: Eintrag %s fehlt – die Liste wird nur ergänzt. Stand vor Dev-Team 3.13 "
+                          "(Liste je Meilenstein ersetzt)? Einmal abnahme_pruefsummen.py --schreiben ausführen, das "
+                          "nimmt entfernte Einträge wieder auf." % rel)
+        elif jetzt[rel] != h0:
+            zeilen = [freigabe_fuer(hauptordner, w, rel) for r, h, w in vermerke if r == rel and h == jetzt[rel]]
+            zeilen = [z for z in zeilen if z]
+            if zeilen:
+                genutzt.append(zeilen[0])
+            else:
+                fehler.append("Prüfsummen-Liste: Eintrag %s wurde nachträglich geändert – Abnahmetests werden nie "
+                              "angepasst (nur mit Simons Freigabe für die Liste und genau diesen Test)." % rel)
+    return fehler, sorted(set(genutzt))
 
 
 def aufgedeckt_finden(wurzel, rel):
@@ -207,24 +212,38 @@ def main():
         with open(pfad, encoding="utf-8") as f:
             alt_text = f.read()
     alt, vermerke = _parse(alt_text)
-    if not jetzt and not alt:
+    erste, letzte = historie(hauptordner)
+    if not jetzt and not alt and not letzte:
         print("FEHLER: Keine verdeckten Tests unter %s gefunden. Nichts geschrieben." % VERDECKT)
         sys.exit(1)
-    erste = erste_summen(hauptordner)
-    neu = dict(alt)
-    geaendert = sorted(rel for rel, h in jetzt.items() if rel in alt and alt[rel] != h)
+    wurzel = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip() \
+        or hauptordner
+    # Einträge, die Dev-Team-Versionen vor 3.13 beim Neuschreiben entfernt haben, kommen zurück: mit der letzten
+    # versionierten Summe, oder – falls der aufgedeckte Test (mit Freigabe) geändert wurde – mit dessen Summe.
+    zurueck = {}
+    for rel in letzte:
+        if rel in alt or rel in jetzt:
+            continue
+        funde = [summe(f) for f in aufgedeckt_finden(wurzel, rel)]
+        zurueck[rel] = letzte[rel] if (letzte[rel] in funde or not funde) else funde[0]
+    neu = dict(zurueck)
+    neu.update(alt)
     neu.update(jetzt)
-    # Jede Abweichung von der ersten versionierten Fassung braucht einen Vermerk mit gültiger Freigabe.
-    ohne_vermerk = sorted(rel for rel, h in neu.items() if rel in erste and erste[rel] != h
-                          and not any(r == rel and x == h and freigabe_gueltig(hauptordner, w) for r, x, w in vermerke))
-    ohne_vermerk = sorted(set(ohne_vermerk) | set(geaendert))
+    # Jede Abweichung von der ersten versionierten Fassung braucht einen gültigen Vermerk.
+    def vermerkt(rel, h):
+        return any(r == rel and x == h and freigabe_fuer(hauptordner, w, rel) for r, x, w in vermerke)
+    ohne_vermerk = sorted(rel for rel, h in neu.items() if rel in erste and erste[rel] != h and not vermerkt(rel, h))
+    ohne_vermerk = sorted(set(ohne_vermerk) | {rel for rel, h in jetzt.items() if rel in alt and alt[rel] != h
+                                               and not vermerkt(rel, h)})
     if ohne_vermerk:
         stichwort = arg.freigabe.strip()
-        if not stichwort or not freigabe_gueltig(hauptordner, stichwort):
+        fehlt = [rel for rel in ohne_vermerk if not (stichwort and freigabe_fuer(hauptordner, stichwort, rel))]
+        if fehlt:
             print("FEHLER: Schon festgehaltene Abnahmetests weichen ab (%s). Das braucht Simons Freigabe in "
-                  ".claude/freigaben.md (Geltung: docs/ABNAHME_PRUEFSUMMEN.txt), dann --freigabe <stichwort>. "
-                  "Neue Abnahmetests (neue Dateien) kommen ohne Freigabe dazu. Nichts geschrieben."
-                  % ", ".join(ohne_vermerk))
+                  ".claude/freigaben.md, deren Geltung die Prüfsummen-Liste und den Test nennt, dann --freigabe "
+                  "<stichwort>. Neue Abnahmetests kommen ohne Freigabe dazu – für einen neuen Meilenstein einen "
+                  "eigenen Unterordner nehmen (z. B. m3/), nie einen alten Namen wiederverwenden. Nichts geschrieben."
+                  % ", ".join(fehlt))
             sys.exit(1)
         for rel in ohne_vermerk:
             vermerke.add((rel, neu[rel], stichwort))
@@ -239,10 +258,12 @@ def main():
         for rel in sorted(neu):
             f.write("%s  %s\n" % (neu[rel], rel))
         for rel, h, w in sorted(vermerke):
-            f.write("%s%s %s %s\n" % (VERMERK, rel, h, w))
+            f.write("%s%s %s %s\n" % (VERMERK, h, w, rel))
     jetzt = neu
     if dazu:
         print("NEU: %s" % ", ".join(dazu))
+    if zurueck:
+        print("WIEDER AUFGENOMMEN (vor 3.13 beim Neuschreiben entfernt): %s" % ", ".join(sorted(zurueck)))
     print("GESCHRIEBEN: %s (%d Abnahmetests). Jetzt committen (mit „Plan freigegeben“ bzw. den Abnahmetests des Meilensteins)." % (DATEI, len(jetzt)))
 
 

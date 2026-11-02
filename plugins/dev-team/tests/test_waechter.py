@@ -168,6 +168,9 @@ class PaketbefehlImVerknuepftenWorktree(Basis):
             self.assertIn("--trennen", fehler)
         self.assertEqual(self.lauf(self.aufruf("Bash", "entwickler", cwd=self.wt, command="npm run build"))[0], 0)
         self.assertEqual(self.lauf(self.aufruf("Bash", "projektleiter", command="npm ci"))[0], 0)   # Hauptordner
+        self.assertEqual(self.lauf(self.aufruf("Bash", "entwickler", cwd=self.wt, command="yarn test"))[0], 0)
+        # vom Hauptordner aus mit cd in den Worktree
+        self.assertEqual(self.lauf(self.aufruf("Bash", "projektleiter", command="cd .claude/worktrees/p1 && npm ci"))[0], 2)
 
 
 if __name__ == "__main__":

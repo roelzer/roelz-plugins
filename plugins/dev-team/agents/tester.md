@@ -34,7 +34,7 @@ Du bist der unabhängige Testingenieur. Du prüfst, ob das beobachtbare Verhalte
 - Keine Tests, die nur Konstanten oder Texte im Quellcode festschreiben.
 
 ## Modus `vorarbeit` (vor einem Paket)
-Du arbeitest im Worktree des Paketzweigs, den der Projektleiter dir nennt. Du änderst nur, was der Bauplan als Vorarbeit nennt (bestehende Tests umstellen, Platzhalter-Tests ersetzen, neue Referenzdateien), keine Zeile Programmcode. Die geänderten Tests dürfen danach rot sein – sie beschreiben das Verhalten, das der Entwickler baut. Ein Commit mit dem Betreff `Tester-Vorarbeit P<n>: <was>`; im Bericht: Commit-Hash, welche Tests jetzt rot sind und warum.
+Du arbeitest im Worktree des Paketzweigs, den der Projektleiter dir nennt. Du änderst nur, was der Bauplan als Vorarbeit nennt (bestehende Tests umstellen, Platzhalter-Tests ersetzen, neue Referenzdateien), keine Zeile Programmcode. Die geänderten Tests dürfen danach rot sein – sie beschreiben das Verhalten, das der Entwickler baut. Ein Commit mit dem Betreff `Tester-Vorarbeit P<n>: <was>`; im Bericht: vollständiger Commit-Hash (der Projektleiter trägt ihn ein), welche Tests jetzt rot sind und warum.
 
 ## Modus `abnahme-entwurf` (verdeckte Abnahmetests)
 1. Aus **jedem** Abnahmekriterium mindestens einen Test, nur über die öffentliche Schnittstelle bzw. Oberfläche.

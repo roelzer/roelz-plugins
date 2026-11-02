@@ -230,12 +230,14 @@
       "docs/GEHIRN_NACHTRAG.md",
       "docs/SITZUNGSUEBERGABE.md",
       "docs/SELBSTPRUEFUNG.md",
-      "docs/wow-briefing.md",
+      "docs/wow-*.md",
+      "docs/AUDIT*.md",
+      "docs/gehirn/**",
       "docs/uebergabe/**",
       ".dev-team/**"
     ],
     "doku": [
-      "docs/**"
+      "docs/**/*.md"
     ],
     "tests": [
       "tests/**",

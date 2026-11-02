@@ -2,7 +2,7 @@
 
 Schreibt der Projektleiter, wenn der Kontext-Wächter es verlangt – kurz bevor Claude Code das Gespräch automatisch
 zusammenfasst. Nach dem Zusammenfassen (oder in einer neuen Sitzung) zeigt der Sitzungsstart diese Datei. Sie wird jedes Mal
-überschrieben und am Ende des Auftrags (Stopp 3) gelöscht. Alles, was nur „im Kopf“ der Sitzung war, muss hier oder in den
+überschrieben und bei jedem festen Stopp (auch Stopp 3) entfernt. Alles, was nur „im Kopf“ der Sitzung war, muss hier oder in den
 Projektdateien stehen – die Zusammenfassung von Claude Code allein reicht nicht.
 
 **Übergeben am:** [Datum, Uhrzeit] · **Auftrag:** [Plan-Titel] · **Dev-Team-Version:** [x.y.z]

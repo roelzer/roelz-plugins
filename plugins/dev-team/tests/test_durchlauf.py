@@ -65,9 +65,9 @@ class TestDurchlauf(unittest.TestCase):
         self.assertEqual(self.stop()["decision"], "block")
 
 
-def usage_zeile(tokens, sidechain=False):
+def usage_zeile(tokens, sidechain=False, modell="claude-opus-5-5"):
     """Eine Assistenten-Zeile wie im Sitzungsprotokoll von Claude Code."""
-    return json.dumps({"type": "assistant", "isSidechain": sidechain, "message": {"role": "assistant", "usage": {
+    return json.dumps({"type": "assistant", "isSidechain": sidechain, "message": {"role": "assistant", "model": modell, "usage": {
         "input_tokens": 2, "cache_creation_input_tokens": 1000, "cache_read_input_tokens": tokens - 1002,
         "output_tokens": 50, "server_tool_use": {"web_search_requests": 0}}}}) + "\n"
 
@@ -117,6 +117,17 @@ class TestKontext(unittest.TestCase):
         self.assertEqual(self.lauf("stufe"), "2")
         with open(os.path.join(self.p, ".claude", "dev-team.json"), "w") as f:
             json.dump({"kontext_grenze": 600000}, f)
+        self.assertEqual(self.lauf("stufe"), "0")
+
+    def test_modell_mit_200k_fenster(self):
+        self.schreibe(usage_zeile(165000, modell="claude-sonnet-4-5-20250929"))
+        self.assertEqual(self.lauf("stufe"), "2")       # 85 % von 190000, vor dem Zusammenfassen bei rund 190000
+        self.schreibe(usage_zeile(165000, modell="claude-opus-5-5"))
+        self.assertEqual(self.lauf("stufe"), "0")
+
+    def test_werkzeugergebnis_mit_fremder_abrechnung_zaehlt_nicht(self):
+        self.schreibe(usage_zeile(50000))
+        self.schreibe(json.dumps({"type": "user", "toolUseResult": {"usage": {"input_tokens": 390000}}}) + "\n")
         self.assertEqual(self.lauf("stufe"), "0")
 
     def test_agenten_schritte_im_sitzungsprotokoll_zaehlen_nicht(self):
