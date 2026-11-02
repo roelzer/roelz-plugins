@@ -101,12 +101,6 @@ def lade_konfig(wurzel, hauptordner):
     return None, None
 
 
-def git_erste_fassung(wurzel, pfad):
-    r = sh(["git", "log", "--diff-filter=A", "--format=%H", "--reverse", "--", pfad], wurzel)
-    commit = (r.stdout or "").split()
-    return git_datei_text(wurzel, commit[0], pfad) if commit else None
-
-
 def git_datei_text(wurzel, commit, pfad):
     r = sh(["git", "show", "%s:%s" % (commit, pfad)], wurzel)
     return r.stdout if r.returncode == 0 else None
@@ -299,18 +293,21 @@ def pruefsummen_pruefen(e, hauptordner, wurzel, fg, rolle="projektleiter"):
         if verdeckt_da and rolle in ("merge", "projektleiter"):
             e.f("Verdeckte Abnahmetests vorhanden, aber keine festgehaltenen Prüfsummen (%s). Erst "
                 "abnahme_pruefsummen.py --schreiben und committen." % mod.DATEI)
-        return
-    erste = git_erste_fassung(hauptordner, mod.DATEI)
-    jetzt_text = datei_text(hauptordner, mod.DATEI) or ""
-    if erste is not None and erste != jetzt_text and not fg.deckt("docs/ABNAHME_PRUEFSUMMEN.txt"):
-        e.f("Die Prüfsummen-Liste weicht von ihrer ersten versionierten Fassung ab – Abnahmetests werden nie "
-            "nachträglich angepasst (nur mit Simons Freigabe).")
+        return []
+    # Neue Einträge (Abnahmetests des nächsten Meilensteins) sind ohne Freigabe erlaubt. Ein einmal
+    # versionierter Eintrag darf sich nie ändern oder verschwinden – außer mit Simons Freigabe (Vermerk in der Liste).
+    fehler_liste, vermerkte = mod.liste_pruefen(hauptordner, wurzel)
+    for t in fehler_liste:
+        (e.w if fg.deckt("docs/ABNAHME_PRUEFSUMMEN.txt") else e.f)(t + fg.text("docs/ABNAHME_PRUEFSUMMEN.txt"))
+    for zeile in vermerkte:
+        e.w("Vermerkte Freigabe für einen geänderten Abnahmetest anerkannt: " + zeile)
     funde = mod.pruefen(hauptordner, wurzel, vollstaendig=(rolle == "projektleiter"))
     for t in funde:
         (e.w if fg.deckt("docs/ABNAHME_PRUEFSUMMEN.txt") else e.f)(t + (fg.text("docs/ABNAHME_PRUEFSUMMEN.txt") or
                                                                          " Abnahmetests werden nie passend gemacht."))
     if not funde:
         e.o("Abnahmetests stimmen mit den festgehaltenen Prüfsummen überein.")
+    return vermerkte
 
 
 TESTNAME_JS = re.compile(r"\b(?:it|test|describe|context|specify)(?:\.\w+)*\s*\(\s*(['\"`])(.*?)\1")
@@ -389,26 +386,128 @@ def ist_testdatei(bereich):
 
 
 class Freigabe:
-    """Eine Freigabe aus .claude/freigaben.md: gilt nur für die genannten Pfade bzw. Prüfungen."""
+    """Eine oder mehrere Freigaben aus .claude/freigaben.md: gelten nur für die genannten Pfade bzw. Prüfungen.
+    Ein Ordner in der Geltung („tests/referenz/x/“ oder „tests/referenz/x“) deckt alle Dateien darin."""
 
     def __init__(self, zeile="", geltung=()):
         self.zeile = zeile
-        self.geltung = [g for g in geltung if g]
+        self.geltung = [bereiche.norm(g).strip() for g in geltung if g and g.strip()]
 
     def deckt(self, ziel):
         if not self.zeile:
             return False
         z = bereiche.norm(ziel)
-        return any(g.lower() == z.lower() or bereiche.passt(z, [g]) for g in self.geltung)
+        for g in self.geltung:
+            ordner = g.rstrip("/")
+            if g.lower() == z.lower() or bereiche.passt(z, [g]):
+                return True
+            if not any(c in g for c in "*?") and z.lower().startswith(ordner.lower() + "/"):
+                return True
+        return False
+
+    def dazu(self, andere):
+        if not andere.zeile:
+            return self
+        if not self.zeile:
+            return andere
+        return Freigabe(self.zeile + " ; " + andere.zeile, self.geltung + andere.geltung)
 
     def text(self, ziel):
         return " – Freigabe: " + self.zeile if self.deckt(ziel) else ""
 
 
-def pruefe_diff(e, wurzel, basis, rolle, team, fg):
+VORARBEIT = re.compile(r"^(Tester|Architekt)-Vorarbeit\b", re.IGNORECASE)
+VORARBEIT_BEREICHE = {"tester": ("tests", "testkonfig", "referenz", "abnahme"), "architekt": ("architektur",)}
+
+
+def vorarbeit_dateien(e, wurzel, hauptordner, basis, team):
+    """Dateien aus Tester- oder Architekt-Vorarbeit am Anfang des Pakets. Zählt nur, wenn (1) der Commit-Betreff
+    mit „Tester-Vorarbeit“ bzw. „Architekt-Vorarbeit“ beginnt UND (2) der Projektleiter den Vorarbeit-Commit im
+    Hauptordner unter .dev-team/vorarbeit/<voller Hash> eingetragen hat (für Entwickler gesperrt) – der Betreff
+    allein beweist nichts. Die Dateien zählen nicht als Entwickler-Änderung, solange der Entwickler sie danach
+    nicht mehr verändert hat. Vorarbeit nach dem ersten Entwickler-Commit zählt nicht."""
+    ordner = os.path.join(hauptordner, ".dev-team", "vorarbeit")
+    try:
+        eingetragen = [n for n in os.listdir(ordner) if re.fullmatch(r"[0-9a-f]{40}", n)]
+    except OSError:
+        eingetragen = []
+    r = sh(["git", "log", "--reverse", "--topo-order", "--no-merges", "--format=%H%x09%s", "%s..HEAD" % basis], wurzel)
+    vorarbeit, letzter = {}, None
+    for zeile in (r.stdout or "").splitlines():
+        commit, _, betreff = zeile.partition("\t")
+        m = VORARBEIT.match(betreff.strip())
+        if not m:
+            break
+        if not any(sh(["git", "merge-base", "--is-ancestor", commit, h], wurzel).returncode == 0 for h in eingetragen):
+            e.w("Commit %s heißt „%s“, ist aber nicht als Vorarbeit eingetragen (.dev-team/vorarbeit/<Hash>, "
+                "macht der Projektleiter) – zählt als Entwickler-Änderung." % (commit[:10], betreff.strip()[:60]))
+            break
+        rolle = m.group(1).lower()
+        for z in git(wurzel, "diff-tree", "--no-commit-id", "--name-status", "--no-renames", "-r", commit).splitlines():
+            teile = z.split("\t")
+            if len(teile) < 2:
+                continue
+            p = bereiche.norm(teile[-1])
+            b = bereiche.bereich_von(p, team)
+            if b not in VORARBEIT_BEREICHE[rolle] and b not in ("nachweis", "prozess"):
+                e.f("%s-Vorarbeit %s ändert %s (Bereich %s) – Vorarbeit darf nur %s enthalten." % (
+                    m.group(1), commit[:10], p, b, ", ".join(VORARBEIT_BEREICHE[rolle])))
+                continue
+            vorarbeit[p] = rolle
+        letzter = commit
+    if not letzter:
+        return set()
+    unveraendert = set()
+    for p in vorarbeit:
+        soll = sh(["git", "rev-parse", "-q", "--verify", "%s:%s" % (letzter, p)], wurzel).stdout.strip()
+        ist = sh(["git", "hash-object", "--", p], wurzel).stdout.strip() if os.path.isfile(os.path.join(wurzel, p)) else ""
+        if soll == ist:
+            unveraendert.add(p)
+    if unveraendert:
+        e.w("Vorarbeit erkannt (bis %s): %d Datei(en) zählen nicht als Entwickler-Änderung." % (letzter[:10], len(unveraendert)))
+    return unveraendert
+
+
+VERSCHAERFBAR = ("zusatzbefehle", "meilensteinbefehle")
+FREI_EINSTELLBAR = ("kontext_grenze", "kontext_grenze_agent", "_hilfe")
+
+
+def _mutation_echt(befehl):
+    """Ein ergänzter Befehl, der mutationstest.py nennt, zählt nur als Verschärfung, wenn er es wirklich aufruft
+    und eine Schwelle von mindestens 60 setzt (Grundgesetz: 70 empfohlen)."""
+    if "mutationstest" not in befehl:
+        return True
+    m = re.search(r"--schwelle\s+(\d+)", befehl)
+    return bool(re.match(r"\s*(python3?|py)\b[^;&|]*mutationstest\.py", befehl)) and bool(m) and int(m.group(1)) >= 60
+
+
+def nur_verschaerft(vorher, nachher):
+    """True, wenn .claude/dev-team.json nur strenger wurde: Befehle in zusatzbefehle/meilensteinbefehle ergänzt
+    (keiner entfernt oder geändert) oder Kontextgrenzen gesetzt. Testbefehl, Zählmuster, Setup, plugin_stand usw.
+    bleiben freigabepflichtig."""
+    try:
+        alt, neu = json.loads(vorher or ""), json.loads(nachher or "")
+    except ValueError:
+        return False
+    if not isinstance(alt, dict) or not isinstance(neu, dict):
+        return False
+    for k in set(alt) | set(neu):
+        a, n = alt.get(k), neu.get(k)
+        if a == n or k in FREI_EINSTELLBAR:
+            continue
+        if k in VERSCHAERFBAR and isinstance(n, list) and isinstance(a or [], list) and n[:len(a or [])] == (a or []):
+            if all(_mutation_echt(str(b)) for b in n[len(a or []):]):
+                continue
+        return False
+    return True
+
+
+def pruefe_diff(e, wurzel, basis, rolle, team, fg, hauptordner=None):
     """fg: Freigabe (gilt nur für ihre Pfade/Prüfungen). Rolle 'merge' = Entwickler-Regeln
     für den zusammengeführten Stand im Hauptordner, ohne die Unterlagen des Projektleiters."""
-    entwicklerregeln = rolle in ("entwickler", "merge")
+    entwickler_rolle = rolle in ("entwickler", "merge")
+    hauptordner = hauptordner or wurzel
+    vorarbeit = vorarbeit_dateien(e, wurzel, hauptordner, basis, team) if entwickler_rolle else set()
     liste = aenderungen(wurzel, basis)
     if not liste:
         e.o("Keine Dateiänderungen gegenüber %s." % basis[:10])
@@ -417,6 +516,7 @@ def pruefe_diff(e, wurzel, basis, rolle, team, fg):
         bereich = bereiche.bereich_von(p, team)
         if p.startswith(".dev-team/"):
             continue
+        entwicklerregeln = entwickler_rolle and p not in vorarbeit
         if bereich in ("nachweis",) or (rolle == "merge" and bereich == "prozess"):
             continue
         if bereich == "referenz" and status in "MD":
@@ -458,7 +558,9 @@ def pruefe_diff(e, wurzel, basis, rolle, team, fg):
             for zeile in neue_zeilen(wurzel, basis, p):
                 if LEERE_PRUEFUNG_JS.search(zeile):
                     e.f("Prüfung, die immer stimmt, in %s: %s" % (p, zeile.strip()[:120]))
-        if bereich == "teamkonfig" and status in "AMD":
+        if bereich == "teamkonfig" and status == "M" and not entwickler_rolle and nur_verschaerft(git_datei_text(wurzel, basis, p), datei_text(wurzel, p)):
+            e.w("Dev-Team-Einstellungen nur verschärft (Prüfbefehle ergänzt bzw. Kontextgrenzen) – ohne Freigabe erlaubt.")
+        elif bereich == "teamkonfig" and status in "AMD":
             (e.w if fg.deckt(".claude/dev-team.json") else e.f)(
                 "Dev-Team-Einstellungen (.claude/dev-team.json) geändert%s." % (
                     fg.text(".claude/dev-team.json") or
@@ -510,6 +612,49 @@ def pruefe_freigabe(e, hauptordner, stichwort):
     e.f("Freigabe '%s' steht nicht in .claude/freigaben.md. Freigaben trägt nur Simon von Hand ein "
         "(Datum | Stichwort | Geltung | Grund)." % stichwort)
     return Freigabe()
+
+
+def sicherheit_pruefen(e, wurzel, basis, rolle, konfig, fg):
+    """Sicherheits-Schranke (pruefe_sicherheit.py): Geheimnisse, Browser-Variablen, gefährliche Muster in den
+    neuen Zeilen – für jede Rolle. Rot nur, was fast sicher falsch ist; Warnungen bewertet der Reviewer einzeln.
+    Am Meilenstein (projektleiter) zusätzlich der ausgelieferte Build und der Scanner für bekannte Lücken in
+    Abhängigkeiten (sicherheitsbefehl). Eine Freigabe mit Geltung „sicherheit“ macht Fehler zu Warnungen."""
+    try:
+        spec = importlib.util.spec_from_file_location("pruefe_sicherheit", os.path.join(HIER, "pruefe_sicherheit.py"))
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        funde = mod.pruefe_basis(wurzel, basis)
+        if rolle == "projektleiter":
+            funde += [f for f in mod.pruefe_build(wurzel) if not f[1].startswith("Kein Build-Ordner")]
+    except Exception as fehler:  # die Schranke selbst darf daran nie scheitern – aber es fällt auf
+        e.f("Sicherheits-Schranke konnte nicht laufen (%s) – NICHT GEPRÜFT." % fehler)
+        funde = []
+    for stufe, text in funde:
+        if stufe == "f" and not fg.deckt("sicherheit"):
+            e.f("Sicherheit: " + text)
+        else:
+            e.w("Sicherheit: " + text + (fg.text("sicherheit") if stufe == "f" else ""))
+    if not any(s == "f" for s, _ in funde):
+        e.o("Sicherheits-Schranke ohne Fehler%s." % (" (%d Warnungen zum Bewerten)" % len(funde) if funde else ""))
+    befehl = ((konfig or {}).get("sicherheitsbefehl") or "").strip()
+    if rolle == "projektleiter" and befehl:
+        try:
+            bash = shutil.which("bash") if os.name == "nt" else None
+            r = subprocess.run([bash, "-c", befehl] if bash else befehl, cwd=wurzel, shell=not bash,
+                               capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=300)
+            code, aus = r.returncode, ((r.stdout or "") + (r.stderr or "")).strip()
+        except subprocess.TimeoutExpired:
+            code, aus = None, "Zeitgrenze 300 s"
+        befund = re.search(r"\d+\s+(?:low|moderate|medium|high|critical)\b|vulnerabilit|Found \d+ known|severity",
+                           aus, re.IGNORECASE)
+        if code == 0:
+            e.o("Scanner für Abhängigkeiten grün (%s)." % befehl)
+        elif befund:
+            (e.w if fg.deckt("sicherheit") else e.f)(
+                "Scanner für Abhängigkeiten meldet Lücken (%s):\n%s" % (befehl, "\n".join(aus.splitlines()[-12:])))
+        else:
+            e.w("Scanner für Abhängigkeiten konnte nicht laufen (kein Netz oder Werkzeug fehlt) – NICHT GEPRÜFT, vor "
+                "der Übergabe nachholen: %s (%s)" % (befehl, (aus.splitlines() or ["?"])[-1][:120]))
 
 
 def letzter_lauf_pfad(hauptordner):
@@ -592,7 +737,8 @@ def main():
     a.add_argument("--rolle", default="projektleiter",
                    choices=["entwickler", "merge", "tester", "reviewer", "projektleiter", "architekt"])
     a.add_argument("--ohne-lauf", action="store_true")
-    a.add_argument("--freigabe", default="")
+    a.add_argument("--freigabe", action="append", default=[],
+                   help="Stichwort aus .claude/freigaben.md; mehrfach oder mit Komma getrennt möglich")
     arg = a.parse_args()
 
     e = Ergebnis()
@@ -610,8 +756,8 @@ def main():
     team = lade_team()
     konfig, _ = lade_konfig(wurzel, hauptordner)
     fg = Freigabe()
-    if arg.freigabe:
-        fg = pruefe_freigabe(e, hauptordner, arg.freigabe)
+    for stichwort in [w.strip() for f in arg.freigabe for w in f.split(",") if w.strip()]:
+        fg = fg.dazu(pruefe_freigabe(e, hauptordner, stichwort))
     freigabe = fg.zeile
     if ist_worktree and arg.rolle == "entwickler":
         haupt_kopf = git(hauptordner, "rev-parse", "HEAD").strip()
@@ -622,7 +768,7 @@ def main():
     if konfig is None:
         e.f("Keine .claude/dev-team.json gefunden (Projekt nicht im Dev-Team aufgenommen).")
 
-    liste = pruefe_diff(e, wurzel, basis, arg.rolle, team, fg)
+    liste = pruefe_diff(e, wurzel, basis, arg.rolle, team, fg, hauptordner)
     if any(MANIFESTE.search(bereiche.norm(p)) for _, p in liste or []):
         abh = sh([sys.executable, "-X", "utf8", os.path.join(PLUGIN, "scripts", "pruefe_abhaengigkeiten.py"),
                   "--basis", basis], wurzel)
@@ -631,6 +777,7 @@ def main():
             e.f("Abhängigkeits-Schranke (automatisch, weil Manifest/Lockfile geändert):\n%s" % letzte)
         else:
             e.o("Abhängigkeits-Schranke grün (automatisch).")
+    sicherheit_pruefen(e, wurzel, basis, arg.rolle, konfig, fg)
     if basis == git(wurzel, "rev-parse", "HEAD").strip() and arg.rolle in ("projektleiter", "merge", "reviewer"):
         e.w("Basis = aktueller Stand: Es werden keine Änderungen geprüft, nur der Testlauf.")
     if (konfig or {}).get("profil") == "fachsoftware" and arg.rolle == "projektleiter" and not any(
@@ -639,13 +786,14 @@ def main():
         (e.w if fg.deckt("mutation") else e.f)(
             "Profil fachsoftware ohne Mutationstest in 'meilensteinbefehle': Die Testqualität des Berechnungskerns "
             "wird nicht gemessen. Eintragen (z. B. python3 ${DEV_TEAM_PLUGIN}/scripts/mutationstest.py --dateien "
-            "<Kern> --schwelle 70) – über scripts/geschuetzt_schreiben.py mit Simons Freigabe.%s" % fg.text("mutation"))
+            "<Kern> --schwelle 70) – das darf der Projektleiter selbst (Verschärfung, keine Freigabe nötig).%s" % fg.text("mutation"))
     if arg.rolle == "merge":
         eltern = git(wurzel, "rev-list", "--parents", "-n", "1", "HEAD").split()
         if len(eltern) < 3:
             e.f("HEAD ist kein Merge-Commit. Zusammenführen nur mit 'git merge --no-ff', sonst prüft --basis HEAD^1 "
                 "nur den letzten Commit des Pakets.")
-    pruefsummen_pruefen(e, hauptordner, wurzel, fg, arg.rolle)
+    for zeile in pruefsummen_pruefen(e, hauptordner, wurzel, fg, arg.rolle) or []:
+        freigabe = (freigabe + " ; " if freigabe else "") + zeile
     if arg.rolle == "projektleiter":
         abdeckung_pruefen(e, wurzel, hauptordner, konfig, fg)
     wt_ordner = os.path.join(wurzel, ".claude", "worktrees")

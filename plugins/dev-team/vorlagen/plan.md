@@ -37,6 +37,7 @@ Jedes Paket für sich lauffähig und testbar. Paketschnitt, Dateien und Parallel
 - Neue Abhängigkeiten: Name, Grund, Abhängigkeits-Schranke.
 - Betroffene Referenzfälle, neue Referenzfälle nötig?
 - Betroffene Fachregeln, neue Plausibilitätsprüfungen (erst rot am alten Stand, dann beheben).
+- **Einsatz:** intern (nur Firmennetz) / öffentlich (aus dem Internet erreichbar) – bestimmt den Umfang der Sicherheitsprüfung (Grundgesetz „Intern heißt nicht sicher“).
 
 ## 7. Risiken
 Bekannte Risiken und was dagegen getan wird. Ergebnisse von Kritiker, Fachprüfer und Abwägungsrunde werden hier eingearbeitet.

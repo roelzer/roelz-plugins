@@ -4,7 +4,9 @@
 # in denen es keine eingerichtete ~/.claude/CLAUDE.md gibt.
 # Ausgabe auf stdout wird von Claude Code als Kontext übernommen. Darf die Sitzung nie blockieren.
 
-cat >/dev/null 2>&1   # Eingabe-JSON wird nicht gebraucht
+IFS= read -r -d '' eingabe || true   # Eingabe-JSON: nur "source" wird gebraucht (startup, resume, clear, compact)
+quelle=""
+[[ "$eingabe" =~ \"source\"[[:space:]]*:[[:space:]]*\"([a-z]*)\" ]] && quelle="${BASH_REMATCH[1]}"
 
 plugin="${CLAUDE_PLUGIN_ROOT:-}"
 [ -n "$plugin" ] || exit 0
@@ -100,9 +102,9 @@ if [ -d "$projekt/.git" ] || [ -n "$(ls -A "$projekt" 2>/dev/null)" ]; then
     echo "Hinweis an den Projektleiter: Im Projekt fehlt .claude/settings.json mit dem Dev-Team. Ohne sie gilt das Dev-Team in Cloud-Sitzungen dieses Projekts nicht. Wird bei /dev-team:projekt-aufnehmen bzw. /dev-team:neues-projekt angelegt."
   elif grep -q 'waechter' "$projekt/.claude/settings.json" 2>/dev/null && { grep -q '"onFailure"' "$projekt/.claude/settings.json" \
        || grep -q '"ConfigChange"' "$projekt/.claude/settings.json" || ! grep -q 'log-start' "$projekt/.claude/settings.json" \
-       || ! grep -q 'durchlauf' "$projekt/.claude/settings.json"; } 2>/dev/null; then
+       || ! grep -q 'durchlauf' "$projekt/.claude/settings.json" || ! grep -q 'kontext' "$projekt/.claude/settings.json" || ! grep -q 'autoCompactWindow' "$projekt/.claude/settings.json"; } 2>/dev/null; then
     echo
-    echo "Hinweis an den Projektleiter: Die Projekteinstellungen sind veraltet (alter Wächter vor jedem Werkzeugaufruf mit Sperre bei Fehlern, fehlende Laufzeitmessung oder fehlender Durchlauf-Wächter). Das kostet bei jedem Schritt Zeit. Sag Simon das in einem Satz und schlage vor: /dev-team:projekt-aufnehmen erneut ausführen (zeigt die Änderung, schreibt erst nach seinem OK)."
+    echo "Hinweis an den Projektleiter: Die Projekteinstellungen sind veraltet (alter Wächter vor jedem Werkzeugaufruf mit Sperre bei Fehlern, fehlende Laufzeitmessung, fehlender Durchlauf- oder Kontext-Wächter, kein vorgezogenes Zusammenfassen). Das kostet bei jedem Schritt Zeit. Sag Simon das in einem Satz und schlage vor: /dev-team:projekt-aufnehmen erneut ausführen (zeigt die Änderung, schreibt erst nach seinem OK)."
   fi
 fi
 
@@ -115,6 +117,19 @@ if [ "${CLAUDE_CODE_REMOTE:-}" = "true" ] && [ -f "$projekt/docs/ABNAHME_PRUEFSU
       break
     fi
   done
+fi
+
+# Fortsetzung nach dem automatischen Zusammenfassen oder in einer neuen Sitzung (Kontext-Wächter).
+if [ -f "$projekt/docs/SITZUNGSUEBERGABE.md" ]; then
+  echo
+  echo "## Sitzungsübergabe"
+  if [ "$quelle" = "compact" ]; then
+    echo "Das Gespräch wurde eben automatisch zusammengefasst. Projektleiter: Lies docs/STATUS.md und die Übergabe unten, prüf den Stand kurz mit git (Branch, letzter Commit, Worktrees) und arbeite am nächsten Schritt weiter – ohne Simon zu fragen. Ein laufender Durchlauf (.dev-team/durchlauf) bleibt an."
+  else
+    echo "Projektleiter: Lies die Übergabe unten und docs/STATUS.md, prüf den Stand mit git (Branch, letzter Commit, Worktrees). Läuft ein Auftrag und steht dort „Durchlauf: an“, gilt Simons Freigabe weiter: Durchlauf wieder einschalten (mkdir -p .dev-team && date > .dev-team/durchlauf) und am nächsten Schritt weiterarbeiten. Ist der Auftrag abgeschlossen, die Datei löschen."
+  fi
+  echo
+  head -n 80 "$projekt/docs/SITZUNGSUEBERGABE.md" 2>/dev/null
 fi
 
 # Versionswechsel mitten im Auftrag (Plugin aktualisiert sich automatisch von GitHub)

@@ -1,6 +1,10 @@
 # Dev-Team-Tafel
 
-Eine Tafel neben dem Chat, die zeigt, was das Dev-Team gerade macht:
+Eine Tafel neben dem Chat, die zeigt, was das Dev-Team gerade macht – damit der Projektleiter im Durchlauf nichts in den Chat schreiben muss:
+
+- **🔴 Braucht dich** ganz oben, wenn der Lauf angehalten hat (Grund aus `docs/STATUS.md`), und die Zahl offener Fragen an dich (`docs/OFFENE_FRAGEN.md`).
+- **Stand-Kasten:** Jetzt / Zuletzt fertig / Als Nächstes / Geschätzt fertig / Fortschritt, und ob der Durchlauf aktiv ist.
+- **Statusleiste:** eine Kurzzeile („Dev-Team: 🟢 3 von 5 Paketen“), auch wenn die Tafel zu ist.
 
 - **Arbeitet gerade:** jeder laufende Agent mit Rolle, Modell (Opus/Sonnet), Laufzeit und Auftrag (z. B. „entwickler · sonnet · 4 min · P3 Rechenkern“).
 - **Zuletzt fertig:** die letzten fünf Agenten mit Dauer.

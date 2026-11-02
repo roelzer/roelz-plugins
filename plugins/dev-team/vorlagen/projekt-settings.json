@@ -9,12 +9,14 @@
   },
   "enabledPlugins": {
     "dev-team@roelz-plugins": true,
-    "tool-scout@roelz-plugins": true
+    "tool-scout@roelz-plugins": true,
+    "dev-team-tafel@roelz-plugins": true
   },
   "disableAllHooks": false,
   "worktree": {
     "baseRef": "head"
   },
+  "autoCompactWindow": 400000,
   "env": {
     "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1",
     "CLAUDE_CODE_FORK_SUBAGENT": "0"
@@ -39,6 +41,17 @@
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" start",
             "timeout": 120
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" kontext",
+            "timeout": 10
           }
         ]
       }
@@ -71,6 +84,18 @@
           {
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" waechter",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Agent|Task|TaskOutput|SendMessage|Write|Edit|MultiEdit|NotebookEdit|Read|Grep|Glob|Bash|PowerShell|Monitor|WebFetch|WebSearch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/dev-team-start.sh\" kontext",
             "timeout": 10
           }
         ]

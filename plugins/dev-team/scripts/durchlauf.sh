@@ -29,6 +29,6 @@ if [ -f "$kz" ]; then
   [ "$offen" -gt 0 ] && exit 0
 fi
 
-grund="Durchlauf aktiv (Simon hat den Auftrag freigegeben): nicht auf „mach weiter“ warten. Beantworte eine Frage von Simon kurz und arbeite dann am nächsten Schritt laut docs/STATUS.md weiter. Ein Zwischenbericht ist kein Stopp. Anhalten nur bei einem festen Stopp (Abschlussbericht, harter Stopp, Frage, ohne die nichts Unabhängiges mehr weitergeht, Simon sagt stopp) – dann zuerst die Datei .dev-team/durchlauf löschen. Laufen Agenten im Hintergrund, beende die Runde einfach erneut."
+grund="Durchlauf aktiv (Simon hat den Auftrag freigegeben): nicht auf „mach weiter“ warten. Beantworte eine Frage von Simon kurz und arbeite dann still am nächsten Schritt laut docs/STATUS.md weiter (keine Zwischenberichte im Chat, der Stand steht auf der Team-Tafel). Anhalten nur bei einem festen Stopp (Abschlussbericht, harter Stopp, Frage, ohne die nichts Unabhängiges mehr weitergeht, Simon sagt stopp) – dann zuerst die Datei .dev-team/durchlauf löschen und docs/SITZUNGSUEBERGABE.md entfernen. Laufen Agenten im Hintergrund, beende die Runde einfach erneut. Ein voller Kontext ist kein Stopp: Übergabe schreiben (Kontext-Wächter), weiterarbeiten."
 printf '{"decision":"block","reason":"%s"}\n' "$grund"
 exit 0

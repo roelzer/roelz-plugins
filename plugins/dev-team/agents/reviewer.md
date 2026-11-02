@@ -72,7 +72,7 @@ Ob eine Stelle wirklich durch Tests abgesichert ist, belegst du mit einer Fehler
 5. Duplikate?
 6. Korrektheit und Randfälle?
 7. Testqualität?
-8. Sicherheitsmuster (nur grobe Muster im Diff; die tiefe Prüfung gehört dem Sicherheitsprüfer)?
+8. Sicherheit im Diff: Sicherheits-Schranke ohne Fehler (steht in der Schranken-Ausgabe)? **Jede neue Warnung der Schranke und jede Stelle mit „dev-team: sicher – …“ einzeln** mit der Gegenfrage des Entwicklers abgleichen und **selbst zu widerlegen versuchen**: Wie würdest du sie ausnutzen? Gelingt dir ein plausibler Angriffsweg, ist es ein Befund „hoch“, egal wie überzeugt der Entwickler klang. Nur „harmlos“ mit Angriffsweg, Grund und Beleg. Prüft jede **neue** Operation auf Daten serverseitig, ob genau dieser Nutzer genau diesen Datensatz darf, und gibt es dafür einen Test mit fremder ID? (Die tiefe Prüfung gehört dem Sicherheitsprüfer.)
 9. Neue Abhängigkeiten?
 10. Struktur und Architektur?
 11. Projektregeln aus `CLAUDE.md` eingehalten (Benennung, Ordner, Verbote)?

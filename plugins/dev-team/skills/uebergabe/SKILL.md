@@ -8,6 +8,12 @@ disable-model-invocation: true
 
 Voraussetzung: Reviewer, Produktprüfer und (bei Risiko-Auslösern) Sicherheitsprüfer haben freigegeben, die Test-Schranke ist grün. Wenn nicht: zuerst `/dev-team:auftrag` abschließen.
 
+**Sicherheits-Tor (Pflicht, nichts geht ohne):**
+1. `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/pruefe_sicherheit.py" --alles --historie`, nach dem Produktions-Build zusätzlich `--build` – ohne Fehler. Ein Schlüssel in der Historie heißt: beim Anbieter sperren und neu erzeugen, bevor ausgeliefert wird.
+2. `sicherheitsbefehl` aus `.claude/dev-team.json` grün (oder jede gemeldete Lücke mit Begründung, warum sie hier nicht ausnutzbar ist).
+3. `sicherheitspruefer` Modus `angriff` gegen die lokal laufende Anwendung: 🟢, kein offener Befund „kritisch“ oder „hoch“.
+4. Ergebnis mit Datum in `docs/uebergabe/abnahmeprotokoll.md`.
+
 Du bist der Projektleiter und schreibst die Unterlagen in `docs/uebergabe/` selbst (Prozessunterlagen, kein Code).
 
 Lege im Projekt den Ordner `docs/uebergabe/` an mit:
@@ -29,7 +35,7 @@ Version, Datum, was enthalten ist. Bekannte Einschränkungen ehrlich nennen.
 - Unterschriftsfelder Auftraggeber und Auftragnehmer
 Hinweis an Simon: Die Abnahme ist rechtlich wichtig (u. a. Beginn der Gewährleistung und Fälligkeit der Rechnung). Die Vorlage einmal von einem Anwalt prüfen lassen.
 
-## 5. `betrieb.md` – Betriebs-Checkliste (Pflicht im Profil `web`)
+## 5. `betrieb.md` – Betriebs-Checkliste (Pflicht im Profil `web` und bei jeder Anwendung, die Daten speichert)
 Jeden Punkt mit ✅ / ❌ / entfällt (Grund). Offene ❌ gehen als Risiko an Simon, die Auslieferung entscheidet er.
 - [ ] Domain und DNS auf ein Konto des Kunden (oder dokumentiert, wem sie gehören)
 - [ ] HTTPS aktiv, Zertifikat erneuert sich automatisch

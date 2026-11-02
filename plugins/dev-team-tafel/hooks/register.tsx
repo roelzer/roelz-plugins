@@ -5,10 +5,10 @@ import type { Lauf, Tafel } from '../types'
 
 const PANE = 'dev-team-tafel'
 const TITEL = 'Dev-Team'
-const leer: Tafel = { phase: '', ampel: '', test: '', ergebnisse: [], sperren: [] }
+const leer: Tafel = { kasten: [], angehalten: '', durchlauf: false, fragen: 0, phase: '', ampel: '', test: '', ergebnisse: [], sperren: [] }
 
 const laeufe = atom({ plugin: 'dev-team-tafel', key: 'laeufe' } as const, [] as Lauf[], { shape: 'laeufe-1' })
-const tafel = atom({ plugin: 'dev-team-tafel', key: 'tafel' } as const, leer, { shape: 'tafel-1' })
+const tafel = atom({ plugin: 'dev-team-tafel', key: 'tafel' } as const, leer, { shape: 'tafel-2' })
 
 /** "dev-team:entwickler" → "entwickler" */
 export const kurzname = (typ: string): string => typ.replace(/^dev-team:/, '')
@@ -25,8 +25,27 @@ export const dauer = (ms: number): string => {
   return s < 60 ? `${s} s` : s < 3600 ? `${Math.floor(s / 60)} min` : `${Math.floor(s / 3600)} h ${Math.floor((s % 3600) / 60)} min`
 }
 
+/** "> **Jetzt:** P3 baut · **Als Nächstes:** P4" → [["Jetzt", "P3 baut"], ["Als Nächstes", "P4"]] */
+export const kasten = (status: string): [string, string][] => {
+  const zeile = status.split('\n').find(l => /^>\s*\*\*Jetzt:\*\*/.test(l))
+  if (!zeile) return []
+  return zeile
+    .replace(/^>\s*/, '')
+    .split(/\s+·\s+(?=\*\*)/)
+    .map(teil => /^\*\*([^*]+?):\*\*\s*(.*)$/.exec(teil.trim()))
+    .filter((m): m is RegExpExecArray => m !== null && !/^\[.*\]$/.test(m[2].trim()))
+    .map(m => [m[1].trim(), m[2].trim().slice(0, 160)] as [string, string])
+}
+
+/** Offene Fragen: Listenpunkte in docs/OFFENE_FRAGEN.md, die nicht als erledigt markiert sind. */
+export const offeneFragen = (text: string): number =>
+  text
+    .split('\n')
+    .filter(l => /^\s*[-*]\s+\S/.test(l))
+    .filter(l => !/~~|✅|\[x\]|erledigt|beantwortet|entschieden/i.test(l)).length
+
 /** Liest die Tafel-Daten aus den Dateien, die das Dev-Team im Projekt führt. */
-export const auswerten = (status: string, log: string, test: string): Tafel => {
+export const auswerten = (status: string, log: string, test: string, fragen = '', durchlauf = false): Tafel => {
   const z = status.split('\n')
   let phase = ''
   const i = z.findIndex(l => /^##\s+Gerade läuft/.test(l))
@@ -42,7 +61,7 @@ export const auswerten = (status: string, log: string, test: string): Tafel => {
     .reverse()
     .map(l => {
       const c = zelle(l)
-      const text = (c[4] ?? '').replace(/\(\[Bericht\]\([^)]*\)\)/, '').replace(/[#*]/g, '').trim()
+      const text = (c[4] ?? '').replace(/\(\[Bericht\]\([^)]*\)\)/, '').replace(/[#*]/g, '').trim().replace(/^[🟢🟡🔴]\s*/u, '')
       return `${c[1]?.slice(11) ?? ''} ${(c[2] ?? '').replace('■', '').trim()} ${c[3]}: ${text}`.slice(0, 160)
     })
   const sperren = zeilen
@@ -59,7 +78,23 @@ export const auswerten = (status: string, log: string, test: string): Tafel => {
     const c = zelle(t)
     testText = `${c[4] ?? ''} ${c[5] ?? ''} bestanden, ${c[6] ?? '?'} Fehler · ${c[3] ?? ''} · ${c[1]?.slice(11) ?? ''} (${c[2] ?? ''})`
   }
-  return { phase: phase.slice(0, 220), ampel: ampel.slice(0, 120), test: testText, ergebnisse, sperren }
+  let angehalten = ''
+  if (ampel.includes('🔴')) {
+    const k = z.findIndex(l => /^##\s+Angehalten/.test(l))
+    const grund = k >= 0 ? z.slice(k + 1).find(l => l.trim() !== '' && !l.startsWith('#') && !/^\(nur bei/.test(l.trim())) : ''
+    angehalten = (grund ?? '').trim().slice(0, 220) || 'Ampel rot – siehe docs/STATUS.md'
+  }
+  return {
+    kasten: kasten(status),
+    angehalten,
+    durchlauf,
+    fragen: offeneFragen(fragen),
+    phase: phase.slice(0, 220),
+    ampel: ampel.slice(0, 120),
+    test: testText,
+    ergebnisse,
+    sperren,
+  }
 }
 
 const lies = async ($: any, pfad: string): Promise<string> => {
@@ -70,14 +105,33 @@ const lies = async ($: any, pfad: string): Promise<string> => {
   }
 }
 
+const da = async ($: any, pfad: string): Promise<boolean> => {
+  try {
+    return await $.fs.exists(pfad)
+  } catch {
+    return false
+  }
+}
+
 const auffrischen = async ($: any) => {
-  const [s, l, t] = await Promise.all([
+  const [s1, s2, l, t, f, d] = await Promise.all([
     lies($, 'docs/STATUS.md'),
+    lies($, 'docs/status.md'), // unter Linux (Cloud) zählt die Schreibweise
     lies($, 'docs/AGENTEN_LOG.md'),
     lies($, 'docs/TESTNACHWEIS.md'),
+    lies($, 'docs/OFFENE_FRAGEN.md'),
+    da($, '.dev-team/durchlauf'),
   ])
-  const neu = auswerten(s, l, t)
+  const neu = auswerten(s1 || s2, l, t, f, d)
   await update($, tafel, alt => (JSON.stringify(alt) === JSON.stringify(neu) ? alt : neu))
+  // Kurzzeile in der Statusleiste, auch wenn die Tafel zu ist
+  try {
+    const fortschritt = neu.kasten.find(([k]) => k === 'Fortschritt')?.[1] ?? ''
+    const kurz = neu.angehalten !== '' ? '🔴 braucht dich' : `${neu.ampel.slice(0, 2)}${fortschritt !== '' ? ' ' + fortschritt : ''}`
+    $.ui.status(s1 || s2 ? `Dev-Team: ${kurz.trim() || 'läuft'}${neu.fragen > 0 ? ` · ${neu.fragen} Fragen` : ''}` : undefined)
+  } catch {
+    // ohne Statusleiste weiter
+  }
   // Laufende Agenten mit der Liste des Motors abgleichen.
   let liste: { id: string; status: string }[] = []
   try {
@@ -99,6 +153,31 @@ const auffrischen = async ($: any) => {
     })
     return geaendert ? neu2 : alt
   })
+}
+
+/** Gesamtzustand für den Kopf der Tafel. */
+export const zustand = (t: Tafel, aktiv: number): { zeichen: string; text: string; farbe: string } => {
+  if (t.angehalten !== '') return { zeichen: '●', text: 'Braucht dich', farbe: 'error' }
+  if (t.ampel.includes('🔴')) return { zeichen: '●', text: 'Angehalten', farbe: 'error' }
+  if (t.ampel.includes('🟡') || t.fragen > 0) return { zeichen: '●', text: aktiv > 0 ? 'Läuft · offene Punkte' : 'Offene Punkte', farbe: 'warning' }
+  if (aktiv > 0 || t.durchlauf) return { zeichen: '●', text: 'Läuft', farbe: 'success' }
+  return { zeichen: '○', text: 'Bereit', farbe: 'subtle' }
+}
+
+/** "3 von 5 Paketen gemergt" → { anteil: 0.6, text: "3 / 5" } */
+export const fortschritt = (text: string): { anteil: number; text: string } | null => {
+  const m = /(\d+)\s*(?:von|\/|of)\s*(\d+)/.exec(text)
+  if (!m) return null
+  const n = Number(m[1])
+  const g = Number(m[2])
+  if (!g) return null
+  return { anteil: Math.max(0, Math.min(1, n / g)), text: `${n} / ${g}` }
+}
+
+/** Balken aus Blockzeichen – sieht auf jeder Oberfläche gleich aus. */
+export const balken = (anteil: number, breite: number): string => {
+  const voll = Math.round(anteil * breite)
+  return '━'.repeat(voll) + '╌'.repeat(Math.max(0, breite - voll))
 }
 
 export const register: Register = on => {
@@ -141,35 +220,171 @@ export const register: Register = on => {
     const alle = await read($, laeufe)
     const t = await read($, tafel)
     const jetzt = Date.now()
+    // Zeichenbalken: im Terminal so breit wie die Tafel, sonst fest (Proportionalschrift)
+    const breite = e.surface === 'terminal' ? Math.max(12, Math.min(40, (e.props?.bodyColumns ?? 40) - 12)) : 22
     const aktiv = alle.filter(x => x.status === 'laeuft')
-    const fertig = alle.filter(x => x.status !== 'laeuft').slice(-5).reverse()
+    const fertig = alle.filter(x => x.status !== 'laeuft').slice(-4).reverse()
+    const lage = zustand(t, aktiv.length)
+    const feld = (k: string) => t.kasten.find(([n]) => n === k)?.[1] ?? ''
+    const fort = fortschritt(feld('Fortschritt'))
+    const weitere = t.kasten.filter(([k]) => k !== 'Fortschritt')
+
+    const abschnitt = (titel: string, anzahl?: number) => (
+      <Box marginTop={1} gap={1}>
+        <Text size="caption" weight="semibold" color="subtle">
+          {titel.toUpperCase()}
+        </Text>
+        {anzahl !== undefined && (
+          <Text size="caption" color="subtle" tabular>
+            {String(anzahl)}
+          </Text>
+        )}
+      </Box>
+    )
+    const zeile = (links: any, rechts: string, key: string) => (
+      <Box key={key} justifyContent="space-between" gap={1}>
+        <Box flexShrink={1}>{links}</Box>
+        <Text size="footnote" color="subtle" tabular>
+          {rechts}
+        </Text>
+      </Box>
+    )
+
     return (
-      <Box flexDirection="column">
-        {t.phase !== '' && <Text bold wrap="wrap">{t.phase}</Text>}
-        {t.ampel !== '' && <Text wrap="wrap">{t.ampel}</Text>}
-        <Text bold>Arbeitet gerade ({aktiv.length})</Text>
-        {aktiv.length === 0 && <Text dimColor>Niemand – der Projektleiter ist dran oder wartet.</Text>}
-        {aktiv.map(x => (
-          <Text wrap="truncate-end">
-            ⏳ {x.agent} · {x.modell} · {dauer(jetzt - x.start)} · {x.beschreibung}
+      <Box flexDirection="column" paddingX={1}>
+        {/* Kopf: Titel und Zustand */}
+        <Box justifyContent="space-between" alignItems="center">
+          <Text size="heading" weight="bold">
+            Dev-Team
+          </Text>
+          <Text weight="semibold" color={lage.farbe}>
+            {lage.zeichen} {lage.text}
+          </Text>
+        </Box>
+        {t.durchlauf && (
+          <Text size="caption" color="subtle">
+            Durchlauf aktiv · arbeitet ohne Nachfragen
+          </Text>
+        )}
+
+        {/* Braucht dich: die wichtigste Nachricht steht immer oben */}
+        {(t.angehalten !== '' || t.fragen > 0) && (
+          <Box flexDirection="column" marginTop={1} borderStyle="round" borderColor={t.angehalten !== '' ? 'error' : 'warning'} paddingX={1}>
+            {t.angehalten !== '' && (
+              <Text size="caption" weight="semibold" color="error">
+                DEINE ENTSCHEIDUNG
+              </Text>
+            )}
+            {t.angehalten !== '' && (
+              <Text weight="semibold" wrap="wrap">
+                {t.angehalten}
+              </Text>
+            )}
+            {t.fragen > 0 && (
+              <Text color="warning" weight="semibold">
+                {t.fragen === 1 ? '1 offene Frage an dich' : `${t.fragen} offene Fragen an dich`}
+              </Text>
+            )}
+            {t.fragen > 0 && (
+              <Text size="caption" color="subtle">
+                docs/OFFENE_FRAGEN.md
+              </Text>
+            )}
+          </Box>
+        )}
+
+        {/* Fortschritt */}
+        {fort !== null && abschnitt('Fortschritt')}
+        {fort !== null && (
+          <Box gap={1} alignItems="center">
+            <Text color={t.angehalten !== '' ? 'error' : 'success'}>{balken(fort.anteil, breite)}</Text>
+            <Text size="footnote" weight="semibold" tabular>
+              {fort.text}
+            </Text>
+          </Box>
+        )}
+
+        {/* Stand-Kasten */}
+        {weitere.length > 0 && abschnitt('Stand')}
+        {weitere.map(([k, v]) => (
+          <Box key={'k-' + k} flexDirection="column">
+            <Text size="caption" color="subtle">
+              {k}
+            </Text>
+            <Text wrap="wrap">{v}</Text>
+          </Box>
+        ))}
+        {weitere.length === 0 && t.phase !== '' && (
+          <Text wrap="wrap" color="subtle">
+            {t.phase}
+          </Text>
+        )}
+
+        {/* Wer arbeitet */}
+        {abschnitt('Arbeitet gerade', aktiv.length)}
+        {aktiv.length === 0 && (
+          <Text size="footnote" color="subtle">
+            Gerade kein Agent – der Projektleiter plant oder wartet.
+          </Text>
+        )}
+        {aktiv.map(x =>
+          zeile(
+            <Text wrap="truncate-end">
+              <Text color="claude">● </Text>
+              <Text weight="semibold">{x.agent}</Text>
+              <Text color="subtle">
+                {' '}
+                · {x.modell} · {x.beschreibung}
+              </Text>
+            </Text>,
+            dauer(jetzt - x.start),
+            'a-' + x.id,
+          ),
+        )}
+
+        {/* Zuletzt fertig */}
+        {fertig.length > 0 && abschnitt('Zuletzt fertig')}
+        {fertig.map(x =>
+          zeile(
+            <Text wrap="truncate-end">
+              <Text color={x.status === 'fertig' ? 'success' : 'error'}>{x.status === 'fertig' ? '✓ ' : '✗ '}</Text>
+              <Text>{x.agent}</Text>
+              <Text color="subtle"> · {x.beschreibung}</Text>
+            </Text>,
+            dauer((x.ende ?? jetzt) - x.start),
+            'f-' + x.id,
+          ),
+        )}
+
+        {/* Ergebnisse mit Ampel aus dem Agenten-Protokoll */}
+        {t.ergebnisse.length > 0 && abschnitt('Ergebnisse')}
+        {t.ergebnisse.slice(0, 4).map((z, i) => (
+          <Text key={'e-' + i} size="footnote" wrap="truncate-end">
+            {z}
           </Text>
         ))}
-        {fertig.length > 0 && <Text bold>Zuletzt fertig</Text>}
-        {fertig.map(x => (
-          <Text dimColor wrap="truncate-end">
-            {x.status === 'fertig' ? '✓' : '✗'} {x.agent} · {x.modell} · {dauer((x.ende ?? jetzt) - x.start)} · {x.beschreibung}
+
+        {/* Sperren und Warnungen */}
+        {t.sperren.length > 0 && (
+          <Box flexDirection="column" marginTop={1} borderStyle="round" borderColor="warning" paddingX={1}>
+            <Text size="caption" weight="semibold" color="warning">
+              SPERREN UND WARNUNGEN
+            </Text>
+            {t.sperren.map((z, i) => (
+              <Text key={'s-' + i} size="footnote" wrap="truncate-end">
+                {z}
+              </Text>
+            ))}
+          </Box>
+        )}
+
+        {/* Tests */}
+        {t.test !== '' && abschnitt('Tests')}
+        {t.test !== '' && (
+          <Text size="footnote" wrap="truncate-end">
+            {t.test}
           </Text>
-        ))}
-        {t.ergebnisse.length > 0 && <Text bold>Ergebnisse (Agenten-Log)</Text>}
-        {t.ergebnisse.map(z => (
-          <Text wrap="truncate-end">{z}</Text>
-        ))}
-        {t.sperren.length > 0 && <Text bold>Sperren und Warnungen</Text>}
-        {t.sperren.map(z => (
-          <Text color="warning" wrap="truncate-end">{z}</Text>
-        ))}
-        {t.test !== '' && <Text bold>Letzter Testnachweis</Text>}
-        {t.test !== '' && <Text wrap="truncate-end">{t.test}</Text>}
+        )}
       </Box>
     )
   })

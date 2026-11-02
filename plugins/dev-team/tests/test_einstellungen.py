@@ -55,6 +55,14 @@ class Einstellungen(unittest.TestCase):
         self.assertEqual(sum("waechter" in b for b in befehle), 1)
         self.assertNotIn("ConfigChange", neu["hooks"])
 
+    def test_vorgezogenes_zusammenfassen(self):
+        code, aus, neu = self.lauf({"env": {}})
+        self.assertEqual(neu["autoCompactWindow"], 400000)
+        self.assertIn("kontext", json.dumps(neu["hooks"]["PostToolUse"]))
+        self.assertIn("kontext", json.dumps(neu["hooks"]["UserPromptSubmit"]))
+        code, aus, neu = self.lauf({"autoCompactWindow": 250000})
+        self.assertEqual(neu["autoCompactWindow"], 250000)   # eigener Wert bleibt
+
     def test_ohne_schreiben_bleibt_datei_gleich(self):
         code, aus, neu = self.lauf({"env": {}}, schreiben=False)
         self.assertIn("Noch nichts geschrieben", aus)
@@ -131,6 +139,8 @@ class Vorlagen(unittest.TestCase):
         with open(VORLAGE) as f:
             v = json.load(f)
         self.assertEqual(p["hooks"]["PreToolUse"][0]["matcher"], v["hooks"]["PreToolUse"][0]["matcher"])
+        self.assertEqual(p["hooks"]["PostToolUse"][0]["matcher"], v["hooks"]["PostToolUse"][0]["matcher"])
+        self.assertEqual(sorted(p["hooks"]), sorted(v["hooks"]))
 
 
 class Agenten(unittest.TestCase):

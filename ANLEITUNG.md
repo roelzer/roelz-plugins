@@ -1,6 +1,6 @@
 # Dev-Team – Anleitung
 
-Stand: Oktober 2026 · Version 3.12
+Stand: November 2026 · Version 3.14
 
 Dieses Repo enthält zwei Plugins für Claude Code: **`dev-team`** und **`tool-scout`**. Beide enthalten kein Firmen- oder Kundenwissen und dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
 
@@ -154,6 +154,7 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
 - **Sicherheit der Lieferkette:** Ohne weitere Angabe holt die Cloud den aktuellen Stand von `main`. Wer einen geprüften Stand festnageln will, trägt in `.claude/dev-team.json` unter `plugin_stand` einen Tag oder Commit ein (oder setzt in der Cloud-Umgebung `DEV_TEAM_REF`). Ohne Angabe meldet der Start eine Warnung. Wegen des öffentlichen Repos darf dort nie etwas Vertrauliches stehen.
 - Lektionen aus Cloud-Sitzungen landen als Vorschlag in `docs/LEKTIONEN_VORSCHLAEGE.md` des Projekts. Übernommen werden sie später, wenn du dabei bist.
 - **Seit 3.12 in der Cloud:** Nach deiner Freigabe läuft der Auftrag durch, ohne dass du „mach weiter“ schreiben musst (Durchlauf-Wächter). Den Stand siehst du jederzeit oben in `docs/STATUS.md`, jede Nachricht endet mit dem Link; nach jedem Merge wird der Arbeitsbranch gepusht. Die verdeckten Abnahmetests sichert der Projektleiter auf dem Branch `dev-team-verdeckt` (nie zusammenführen); eine neue Sitzung holt sie automatisch zurück.
+- **Seit 3.13 läuft ein Auftrag ohne Handstopps durch:** Wird der Kontext voll, schreibt der Projektleiter selbst eine Übergabe, Claude Code fasst bei 400.000 Tokens automatisch zusammen und der Lauf geht weiter – du musst keine neue Sitzung starten. Neue Abnahmetests und neue Referenzdateien (z. B. eingefrorene Altdaten) legt das Team ohne Freigabe an; du wirst nur noch gefragt, wenn bestehende Referenzwerte oder Abnahmetests geändert werden sollen, bei Produktentscheidungen und bei Dingen, die nur du kannst.
 
 ## 8. Befehle
 
@@ -212,6 +213,12 @@ Danach VS Code neu starten.
 **Nach dem Update auf 3.11 einmal je Projekt:** `/dev-team:projekt-aufnehmen` ausführen. Es bringt die Projekteinstellungen auf den neuen Stand (minimaler Wächter, alte Sperren wie die gegen eingebaute Helfer oder `git push origin main*` – die auch Branches wie `main-1tg5m0` traf – werden entfernt) und zeigt dir die Änderung vorher. Auf jedem Rechner zusätzlich einmal `/dev-team:einrichten` (privat bzw. arbeit), damit Worktrees überall vom aktuellen Stand starten.
 
 **Nach dem Update auf 3.12 einmal je Projekt** (auch für Cloud-Projekte): `/dev-team:projekt-aufnehmen`. Das bringt den Durchlauf-Wächter und die Laufzeitmessung in die Projekteinstellungen und entfernt den alten Wächter, der vor jedem Schritt bis zu 60 s prüfen durfte. Der Sitzungsstart erinnert daran.
+
+**Seit 3.14 – stiller Durchlauf mit Team-Tafel:** Nach deiner Freigabe schreibt der Projektleiter nichts mehr in den Chat, bis ein fester Stopp kommt oder du fragst. Den Stand siehst du auf der Team-Tafel neben dem Chat: oben rot „Braucht dich“, falls der Lauf dich braucht, dann Jetzt / Als Nächstes / Fortschritt, wer gerade arbeitet und die letzten Ergebnisse. Einschalten (einmal je Rechner): `claude plugin install dev-team-tafel@roelz-plugins`, danach Claude Code neu starten; in Projekten schaltet `/dev-team:projekt-aufnehmen` sie ein. Falls sie zu ist: `/tafel`.
+
+**Seit 3.14 – Sicherheit:** Bei jedem Paket prüft die Schranke automatisch auf Schlüssel und Passwörter im Code, auf Geheimnisse im Browser-Code und auf typische Lücken (SQL- und Shell-Injection, fremde Pfade und Adressen, verschluckte Fehler …). Rot heißt: kein Merge. Vor jeder Übergabe probiert der Sicherheitsprüfer einfache Angriffe gegen die laufende Anwendung aus. Für Kundenprojekte mit sensiblen Daten ersetzt das keinen externen Penetrationstest – der Projektleiter sagt dir, wann einer sinnvoll ist.
+
+**Nach dem Update auf 3.13 einmal je Projekt:** `/dev-team:projekt-aufnehmen`. Das bringt das vorgezogene Zusammenfassen und den Kontext-Wächter in die Projekteinstellungen (auch für Cloud-Sitzungen). Der Sitzungsstart erinnert daran.
 
 **Bestehende Projekte auf Version 3 umstellen:** im Projekt `/dev-team:projekt-aufnehmen` ausführen. Es legt `.claude/dev-team.json` an und zeigt dir die Änderungen an `.claude/settings.json` (Teamzwang, Worktrees), bevor es sie schreibt.
 

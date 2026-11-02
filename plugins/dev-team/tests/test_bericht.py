@@ -58,6 +58,17 @@ class TestBericht(unittest.TestCase):
                              "agent_transcript_path": pfad})
         self.assertIn("Bericht direkt", open(dateien[0], encoding="utf-8").read())
 
+    def test_handback_bericht_statt_letzter_zeile(self):
+        # Agenten, die über SubagentHandback berichten: die letzte Textzeile ist nur „Bericht übergeben.“
+        pfad = self.protokoll(
+            {"type": "assistant", "message": {"content": [{"type": "tool_use", "name": "SubagentHandback",
+                                                           "input": {"report": "🟢 FERTIG\nPlan geprüft, 3 Befunde: …"}}]}},
+            {"type": "assistant", "message": {"content": [{"type": "text", "text": "Bericht übergeben."}]}},
+        )
+        dateien = self.ende({"agent_type": "dev-team:kritiker", "last_assistant_message": "Bericht übergeben.",
+                             "agent_transcript_path": pfad})
+        self.assertIn("3 Befunde", open(dateien[0], encoding="utf-8").read())
+
     def test_ohne_agententyp_kein_eintrag(self):
         # In Cloud-Sitzungen kamen Ereignisse ohne Agententyp mit Simons Chatnachricht an („? | mach weiter“).
         dateien = self.ende({"agent_type": "", "last_assistant_message": "Gut mach weiter"})

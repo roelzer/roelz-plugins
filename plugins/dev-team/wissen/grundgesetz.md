@@ -30,19 +30,22 @@ Die Tabelle ist die Arbeitsteilung, an die sich jede Rolle hält. Technisch gesp
 | Bereich | Projektleiter | Entwickler | Tester | Architekt | Rechercheur | alle Prüfer |
 |---|---|---|---|---|---|---|
 | Programmcode | – | ✅ | – | – | – | – |
-| Tests | – | **neue** (und im Paket selbst angelegte weiter bearbeiten) | ✅ | – | – | – |
+| Tests | – | **neue** (und im Paket selbst angelegte weiter bearbeiten) | ✅ (Änderungen, die ein Paket braucht, als **Tester-Vorarbeit**, siehe unten) | – | – | – |
 | Abnahmetests (verdeckt in `.dev-team/verdeckt/`, nach dem Aufdecken `tests/abnahme/`) | – | – (vor dem Aufdecken nicht lesen; der direkte Weg ist gesperrt, mit einem eigenen Skript aber möglich – deshalb Prüfsummen und blinder Lauf) | ✅ | – | – | – |
 | Architektur (`docs/ARCHITEKTUR.md`, `tests/architektur/`) | – | – | – | ✅ | – | – |
 | Design (`docs/DESIGN.md`, `design/`) | – | – | – | – (nur der Designer) | – | – |
-| Referenzfälle (`tests/referenz/`) | nur über `scripts/geschuetzt_schreiben.py` mit Simons Freigabe | – | – | – | – | – |
-| Fachregeln, Lastenheft, Plan, Status, `docs/` | ✅ | – | – | – | – | – |
+| Referenzfälle (`tests/referenz/`) | bestehende ändern/löschen nur über `scripts/geschuetzt_schreiben.py` mit Simons Freigabe | – | **neue** Dateien anlegen ✅ (eingefrorene Daten wie alte Speicherformate, oder Werte mit unabhängiger Herleitung; je Ordner ein `LIESMICH.md` mit Herkunft) | – | – | – |
+| Fachregeln, Lastenheft, Plan, Status und Prozessdateien unter `docs/` | ✅ | – | – | – | – | – |
+| Weitere Unterlagen unter `docs/` (Anleitungen, Hilfetexte), wenn der Bauplan sie nennt | ✅ | ✅ | – | – | – | – |
 | Recherche (`fachwissen/recherche/`) | ✅ | – | – | – | ✅ | – |
-| Dev-Team-Einstellungen (`.claude/dev-team.json`) | anlegen ✅; ändern nur über `scripts/geschuetzt_schreiben.py` mit Simons Freigabe | – | – | – | – | – |
+| Dev-Team-Einstellungen (`.claude/dev-team.json`) | anlegen ✅; **verschärfen** ✅ (Befehle in `zusatzbefehle`/`meilensteinbefehle` ergänzen, Kontextgrenzen); alles andere (Testbefehl, Zählmuster, Setup, `plugin_stand`, Befehle entfernen) nur über `scripts/geschuetzt_schreiben.py` mit Simons Freigabe | – | – | – | – | – |
 | Einstellungsdateien (`.claude/settings*.json`, `~/.claude/settings.json`) | nur über `scripts/settings_zusammenfuehren.py` nach Simons OK | – | – | – | – | – |
 | Freigaben (`.claude/freigaben.md`) | **nur Simon von Hand** | – | – | – | – | – |
 | Agenten-, Skill-, Hook-Dateien | – | – | – | – | – | – |
 
-Referenzwerte ändert nur Simon. Bestehende Tests ändert nur der Tester, nie, um sie grün zu machen.
+Bestehende Referenzwerte ändert nur Simon. Erwartete fachliche Rechenwerte, die nur Simon kennen kann, legt nie das Team fest. Bestehende Tests ändert nur der Tester, nie, um sie grün zu machen.
+
+**Tester- und Architekt-Vorarbeit:** Braucht ein Paket geänderte bestehende Tests (umgestellte Bedienregel, festgeschriebener Text, Gerüst-Test mit Platzhalter) oder geänderte Architekturtests (tote Ausnahmen streichen), erledigt das der Tester bzw. Architekt **auf dem Paketzweig**, bevor der Entwickler startet – als eigener Commit mit dem Betreff `Tester-Vorarbeit P3: …` bzw. `Architekt-Vorarbeit P3: …`. Nie auf dem Arbeitsbranch: rote Vorarbeit-Tests würden parallele Pakete blockieren. Der Projektleiter trägt den Vorarbeit-Commit im Hauptordner ein (`.dev-team/vorarbeit/<Hash>`, für Entwickler gesperrt); nur dann erkennt die Schranke ihn am Anfang des Pakets und rechnet ihn nicht dem Entwickler zu – der Betreff allein beweist nichts; ändert der Entwickler die Dateien danach, ist es wieder sein Verstoß. Die Tests der Vorarbeit dürfen am Startpunkt rot sein – sie sind das Ziel des Pakets.
 
 ## Vollständigkeit: nichts geht verloren
 - Jede Anforderung von Simon wird **einzeln mit Nummer** festgehalten (A1, A2 …), mit Simons eigenen Worten und einem Abnahmekriterium. Auch Nebensätze und „übrigens …“.
@@ -57,7 +60,7 @@ Das ist die **einzige verbindliche Definition**. Sag Simon vor dem Start, welche
 | **Normal** | Feature über mehrere Dateien, begrenzter Umbau | voller Ablauf (`/dev-team:auftrag`) inklusive Abwägungsrunde |
 | **Groß** | Berechnung, Datenmodell, neues Modul, fachliche Folgen, Mehrbenutzer, Schnittstellen | voller Ablauf mit allen Instanzen, Abwägungsrunde immer, Meilensteine |
 
-**Risiko-Auslöser** stufen automatisch auf mindestens **Normal**, bei mehreren oder bei Daten/Updates auf **Groß**: Anmeldung/Rechte, personenbezogene oder vertrauliche Daten, Datenbank oder Datenmigration, Serverbetrieb, Netzwerk/Schnittstellen, Updates/Signierung/Release, Geheimnisse/Schlüssel, Löschen oder Überschreiben von Daten, Desktop-Berechtigungen, neue fremde Abhängigkeiten. Bei Auslösern prüft zusätzlich der `sicherheitspruefer`.
+**Risiko-Auslöser** stufen automatisch auf mindestens **Normal**, bei mehreren oder bei Daten/Updates auf **Groß**: Anmeldung/Rechte, personenbezogene oder vertrauliche Daten, Datenbank oder Datenmigration, Serverbetrieb, Netzwerk/Schnittstellen, Updates/Signierung/Release, Geheimnisse/Schlüssel, Löschen oder Überschreiben von Daten, Desktop-Berechtigungen, neue fremde Abhängigkeiten, mehrere Nutzer bearbeiten dieselben Daten, Dateien oder Daten von außen (Upload, Import), Zahlungen, Anbindung an KI- oder andere externe Dienste. Bei Auslösern prüft zusätzlich der `sicherheitspruefer`.
 
 ## Profile
 Steht in `.claude/dev-team.json` (`"profil"`):
@@ -90,26 +93,19 @@ Damit nichts doppelt oder dreifach geprüft wird, fragt je Thema genau eine Roll
 **Wer miteinander reden darf:** Entwickler und Tester nie; prüfende Rollen (Kritiker, Reviewer, Sicherheitsprüfer, Produktprüfer) nie untereinander. Rückfragen des Entwicklers an den Architekten und Absprachen der Planungsgruppe (Architekt, Designer, Fachprüfer, Rechercheur) beantwortet der Projektleiter **sofort im selben Schritt** (siehe Skill auftrag), ohne den Ablauf neu zu starten. Die Abwägungsrunde hat eine Aussprache (Skill auftrag, Phase 4).
 
 ## Alle Tests grün – mechanisch belegt
-- „Grün“ heißt: Die **Test-Schranke** (`scripts/pruefe-tests.sh`) meldet „OK – alles grün“. Sie führt den Testbefehl und die Zusatzbefehle aus `.claude/dev-team.json` aus und prüft außerdem: keine übersprungenen oder exklusiven Tests, keine geänderten Referenzfälle, keine gelöschten Tests, nicht weniger Tests als beim letzten grünen Lauf, keine 0-Tests-Läufe, Entwickler hat keine bestehenden Tests oder Testkonfiguration angefasst. Nach jedem Merge prüft der Projektleiter das mit `--rolle merge --basis HEAD^1`. Tests, die das Testwerkzeug selbst verändern (assert-Methoden überschreiben, `except AssertionError`, `sys.exit` im Test), und geänderte Testeinstellungen in `pyproject.toml`/`package.json` sind ebenfalls rot. Bei geänderten Manifesten oder Lockfiles läuft die Abhängigkeits-Schranke automatisch mit.
-- Übersprungene oder offene Tests im Testlauf, neue Tests ohne eine einzige Prüfung und Änderungen an `.claude/dev-team.json` sind ebenfalls rot. Geänderte Abnahmetests (gegen `docs/ABNAHME_PRUEFSUMMEN.txt`) sind rot. Am Meilenstein-Ende (`--rolle projektleiter`) zusätzlich: jede Anforderung (A-Nummer) und bei Fachsoftware jede bestätigte Fachregel (F-Nummer, auch R-Nummer wird erkannt) hat einen Test, und die `meilensteinbefehle` (Mutationstest) sind grün.
-- Ausnahmen (`--freigabe <Stichwort>`) gelten nur, wenn Simon die Freigabe **von Hand** in `.claude/freigaben.md` eingetragen hat (`Datum | Stichwort | Geltung | Grund`). Das Stichwort muss genau passen, und die Freigabe gilt nur für die Pfade oder Prüfungen in „Geltung“ (z. B. `tests/referenz/fall3.json` oder `testzahl`). Claude kann diese Datei über die Datei-Werkzeuge nicht schreiben; über die Shell ist es gesperrt, aber nicht unmöglich – deshalb steht jede verwendete Freigabe im Testnachweis und im Bericht, und Simon prüft sie.
+- „Grün“ heißt: Die **Test-Schranke** (`scripts/pruefe-tests.sh`) meldet „OK – alles grün“. Sie führt den Testbefehl und die Zusatzbefehle aus `.claude/dev-team.json` aus und prüft außerdem: keine übersprungenen oder exklusiven Tests, keine geänderten Referenzfälle, keine gelöschten Tests, nicht weniger Tests als beim letzten grünen Lauf, keine 0-Tests-Läufe, Entwickler hat keine bestehenden Tests oder Testkonfiguration angefasst. Nach jedem Merge prüft der Projektleiter das mit `--rolle merge --basis HEAD^1`. Tests, die das Testwerkzeug selbst verändern (assert-Methoden überschreiben, `except AssertionError`, `sys.exit` im Test), und geänderte Testeinstellungen in `pyproject.toml`/`package.json` sind ebenfalls rot. Bei geänderten Manifesten oder Lockfiles läuft die Abhängigkeits-Schranke automatisch mit. Die **Sicherheits-Schranke** (`scripts/pruefe_sicherheit.py`) läuft immer mit: Geheimnisse, Browser-Variablen, gefährliche Muster in neuen Zeilen; am Meilenstein zusätzlich der ausgelieferte Build und der Scanner für Lücken in Abhängigkeiten (`sicherheitsbefehl`).
+- Übersprungene oder offene Tests im Testlauf, neue Tests ohne eine einzige Prüfung und Änderungen an `.claude/dev-team.json` sind ebenfalls rot. Geänderte Abnahmetests (gegen `docs/ABNAHME_PRUEFSUMMEN.txt`) sind rot. Die Prüfsummen-Liste wird nur ergänzt: neue Abnahmetests eines Meilensteins kommen ohne Freigabe dazu, ein versionierter Eintrag ändert sich nie und verschwindet nie (außer mit Simons Freigabe für die Liste und genau diesen Test; sie wird in der Liste vermerkt und bei jeder Schranke im Testnachweis genannt). Am Meilenstein-Ende (`--rolle projektleiter`) zusätzlich: jede Anforderung (A-Nummer) und bei Fachsoftware jede bestätigte Fachregel (F-Nummer, auch R-Nummer wird erkannt) hat einen Test, und die `meilensteinbefehle` (Mutationstest) sind grün.
+- Ausnahmen (`--freigabe <Stichwort>`) gelten nur, wenn Simon die Freigabe **von Hand** in `.claude/freigaben.md` eingetragen hat (`Datum | Stichwort | Geltung | Grund`). Das Stichwort muss genau passen, und die Freigabe gilt nur für die Pfade oder Prüfungen in „Geltung“ (z. B. `tests/referenz/fall3.json`, ein Ordner wie `tests/referenz/format-v1/` mit allem darin, oder `testzahl`). Mehrere Freigaben: `--freigabe a,b`. Claude kann diese Datei über die Datei-Werkzeuge nicht schreiben; über die Shell ist es gesperrt, aber nicht unmöglich – deshalb steht jede verwendete Freigabe im Testnachweis und im Bericht, und Simon prüft sie.
 - Kein Merge, kein Meilenstein-Abschluss, kein Bericht „fertig“ ohne grüne Schranke. Ergebnisse stehen automatisch in `docs/TESTNACHWEIS.md`.
 - Erwartete Testwerte (besonders Referenzfälle) werden **nie** angepasst, damit ein Test grün wird. Ändert sich ein Referenzergebnis: Stopp, Simon entscheidet (`--freigabe`).
 - Grüne Tests beweisen weder Sicherheit noch fachliche Richtigkeit noch gutes Aussehen. Dafür gibt es die anderen Prüfer.
 
-## KI-Schwachstellen und wer sie abfängt
-| Schwachstelle | Gegenmaßnahme |
-|---|---|
-| Tests werden ausgetrickst (Sonderfälle für Testwerte, Funktionen nur einzeln geprüft, Tests abgeschaltet oder leer) | verdeckte Abnahmetests mit Zusammenspiel-Tests und anderen Werten; Entwickler darf bestehende Tests nicht ändern (Wächter + Schranke, nach jedem Merge unabhängig geprüft); Schranke erkennt übersprungene und leere Tests; Reviewer-Pflichtfrage „Testdaten-Sonderfälle“ |
-| erfundene Pakete | Abhängigkeits-Schranke (`scripts/pruefe-abhaengigkeiten.sh`): existiert, alt genug, verbreitet, Lockfile |
-| unsicherer Code | Sicherheitsprüfer mit Scannern; Reviewer-Pflichtfrage Sicherheitsmuster |
-| doppelter Code statt Wiederverwendung | Entwickler sucht vor dem Bauen; Architekt und Reviewer prüfen Duplikate |
-| falsches „fertig“ | fester Status des Entwicklers; ein Hook weist „FERTIG“ ohne grünen Schranken-Nachweis für genau diesen Commit zurück; nur Belege zählen: Schranke, Testnachweis, Agenten-Log |
-| Abdriften bei langen Läufen, Teile passen nicht zusammen | frischer Entwickler pro Paket, Bauplan mit exakten Schnittstellen, Architekturtests, Meilensteine, Stand in Dateien |
-| verschluckte Fehler | Reviewer- und Architekt-Pflichtfrage, Tester prüft Fehlerfälle |
-| Rauschen in Prüfberichten | Sicherheit 0–100 pro Befund, unter 80 nicht in die Befundliste |
-| Optik kaputt trotz grüner Tests | Produktprüfer mit Screenshots Desktop + Handy |
-| gleiche blinde Flecken aller Agenten | Modellmix, Werkzeuge ohne KI (Tests, Linter, Scanner), menschliche Abnahme. **Nicht vollständig lösbar** – ehrlich so berichten |
+## Sicherheit und typische KI-Schwachstellen
+Die Übersicht der häufigsten Schwachstellen (Berechtigungen, Geheimnisse, Injection, unvollständige Tests, gleichzeitige Zugriffe, verschluckte Fehler, Bibliotheken, Backups, Architektur, Geschäftslogik, Updates, Selbstprüfung) mit technischer Prüfung und Besitzer steht in der Checkliste `skills/sicherheit/SKILL.md` im Plugin-Ordner. Für jede Rolle gilt:
+- Die **Sicherheits-Schranke** läuft in der Test-Schranke mit (rot nur fast Sicheres; Warnungen bewertet der Reviewer einzeln). Bewusste Ausnahme nur mit `// dev-team: sicher – <Grund>` in der Zeile; Schlüssel bekannter Anbieter haben keine Ausnahme.
+- **Harmlos muss belegt werden (Gegenfrage):** „harmlos“, „entfällt“ oder „✅“ bei einer Sicherheitsfrage nur mit Angriffsweg, Grund, warum er scheitert, und Beleg (Test, Versuch, Code-Stelle) – sonst „nicht geprüft“. Wer eine Ausnahme schreibt, bewertet sie nie selbst.
+- **Intern heißt nicht sicher:** auch im Firmennetz Rechte, Injection, Geheimnisse, Fehler, Gleichzeitigkeit und Backup voll prüfen (der neugierige Kollege, übernommene Rechner, später doch erreichbar, Datenschutz). Der Plan nennt den Einsatz (intern/öffentlich), danach richtet sich der Umfang der Angriffsversuche.
+- Befunde „kritisch“ und „hoch“ werden nie zurückgestellt. Keine Übergabe ohne Sicherheits-Tor (Skill `uebergabe`). Was Werkzeuge nicht sehen, ist **nicht vollständig lösbar** – ehrlich so berichten.
 
 ## Berichte an Simon
 Jeder Bericht (vom Projektleiter und von jedem Agenten) beginnt mit einer **Ampel**:
@@ -120,7 +116,8 @@ Jeder Bericht (vom Projektleiter und von jedem Agenten) beginnt mit einer **Ampe
 Danach: das Wichtigste in einfacher Sprache, höchstens 5 Punkte, jeweils mit „Was kann im schlimmsten Fall passieren?“ und „Was schlage ich vor?“.
 
 ## Sichtbarkeit: Simon sieht, wer was macht
-- **Vor jedem Agenten-Aufruf** eine Zeile im Chat: „→ Entwickler 2 baut P3 (Rabatt)“. **Danach** eine Zeile mit Ampel: „← Entwickler 2: 🟢 P3 fertig, 14 Tests grün“.
+- **Team-Tafel** (Plugin `dev-team-tafel`) neben dem Chat: Stand-Kasten aus `docs/STATUS.md`, „🔴 Braucht dich“ und offene Fragen ganz oben, laufende Agenten mit Rolle, Modell und Laufzeit, letzte Ergebnisse, Teststand; Kurzzeile in der Statusleiste.
+- **Stiller Durchlauf:** Während eines freigegebenen Auftrags schreibt der Projektleiter nichts in den Chat (keine Zeilen vor/nach Agenten, keine Zwischenberichte) – nur bei festen Stopps, auf Simons Frage (kurz) und wenn er etwas braucht, das nur Simon kann. Außerhalb eines Durchlaufs (Gespräch, Planung, Stufe Klein) normal knapp berichten.
 - `docs/AGENTEN_LOG.md` wird automatisch geschrieben (Hooks). Jeder vollständige Agentenbericht liegt in `docs/pruefberichte/`, eine Kennzahl je Lauf in `.dev-team/kennzahlen.jsonl`. Nicht von Hand bearbeiten.
 - `docs/STATUS.md` zeigt oben immer die aktuelle Phase und **jeden laufenden Agenten**, z. B. „Phase 7: Bauen – Entwickler P3 ⏳, Entwickler P4 ⏳, Reviewer P2 ✅“.
 
@@ -129,6 +126,7 @@ Hat Simon einen Plan freigegeben, wird ohne Rückfragen weitergebaut, auch wenn 
 - Pakete in der geplanten Reihenfolge, parallele Gruppen gleichzeitig. Nach jedem Paket: Review, Merge, Schranke, `docs/STATUS.md`.
 - **Entscheiden statt stehen bleiben:** Umkehrbare Fragen (Widersprüche im Plan, kleine Lücken, Befunde nach der letzten Fix-Runde) entscheidest du und schreibst sie nach `docs/ENTSCHEIDUNGEN.md` (`Datum | was | warum | was es kostet, wenn falsch`). Im Bericht stehen sie **vollständig**.
 - **Nicht raten.** Unklarheit → `docs/OFFENE_FRAGEN.md` (mit Empfehlung) und weiter mit einem unabhängigen Paket.
+- **Simon nur fragen, was nur Simon kann.** Fragen, für die er kein Fachwissen braucht oder hat (Technik, Werkzeuge, Prozess, Sicherheitsdetails, Formulierungen), entscheidest du nach der Empfehlung des zuständigen Agenten, schreibst sie in `docs/ENTSCHEIDUNGEN.md` und informierst ihn im nächsten Bericht. Vorgelegt werden nur: Produkt- und Fachentscheidungen, die seine Anforderungen verändern; was technisch ausschließlich er kann (Konten, Netzwerk, echtes Gerät, Zahlungen); geänderte bestehende Referenzwerte oder Abnahmetests; Unumkehrbares. Unbestätigte Fachregeln bleiben dabei „vorläufig“.
 - **Harte Stopps** (Stand sichern, Grund in STATUS.md): Referenzfall oder Fachregel rot und nicht im Plan behebbar; Änderung außerhalb des Plans nötig (Datenmodell, Umbau). Eine neue Abhängigkeit ist **kein** harter Stopp, wenn die Abhängigkeits-Schranke grün ist (Zeile in `docs/ENTSCHEIDUNGEN.md`); ein Agent meldet 🔴 und es ist nicht innerhalb von 3 Runden behebbar; etwas müsste gelöscht oder überschrieben werden, das nicht neu angelegt wurde; eine freigabepflichtige Aktion wäre nötig; eine Rolle fehlt.
 
 ## Fertig heißt belegt
@@ -151,6 +149,13 @@ Eigenständig heißt: selbst arbeiten innerhalb dieser Grenzen, nicht: alles dü
 - **Ein ⛔ des Wächters hält den Lauf nicht an:** das Paket zurückstellen oder anders schneiden, dokumentieren, weiterbauen.
 - Der Stand liegt **in Dateien, nicht im Gedächtnis**: `docs/STATUS.md` (Phase, Pakete, laufende Agenten, Basis-Commits, zurückgestellte Befunde), `docs/plan.md`, `docs/ENTSCHEIDUNGEN.md`, `docs/OFFENE_FRAGEN.md`, `docs/TESTNACHWEIS.md`. Nach `/compact`, `/clear` oder Sitzungsende liest du zuerst diese Dateien.
 - Lange Ausgaben zusammenfassen, nicht komplett im Gespräch behalten.
+
+## Voller Kontext: automatisch weiter, ohne Wissensverlust
+- Claude Code fasst das Gespräch automatisch zusammen, wenn der Kontext voll ist. Das Dev-Team zieht das vor: `autoCompactWindow: 400000` in `.claude/settings.json` (bei 1-Mio-Modellen sonst erst bei rund 967.000). Grund: Jeder Schritt liest den ganzen Kontext neu (Kosten), und sehr lange Kontexte machen ungenauer. Der eigentliche Stand liegt ohnehin in Dateien.
+- Der **Kontext-Wächter** (`scripts/kontext.sh`) misst die echte Kontextgröße. Ab 70 % des Fensters: `docs/STATUS.md` nach jedem Schritt aktuell halten. Ab 85 %: sofort `docs/SITZUNGSUEBERGABE.md` nach `vorlagen/sitzungsuebergabe.md` schreiben, STATUS aktualisieren, beides committen – dann **weiterarbeiten**. Kein Stopp, keine Frage an Simon.
+- Nach dem Zusammenfassen lädt der Sitzungsstart Grundgesetz und Übergabe wieder; der Durchlauf bleibt an. In einer neuen Sitzung genauso (Durchlauf wieder einschalten, wenn die Übergabe „an“ sagt). Bei jedem festen Stopp und am Ende des Auftrags die Übergabedatei entfernen.
+- Modelle mit 200.000er Fenster erkennt der Wächter am Modellnamen im Protokoll und rechnet mit diesem Fenster.
+- **Agenten** haben eine eigene Grenze (200.000, höchstens 80 % des Fensters, `kontext_grenze_agent`): Wer sie erreicht, hat ein zu großes Paket. Er schließt sauber ab (Zwischenstand committen, BLOCKIERT, Grund „Kontext voll“, was fertig ist, was fehlt, nächster Schritt). Der Projektleiter gibt den Rest an einen frischen Agenten (Startpunkt = letzter Commit des Vorgängers; zählt nicht als Fix-Runde; zweimal im selben Paket → Architekt teilt).
 
 ## Fachregeln
 - Jedes Projekt mit fachlichen Ergebnissen hat `fachwissen/regeln.md`: Regeln, die ein Ergebnis **niemals** verletzen darf.
@@ -191,7 +196,7 @@ Das Gehirn ist Simons privater Obsidian-Tresor (Repo `roelzer/brain`, Pfad in de
 - Wiederholt sich eine Lektion, wird sie zur festen Regel in diesem Grundgesetz.
 
 ## Tokens sparen
-- Eine Aufgabe pro Sitzung. Danach `/clear`. Bei langen Sitzungen `/compact`.
+- Eine Aufgabe pro Sitzung. Danach `/clear`. Lange Sitzungen regelt der Kontext-Wächter (siehe „Voller Kontext“).
 - Jedem Agenten nur den nötigen Kontext und eine klare Frage geben.
 - Unabhängige Prüfer parallel starten (höchstens 3).
 
