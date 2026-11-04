@@ -663,6 +663,7 @@ class TestSchranke(unittest.TestCase):
         self.assertEqual(code, 2, aus)
         self.assertIn("UNGÜLTIG", aus)
         self.assertIn("Lade- oder Syntaxfehler", aus)
+        self.assertIn("Ladefehler: ", aus)   # nennt die Ursache, damit sie sich nachstellen lässt
 
     def test_rote_tests(self):
         self.schreibe("src/rechnung.py", "def summe(w):\n    return 0\n")

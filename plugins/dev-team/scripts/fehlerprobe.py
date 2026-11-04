@@ -58,6 +58,14 @@ def letzte(ausgabe, n=3):
     return ["  " + z[:160] for z in ausgabe.splitlines() if z.strip()][-n:]
 
 
+def ladefehler_zeile(ausgabe):
+    """Die erste Zeile mit dem Ladefehler (welches Modul fehlt) – sie steht oft weit vor den letzten Zeilen."""
+    for z in ausgabe.splitlines():
+        if LADEFEHLER.search(z):
+            return "  Ladefehler: " + z.strip()[:240]
+    return None
+
+
 def main():
     a = argparse.ArgumentParser()
     a.add_argument("--datei", required=True)
@@ -149,6 +157,7 @@ def main():
         if LADEFEHLER.search(aus) and not PRUEFFEHLER.search(aus):
             print("UNGÜLTIG: Mit dem eingebauten Fehler (%s) sind die Tests nur wegen eines Lade- oder Syntaxfehlers "
                   "rot, nicht wegen einer Prüfung. Ersetzung so wählen, dass der Code gültig bleibt." % stelle)
+            print(ladefehler_zeile(aus))
             for z in letzte(aus, 5):
                 print(z)
             sys.exit(2)

@@ -1,5 +1,17 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.14.1 – Rest aus dem Pilot M3–M7
+
+Was aus dem früheren Umbau (PR #8) auf `main` noch fehlte; der Rest steckt schon in 3.13/3.14.
+
+- **Entwickler: Opus für `mittel` und `schwer`**, Sonnet nur für `einfach` – Ergebnis des Versuchs aus 3.12 (Pilot M3–M6: Opus 0–1 Nachbesserungsrunde je Paket, Sonnet 1–2). Standardmodell im Steckbrief jetzt Opus.
+- **Designer nach Risiko:** reine Oberflächen-Pakete ohne Daten- oder Eingaberisiko sieht er einmal gesammelt am Meilenstein-Ende statt je Paket.
+- **Kleiner Folge-Meilenstein:** eine gemeinsame Gesamtprüfung statt zwei.
+- **Merge-Schranke rot nur durch Zeitüberschreitung:** einmal ohne parallele Testläufe wiederholen, flackernde Tests an den Tester.
+- **Cloud:** fertig geprüfte Paketstände, die auf eine Freigabe warten, als `dev-team/zwischenstand-<paket>` pushen statt nur im Container (M7: fünf fertige Pakete lagen über Nacht nur lokal); entfernte Branches löscht nur Simon.
+- **fehlerprobe.py** nennt bei „UNGÜLTIG“ die Zeile mit dem Ladefehler.
+- **Lektionen** (Rückfall-Datei): Gleitkomma-Grenzwerte, Gegenprobe-Suchtext, userEvent mit Fake-Timern, Sichtprüfung von Überlagerungen.
+
 ## 3.14.0 – Sicherheit: einfache Lücken kommen nicht mehr durch
 
 Anlass: Simons Vorgabe „man darf sich nicht durch einfache Lücken hacken lassen – gerade bei Kundenprojekten“ und seine Liste der zwölf häufigsten Schwachstellen bei KI-Entwicklung. Bisher hing Sicherheit vollständig am Urteil des Sicherheitsprüfers und des Reviewers; es gab keine technische Sperre im Projektcode, keine Regel für den Browser-Code und keine echten Angriffsversuche.

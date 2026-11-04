@@ -11,3 +11,7 @@ Pflege: Bei über 40 Einträgen zusammenfassen; doppelte zusammenlegen; wiederke
 - [Prozess/Effizienz] Entwickler arbeiten vor FERTIG die Selbstprüfung ab (Plan-Treue, Gegenproben, Grenzfälle, Sichtprüfung, Duplikate) – spart je Paket 1–2 Review-Runden. (Pilot-Auswertung, 2026-10-30)
 - [Prozess] Änderungen an bestehenden Tests, die ein Bauplan braucht, macht der Tester vorab in einem eigenen Commit – nie im Merge-Commit eines Entwicklerpakets. (Merge-Schranke meldete Tester-Änderung, 2026-10-30)
 - [Werkzeuge] Eine Gegenprobe zählt nur, wenn der Leerlauf grün war und der Test an einer Prüfung scheitert, nicht an einem Lade- oder Syntaxfehler. (Schein-„ERKANNT“ ohne node_modules, 2026-10-30)
+- [Tests] Grenzwert-Tests mit Gleitkomma (`<=` gegen `<`) treffen die Grenze nur, wenn die Differenz exakt darstellbar ist – Grenzwerte so wählen (z. B. 0,5 statt 0,1). (Pilot M3, 2026-10-30)
+- [Werkzeuge] Gegenprobe-Suchtext mit genug Umgebung angeben, damit er genau eine Stelle trifft – sonst wird die erste Fundstelle ersetzt. (Pilot M4, 2026-10-30)
+- [Werkzeuge] userEvent unter vi.useFakeTimers() hängt in happy-dom – Tastatur dort mit fireEvent prüfen. (Pilot M4, 2026-10-30)
+- [Sichtprüfung] Überlagerungen (Bänder, Hinweise, Menüs) in jeder Ansicht fotografieren, die die Fläche nutzt, am Handy und am Desktop. (Pilot M3, 2026-10-30)
