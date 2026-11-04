@@ -29,7 +29,7 @@ Gilt nur für dieses Projekt. Allgemeine Regeln stehen im Grundgesetz des Dev-Te
 - `docs/risiko-log.md` – Risiken und Entscheidungen
 - `docs/ARCHITEKTUR.md` – Architektur-Rückgrat (nur der Architekt ändert es)
 - `docs/ENTSCHEIDUNGEN.md` – Entscheidungen des Projektleiters während eines Auftrags
-- `.claude/freigaben.md` – Freigaben, nur von Simon von Hand
+- `.claude/freigaben.md` – Freigaben: technische trägt der Projektleiter nach Kritiker-Prüfung ein, fachliche nur Simon
 - `fachwissen/regeln.md` – Fachregeln, die nie verletzt werden dürfen
 - `tests/referenz/` – Referenzfälle mit bekanntem Ergebnis
 

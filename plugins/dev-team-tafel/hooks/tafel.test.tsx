@@ -1,6 +1,6 @@
 import { expect, test } from 'claude-code/testing'
 
-import { auswerten, balken, fortschritt, kasten, kurzname, modellname, offeneFragen, zustand } from './register'
+import { auswerten, balken, fortschritt, kasten, kurzname, modellname, nurSimonOffen, offeneFragen, zustand } from './register'
 
 const PANE = {
   plugin: 'dev-team-tafel',
@@ -120,4 +120,17 @@ test('Fortschritt, Balken und Zustand', async () => {
   expect(zustand(leer, 0).text).toBe('Bereit')
   expect(zustand({ ...leer, durchlauf: true }, 0).text).toBe('Läuft')
   expect(zustand({ ...leer, angehalten: 'x' }, 2).text).toBe('Braucht dich')
+})
+
+test('Fragen und „Nur Simon“-Liste werden getrennt gezählt', async () => {
+  const datei = '# Offene Fragen\n\n## Fragen an Simon\n- **Q1 (blockiert: nein):** CSV? – Empfehlung: ja\n- **Q2** ✅ erledigt\n\n' +
+    '## Nur Simon\n- [ ] Seite im privaten Fenster prüfen – so geht es: 1. …\n- [x] Branch geschützt\n- [ ] [Was] – so geht es: 1. …\n'
+  expect(offeneFragen(datei)).toBe(1)
+  expect(nurSimonOffen(datei)).toBe(1)
+})
+
+test('Vorlagenzeilen zählen nicht', async () => {
+  const v = '# Offene Fragen\n\n## Fragen an Simon\n- **Q1 (blockiert: ja/nein):** [Frage in einem Satz] – Empfehlung: [ … ]\n\n## Nur Simon\n- [ ] [Was] – so geht es: 1. …\n'
+  expect(offeneFragen(v)).toBe(0)
+  expect(nurSimonOffen(v)).toBe(0)
 })

@@ -43,7 +43,8 @@ class Einstellungen(unittest.TestCase):
         # 3.11: alte Bremsen werden entfernt (Teamzwang-Sperren, main* traf auch Branches wie main-1tg5m0)
         self.assertNotIn("Agent(Explore)", neu["permissions"]["deny"])
         self.assertNotIn("Bash(git push origin main*)", neu["permissions"]["deny"])
-        self.assertIn("Bash(git push origin main)", neu["permissions"]["deny"])
+        self.assertNotIn("Bash(git push origin main)", neu["permissions"]["deny"])   # seit 3.15: PL merged selbst
+        self.assertIn("Bash(git push --force*)", neu["permissions"]["deny"])
         self.assertEqual(neu["permissions"]["allow"], ["Bash(npm test)"])
         self.assertFalse(neu["disableAllHooks"])
         self.assertEqual(neu["worktree"]["baseRef"], "head")

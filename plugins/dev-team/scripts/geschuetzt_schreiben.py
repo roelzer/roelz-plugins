@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Schreibt eine geschützte Datei (Referenzfall oder .claude/dev-team.json) – nur mit Simons Freigabe.
+"""Schreibt eine geschützte Datei (Referenzfall oder .claude/dev-team.json) – nur mit einer Freigabe in .claude/freigaben.md.
 
 Der Projektleiter darf Referenzfälle und die Dev-Team-Einstellungen nicht selbst ändern. Liefert Simon
 neue Referenzdaten oder einen geänderten Testbefehl, trägt er in .claude/freigaben.md eine Zeile ein:

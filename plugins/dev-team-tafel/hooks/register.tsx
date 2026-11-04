@@ -5,10 +5,10 @@ import type { Lauf, Tafel } from '../types'
 
 const PANE = 'dev-team-tafel'
 const TITEL = 'Dev-Team'
-const leer: Tafel = { kasten: [], angehalten: '', durchlauf: false, fragen: 0, phase: '', ampel: '', test: '', ergebnisse: [], sperren: [] }
+const leer: Tafel = { kasten: [], angehalten: '', durchlauf: false, fragen: 0, nurSimon: 0, phase: '', ampel: '', test: '', ergebnisse: [], sperren: [] }
 
 const laeufe = atom({ plugin: 'dev-team-tafel', key: 'laeufe' } as const, [] as Lauf[], { shape: 'laeufe-1' })
-const tafel = atom({ plugin: 'dev-team-tafel', key: 'tafel' } as const, leer, { shape: 'tafel-2' })
+const tafel = atom({ plugin: 'dev-team-tafel', key: 'tafel' } as const, leer, { shape: 'tafel-3' })
 
 /** "dev-team:entwickler" → "entwickler" */
 export const kurzname = (typ: string): string => typ.replace(/^dev-team:/, '')
@@ -37,12 +37,20 @@ export const kasten = (status: string): [string, string][] => {
     .map(m => [m[1].trim(), m[2].trim().slice(0, 160)] as [string, string])
 }
 
-/** Offene Fragen: Listenpunkte in docs/OFFENE_FRAGEN.md, die nicht als erledigt markiert sind. */
-export const offeneFragen = (text: string): number =>
-  text
-    .split('\n')
-    .filter(l => /^\s*[-*]\s+\S/.test(l))
-    .filter(l => !/~~|✅|\[x\]|erledigt|beantwortet|entschieden/i.test(l)).length
+/** Offene Fragen: Listenpunkte in docs/OFFENE_FRAGEN.md, die nicht als erledigt markiert sind (ohne „Nur Simon“). */
+export const offeneFragen = (text: string): number => {
+  let nurSimon = false
+  let n = 0
+  for (const l of text.split('\n')) {
+    if (/^#{1,3}\s/.test(l)) nurSimon = /nur simon/i.test(l)
+    else if (!nurSimon && /^\s*[-*]\s+(?!\[[ xX]\])\S/.test(l) && !/~~|✅|erledigt|beantwortet|entschieden/i.test(l) && !/:\*\*\s*\[[^\]]+\]/.test(l)) n++
+  }
+  return n
+}
+
+/** „Nur Simon“-Liste: offene Kästchen `- [ ]` (Vorlagenzeile mit eckigen Platzhaltern zählt nicht). */
+export const nurSimonOffen = (text: string): number =>
+  text.split('\n').filter(l => /^\s*[-*]\s+\[ \]\s+(?!\[)/.test(l)).length
 
 /** Liest die Tafel-Daten aus den Dateien, die das Dev-Team im Projekt führt. */
 export const auswerten = (status: string, log: string, test: string, fragen = '', durchlauf = false): Tafel => {
@@ -89,6 +97,7 @@ export const auswerten = (status: string, log: string, test: string, fragen = ''
     angehalten,
     durchlauf,
     fragen: offeneFragen(fragen),
+    nurSimon: nurSimonOffen(fragen),
     phase: phase.slice(0, 220),
     ampel: ampel.slice(0, 120),
     test: testText,
@@ -290,6 +299,14 @@ export const register: Register = on => {
                 docs/OFFENE_FRAGEN.md
               </Text>
             )}
+          </Box>
+        )}
+        {t.nurSimon > 0 && t.angehalten === '' && t.fragen === 0 && (
+          <Box flexDirection="column" marginTop={1} borderStyle="round" borderColor="subtle" paddingX={1}>
+            <Text weight="semibold">{t.nurSimon === 1 ? '1 Punkt nur für dich' : `${t.nurSimon} Punkte nur für dich`}</Text>
+            <Text size="caption" color="subtle">
+              „Nur Simon“ in docs/OFFENE_FRAGEN.md · hält den Lauf nicht an
+            </Text>
           </Box>
         )}
 

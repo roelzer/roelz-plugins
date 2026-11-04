@@ -1,6 +1,6 @@
 # Dev-Team – Anleitung
 
-Stand: November 2026 · Version 3.14.1
+Stand: November 2026 · Version 3.15.1
 
 Dieses Repo enthält zwei Plugins für Claude Code: **`dev-team`** und **`tool-scout`**. Beide enthalten kein Firmen- oder Kundenwissen und dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
 
@@ -46,7 +46,7 @@ Für alle anderen Aufrufe endet er sofort. Kann er nicht laufen (Last, fehlende 
 
 Was es außerdem gibt, ohne zu bremsen:
 - Die **Test-Schranke** nach jedem Paket und Merge erkennt geänderte Tests und Referenzwerte – auch wenn jemand sie über die Shell geändert hat.
-- **Sperrregeln in den Projekteinstellungen:** kein Force-Push, kein Push auf main, keine Geheimnisse (`.env`, Schlüssel) lesen. Noch stärker: auf GitHub für `main` den Branch-Schutz einschalten.
+- **Sperrregeln in den Projekteinstellungen:** kein Force-Push, keine Geheimnisse (`.env`, Schlüssel) lesen. Noch stärker: auf GitHub für `main` den Branch-Schutz einschalten.
 - **Prüfsummen und blinder Lauf** der verdeckten Tests, Reviewer, Teamnachweis im Abschlussbericht.
 
 ## 3. Wie viel Prüfung? Stufen und Profile
@@ -214,6 +214,8 @@ Danach VS Code neu starten.
 
 **Nach dem Update auf 3.12 einmal je Projekt** (auch für Cloud-Projekte): `/dev-team:projekt-aufnehmen`. Das bringt den Durchlauf-Wächter und die Laufzeitmessung in die Projekteinstellungen und entfernt den alten Wächter, der vor jedem Schritt bis zu 60 s prüfen durfte. Der Sitzungsstart erinnert daran.
 
+**Seit 3.15 – ein Stopp oder keiner:** Das Team fragt dich nur noch einmal, in der Startfreigabe: Anforderungen, Plan und Entscheidungen in einer Nachricht. Technische Freigaben (z. B. einen Abnahmetest an eine geänderte Anforderung anpassen) prüft ein unabhängiger Kritiker und der Projektleiter trägt sie ein; nur fachliche Sollwerte und Regeln landen bei dir. Am Ende führt der Projektleiter selbst nach `main` zusammen, wenn alles grün ist – du musst nicht mehr auf „Merge“ klicken. Danach läuft es bis zum Ende. Willst du gar nicht gefragt werden, schreib beim Auftrag „Autopilot“: Dann entscheidet das Team nach Empfehlung und legt dir die Entscheidungen am Ende vor; was nur du darfst, wird geparkt und steht in `docs/OFFENE_FRAGEN.md`. Dinge, die nur ein Mensch kann (z. B. etwas im privaten Browser prüfen), stehen dort unter „Nur Simon“ und halten den Lauf nie an.
+
 **Seit 3.14 – stiller Durchlauf mit Team-Tafel:** Nach deiner Freigabe schreibt der Projektleiter nichts mehr in den Chat, bis ein fester Stopp kommt oder du fragst. Den Stand siehst du auf der Team-Tafel neben dem Chat: oben rot „Braucht dich“, falls der Lauf dich braucht, dann Jetzt / Als Nächstes / Fortschritt, wer gerade arbeitet und die letzten Ergebnisse. Einschalten (einmal je Rechner): `claude plugin install dev-team-tafel@roelz-plugins`, danach Claude Code neu starten; in Projekten schaltet `/dev-team:projekt-aufnehmen` sie ein. Falls sie zu ist: `/tafel`.
 
 **Seit 3.14 – Sicherheit:** Bei jedem Paket prüft die Schranke automatisch auf Schlüssel und Passwörter im Code, auf Geheimnisse im Browser-Code und auf typische Lücken (SQL- und Shell-Injection, fremde Pfade und Adressen, verschluckte Fehler …). Rot heißt: kein Merge. Vor jeder Übergabe probiert der Sicherheitsprüfer einfache Angriffe gegen die laufende Anwendung aus. Für Kundenprojekte mit sensiblen Daten ersetzt das keinen externen Penetrationstest – der Projektleiter sagt dir, wann einer sinnvoll ist.
@@ -234,7 +236,7 @@ Damit der Lauf nicht bei der ersten Rückfrage stehen bleibt, braucht Claude Cod
 
 ## 11. Senior-Qualitätsregeln und Grenzen der Autonomie
 
-- Gebaut wird eigenständig, aber auf einem eigenen Branch. Kein Push auf `main`, kein Löschen, keine Datenbank-Migration, kein Release, keine Schlüssel in der Sitzung und keine Daten an externe Dienste ohne dein Ja. Die vollständige Liste steht im Grundgesetz („Grenzen der Autonomie“).
+- Gebaut wird eigenständig, aber auf einem eigenen Branch; nach `main` führt der Projektleiter erst am Ende zusammen, wenn alles grün ist (liefert `main` automatisch aus, nur mit deiner Erlaubnis aus der Startfreigabe). Kein Löschen, keine Datenbank-Migration, kein Release, keine Schlüssel in der Sitzung und keine Daten an externe Dienste ohne dein Ja. Die vollständige Liste steht im Grundgesetz („Grenzen der Autonomie“).
 - Technische Grenzen: höchstens drei Entwickler und drei Prüfer gleichzeitig, jeder mit Schrittobergrenze, Nachbesserung höchstens fünf Runden. Große Aufträge werden in Meilensteine mit höchstens 5 Paketen geteilt; deine Freigabe gilt für alle, angehalten wird nur bei Rot oder harten Stopps. Der Stand steht in Dateien (`docs/STATUS.md`), damit nach `/clear` nichts verloren geht.
 - Gibt dein Auftrag eigene Phasen vor („nur analysieren, noch nichts ändern“), gilt das vor dem Standardablauf.
 - Selbstprüfung des Plugins: `bash plugins/dev-team/scripts/pruefe-plugin.sh` (findet widersprüchliche Namen, tote Verweise, uneinheitliche Versionen, Abweichungen zwischen `team.json` und den Agentendateien und führt die Plugin-Tests aus).
