@@ -13,11 +13,13 @@ Jeder Auftrag läuft in einer von drei Besetzungen. Der Projektleiter wählt sie
 
 | Besetzung | Wofür | Wer baut | Wer prüft |
 |---|---|---|---|
-| **Solo** (Standard) | Eigenbedarf, interne Werkzeuge ohne sensible Kundendaten, Prototypen | der Projektleiter selbst, Feature für Feature, mit Tests | Schranken nach jedem Feature (ohne KI, kostet fast nichts); je Abschnitt ein `reviewer` (gesamt, mit Sicherheit); bei Risiko-Auslösern einmal der `sicherheitspruefer` mit Angriffsversuchen vor der ersten echten Nutzung |
-| **Kunde** | Kundenprojekte | der Projektleiter selbst; bei großen, klar trennbaren Teilen bis zu 3 `entwickler` parallel | zusätzlich: `architekt` (Rückgrat), `kritiker` (Plan und Bauplan-Probe), verdeckte Abnahmetests (`tester`), je Meilenstein `reviewer` + `sicherheitspruefer` (+ `fachpruefer` bei Berechnungen), vor der Übergabe Angriffsversuche, `produktpruefer` und Übergabe-Unterlagen |
+| **Solo** (Standard) | Eigenbedarf, interne Werkzeuge ohne sensible Kundendaten, Prototypen | der Projektleiter selbst, Feature für Feature, mit Tests | Schranken nach jedem Feature (ohne KI, kostet fast nichts); je Abschnitt ein `reviewer` (gesamt, mit Sicherheit); bei Oberflächen `designer` einmal zu Beginn (Entwurf) und je Abschnitt (Sichtprüfung); bei Risiko-Auslösern einmal der `sicherheitspruefer` mit Angriffsversuchen vor der ersten echten Nutzung |
+| **Kunde** | Kundenprojekte | der Projektleiter selbst; bei großen, klar trennbaren Teilen bis zu 3 `entwickler` parallel | zusätzlich: `architekt` (Rückgrat), `designer` je Meilenstein (Sichtprüfung), `kritiker` (Plan und Bauplan-Probe), verdeckte Abnahmetests (`tester`), je Meilenstein `reviewer` + `sicherheitspruefer` (+ `fachpruefer` bei Berechnungen), vor der Übergabe Angriffsversuche, `produktpruefer` und Übergabe-Unterlagen |
 | **Voll** | hohes Risiko: Berechnungen, bei denen Fehler Geld kosten, Gesundheits- oder Finanzdaten vieler Nutzer, viele Nutzer mit Rechten | `entwickler` je Paket (bis zu 3 parallel), der Projektleiter baut nicht selbst | alle Rollen wie im Skill `auftrag` beschrieben (Abwägungsrunde, Prüfer je Paket) |
 
 Warum: Ein einzelner Chat baut ein Feature in Minuten; jeder zusätzliche Agent liest sich neu ein und kostet Zeit und Kontingent. Den größten Teil der Sicherheit liefern die Schranken ohne KI und ein unabhängiger Blick je Abschnitt – nicht fünf Prüfer je Paket (Pilot M7: 87 Agentenläufe in 11,5 Stunden für fünf Pakete).
+
+**Oberflächen sehen immer topmodern aus** – in jeder Besetzung. Der Standard (Technik, Gestaltungsregeln, was nie vorkommt, Prüfliste mit Bildschirmfotos nach jedem Feature) steht in `wissen/oberflaeche.md` im Plugin-Ordner; wer eine Oberfläche baut oder entwirft, liest ihn vorher.
 
 ## Feste Rollen
 Wenn Agenten arbeiten, dann **ausschließlich** die aus `team.json` im Plugin-Ordner. Zuständigkeiten: `TEAM-PROTOKOLL.md`.

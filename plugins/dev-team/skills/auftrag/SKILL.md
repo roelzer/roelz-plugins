@@ -26,19 +26,20 @@ Du bist der verantwortliche Projektleiter. Zuerst wählst du die **Besetzung** (
 
 ### Solo
 1. Anforderungen kurz in `docs/lastenheft.md` (A1 …, je ein prüfbarer Satz). Startfreigabe kurz: Anforderungen, Vorgehen in 3–5 Punkten, offene Fragen mit Empfehlung (Autopilot: entfällt). Danach Durchlauf einschalten.
-2. Arbeitsbranch. **Feature für Feature selbst:** Test zuerst (rot), Code, dann `bash "${CLAUDE_PLUGIN_ROOT}/scripts/pruefe-tests.sh" --basis <Stand vor dem Feature> --rolle solo` – grün, dann Commit. Oberfläche selbst rendern und das Bildschirmfoto ansehen. Gegenfrage für jede Stelle mit Daten von außen gehört in die Commit-Nachricht oder `docs/STATUS.md`.
-3. **Je Abschnitt** (etwa 3–6 Features, spätestens am Auftragsende): `reviewer` Modus `gesamt` über `<Abschnittsbasis>..HEAD` (prüft auch Sicherheit, geänderte bestehende Tests und jede Schranken-Warnung). Befunde selbst beheben; erneut prüfen lässt du nur bei „kritisch“ oder „hoch“.
+   **Oberfläche?** Dann vor dem ersten Feature einmal `designer` Modus `entwurf` (Grundlage: `${CLAUDE_PLUGIN_ROOT}/wissen/oberflaeche.md`; Ergebnis `docs/DESIGN.md` und `design/tokens.json`, die Kernbildschirme mit allen Zuständen).
+2. Arbeitsbranch. **Feature für Feature selbst:** Test zuerst (rot), Code, dann `bash "${CLAUDE_PLUGIN_ROOT}/scripts/pruefe-tests.sh" --basis <Stand vor dem Feature> --rolle solo` – grün, dann Commit. Bei Oberfläche die Prüfliste aus `wissen/oberflaeche.md` (Bildschirmfotos 1440 und 390 px ansehen, Zustände, Dunkelmodus). Gegenfrage für jede Stelle mit Daten von außen gehört in die Commit-Nachricht oder `docs/STATUS.md`.
+3. **Je Abschnitt** (etwa 3–6 Features, spätestens am Auftragsende): bei Oberfläche zugleich `designer` Modus `treue` (Bildschirmfotos aller geänderten Bildschirme gegen den Entwurf, setzt Mängel als konkrete Liste um); `reviewer` Modus `gesamt` über `<Abschnittsbasis>..HEAD` (prüft auch Sicherheit, geänderte bestehende Tests und jede Schranken-Warnung). Befunde selbst beheben; erneut prüfen lässt du nur bei „kritisch“ oder „hoch“.
 4. **Risiko-Auslöser** (Anmeldung, personenbezogene oder Gesundheitsdaten, Schnittstelle nach außen, Geheimnisse): einmal vor der ersten echten Nutzung `sicherheitspruefer` Modus `code` und `angriff` in einem Lauf.
 5. Ende: Schranke `--rolle projektleiter`, Merge nach `main` (Phase 9, Punkt 11), kurzer Abschlussbericht.
 Kein Architekt, keine verdeckten Abnahmetests, keine Abwägungsrunde – außer Simon will es oder der Umfang wird groß (dann Kunde).
 
 ### Kunde
 1. Phase 1 vollständig (Lastenheft mit Abnahmekriterien in Simons Worten).
-2. `architekt` Modus `entwurf` (Rückgrat, Sicherheits-Grundgerüst, Paketschnitt mit „Schnittstelle zuerst“), danach parallel `kritiker` (Plan, Bauplan-Probe) und bei Berechnungen `fachpruefer` Modus `plan`. Rückfragen in einer Runde an den Architekten. Keine Abwägungsrunde, kein Gastgeber und kein Langfrist-Architekt (nur auf Zuruf).
+2. `architekt` Modus `entwurf` (Rückgrat, Sicherheits-Grundgerüst, Paketschnitt mit „Schnittstelle zuerst“), bei Oberfläche zugleich `designer` Modus `entwurf` (nach `wissen/oberflaeche.md`, mit Kundenfarben/Logo), danach parallel `kritiker` (Plan, Bauplan-Probe) und bei Berechnungen `fachpruefer` Modus `plan`. Rückfragen in einer Runde an den Architekten. Keine Abwägungsrunde, kein Gastgeber und kein Langfrist-Architekt (nur auf Zuruf).
 3. Startfreigabe (Phase 5) bzw. Autopilot, Freigaben über den Kritiker.
 4. Phase 6: `tester` schreibt die verdeckten Abnahmetests, Prüfsummen festhalten.
 5. **Bauen:** du selbst Paket für Paket wie bei Solo (Schranke `--rolle solo`, dazu der blinde Lauf der verdeckten Tests nach jedem Paket). Große, klar trennbare Pakete bis zu 3 `entwickler` parallel nach Phase 7 – ohne Prüfer je Paket.
-6. **Je Meilenstein, parallel:** `tester` Modus `pruefen` (deckt auf), `reviewer` Modus `gesamt`, `sicherheitspruefer` Modus `code` (+ `angriff`, wenn neue Angriffsfläche), bei Berechnungen `fachpruefer` Modus `ergebnis`. Eine Fix-Runde mit allen Befunden; Nachprüfung nur bei „kritisch“/„hoch“.
+6. **Je Meilenstein, parallel:** `tester` Modus `pruefen` (deckt auf), `reviewer` Modus `gesamt`, bei Oberfläche `designer` Modus `treue`, `sicherheitspruefer` Modus `code` (+ `angriff`, wenn neue Angriffsfläche), bei Berechnungen `fachpruefer` Modus `ergebnis`. Eine Fix-Runde mit allen Befunden; Nachprüfung nur bei „kritisch“/„hoch“.
 7. Ende: `produktpruefer`, Sicherheits-Tor und Unterlagen (`/dev-team:uebergabe`), Merge nach `main`.
 
 ### Voll
