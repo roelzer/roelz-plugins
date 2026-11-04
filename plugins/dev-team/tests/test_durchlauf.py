@@ -222,6 +222,39 @@ class TestKontext(unittest.TestCase):
         self.assertNotIn("automatisch zusammengefasst", aus)
 
 
+class TestSitzungsstartDurchlauf(unittest.TestCase):
+    """Neue Cloud-Sitzung = neuer Container ohne .dev-team/: der Durchlauf kommt aus der Übergabe zurück."""
+
+    def lauf(self, uebergabe, claude_md=None):
+        d = tempfile.mkdtemp(prefix="start-")
+        try:
+            os.makedirs(os.path.join(d, "docs"))
+            with open(os.path.join(d, "docs", "SITZUNGSUEBERGABE.md"), "w") as f:
+                f.write(uebergabe)
+            if claude_md:
+                with open(os.path.join(d, "CLAUDE.md"), "w") as f:
+                    f.write(claude_md)
+            r = subprocess.run(["bash", SITZUNGSSTART], input="{}", text=True, capture_output=True,
+                               env=dict(os.environ, CLAUDE_PLUGIN_ROOT=PLUGIN, CLAUDE_PROJECT_DIR=d, HOME=d))
+            return r.stdout, os.path.exists(os.path.join(d, ".dev-team", "durchlauf"))
+        finally:
+            shutil.rmtree(d, ignore_errors=True)
+
+    def test_durchlauf_an_wird_wieder_eingeschaltet(self):
+        for text in ("**Durchlauf:** an\n", "2. Durchlauf neu starten (`.dev-team/durchlauf` anlegen)\n"):
+            aus, an = self.lauf(text)
+            self.assertTrue(an, text)
+            self.assertIn("Durchlauf wieder eingeschaltet", aus)
+
+    def test_durchlauf_aus_oder_vorlage_bleibt_aus(self):
+        for text in ("**Durchlauf:** aus\n", "**Durchlauf:** an / aus (an = Simons Freigabe gilt weiter)\n"):
+            self.assertFalse(self.lauf(text)[1], text)
+
+    def test_alte_freigabe_zeile_in_claude_md(self):
+        aus, _ = self.lauf("x\n", "- `.claude/freigaben.md` – Freigaben, nur von Simon von Hand\n")
+        self.assertIn("alten Vorlage", aus)
+
+
 class TestVerdecktSichern(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.mkdtemp(prefix="verdeckt-")
