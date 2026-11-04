@@ -376,6 +376,24 @@ class TestSchranke(unittest.TestCase):
         self.assertEqual(code, 1, aus)
         self.assertIn("überlebt", aus)
 
+    def test_rolle_solo(self):
+        # Der Projektleiter baut selbst: Code und neue Tests frei, geänderte bestehende Tests als Warnung,
+        # übersprungene Tests und Geheimnisse weiter rot.
+        self.schreibe("src/rabatt.py", "def rabatt(x):\n    return x\n")
+        self.schreibe("tests/test_rechnung.py", TEST_GRUEN + "\n# umgestellt\n")
+        code, aus = self.lauf("--rolle", "solo", "--ohne-lauf")
+        self.assertEqual(code, 0, aus)
+        self.assertIn("Bestehender Test geändert", aus)
+        self.schreibe("tests/test_neu.py", "import unittest\nclass N(unittest.TestCase):\n    @unittest.skip('x')\n"
+                      "    def test_n(self):\n        self.assertEqual(1, 1)\n")
+        self.assertEqual(self.lauf("--rolle", "solo", "--ohne-lauf")[0], 1)
+
+    def test_besetzung_selbst_einstellen(self):
+        self.konfig({"testbefehl": "%s -m unittest discover -s tests -t . -v" % sys.executable,
+                     "testzahl_muster": r"Ran (\d+) tests?", "besetzung": "kunde"})
+        code, aus = self.lauf("--rolle", "projektleiter", "--ohne-lauf")
+        self.assertNotIn("Dev-Team-Einstellungen (.claude/dev-team.json) geändert", aus)
+
     def test_einstellungen_verschaerfen_ohne_freigabe(self):
         self.konfig({"testbefehl": "%s -m unittest discover -s tests -t . -v" % sys.executable,
                      "testzahl_muster": r"Ran (\d+) tests?",

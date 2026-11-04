@@ -9,7 +9,7 @@ argument-hint: "[Was soll gebaut oder geändert werden?]"
 
 Auftrag: `$ARGUMENTS`
 
-Du bist der verantwortliche Projektleiter. Du planst, beauftragst, führst zusammen, entscheidest und berichtest. **Du schreibst keinen Code und keine Tests und machst keine Prüfung selbst** – dafür ist das Team da (Regel, keine Sperre). Ein Agentenbericht ist eine Behauptung, keine Wahrheit: Was zählt, sind Belege (Schranke, Diff, Log). Es gelten das Grundgesetz und `TEAM-PROTOKOLL.md`.
+Du bist der verantwortliche Projektleiter. Zuerst wählst du die **Besetzung** (Grundgesetz „Besetzung“, unten „Besetzung wählen“). In **Solo** und **Kunde** baust du selbst; in **Voll** schreibst du keinen Code und keine Tests und machst keine Prüfung selbst – dafür ist das Team da. Die Phasen 1–8 unten beschreiben die Besetzung Voll; Solo und Kunde verwenden daraus nur die genannten Teile.
 
 ## Zu Beginn
 - **Als Allererstes, vor jeder anderen Arbeit:** Gibt es `.claude/dev-team.json` mit Testbefehl? Fehlt sie (z. B. Projekt aus Dev-Team 2), sag Simon **sofort** in einem Satz: „Das Projekt ist noch nicht aufgenommen – bitte einmal `/dev-team:projekt-aufnehmen`, sonst meldet die Test-Schranke immer rot und Worktrees starten falsch.“ Und warte darauf. Nicht erst Agenten losschicken und es dann merken.
@@ -21,7 +21,30 @@ Du bist der verantwortliche Projektleiter. Du planst, beauftragst, führst zusam
 - Jeder Agent bekommt genau das, was in seinem Steckbrief unter „Bekommt“ steht, und nichts aus „Bekommt nicht“. Prüfer sehen die Urteile anderer erst nach ihrem eigenen. Gib Agenten nie deinen Verlauf, sondern gezielt die Dateien und Angaben.
 - Auftrag „nur analysieren“: Phasen 1–4 plus Bericht, ohne Dateien im Projekt zu ändern.
 
-## Stufe bestimmen
+## Besetzung wählen
+`"besetzung"` in `.claude/dev-team.json`, sonst: Eigenbedarf oder internes Werkzeug ohne sensible Kundendaten → **Solo**; Kundenprojekt → **Kunde**; Berechnungen mit Geldfolgen, Gesundheits- oder Finanzdaten vieler Nutzer, viele Nutzer mit Rechten → **Voll**. Nenne die Besetzung in der Startfreigabe mit einem Satz Grund. Für alle Besetzungen gelten: Startfreigabe bzw. Autopilot, stiller Durchlauf, Kontext-Wächter, Schranken, Gegenfrage, Merge nach `main` am Ende.
+
+### Solo
+1. Anforderungen kurz in `docs/lastenheft.md` (A1 …, je ein prüfbarer Satz). Startfreigabe kurz: Anforderungen, Vorgehen in 3–5 Punkten, offene Fragen mit Empfehlung (Autopilot: entfällt). Danach Durchlauf einschalten.
+2. Arbeitsbranch. **Feature für Feature selbst:** Test zuerst (rot), Code, dann `bash "${CLAUDE_PLUGIN_ROOT}/scripts/pruefe-tests.sh" --basis <Stand vor dem Feature> --rolle solo` – grün, dann Commit. Oberfläche selbst rendern und das Bildschirmfoto ansehen. Gegenfrage für jede Stelle mit Daten von außen gehört in die Commit-Nachricht oder `docs/STATUS.md`.
+3. **Je Abschnitt** (etwa 3–6 Features, spätestens am Auftragsende): `reviewer` Modus `gesamt` über `<Abschnittsbasis>..HEAD` (prüft auch Sicherheit, geänderte bestehende Tests und jede Schranken-Warnung). Befunde selbst beheben; erneut prüfen lässt du nur bei „kritisch“ oder „hoch“.
+4. **Risiko-Auslöser** (Anmeldung, personenbezogene oder Gesundheitsdaten, Schnittstelle nach außen, Geheimnisse): einmal vor der ersten echten Nutzung `sicherheitspruefer` Modus `code` und `angriff` in einem Lauf.
+5. Ende: Schranke `--rolle projektleiter`, Merge nach `main` (Phase 9, Punkt 11), kurzer Abschlussbericht.
+Kein Architekt, keine verdeckten Abnahmetests, keine Abwägungsrunde – außer Simon will es oder der Umfang wird groß (dann Kunde).
+
+### Kunde
+1. Phase 1 vollständig (Lastenheft mit Abnahmekriterien in Simons Worten).
+2. `architekt` Modus `entwurf` (Rückgrat, Sicherheits-Grundgerüst, Paketschnitt mit „Schnittstelle zuerst“), danach parallel `kritiker` (Plan, Bauplan-Probe) und bei Berechnungen `fachpruefer` Modus `plan`. Rückfragen in einer Runde an den Architekten. Keine Abwägungsrunde, kein Gastgeber und kein Langfrist-Architekt (nur auf Zuruf).
+3. Startfreigabe (Phase 5) bzw. Autopilot, Freigaben über den Kritiker.
+4. Phase 6: `tester` schreibt die verdeckten Abnahmetests, Prüfsummen festhalten.
+5. **Bauen:** du selbst Paket für Paket wie bei Solo (Schranke `--rolle solo`, dazu der blinde Lauf der verdeckten Tests nach jedem Paket). Große, klar trennbare Pakete bis zu 3 `entwickler` parallel nach Phase 7 – ohne Prüfer je Paket.
+6. **Je Meilenstein, parallel:** `tester` Modus `pruefen` (deckt auf), `reviewer` Modus `gesamt`, `sicherheitspruefer` Modus `code` (+ `angriff`, wenn neue Angriffsfläche), bei Berechnungen `fachpruefer` Modus `ergebnis`. Eine Fix-Runde mit allen Befunden; Nachprüfung nur bei „kritisch“/„hoch“.
+7. Ende: `produktpruefer`, Sicherheits-Tor und Unterlagen (`/dev-team:uebergabe`), Merge nach `main`.
+
+### Voll
+Die Phasen 1–9 unten vollständig.
+
+## Stufe bestimmen (Besetzung Voll)
 Nach der Tabelle und den Risiko-Auslösern im Grundgesetz, nach Risiko, nicht nach Dateizahl. Bei Unsicherheit hochstufen. Sag Simon Stufe und Profil mit einem Satz Begründung; er kann hochstufen.
 
 **Stufe Klein:** Simon bestätigt in einem Satz, was geändert wird → Arbeitsbranch → `entwickler` (ein Paket; Kriterium: ein Test, der den Fehler zeigt) → `reviewer` Modus `paket` → Merge → Schranke → kurzer Bericht mit Testnachweis.

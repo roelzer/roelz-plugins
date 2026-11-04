@@ -8,7 +8,7 @@
     {
       "name": "dev-team",
       "source": "./plugins/dev-team",
-      "description": "Festes Senior-Entwicklungsteam mit Teamzwang: Architekt, Entwickler (parallel), Prüfer, verdeckte Abnahmetests, Test-Schranke „alle Tests grün“. Ohne Firmenwissen – überall nutzbar.",
+      "description": "Senior-Entwicklungsteam in drei Besetzungen (Solo, Kunde, Voll): so viel Team wie nötig, Schranken für Tests, Sicherheit und Abhängigkeiten immer. Ohne Firmenwissen – überall nutzbar.",
       "category": "development"
     },
     {

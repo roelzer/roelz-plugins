@@ -1,5 +1,18 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.16.0 – Drei Besetzungen: so viel Team wie nötig
+
+Anlass: Simons Vergleich „SiRo habe ich an einem Nachmittag mit einem Chat gebaut, und jetzt reden wir über Tage?“ – am 30.09. entstanden in SiRo in rund zwei Stunden Anmeldung mit Rollen, Sicherung, Rechnungsprüfung, E-Rechnung und Einstellungen. Das Team brauchte in M7 für fünf Pakete 11,5 Stunden mit 87 Agentenläufen; den Großteil der Zeit und des Kontingents kostete Kontrolle, nicht das Bauen. Den wirksamsten Teil der Sicherheit liefern die Schranken ohne KI und ein unabhängiges Review je Abschnitt.
+
+- **Besetzung Solo (Standard):** Der Projektleiter baut selbst, Feature für Feature mit Tests; nach jedem Feature die Test-Schranke mit der neuen Rolle `solo` (Code und neue Tests frei, geänderte bestehende Tests als Warnung, übersprungene oder leere Tests, Geheimnisse und gefährliche Muster weiter rot). Je Abschnitt ein `reviewer` (gesamt, mit Sicherheit und neuer Pflichtfrage 14 zu geänderten bestehenden Tests). Bei Risiko-Auslösern einmal der Sicherheitsprüfer mit Angriffsversuchen vor der ersten echten Nutzung.
+- **Besetzung Kunde:** zusätzlich Architekt (Rückgrat, Sicherheits-Grundgerüst), Kritiker mit Bauplan-Probe, Fachprüfer bei Berechnungen, verdeckte Abnahmetests, je Meilenstein Tester, Reviewer, Sicherheitsprüfer parallel, vor der Übergabe Produktprüfer und Sicherheits-Tor. Gebaut wird vom Projektleiter; nur große, klar trennbare Teile von bis zu 3 Entwicklern parallel, ohne Prüfer je Paket. Keine Abwägungsrunde, kein Gastgeber, kein Langfrist-Architekt (auf Zuruf möglich).
+- **Besetzung Voll:** der bisherige Ablauf mit Entwicklern je Paket und allen Prüfern – für hohes Risiko.
+- Wahl nach Projekt und Risiko-Auslösern, in der Startfreigabe genannt; fest mit `"besetzung"` in `.claude/dev-team.json` (darf der Projektleiter ohne Freigabe setzen, ebenso `autopilot`). Der Sitzungsstart nennt die Besetzung.
+- Grundgesetz: „Teamzwang“ wird „Besetzung“ + „Feste Rollen“ (wenn Agenten, dann nur die aus `team.json`); die Stufen gelten für die Besetzung Voll.
+- Team-Tafel 0.3.1: „Gerade kein Agent – der Projektleiter arbeitet selbst“.
+- Tests: Rolle `solo`, Besetzung selbst einstellen.
+
+
 ## 3.15.0 – Ein Stopp oder keiner: Simon muss sich nicht mehr um den Lauf kümmern
 
 Anlass: Pilotnacht M7 in `ichkannalles` (03.11. 20:13 bis 04.11. 07:41: 87 Agentenstarts, davon 10 Klarstellungen des Architekten mitten im Bau, 18 Tester-Läufe für Vorarbeit und Umstellungen, 14 Sicherheitsprüfungen, nach jeder Fix-Runde Nachprüfung durch drei Prüfer, ab 23:20 nur noch ein Entwickler gleichzeitig) und Simons Vorgabe „Fehler und Umstände sollen im Team gelöst werden, ich hätte gern keine Stopps mehr“. Was die Nacht langsam machte: alles nacheinander (M7-3 und M7-4 hingen aneinander), sechs Klarstellungen des Architekten mitten im Bau, Fertigmeldungen zurückgewiesen wegen fehlender Freigaben, fertige Pakete nur im Container, Fragen an Simon, deren Text nirgends stand.
