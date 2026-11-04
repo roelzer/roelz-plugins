@@ -1,5 +1,13 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.16.1 – Oberflächen immer topmodern, auch in Solo
+
+Anlass: Simon: „Meine Oberflächen sollen immer topmodern aussehen“ – in Solo fiel der Designer weg.
+
+- **Oberflächen-Standard** `wissen/oberflaeche.md`: Technik-Grundlage (Tailwind + shadcn/ui bzw. shadcn-svelte, lucide-Symbole, shadcn-Charts/Tremor, Inter/Geist selbst gehostet), Gestaltungsregeln (Abstands-Skala, eine Akzentfarbe, Hell/Dunkel über Tokens, Radien, Zustände leer/lädt/Fehler, Dashboards, Handy, Barrierefreiheit), was nie vorkommt („KI-Look“) und eine Prüfliste mit Bildschirmfotos (1440/390 px, Dunkelmodus) nach jedem Feature. Wird nur gelesen, wenn eine Oberfläche gebaut wird – kostet sonst nichts.
+- **Designer in Solo und Kunde:** einmal `entwurf` zu Beginn, `treue` je Abschnitt bzw. Meilenstein mit konkreter Mängelliste (statt je Paket).
+
+
 ## 3.16.0 – Drei Besetzungen: so viel Team wie nötig
 
 Anlass: Simons Vergleich „SiRo habe ich an einem Nachmittag mit einem Chat gebaut, und jetzt reden wir über Tage?“ – am 30.09. entstanden in SiRo in rund zwei Stunden Anmeldung mit Rollen, Sicherung, Rechnungsprüfung, E-Rechnung und Einstellungen. Das Team brauchte in M7 für fünf Pakete 11,5 Stunden mit 87 Agentenläufen; den Großteil der Zeit und des Kontingents kostete Kontrolle, nicht das Bauen. Den wirksamsten Teil der Sicherheit liefern die Schranken ohne KI und ein unabhängiges Review je Abschnitt.
