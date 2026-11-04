@@ -15,8 +15,10 @@ export type Tafel = {
   angehalten: string
   /** .dev-team/durchlauf vorhanden: der Auftrag läuft ohne Nachfragen durch */
   durchlauf: boolean
-  /** offene Fragen an Simon laut docs/OFFENE_FRAGEN.md */
+  /** offene Fragen und Freigaben an Simon laut docs/OFFENE_FRAGEN.md */
   fragen: number
+  /** offene Punkte der „Nur Simon“-Liste (- [ ]), halten den Lauf nicht an */
+  nurSimon: number
   phase: string
   ampel: string
   test: string

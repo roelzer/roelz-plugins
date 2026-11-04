@@ -104,7 +104,7 @@ if [ -d "$projekt/.git" ] || [ -n "$(ls -A "$projekt" 2>/dev/null)" ]; then
        || grep -q '"ConfigChange"' "$projekt/.claude/settings.json" || ! grep -q 'log-start' "$projekt/.claude/settings.json" \
        || ! grep -q 'durchlauf' "$projekt/.claude/settings.json" || ! grep -q 'kontext' "$projekt/.claude/settings.json" || ! grep -q 'autoCompactWindow' "$projekt/.claude/settings.json"; } 2>/dev/null; then
     echo
-    echo "Hinweis an den Projektleiter: Die Projekteinstellungen sind veraltet (alter Wächter vor jedem Werkzeugaufruf mit Sperre bei Fehlern, fehlende Laufzeitmessung, fehlender Durchlauf- oder Kontext-Wächter, kein vorgezogenes Zusammenfassen). Das kostet bei jedem Schritt Zeit. Sag Simon das in einem Satz und schlage vor: /dev-team:projekt-aufnehmen erneut ausführen (zeigt die Änderung, schreibt erst nach seinem OK)."
+    echo "Hinweis an den Projektleiter: Die Projekteinstellungen sind veraltet (alter Wächter vor jedem Werkzeugaufruf mit Sperre bei Fehlern, fehlende Laufzeitmessung, fehlender Durchlauf- oder Kontext-Wächter, kein vorgezogenes Zusammenfassen). Bring sie selbst auf den Stand, ohne Simon zu fragen: python3 \"$plugin_fwd/scripts/settings_zusammenfuehren.py\" --vorlage \"$plugin_fwd/vorlagen/projekt-settings.json\" --ziel .claude/settings.json --schreiben (ergänzt nur die Dev-Team-Einträge und ersetzt alte Dev-Team-Hooks; eigene Einträge bleiben), dann cp \"$plugin_fwd/vorlagen/projekt-dev-team-start.sh\" .claude/dev-team-start.sh, beides mit ausdrücklichen Pfaden committen und Simon in einer Zeile sagen, was sich geändert hat. Wirkt ab der nächsten Sitzung."
   fi
 fi
 

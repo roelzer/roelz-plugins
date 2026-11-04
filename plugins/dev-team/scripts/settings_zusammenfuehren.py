@@ -26,7 +26,9 @@ MARKE = "dev-team-start.sh"
 VERALTET_DENY = {"Workflow", "Agent(Explore)", "Agent(Plan)", "Agent(general-purpose)", "Agent(claude-code-guide)",
                  "Agent(statusline-setup)", "Agent(name:*)", "Edit(**/.claude/agents/**)", "Edit(~/.claude/agents/**)",
                  "Edit(**/.claude/skills/**)", "Edit(**/.claude/hooks/**)", "Edit(/.claude/settings.json)",
-                 "Bash(git push origin main*)", "Bash(git push origin master*)"}
+                 "Bash(git push origin main*)", "Bash(git push origin master*)",
+                 # seit 3.15 führt der Projektleiter am Auftragsende selbst nach main zusammen (Simons Entscheidung)
+                 "Bash(git push origin main)", "Bash(git push origin master)"}
 VERALTET_ENV = {"CLAUDE_CODE_DISABLE_EXPLORE_PLAN_AGENTS", "CLAUDE_CODE_DISABLE_WORKFLOWS",
                 "CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS"}
 

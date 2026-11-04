@@ -609,7 +609,7 @@ def pruefe_freigabe(e, hauptordner, stichwort):
             geltung = [g.strip() for g in teile[2].split(",")]
             e.w("Freigabe verwendet: %s (gilt für: %s)" % (z, ", ".join(geltung)))
             return Freigabe(z, geltung)
-    e.f("Freigabe '%s' steht nicht in .claude/freigaben.md. Freigaben trägt nur Simon von Hand ein "
+    e.f("Freigabe '%s' steht nicht in .claude/freigaben.md. Technische Freigaben trägt der Projektleiter nach Prüfung durch einen frischen kritiker (Modus freigabe) ein, fachliche nur Simon "
         "(Datum | Stichwort | Geltung | Grund)." % stichwort)
     return Freigabe()
 

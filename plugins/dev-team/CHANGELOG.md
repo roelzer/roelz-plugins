@@ -1,5 +1,21 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.15.0 – Ein Stopp oder keiner: Simon muss sich nicht mehr um den Lauf kümmern
+
+Anlass: Pilotnacht M7 in `ichkannalles` (03.11. 20:13 bis 04.11. 07:41: 87 Agentenstarts, davon 10 Klarstellungen des Architekten mitten im Bau, 18 Tester-Läufe für Vorarbeit und Umstellungen, 14 Sicherheitsprüfungen, nach jeder Fix-Runde Nachprüfung durch drei Prüfer, ab 23:20 nur noch ein Entwickler gleichzeitig) und Simons Vorgabe „Fehler und Umstände sollen im Team gelöst werden, ich hätte gern keine Stopps mehr“. Was die Nacht langsam machte: alles nacheinander (M7-3 und M7-4 hingen aneinander), sechs Klarstellungen des Architekten mitten im Bau, Fertigmeldungen zurückgewiesen wegen fehlender Freigaben, fertige Pakete nur im Container, Fragen an Simon, deren Text nirgends stand.
+
+- **Ein Stopp statt drei:** Stopp 1 entfällt; Anforderungen, Verständnisfragen, Plan, Entscheidungen und alle nötigen Freigaben kommen in **einer Startfreigabe**. Stufe Klein läuft ohne Rückfrage. Harte Stopps halten nur das betroffene Paket an, der Rest läuft weiter.
+- **Autopilot (ganz ohne Stopp):** „Autopilot“ beim Auftrag oder `"autopilot": true` in `.claude/dev-team.json`. Entscheidungen nach Empfehlung (im Abschlussbericht zum Prüfen), unbestätigte Fachregeln als „vorläufig“ gekennzeichnet, was nur Simon darf (bestehende Abnahmetests ändern, veröffentlichen, Geld, Daten löschen), wird gebaut, geprüft und geparkt statt gewartet.
+- **Technische Freigaben ohne Simon** (Simon: „von Abnahmetests habe ich keine Ahnung, das kann er machen“): Einen bestehenden Abnahmetest an eine geänderte Anforderung anpassen, Format-/Altdaten, Testeinstellungen – das prüft ein frischer `kritiker` im neuen Modus `freigabe` (verlangt eine Anforderung genau diese Änderung? ist der neue Test mindestens so streng? ist die Geltung eng? ist es wirklich nicht fachlich?), bei 🟢 trägt der Projektleiter die Zeile ein. Der Bedarf wird vor dem Bau ermittelt und in einem Auftrag geprüft; mitten im Lauf sofort. Fachliche Sollwerte und Fachregeln bestätigt weiterhin nur Simon (Autopilot: als „vorläufig“ gebaut).
+- **Merge nach `main` durch den Projektleiter** (Simon: „ich klicke sowieso immer auf Merge“): am Auftragsende, wenn alles belegt grün ist; liefert `main` automatisch aus, zusätzlich das Sicherheits-Tor. Per Pull Request mit dem Abschlussbericht als Beschreibung. Die Sperrregel `git push origin main` entfällt (wird aus bestehenden Projekten entfernt), Force-Push bleibt gesperrt.
+- **Nachprüfen nur, wer Befunde hatte:** Nach einer Fix-Runde prüft der Reviewer alle Befunde mittel/niedrig mit; Designer und Sicherheitsprüfer prüfen nur bei eigenen Befunden „kritisch“/„hoch“ selbst nach. In M7 liefen nach jeder Fix-Runde drei Prüfer erneut.
+- **Bauplan-Probe:** Der Kritiker liest jeden Bauplan, als müsste er ihn allein bauen, und listet alle Rückfragen je Paket (Pflichtfrage 9); der Architekt beantwortet sie in einer Runde vor der Startfreigabe. Eine Rückfrage mitten im Bau ist ein Befund gegen den Bauplan.
+- **Schnittstelle zuerst:** Abhängige Pakete laufen parallel gegen einen vorab festgelegten Vertrag (Typen, Signaturen, Formate); der Plan nennt den kritischen Pfad, läuft mehr als die Hälfte nacheinander, wird neu geschnitten (Architekt; Kritiker Pflichtfrage 10).
+- **Fragen nur ausgeschrieben:** Jede Frage an Simon steht vollständig in `docs/OFFENE_FRAGEN.md` (neue Vorlage: Fragen, Freigaben als fertige Zeilen, „Nur Simon“-Liste mit Anleitung). Ein Verweis auf nicht Ausgeschriebenes gilt als nicht gestellt. Die „Nur Simon“-Liste hält den Lauf nie an.
+- **Projekteinstellungen selbst aktuell:** Meldet der Sitzungsstart veraltete Projekteinstellungen, bringt der Projektleiter den Dev-Team-Teil selbst auf den Stand (`settings_zusammenfuehren.py`, eigene Einträge bleiben) und sagt es Simon in einer Zeile.
+- **Team-Tafel 0.3.0:** zählt „Nur Simon“-Punkte getrennt von Fragen (eigene, ruhige Karte); Vorlagenzeilen zählen nicht.
+
+
 ## 3.14.1 – Rest aus dem Pilot M3–M7
 
 Was aus dem früheren Umbau (PR #8) auf `main` noch fehlte; der Rest steckt schon in 3.13/3.14.
