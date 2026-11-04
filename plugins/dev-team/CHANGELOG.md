@@ -1,5 +1,14 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.16.2 – Still bleibt still, auch nach dem Sitzungswechsel
+
+Anlass: In `ichkannalles` schrieb der Projektleiter nach dem Sitzungswechsel wieder viel in den Chat und legte Simon Freigabe-Zeilen zum Einfügen vor.
+- **Durchlauf kommt automatisch zurück:** Eine neue Cloud-Sitzung hat einen neuen Container ohne `.dev-team/durchlauf`; der Projektleiter fiel in den Gesprächsmodus. Jetzt schaltet der Sitzungsstart den Durchlauf selbst wieder ein, wenn die Übergabe es sagt („Durchlauf: an“ oder „Durchlauf neu starten“). Der stille Modus gilt ab der Startfreigabe ohnehin, auch ohne Marke.
+- **Alte Projektregel erkannt:** In der `CLAUDE.md` älterer Projekte stand aus der Vorlage „Freigaben, nur von Simon von Hand“ – Projektregeln gehen vor, also fragte der Projektleiter weiter Simon. Der Sitzungsstart meldet die Zeile, der Projektleiter ersetzt sie selbst.
+- **Push-Mitteilung statt Chat:** Gibt es ein Werkzeug dafür, schickt der Projektleiter genau dann eine kurze Mitteilung, wenn Simon gebraucht wird oder der Auftrag fertig ist.
+- Tests: Durchlauf aus der Übergabe (an / neu starten / aus / unausgefüllte Vorlage), alte Freigabe-Zeile.
+
+
 ## 3.16.1 – Oberflächen immer topmodern, auch in Solo
 
 Anlass: Simon: „Meine Oberflächen sollen immer topmodern aussehen“ – in Solo fiel der Designer weg.

@@ -120,6 +120,22 @@ if [ "${CLAUDE_CODE_REMOTE:-}" = "true" ] && [ -f "$projekt/docs/ABNAHME_PRUEFSU
   done
 fi
 
+# Neue Sitzung = neuer Container: Die Durchlauf-Marke (.dev-team/, nicht im Repo) fehlt. Sagt die Übergabe, dass der
+# Durchlauf läuft, schaltet der Sitzungsstart ihn selbst wieder ein – sonst fiel der Projektleiter in den
+# Gesprächsmodus und schrieb wieder viel in den Chat (ichkannalles, 04.11.).
+if [ -f "$projekt/docs/SITZUNGSUEBERGABE.md" ] && [ ! -f "$projekt/.dev-team/durchlauf" ] \
+   && grep -iE 'Durchlauf[^|]{0,40}(\*\*)?[[:space:]]*:?[[:space:]]*(\*\*)?[[:space:]]*an\b|Durchlauf (neu|wieder) (starten|einschalten)' "$projekt/docs/SITZUNGSUEBERGABE.md" 2>/dev/null | grep -viq 'an / aus'; then
+  mkdir -p "$projekt/.dev-team" 2>/dev/null && date > "$projekt/.dev-team/durchlauf" 2>/dev/null \
+    && { echo; echo "Durchlauf wieder eingeschaltet (laut docs/SITZUNGSUEBERGABE.md). Stiller Durchlauf gilt: nichts in den Chat außer festen Stopps, Antworten auf Simon und was nur Simon kann."; }
+fi
+
+# Zeilen aus alten Vorlagen in der Projekt-CLAUDE.md, die neueren Dev-Team-Regeln widersprechen (Projektregeln gehen
+# sonst vor): der Projektleiter ersetzt sie selbst.
+if [ -f "$projekt/CLAUDE.md" ] && grep -q 'Freigaben, nur von Simon von Hand' "$projekt/CLAUDE.md" 2>/dev/null; then
+  echo
+  echo "Hinweis an den Projektleiter: In CLAUDE.md steht noch die Zeile aus einer alten Vorlage „.claude/freigaben.md – Freigaben, nur von Simon von Hand“. Seit 3.15 gilt (Simons Entscheidung): technische Freigaben trägt der Projektleiter nach Prüfung durch einen frischen kritiker (Modus freigabe) ein, fachliche nur Simon. Ersetze die Zeile durch „- \`.claude/freigaben.md\` – Freigaben: technische trägt der Projektleiter nach Kritiker-Prüfung ein, fachliche nur Simon“, committe mit ausdrücklichem Pfad, ohne Simon zu fragen."
+fi
+
 # Fortsetzung nach dem automatischen Zusammenfassen oder in einer neuen Sitzung (Kontext-Wächter).
 if [ -f "$projekt/docs/SITZUNGSUEBERGABE.md" ]; then
   echo
