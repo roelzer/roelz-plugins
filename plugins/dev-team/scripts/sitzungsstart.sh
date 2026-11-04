@@ -84,6 +84,7 @@ done
 if [ -n "$team" ]; then
   echo
   echo "Festes Dev-Team: $team"
+  echo "Baut Simon etwas (auch ohne /dev-team-auftrag): Ablauf nach Skill auftrag, Durchlauf-Marke anlegen und bis zum Ende durcharbeiten – nie nach einem Teilstand fragen, womit du weitermachen sollst."
   besetzung="$(sed -n 's/^[[:space:]]*"besetzung":[[:space:]]*"\([a-z]*\)".*/\1/p' "$projekt/.claude/dev-team.json" 2>/dev/null | head -n 1)"
   echo "Besetzung: ${besetzung:-nicht festgelegt – wähle sie nach dem Grundgesetz (Standard solo)}. Solo und Kunde: du baust selbst, mit Tests und Schranke nach jedem Feature. Voll: Code = entwickler, Tests = tester, Struktur = architekt."
 fi

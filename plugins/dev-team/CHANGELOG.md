@@ -1,5 +1,13 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.16.3 – Jeder Bau-Auftrag läuft bis zum Ende
+
+Anlass: In `simfit` baute der Projektleiter den ersten lauffähigen Stand und fragte dann „Womit soll ich weitermachen?“. Simon hatte einfach beschrieben, was gebaut werden soll – ohne `/dev-team-auftrag`; damit gab es weder Startfreigabe noch Durchlauf-Marke, und der Projektleiter verhielt sich wie im Gespräch.
+- Grundgesetz „Eigenständig bauen“: Jeder Bau-Auftrag ist ein Auftrag nach dem Skill `auftrag`, egal wie formuliert; Durchlauf-Marke sofort nach der Startfreigabe (bzw. bei Autopilot); fertig erst, wenn jede Anforderung gebaut, geprüft und zusammengeführt oder als „Nur Simon“/offene Frage dokumentiert ist; nie nach einem Teilstand fragen, womit es weitergeht.
+- Skill `auftrag`, Solo: ausdrücklich bis alle Anforderungen fertig sind; naheliegende Pflichtpunkte aus den Projektregeln macht der Projektleiter einfach.
+- Sitzungsstart nennt die Regel in jeder Sitzung.
+
+
 ## 3.16.2 – Still bleibt still, auch nach dem Sitzungswechsel
 
 Anlass: In `ichkannalles` schrieb der Projektleiter nach dem Sitzungswechsel wieder viel in den Chat und legte Simon Freigabe-Zeilen zum Einfügen vor.

@@ -135,6 +135,8 @@ Danach: das Wichtigste in einfacher Sprache, höchstens 5 Punkte, jeweils mit �
 - `docs/STATUS.md` zeigt oben immer die aktuelle Phase und **jeden laufenden Agenten**, z. B. „Phase 7: Bauen – Entwickler P3 ⏳, Entwickler P4 ⏳, Reviewer P2 ✅“.
 
 ## Eigenständig bauen
+**Jeder Bau-Auftrag von Simon ist ein Auftrag nach dem Skill `auftrag`** – egal, ob er `/dev-team:auftrag` tippt oder einfach schreibt, was gebaut werden soll. Also: Besetzung wählen, Startfreigabe (bei „Autopilot“ ohne), dann sofort die Durchlauf-Marke anlegen (`mkdir -p .dev-team && date > .dev-team/durchlauf`) und **bis zum Ende durcharbeiten**: Fertig ist der Auftrag erst, wenn jede Anforderung gebaut, getestet, geprüft und zusammengeführt ist bzw. als „Nur Simon“ oder offene Frage dokumentiert ist. Nach einem Teilstand fragst du **nie** „Womit soll ich weitermachen?“ – die Reihenfolge entscheidest du nach Anforderungen und Risiko; was nur Simon kann, kommt auf die „Nur Simon“-Liste, und du baust das Nächste.
+
 Hat Simon einen Plan freigegeben, wird ohne Rückfragen weitergebaut, auch wenn er stundenlang nicht da ist:
 - Pakete in der geplanten Reihenfolge, parallele Gruppen gleichzeitig. Nach jedem Paket: Review, Merge, Schranke, `docs/STATUS.md`.
 - **Entscheiden statt stehen bleiben:** Umkehrbare Fragen (Widersprüche im Plan, kleine Lücken, Befunde nach der letzten Fix-Runde) entscheidest du und schreibst sie nach `docs/ENTSCHEIDUNGEN.md` (`Datum | was | warum | was es kostet, wenn falsch`). Im Bericht stehen sie **vollständig**.
