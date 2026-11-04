@@ -341,7 +341,7 @@ export const register: Register = on => {
         {abschnitt('Arbeitet gerade', aktiv.length)}
         {aktiv.length === 0 && (
           <Text size="footnote" color="subtle">
-            Gerade kein Agent – der Projektleiter plant oder wartet.
+            Gerade kein Agent – der Projektleiter arbeitet selbst oder wartet.
           </Text>
         )}
         {aktiv.map(x =>

@@ -1,6 +1,6 @@
 # Dev-Team – Anleitung
 
-Stand: November 2026 · Version 3.15.1
+Stand: November 2026 · Version 3.16.1
 
 Dieses Repo enthält zwei Plugins für Claude Code: **`dev-team`** und **`tool-scout`**. Beide enthalten kein Firmen- oder Kundenwissen und dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
 
@@ -213,6 +213,8 @@ Danach VS Code neu starten.
 **Nach dem Update auf 3.11 einmal je Projekt:** `/dev-team:projekt-aufnehmen` ausführen. Es bringt die Projekteinstellungen auf den neuen Stand (minimaler Wächter, alte Sperren wie die gegen eingebaute Helfer oder `git push origin main*` – die auch Branches wie `main-1tg5m0` traf – werden entfernt) und zeigt dir die Änderung vorher. Auf jedem Rechner zusätzlich einmal `/dev-team:einrichten` (privat bzw. arbeit), damit Worktrees überall vom aktuellen Stand starten.
 
 **Nach dem Update auf 3.12 einmal je Projekt** (auch für Cloud-Projekte): `/dev-team:projekt-aufnehmen`. Das bringt den Durchlauf-Wächter und die Laufzeitmessung in die Projekteinstellungen und entfernt den alten Wächter, der vor jedem Schritt bis zu 60 s prüfen durfte. Der Sitzungsstart erinnert daran.
+
+**Seit 3.16 – drei Besetzungen:** Nicht jeder Auftrag braucht das ganze Team. **Solo** (Standard für Eigenbedarf und interne Werkzeuge): Der Projektleiter baut selbst, Feature für Feature mit Tests; nach jedem Feature laufen die Schranken (Tests, Sicherheit, Abhängigkeiten – ohne KI, kostet fast nichts), je Abschnitt prüft ein unabhängiger Reviewer. **Kunde**: zusätzlich Architekt, Kritiker, verdeckte Abnahmetests, Prüfung je Meilenstein und Übergabe-Unterlagen. **Voll** (hohes Risiko): wie bisher, Entwickler je Paket und alle Prüfer. Der Projektleiter wählt die Besetzung und nennt sie dir; fest einstellen mit `"besetzung"` in `.claude/dev-team.json`.
 
 **Seit 3.15 – ein Stopp oder keiner:** Das Team fragt dich nur noch einmal, in der Startfreigabe: Anforderungen, Plan und Entscheidungen in einer Nachricht. Technische Freigaben (z. B. einen Abnahmetest an eine geänderte Anforderung anpassen) prüft ein unabhängiger Kritiker und der Projektleiter trägt sie ein; nur fachliche Sollwerte und Regeln landen bei dir. Am Ende führt der Projektleiter selbst nach `main` zusammen, wenn alles grün ist – du musst nicht mehr auf „Merge“ klicken. Danach läuft es bis zum Ende. Willst du gar nicht gefragt werden, schreib beim Auftrag „Autopilot“: Dann entscheidet das Team nach Empfehlung und legt dir die Entscheidungen am Ende vor; was nur du darfst, wird geparkt und steht in `docs/OFFENE_FRAGEN.md`. Dinge, die nur ein Mensch kann (z. B. etwas im privaten Browser prüfen), stehen dort unter „Nur Simon“ und halten den Lauf nie an.
 

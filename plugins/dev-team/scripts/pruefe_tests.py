@@ -469,7 +469,7 @@ def vorarbeit_dateien(e, wurzel, hauptordner, basis, team):
 
 
 VERSCHAERFBAR = ("zusatzbefehle", "meilensteinbefehle")
-FREI_EINSTELLBAR = ("kontext_grenze", "kontext_grenze_agent", "_hilfe")
+FREI_EINSTELLBAR = ("kontext_grenze", "kontext_grenze_agent", "_hilfe", "besetzung", "autopilot")
 
 
 def _mutation_echt(befehl):
@@ -585,6 +585,9 @@ def pruefe_diff(e, wurzel, basis, rolle, team, fg, hauptordner=None):
                 e.f("Entwickler hat %s angelegt (Bereich %s gehört ihm nicht)." % (p, bereich))
             if bereich in ("regeln", "lastenheft", "prozess", "konfig", "gesperrt"):
                 e.f("Entwickler hat %s geändert (Bereich %s gehört ihm nicht)." % (p, bereich))
+        if rolle == "solo" and ist_testdatei(bereich) and status == "M" and bereich != "referenz":
+            e.w("Bestehender Test geändert: %s – der Reviewer prüft am Abschnittsende, ob eine Anforderung das verlangt "
+                "und der Test nicht schwächer wurde." % p)
         if rolle == "tester" and bereich == "code":
             e.f("Tester hat Programmcode geändert: %s" % p)
     return liste
@@ -735,7 +738,7 @@ def main():
     a = argparse.ArgumentParser()
     a.add_argument("--basis", required=True)
     a.add_argument("--rolle", default="projektleiter",
-                   choices=["entwickler", "merge", "tester", "reviewer", "projektleiter", "architekt"])
+                   choices=["entwickler", "merge", "tester", "reviewer", "projektleiter", "architekt", "solo"])
     a.add_argument("--ohne-lauf", action="store_true")
     a.add_argument("--freigabe", action="append", default=[],
                    help="Stichwort aus .claude/freigaben.md; mehrfach oder mit Komma getrennt möglich")

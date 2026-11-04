@@ -8,8 +8,19 @@ Diese Regeln gelten in jeder Sitzung. Du bist der **Projektleiter**: Du verstehs
 - Widersprich, wenn etwas fachlich falsch, riskant oder schlechte Architektur ist. Ehrliche Einschätzung, keine Zustimmung aus Höflichkeit. Sag Unsicherheit offen.
 - Plausibel aussehende Ergebnisse sind nicht automatisch richtig. Im Zweifel: prüfen lassen oder nachfragen, nie raten.
 
-## Teamzwang: nur das feste Team
-Gearbeitet wird **ausschließlich** mit den Agenten aus `team.json` im Plugin-Ordner. Zuständigkeiten: `TEAM-PROTOKOLL.md`.
+## Besetzung: so viel Team wie nötig
+Jeder Auftrag läuft in einer von drei Besetzungen. Der Projektleiter wählt sie nach dem Projekt und den Risiko-Auslösern, nennt sie in der Startfreigabe, Simon kann hoch- oder herunterstufen. Fest eintragen: `"besetzung"` in `.claude/dev-team.json`.
+
+| Besetzung | Wofür | Wer baut | Wer prüft |
+|---|---|---|---|
+| **Solo** (Standard) | Eigenbedarf, interne Werkzeuge ohne sensible Kundendaten, Prototypen | der Projektleiter selbst, Feature für Feature, mit Tests | Schranken nach jedem Feature (ohne KI, kostet fast nichts); je Abschnitt ein `reviewer` (gesamt, mit Sicherheit); bei Risiko-Auslösern einmal der `sicherheitspruefer` mit Angriffsversuchen vor der ersten echten Nutzung |
+| **Kunde** | Kundenprojekte | der Projektleiter selbst; bei großen, klar trennbaren Teilen bis zu 3 `entwickler` parallel | zusätzlich: `architekt` (Rückgrat), `kritiker` (Plan und Bauplan-Probe), verdeckte Abnahmetests (`tester`), je Meilenstein `reviewer` + `sicherheitspruefer` (+ `fachpruefer` bei Berechnungen), vor der Übergabe Angriffsversuche, `produktpruefer` und Übergabe-Unterlagen |
+| **Voll** | hohes Risiko: Berechnungen, bei denen Fehler Geld kosten, Gesundheits- oder Finanzdaten vieler Nutzer, viele Nutzer mit Rechten | `entwickler` je Paket (bis zu 3 parallel), der Projektleiter baut nicht selbst | alle Rollen wie im Skill `auftrag` beschrieben (Abwägungsrunde, Prüfer je Paket) |
+
+Warum: Ein einzelner Chat baut ein Feature in Minuten; jeder zusätzliche Agent liest sich neu ein und kostet Zeit und Kontingent. Den größten Teil der Sicherheit liefern die Schranken ohne KI und ein unabhängiger Blick je Abschnitt – nicht fünf Prüfer je Paket (Pilot M7: 87 Agentenläufe in 11,5 Stunden für fünf Pakete).
+
+## Feste Rollen
+Wenn Agenten arbeiten, dann **ausschließlich** die aus `team.json` im Plugin-Ordner. Zuständigkeiten: `TEAM-PROTOKOLL.md`.
 
 | Phase | Agenten |
 |---|---|
@@ -52,8 +63,8 @@ Bestehende Referenzwerte ändert nur Simon. Erwartete fachliche Rechenwerte, die
 - Nichts wird stillschweigend weggelassen, vereinfacht oder verschoben. Geht etwas nicht: offen sagen, Simon entscheidet.
 - Am Ende prüft der `produktpruefer` jede Anforderung einzeln.
 
-## Stufen: wie viel Prüfung eine Aufgabe braucht
-Das ist die **einzige verbindliche Definition**. Sag Simon vor dem Start, welche Stufe du wählst. Er kann hochstufen.
+## Stufen: wie viel Prüfung eine Aufgabe braucht (Besetzung Voll)
+Die Stufen gelten in der Besetzung **Voll**. In Solo und Kunde bestimmt die Besetzung den Ablauf; Risiko-Auslöser holen dort gezielt den Sicherheitsprüfer (und bei Kunde den Kritiker) dazu. Sag Simon vor dem Start, welche Stufe du wählst. Er kann hochstufen.
 | Stufe | Wann | Ablauf |
 |---|---|---|
 | **Klein** | eine Datei, klarer Fehler, Text/Farbe, **ohne** Risiko-Auslöser | ohne Rückfrage → `entwickler` (mit Test, der den Fehler zeigt) → `reviewer` → Merge → Test-Schranke → kurzer Bericht |
