@@ -70,7 +70,8 @@ Nach der Tabelle und den Risiko-Auslösern im Grundgesetz, nach Risiko, nicht na
 4. Neu vorgeschlagene Fachregeln zur Bestätigung.
 5. **Wow-Vorschläge des Gastgebers** (Top 3: was der Nutzer erlebt, Aufwand, Prüfkriterium) mit deiner Empfehlung. Was Simon wählt, wird eine Anforderung mit nächster A-Nummer im Lastenheft (Prüfkriterium = Abnahmekriterium), bekommt Paket und Bauplan vom `architekt` und wird getestet wie alles andere. Nicht Gewähltes → `docs/wow-ideen.md`.
 6. Paketliste mit Parallelität (kritischer Pfad), geschätzter Bauzeit, Arbeitsbranch.
-7. **Freigaben:** Technische Freigaben (siehe Grundgesetz „Alle Tests grün“) lässt du von einem frischen `kritiker` Modus `freigabe` prüfen und trägst sie selbst ein – Simon sieht nur die Liste. Fachliche Sollwerte und Fachregeln legst du ihm zur Bestätigung vor. Keine Freigaben nötig: sag das.
+7. **Auslieferung:** Baut das Hosting automatisch aus `main`? Dann einmal fragen: „Am Ende selbst ausliefern?“ (Autopilot: nein, Pull Request bleibt offen.)
+8. **Freigaben:** Technische Freigaben (siehe Grundgesetz „Alle Tests grün“) lässt du von einem frischen `kritiker` Modus `freigabe` prüfen und trägst sie selbst ein – Simon sieht nur die Liste. Fachliche Sollwerte und Fachregeln legst du ihm zur Bestätigung vor. Keine Freigaben nötig: sag das.
 Frage: „Freigabe zum eigenständigen Bauen?“
 
 Entscheidungen in `docs/risiko-log.md`, bestätigte Regeln in `fachwissen/regeln.md`. Bei jeder neuen Regel fragen, ob sie fürs ganze Fachgebiet gilt. **Ohne ausdrückliche Freigabe wird nicht gebaut.**
@@ -170,7 +171,7 @@ Zuerst den Durchlauf ausschalten und die Übergabe entfernen: `rm -f .dev-team/d
 8. Offene Fragen aus `docs/OFFENE_FRAGEN.md`.
 9. Ideen des Produktprüfers und des Gastgebers (Nachschliff) und Fachregel-Vorschläge.
 10. Lektionsvorschläge mit Empfehlung (bestätigt → `/dev-team:lektion vorschlaege`).
-11. **Merge nach `main` machst du selbst,** sobald alles belegt grün ist (Schranke, verdeckte Abnahmetests, Gesamtprüfung, Produktprüfer; liefert `main` automatisch aus: zusätzlich das Sicherheits-Tor aus `/dev-team:uebergabe`). Mit GitHub-Werkzeug: Pull Request vom Arbeitsbranch nach `main`, Beschreibung = Abschlussbericht, selbst zusammenführen; sonst `git checkout main && git merge --no-ff <arbeitsbranch>` und pushen. Im Bericht steht der Merge-Commit. Bei Kundenprojekten danach `/dev-team:uebergabe`.
+11. **Merge nach `main` machst du selbst,** sobald alles belegt grün ist (Schranke, verdeckte Abnahmetests, Gesamtprüfung, Produktprüfer; liefert `main` automatisch aus, ist das eine Auslieferung: nur wenn Simon sie in der Startfreigabe erlaubt hat – dort fragst du einmal „Am Ende ausliefern?“ – und mit dem Sicherheits-Tor aus `/dev-team:uebergabe`; sonst Pull Request offen lassen, Eintrag unter „Nur Simon“). Mit GitHub-Werkzeug: Pull Request vom Arbeitsbranch nach `main`, Beschreibung = Abschlussbericht, selbst zusammenführen; sonst `git checkout main && git merge --no-ff <arbeitsbranch>` und pushen. Im Bericht steht der Merge-Commit. Bei Kundenprojekten danach `/dev-team:uebergabe`.
 12. **Ins Gehirn schreiben** (vor dem Bericht, ohne Nachfrage – das ist Teil von „fertig“):
     - Projektstand: `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/gehirn.py" projekt --name <Projekt> --status <aktiv|fertig|ruhend> --stand-datei docs/STATUS.md --fachgebiet <…> --ordner <Projektordner>`.
     - Lektionsvorschläge der Agenten: je `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/gehirn.py" lektion --text "- [Bereich] Regel. (Anlass, Datum)" --projekt <Projekt>` (landen unter „Vorgeschlagen“; bestätigt werden sie erst über `/dev-team:lektion vorschlaege`).

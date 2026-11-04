@@ -46,7 +46,7 @@ Für alle anderen Aufrufe endet er sofort. Kann er nicht laufen (Last, fehlende 
 
 Was es außerdem gibt, ohne zu bremsen:
 - Die **Test-Schranke** nach jedem Paket und Merge erkennt geänderte Tests und Referenzwerte – auch wenn jemand sie über die Shell geändert hat.
-- **Sperrregeln in den Projekteinstellungen:** kein Force-Push, kein Push auf main, keine Geheimnisse (`.env`, Schlüssel) lesen. Noch stärker: auf GitHub für `main` den Branch-Schutz einschalten.
+- **Sperrregeln in den Projekteinstellungen:** kein Force-Push, keine Geheimnisse (`.env`, Schlüssel) lesen. Noch stärker: auf GitHub für `main` den Branch-Schutz einschalten.
 - **Prüfsummen und blinder Lauf** der verdeckten Tests, Reviewer, Teamnachweis im Abschlussbericht.
 
 ## 3. Wie viel Prüfung? Stufen und Profile
@@ -236,7 +236,7 @@ Damit der Lauf nicht bei der ersten Rückfrage stehen bleibt, braucht Claude Cod
 
 ## 11. Senior-Qualitätsregeln und Grenzen der Autonomie
 
-- Gebaut wird eigenständig, aber auf einem eigenen Branch. Kein Push auf `main`, kein Löschen, keine Datenbank-Migration, kein Release, keine Schlüssel in der Sitzung und keine Daten an externe Dienste ohne dein Ja. Die vollständige Liste steht im Grundgesetz („Grenzen der Autonomie“).
+- Gebaut wird eigenständig, aber auf einem eigenen Branch; nach `main` führt der Projektleiter erst am Ende zusammen, wenn alles grün ist (liefert `main` automatisch aus, nur mit deiner Erlaubnis aus der Startfreigabe). Kein Löschen, keine Datenbank-Migration, kein Release, keine Schlüssel in der Sitzung und keine Daten an externe Dienste ohne dein Ja. Die vollständige Liste steht im Grundgesetz („Grenzen der Autonomie“).
 - Technische Grenzen: höchstens drei Entwickler und drei Prüfer gleichzeitig, jeder mit Schrittobergrenze, Nachbesserung höchstens fünf Runden. Große Aufträge werden in Meilensteine mit höchstens 5 Paketen geteilt; deine Freigabe gilt für alle, angehalten wird nur bei Rot oder harten Stopps. Der Stand steht in Dateien (`docs/STATUS.md`), damit nach `/clear` nichts verloren geht.
 - Gibt dein Auftrag eigene Phasen vor („nur analysieren, noch nichts ändern“), gilt das vor dem Standardablauf.
 - Selbstprüfung des Plugins: `bash plugins/dev-team/scripts/pruefe-plugin.sh` (findet widersprüchliche Namen, tote Verweise, uneinheitliche Versionen, Abweichungen zwischen `team.json` und den Agentendateien und führt die Plugin-Tests aus).
