@@ -16,7 +16,10 @@ Prüft gegen einen Basis-Commit:
 
 Aufruf (im Projekt- oder Worktree-Ordner):
   python3 pruefe_tests.py --basis <commit> [--rolle entwickler|tester|reviewer|projektleiter]
-                          [--ohne-lauf] [--freigabe "Grund, von Simon bestätigt"]
+                          [--ohne-lauf] [--schnell] [--freigabe "Grund, von Simon bestätigt"]
+  --schnell: Schnellprüfung in der Aufbau-Phase (Solo). Diff-, Sicherheits- und Abhängigkeitsprüfung wie immer,
+  statt des vollen Testbefehls nur 'schnelltestbefehl' (falls eingetragen). Nie ein Grün-Nachweis – den liefert
+  erst die volle Schranke in der Fertigstellung.
 Exit 0 = OK, Exit 1 = mindestens ein FEHLER. Ändert keine Projektdateien (außer dem
 Nachweis docs/TESTNACHWEIS.md und .dev-team/letzter-gruener-lauf.json im Hauptordner).
 """
@@ -469,7 +472,8 @@ def vorarbeit_dateien(e, wurzel, hauptordner, basis, team):
 
 
 VERSCHAERFBAR = ("zusatzbefehle", "meilensteinbefehle")
-FREI_EINSTELLBAR = ("kontext_grenze", "kontext_grenze_agent", "_hilfe", "besetzung", "autopilot")
+FREI_EINSTELLBAR = ("kontext_grenze", "kontext_grenze_agent", "_hilfe", "besetzung", "autopilot",
+                    "schnelltestbefehl")  # Schnelltest ergibt nie einen Grün-Nachweis, also frei
 
 
 def _mutation_echt(befehl):
@@ -734,15 +738,38 @@ def lauf(e, wurzel, hauptordner, konfig, ist_worktree, fg, rolle):
     return zahl
 
 
+def schnelllauf(e, wurzel, konfig):
+    """Aufbau-Phase: nur der schnelle Testbefehl (z. B. die Tests zur Änderung), kein Zählvergleich."""
+    befehl = str((konfig or {}).get("schnelltestbefehl") or "").strip()
+    if not befehl:
+        e.w("Kein 'schnelltestbefehl' in .claude/dev-team.json – in der Schnellprüfung liefen keine Tests, nur "
+            "Diff-, Sicherheits- und Abhängigkeitsprüfung.")
+        return
+    befehl = befehl.replace("${DEV_TEAM_PLUGIN}", PLUGIN).replace("$DEV_TEAM_PLUGIN", PLUGIN)
+    print("→ Schnelltest: %s" % befehl, flush=True)
+    r = sh(befehl, wurzel)
+    if r.returncode != 0:
+        ende = "\n".join(((r.stdout or "") + "\n" + (r.stderr or "")).strip().splitlines()[-15:])
+        e.f("Schnelltest fehlgeschlagen (Exit %d). Letzte Zeilen:\n%s" % (r.returncode, ende))
+    else:
+        e.o("Schnelltest grün (Exit 0).")
+
+
 def main():
     a = argparse.ArgumentParser()
     a.add_argument("--basis", required=True)
     a.add_argument("--rolle", default="projektleiter",
                    choices=["entwickler", "merge", "tester", "reviewer", "projektleiter", "architekt", "solo"])
     a.add_argument("--ohne-lauf", action="store_true")
+    a.add_argument("--schnell", action="store_true",
+                   help="Schnellprüfung in der Aufbau-Phase: nur schnelltestbefehl, nie ein Grün-Nachweis")
     a.add_argument("--freigabe", action="append", default=[],
                    help="Stichwort aus .claude/freigaben.md; mehrfach oder mit Komma getrennt möglich")
     arg = a.parse_args()
+    if arg.schnell and arg.rolle != "solo":
+        print("FEHLER: --schnell gibt es nur in der Aufbau-Phase (Rolle solo). Rolle %s braucht die volle Schranke."
+              % arg.rolle)
+        sys.exit(1)
 
     e = Ergebnis()
     try:
@@ -804,7 +831,9 @@ def main():
         e.w("Im Hauptordner liegen Entwickler-Worktrees (.claude/worktrees/). Der Testbefehl darf sie "
             "nicht mit erfassen, sonst laufen fremde oder doppelte Tests (z. B. Testpfad auf tests/ begrenzen).")
     zahl = None
-    if arg.ohne_lauf:
+    if arg.schnell:
+        schnelllauf(e, wurzel, konfig)
+    elif arg.ohne_lauf:
         e.w("Tests wurden in diesem Aufruf NICHT ausgeführt (--ohne-lauf) – kein Grün-Nachweis.")
     else:
         zahl = lauf(e, wurzel, hauptordner, konfig, ist_worktree, fg, arg.rolle)
@@ -816,9 +845,11 @@ def main():
         print("WARNUNG: " + t)
     for t in e.fehler:
         print("FEHLER:  " + t)
-    gruen = not e.fehler and not arg.ohne_lauf
+    gruen = not e.fehler and not arg.ohne_lauf and not arg.schnell
     print("\nERGEBNIS: %s (Rolle %s, Basis %s, Stand %s%s)" % (
-        "OK – alles grün" if gruen else ("OK – Diff-Prüfung ohne Testlauf" if not e.fehler else "NICHT OK"),
+        "OK – alles grün" if gruen else (
+            "NICHT OK" if e.fehler else
+            "OK – Schnellprüfung (Aufbau), kein Grün-Nachweis" if arg.schnell else "OK – Diff-Prüfung ohne Testlauf"),
         arg.rolle, basis[:10], commit, ", Worktree" if ist_worktree else ""))
 
     if gruen and ist_worktree and arg.rolle == "entwickler":
@@ -853,7 +884,7 @@ def main():
             except OSError:
                 pass
 
-    if not ist_worktree and not arg.ohne_lauf:
+    if not ist_worktree and not arg.ohne_lauf and not arg.schnell:
         try:
             docs = os.path.join(hauptordner, "docs")
             if os.path.isdir(docs):

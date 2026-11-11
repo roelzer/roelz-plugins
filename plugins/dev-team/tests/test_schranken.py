@@ -388,6 +388,44 @@ class TestSchranke(unittest.TestCase):
                       "    def test_n(self):\n        self.assertEqual(1, 1)\n")
         self.assertEqual(self.lauf("--rolle", "solo", "--ohne-lauf")[0], 1)
 
+    def test_schnellpruefung_aufbau(self):
+        # Aufbau-Phase: Schnelltest statt vollem Lauf, nie ein Grün-Nachweis; Sicherheit und Diff weiter scharf.
+        self.konfig({"testbefehl": "%s -c 'import sys; sys.exit(1)'" % sys.executable,
+                     "testzahl_muster": r"Ran (\d+) tests?", "schnelltestbefehl": "%s -c 'print(1)'" % sys.executable})
+        git(self.p, "add", "-A")
+        git(self.p, "commit", "-qm", "schnelltest eingetragen")
+        self.basis = git(self.p, "rev-parse", "HEAD").strip()
+        self.schreibe("src/rabatt.py", "def rabatt(x):\n    return x\n")
+        code, aus = self.lauf("--rolle", "solo", "--schnell")
+        self.assertEqual(code, 0, aus)
+        self.assertIn("Schnelltest grün", aus)
+        self.assertIn("Schnellprüfung (Aufbau), kein Grün-Nachweis", aus)
+        self.assertNotIn("Testbefehl", aus.replace("Schnelltest", ""))
+        self.assertFalse(os.path.exists(os.path.join(self.p, "docs", "TESTNACHWEIS.md")))
+        self.assertFalse(os.path.isdir(os.path.join(self.p, ".dev-team", "gruen")))
+        # übersprungener Test bleibt rot, auch in der Schnellprüfung
+        self.schreibe("tests/test_neu.py", "import unittest\nclass N(unittest.TestCase):\n    @unittest.skip('x')\n"
+                      "    def test_n(self):\n        self.assertEqual(1, 1)\n")
+        self.assertEqual(self.lauf("--rolle", "solo", "--schnell")[0], 1)
+        os.remove(os.path.join(self.p, "tests", "test_neu.py"))
+        # roter Schnelltest ist rot
+        self.konfig({"testbefehl": "x", "schnelltestbefehl": "%s -c 'import sys; sys.exit(3)'" % sys.executable})
+        code, aus = self.lauf("--rolle", "solo", "--schnell")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("Schnelltest fehlgeschlagen", aus)
+
+    def test_schnellpruefung_nicht_fuer_endpruefung(self):
+        for rolle in ("projektleiter", "merge", "entwickler"):
+            code, aus = self.lauf("--rolle", rolle, "--schnell")
+            self.assertEqual(code, 1, aus)
+            self.assertIn("nur in der Aufbau-Phase", aus)
+
+    def test_schnelltestbefehl_frei_einstellbar(self):
+        self.konfig({"testbefehl": "%s -m unittest discover -s tests -t . -v" % sys.executable,
+                     "testzahl_muster": r"Ran (\d+) tests?", "schnelltestbefehl": "echo ok"})
+        code, aus = self.lauf("--rolle", "projektleiter", "--ohne-lauf")
+        self.assertNotIn("Dev-Team-Einstellungen (.claude/dev-team.json) geändert", aus)
+
     def test_besetzung_selbst_einstellen(self):
         self.konfig({"testbefehl": "%s -m unittest discover -s tests -t . -v" % sys.executable,
                      "testzahl_muster": r"Ran (\d+) tests?", "besetzung": "kunde"})
