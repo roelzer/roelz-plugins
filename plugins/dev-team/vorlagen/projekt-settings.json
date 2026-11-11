@@ -10,7 +10,8 @@
   "enabledPlugins": {
     "dev-team@roelz-plugins": true,
     "tool-scout@roelz-plugins": true,
-    "dev-team-tafel@roelz-plugins": true
+    "dev-team-tafel@roelz-plugins": true,
+    "video-studio@roelz-plugins": true
   },
   "disableAllHooks": false,
   "worktree": {

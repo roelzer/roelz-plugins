@@ -1,5 +1,9 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.17.1 – Video-Studio in neuen Projekten
+
+- Projektvorlage schaltet das neue Plugin `video-studio` (KI-Videos mit Storyboard, Higgsfield, Kritiker) mit ein; bestehende Projekte bekommen es beim nächsten Abgleich der Einstellungen.
+
 ## 3.17.0 – Schnell aufbauen, robust fertigstellen, mit Wow-Effekt
 
 Anlass: Simon hat einige Tage mit einem anderen Chat-Werkzeug gebaut und war „locker 10-mal schneller“. Beim Ausprobieren vieler Zwischenschritte war das Warten auf das volle Prüfprogramm nach jedem Feature mühsam. Seine Vorgabe: „Erst wenn das Produkt finalisiert wird, also das Grundgerüst mit Funktionen steht, soll das Testteam alles robust bauen.“ Dazu die fünf Leitfäden zum Wow-Effekt (Experience/Art/Motion Director, Reverse Engineering), die Simon mit Copilot erarbeitet hat, und sein Wunsch, fertige Werkzeuge und Bibliotheken aus dem Internet zu nutzen.
