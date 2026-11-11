@@ -40,6 +40,26 @@ fi
 # Gehirn (Simons Obsidian-Tresor): Dev-Team-Lektionen und Projektnotiz mitgeben.
 gehirn=""
 [ -f "$global" ] && gehirn="$(grep -m 1 '^Gehirn:' "$global" 2>/dev/null | sed 's/^Gehirn:[[:space:]]*//' | tr '\\' '/' | tr -d '\r')"
+
+# Cloud-Sitzung ohne eingetragenes Gehirn: selbst holen (Simons Wunsch 2026-11-11 – in der Cloud wurde sonst
+# nie etwas ins Gehirn geschrieben). Klappt es nicht (kein Zugriff, kein Netz), läuft die Sitzung ganz normal weiter.
+if [ -z "$gehirn" ] && [ "${CLAUDE_CODE_REMOTE:-}" = "true" ]; then
+  quelle_gehirn="${DEV_TEAM_GEHIRN_QUELLE:-https://github.com/roelzer/brain}"
+  ziel_gehirn="$HOME/roelz-brain"
+  if [ ! -f "$ziel_gehirn/00 Start.md" ] && command -v git >/dev/null 2>&1; then
+    rm -rf "$ziel_gehirn" 2>/dev/null
+    if command -v timeout >/dev/null 2>&1; then
+      GIT_TERMINAL_PROMPT=0 timeout 25 git clone -q --depth 50 "$quelle_gehirn" "$ziel_gehirn" >/dev/null 2>&1 || rm -rf "$ziel_gehirn" 2>/dev/null
+    else
+      GIT_TERMINAL_PROMPT=0 git clone -q --depth 50 "$quelle_gehirn" "$ziel_gehirn" >/dev/null 2>&1 || rm -rf "$ziel_gehirn" 2>/dev/null
+    fi
+  fi
+  if [ -f "$ziel_gehirn/00 Start.md" ]; then
+    mkdir -p "$HOME/.claude" 2>/dev/null
+    grep -q '^Gehirn:' "$global" 2>/dev/null || printf 'Gehirn: %s\n' "$ziel_gehirn" >> "$global"
+    gehirn="$ziel_gehirn"
+  fi
+fi
 if [ -n "$gehirn" ] && [ -f "$gehirn/00 Start.md" ]; then
   # Erst den neuesten Stand holen (anderer Laptop, Obsidian evtl. zu). Höchstens 8 Sekunden, nie nachfragen,
   # eigene Änderungen werden beiseitegelegt und wieder aufgesetzt. Klappt es nicht: lokaler Stand, mit Hinweis.

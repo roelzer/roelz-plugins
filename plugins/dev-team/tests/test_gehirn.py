@@ -172,5 +172,75 @@ class GehirnAbgleich(unittest.TestCase):
             self.assertIn("Regel von A", aus)
 
 
+class GehirnInDerCloud(unittest.TestCase):
+    """In Cloud-Sitzungen gibt es keine eingerichtete ~/.claude/CLAUDE.md: der Sitzungsstart holt das Gehirn selbst."""
+
+    def bau_quelle(self, t):
+        quelle = os.path.join(t, "quelle")
+        os.makedirs(os.path.join(quelle, "05 Lektionen"))
+        with open(os.path.join(quelle, "00 Start.md"), "w", encoding="utf-8") as f:
+            f.write("# Start\n")
+        with open(os.path.join(quelle, "05 Lektionen", "Dev-Team-Lektionen.md"), "w", encoding="utf-8") as f:
+            f.write("# L\n\n## Lektionen\n- [C] Cloud-Regel gilt. (T, 2026)\n")
+        git(quelle, "init", "-q")
+        git(quelle, "-c", "user.name=t", "-c", "user.email=t@t", "add", "-A")
+        git(quelle, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "start")
+        remote = os.path.join(t, "remote.git")
+        subprocess.run(["git", "clone", "-q", "--bare", quelle, remote], check=True)
+        return remote
+
+    def start(self, t, **extra):
+        heim = os.path.join(t, "heim")
+        os.makedirs(heim, exist_ok=True)
+        env = dict(os.environ, HOME=heim, CLAUDE_PLUGIN_ROOT=PLUGIN, CLAUDE_PROJECT_DIR=t, **extra)
+        env.pop("DEV_TEAM_GEHIRN_TEST", None)
+        aus = subprocess.run(["bash", os.path.join(PLUGIN, "scripts", "sitzungsstart.sh")], input="{}",
+                             capture_output=True, text=True, env=env).stdout
+        return heim, aus
+
+    def test_cloud_holt_gehirn_und_traegt_pfad_ein(self):
+        with tempfile.TemporaryDirectory() as t:
+            remote = self.bau_quelle(t)
+            heim, aus = self.start(t, CLAUDE_CODE_REMOTE="true", DEV_TEAM_GEHIRN_QUELLE=remote)
+            ziel = os.path.join(heim, "roelz-brain")
+            self.assertTrue(os.path.isfile(os.path.join(ziel, "00 Start.md")), aus)
+            with open(os.path.join(heim, ".claude", "CLAUDE.md"), encoding="utf-8") as f:
+                self.assertIn("Gehirn: " + ziel.replace("\\", "/"), f.read())
+            self.assertIn("Cloud-Regel gilt", aus)
+            # gehirn.py findet den Pfad jetzt über ~/.claude/CLAUDE.md
+            r = subprocess.run([sys.executable, SKRIPT, "pfad"], capture_output=True, text=True,
+                               env={k: v for k, v in dict(os.environ, HOME=heim).items() if k != "DEV_TEAM_GEHIRN_TEST"})
+            self.assertIn("roelz-brain", r.stdout + r.stderr)
+
+    def test_zweiter_start_klont_nicht_doppelt(self):
+        with tempfile.TemporaryDirectory() as t:
+            remote = self.bau_quelle(t)
+            heim, _ = self.start(t, CLAUDE_CODE_REMOTE="true", DEV_TEAM_GEHIRN_QUELLE=remote)
+            heim, aus = self.start(t, CLAUDE_CODE_REMOTE="true", DEV_TEAM_GEHIRN_QUELLE=remote)
+            with open(os.path.join(heim, ".claude", "CLAUDE.md"), encoding="utf-8") as f:
+                self.assertEqual(f.read().count("Gehirn:"), 1)
+            self.assertIn("Cloud-Regel gilt", aus)
+
+    def test_lokal_ohne_cloud_klont_nichts(self):
+        with tempfile.TemporaryDirectory() as t:
+            remote = self.bau_quelle(t)
+            env_ohne = {k: v for k, v in os.environ.items() if k != "CLAUDE_CODE_REMOTE"}
+            heim = os.path.join(t, "heim")
+            os.makedirs(heim)
+            env = dict(env_ohne, HOME=heim, CLAUDE_PLUGIN_ROOT=PLUGIN, CLAUDE_PROJECT_DIR=t,
+                       DEV_TEAM_GEHIRN_QUELLE=remote)
+            env.pop("DEV_TEAM_GEHIRN_TEST", None)
+            subprocess.run(["bash", os.path.join(PLUGIN, "scripts", "sitzungsstart.sh")], input="{}",
+                           capture_output=True, text=True, env=env)
+            self.assertFalse(os.path.exists(os.path.join(heim, "roelz-brain")))
+
+    def test_ohne_zugriff_bleibt_sitzung_heil(self):
+        with tempfile.TemporaryDirectory() as t:
+            heim, aus = self.start(t, CLAUDE_CODE_REMOTE="true",
+                                   DEV_TEAM_GEHIRN_QUELLE=os.path.join(t, "gibt-es-nicht.git"))
+            self.assertFalse(os.path.exists(os.path.join(heim, "roelz-brain", "00 Start.md")))
+            self.assertIn("Dev-Team aktiv", aus)
+
+
 if __name__ == "__main__":
     unittest.main()

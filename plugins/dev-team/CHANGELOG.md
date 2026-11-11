@@ -1,5 +1,10 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.17.2 – Gehirn auch in Cloud-Sitzungen
+
+- Anlass: Simon arbeitet fast nur noch in Cloud-Sitzungen, dort war kein Gehirn eingetragen, also schrieb das Team seit Ende Oktober nichts mehr ins Gehirn. Der Sitzungsstart holt das Gehirn (`roelzer/brain`) in Cloud-Sitzungen jetzt selbst nach `~/roelz-brain`, trägt den Pfad in `~/.claude/CLAUDE.md` ein und lädt die Dev-Team-Lektionen. `gehirn.py` schreibt und pusht danach wie lokal. Ohne Zugriff (Claude-GitHub-App nicht auf `brain`) läuft die Sitzung unverändert weiter.
+- Quelle für Tests umstellbar über `DEV_TEAM_GEHIRN_QUELLE`. 4 neue Tests.
+
 ## 3.17.1 – Video-Studio in neuen Projekten
 
 - Projektvorlage schaltet das neue Plugin `video-studio` (KI-Videos mit Storyboard, Higgsfield, Kritiker) mit ein; bestehende Projekte bekommen es beim nächsten Abgleich der Einstellungen.
