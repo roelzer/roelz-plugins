@@ -1,5 +1,25 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.17.0 – Schnell aufbauen, robust fertigstellen, mit Wow-Effekt
+
+Anlass: Simon hat einige Tage mit einem anderen Chat-Werkzeug gebaut und war „locker 10-mal schneller“. Beim Ausprobieren vieler Zwischenschritte war das Warten auf das volle Prüfprogramm nach jedem Feature mühsam. Seine Vorgabe: „Erst wenn das Produkt finalisiert wird, also das Grundgerüst mit Funktionen steht, soll das Testteam alles robust bauen.“ Dazu die fünf Leitfäden zum Wow-Effekt (Experience/Art/Motion Director, Reverse Engineering), die Simon mit Copilot erarbeitet hat, und sein Wunsch, fertige Werkzeuge und Bibliotheken aus dem Internet zu nutzen.
+
+**Tempo (Solo)**
+- **Zwei Phasen:** *Aufbau* – der Projektleiter baut das Grundgerüst mit allen Funktionen schnell, Tests nur für Kernlogik, nach jedem Feature die **Schnellprüfung** (`pruefe-tests.sh --rolle solo --schnell`: Diff-Regeln, Sicherheits- und Abhängigkeits-Schranke, dazu `schnelltestbefehl` – Sekunden statt Minuten, nie ein Grün-Nachweis). *Fertigstellung* – beginnt von selbst, sobald das Grundgerüst steht: `tester` Modus `haerten` (neu: Tests für jede Anforderung, Fall-Matrix, Ende-zu-Ende mit Konsolen-Wächter), ab dann volle Schranke, `reviewer`, `designer` mit Video, bei Risiko `sicherheitspruefer`, Feinschliff-Runde, Merge nach `main`. In der Aufbau-Phase kommt nichts nach `main`.
+- **Vorschau:** sichtbare Änderungen kann Simon sofort ausprobieren (Entwicklungsserver, Port einmal melden), Arbeitsbranch nach jedem Feature gepusht.
+- **Werkstatt:** kleine Änderungswünsche zwischendurch sofort umsetzen – Schnellprüfung, Commit, eine Zeile Antwort, kein Plan, kein Agent.
+- Kunde und Voll bleiben streng (volle Schranke je Paket); Vorschau und Werkstatt gibt es dort auch, die Werkstatt mit voller Schranke.
+- `schnelltestbefehl` in `.claude/dev-team.json` ist frei einstellbar (keine Freigabe nötig, weil er nie grün belegt). `--schnell` ist nur mit Rolle `solo` erlaubt.
+
+**Wow-Effekt**
+- **Designer = Gestaltungs-Verantwortlicher** für Optik, Bewegung und Gefühl: im Entwurf 2–3 Vorbilder mit abgeleiteten Prinzipien (Reverse Engineering, nie kopieren) und eine **Bewegungssprache** (Zeiten 100–250/250–500/500–1000 ms, Federn, Erfolgsmomente).
+- **Prüfen mit Video:** Designer Modus `treue` nimmt die Hauptabläufe per Playwright als Video auf und bewertet sie (Rückmeldung bei jeder Aktion? harte Sprünge? Erfolgsmomente? „Würde man das Video teilen?“), dazu der **Screenshot-Test** (Produkt, wichtigste Aktion, Zustand sofort erkennbar).
+- **Oberflächen-Standard** erweitert: Bewegung (Zweck je Animation, 60 FPS nur mit transform/opacity, reduzierte Bewegung), Rückmeldung, Erfolgsmomente, Spiele (PixiJS/Phaser/Three.js) und ein **Werkzeugkasten** mit geprüften Bibliotheken (Motion, GSAP, AutoAnimate, Magic UI, Aceternity UI, Sonner, Vaul, cmdk, Lottie, Rive, canvas-confetti, Lucide/Phosphor, Fontsource, Playwright, Lighthouse, axe-core) samt Regeln für Material aus dem Internet (gepflegt, Lizenz für Firmen, Abhängigkeits-Schranke, nichts zur Laufzeit nachladen).
+- **Harte Prüfungen ohne KI:** Konsolen-Wächter für Ende-zu-Ende-Tests (Vorlage im Standard) und neues Skript `scripts/ohne_warnungen.py` (Build muss ohne Fehler **und** ohne Warnungen laufen; für `meilensteinbefehle`).
+- **Feinschliff-Runde** am Ende der Fertigstellung (Solo) bzw. jedes Meilensteins (Kunde): Gastgeber und Designer nennen die 3 Stellen mit dem größten Wow-Potenzial, der Projektleiter setzt sie um.
+- Nicht übernommen: „TypeScript bevorzugen“ als allgemeine Regel (Python-/VBA-Projekte); der Rest des „Agent Operating System“ stand schon im Grundgesetz.
+- Tests: Schnellprüfung (grün ohne Nachweis, übersprungener Test und roter Schnelltest bleiben rot, nur Rolle solo, frei einstellbar), `ohne_warnungen.py`.
+
 ## 3.16.3 – Jeder Bau-Auftrag läuft bis zum Ende
 
 Anlass: In `simfit` baute der Projektleiter den ersten lauffähigen Stand und fragte dann „Womit soll ich weitermachen?“. Simon hatte einfach beschrieben, was gebaut werden soll – ohne `/dev-team-auftrag`; damit gab es weder Startfreigabe noch Durchlauf-Marke, und der Projektleiter verhielt sich wie im Gespräch.

@@ -1,7 +1,7 @@
 {
   "name": "dev-team",
   "displayName": "Dev-Team",
-  "version": "3.16.3",
+  "version": "3.17.0",
   "description": "Senior-Entwicklungsteam in drei Besetzungen: Solo (der Projektleiter baut selbst, abgesichert durch Test-, Sicherheits- und Abhängigkeits-Schranke und ein unabhängiges Review), Kunde (zusätzlich Architekt, Kritiker, verdeckte Abnahmetests, Prüfung je Meilenstein, Übergabe) und Voll (Entwickler je Paket, alle Prüfer). Enthält kein Firmen- oder Kundenwissen.",
   "author": {
     "name": "Simon Rölz"

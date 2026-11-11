@@ -1,4 +1,4 @@
-# Übergabe: Dev-Team weiterentwickeln (Stand 11.11.2026, Dev-Team 3.16.3)
+# Übergabe: Dev-Team weiterentwickeln (Stand 11.11.2026, Dev-Team 3.17.0)
 
 Für die nächste Sitzung, die mit Simon am Dev-Team (roelz-plugins) weiterarbeitet. Erst ganz lesen.
 
@@ -9,7 +9,7 @@ Für die nächste Sitzung, die mit Simon am Dev-Team (roelz-plugins) weiterarbei
 - Hat Merges an Claude delegiert („ich klicke sowieso auf Merge“): Plugin-PRs nach grünen Tests selbst zusammenführen.
 
 ## Stand roelz-plugins (main)
-- Dev-Team **3.16.3**, Team-Tafel **0.3.1**. Alles in `plugins/dev-team/CHANGELOG.md` (3.13–3.16.3 aus dieser Sitzung).
+- Dev-Team **3.17.0**, Team-Tafel **0.3.1**. Alles in `plugins/dev-team/CHANGELOG.md`.
 - Kernideen:
   - **Besetzungen** Solo (Standard: Projektleiter baut selbst, Schranken nach jedem Feature, Review je Abschnitt), Kunde (+Architekt, Kritiker, verdeckte Abnahmetests, Prüfung je Meilenstein, Übergabe), Voll (Entwickler je Paket, alle Prüfer).
   - **Ein Stopp** (Startfreigabe) oder **Autopilot** (keiner). Jeder Bau-Auftrag läuft bis zum Ende, nie „womit weitermachen?“.
@@ -28,12 +28,6 @@ Für die nächste Sitzung, die mit Simon am Dev-Team (roelz-plugins) weiterarbei
 - **Simfit** (Solo, Fitness-App, Garmin): eingerichtet, erste Version gebaut; Sitzung wartete auf Simons Antworten H1–H4. Garmin-Login macht Simon selbst.
 - **W-rmenetz-Dorf** (Solo, Handyspiel): Sitzung lief zuletzt mit Opus, Denkaufwand „medium“, ~250k Kontext. Empfehlung an Simon war: neue Sitzung, Opus + Denkaufwand hoch, Spielregeln in `docs/lastenheft.md` mit Tests.
 
-## Offene Entscheidung: Dev-Team 3.17 „Wow-Effekt“
-Simon hat mit Copilot fünf Leitfäden erarbeitet (Agent Operating System, Experience Director, Art Director, Motion Director, Reverse Engineering Workflow). Meine Bewertung: kein neuer Agent, sondern einbauen:
-1. **Designer = Gestaltungs-Verantwortlicher** für Optik, Bewegung und Gefühl; im Entwurf 2–3 Vorbilder wählen und Prinzipien ableiten (Reverse Engineering, nie kopieren), Bewegungssprache festlegen (Zeiten klein 100–250 ms / mittel 250–500 / groß 500–1000, Federn, Erfolgsmomente).
-2. **Prüfen mit Video statt nur Bildschirmfoto:** am Abschnittsende die wichtigsten Abläufe per Playwright als Video aufnehmen und bewerten (Rückmeldung bei jeder Aktion? harte Sprünge? Erfolgsmomente? „Würde man das Video teilen?“) plus Screenshot-Test (Produkt, wichtigste Aktion, Zustand sofort erkennbar).
-3. **Oberflächen-Standard erweitern** um Bewegung (Framer Motion/GSAP für Web, PixiJS fürs Spiel, Zweck je Animation, 60 FPS), Rückmeldung, Erfolgsmomente, Screenshot-Test.
-4. **Harte Prüfung ohne KI:** keine Browser-Konsolenfehler, keine Build-Warnungen.
-5. **Feinschliff-Runde je Meilenstein:** Gastgeber + Designer nennen die 3 Stellen mit dem größten Wow-Potenzial, der Projektleiter setzt sie um.
-Nicht übernehmen: „TypeScript bevorzugen“ als allgemeine Regel (Python/VBA-Projekte); der Rest des „Agent Operating System“ steht schon im Grundgesetz.
-**Simon hat noch nicht zugestimmt** – zuerst fragen.
+## Erledigt: Dev-Team 3.17 „Schnell aufbauen, robust fertigstellen, mit Wow-Effekt“
+Simon hat zugestimmt und ergänzt: (a) Werkzeuge und Bibliotheken aus dem Internet nutzen → Werkzeugkasten in `wissen/oberflaeche.md`; (b) Tempo: Er empfand ein anderes Chat-Werkzeug als „10-mal schneller“, das Warten auf Prüfungen bei vielen Zwischenschritten nervt. Seine Vorgabe: „Erst wenn das Produkt finalisiert wird, also das Grundgerüst mit Funktionen steht, soll das Testteam alles robust bauen.“ → Solo in zwei Phasen (Aufbau mit Schnellprüfung `--schnell`, Vorschau, Werkstatt; Fertigstellung mit `tester` Modus `haerten`, voller Schranke, Prüfern, Video, Feinschliff). Kunde/Voll bleiben streng. Details im CHANGELOG 3.17.0.
+Ehrlich gesagt an Simon: erwartet 2–4-mal schneller in Solo, nicht gemessen. **Nächster Schritt:** in Simfit oder W-rmenetz-Dorf messen, wie lange Aufbau-Schritte jetzt dauern, und nachjustieren.
