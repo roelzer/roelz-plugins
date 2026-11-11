@@ -1,7 +1,7 @@
 {
   "name": "video-studio",
   "displayName": "Video-Studio",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Regisseur für KI-Videos auf Spitzenniveau: Briefing, Storyboard zur Freigabe, Erzeugung über Higgsfield (oder andere verbundene Video-KI), strenge Bildprüfung durch einen unabhängigen Kritiker, Schnitt und Export für jede Plattform.",
   "author": {
     "name": "Simon Rölz"
