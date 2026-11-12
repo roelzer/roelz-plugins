@@ -1,6 +1,6 @@
 # Dev-Team – Anleitung
 
-Stand: November 2026 · Version 3.17.0
+Stand: November 2026 · Version 3.18.0
 
 Dieses Repo enthält zwei Plugins für Claude Code: **`dev-team`** und **`tool-scout`**. Beide enthalten kein Firmen- oder Kundenwissen und dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
 
@@ -215,6 +215,8 @@ Danach VS Code neu starten.
 **Nach dem Update auf 3.12 einmal je Projekt** (auch für Cloud-Projekte): `/dev-team:projekt-aufnehmen`. Das bringt den Durchlauf-Wächter und die Laufzeitmessung in die Projekteinstellungen und entfernt den alten Wächter, der vor jedem Schritt bis zu 60 s prüfen durfte. Der Sitzungsstart erinnert daran.
 
 **Seit 3.16 – drei Besetzungen:** Nicht jeder Auftrag braucht das ganze Team. **Solo** (Standard für Eigenbedarf und interne Werkzeuge): Der Projektleiter baut selbst, Feature für Feature mit Tests; nach jedem Feature laufen die Schranken (Tests, Sicherheit, Abhängigkeiten – ohne KI, kostet fast nichts), je Abschnitt prüft ein unabhängiger Reviewer. **Kunde**: zusätzlich Architekt, Kritiker, verdeckte Abnahmetests, Prüfung je Meilenstein und Übergabe-Unterlagen. **Voll** (hohes Risiko): wie bisher, Entwickler je Paket und alle Prüfer. Oberflächen sehen in jeder Besetzung topmodern aus: Es gibt einen festen Standard (`wissen/oberflaeche.md`), der Designer entwirft zu Beginn und prüft je Abschnitt mit Bildschirmfotos. Der Projektleiter wählt die Besetzung und nennt sie dir; fest einstellen mit `"besetzung"` in `.claude/dev-team.json`.
+
+**Seit 3.18 – Besetzung „Gemischt“:** Das Team plant (Architekt, Kritiker) und schreibt die Abnahmetests (Tester), danach baut der Projektleiter allein wie in Solo – schnell, mit Vorschau. Gut für Projekte, bei denen Regeln, Berechnungen oder das Datenmodell das Schwierige sind. Der Projektleiter wählt das von selbst, wenn es passt; du kannst jederzeit „ab jetzt Solo“ oder „ab jetzt Team“ sagen.
 
 **Seit 3.17 – schnell aufbauen, robust fertigstellen, mit Wow-Effekt:** In **Solo** baut der Projektleiter zuerst schnell das Grundgerüst mit allen Funktionen. Nach jedem Schritt läuft nur die Schnellprüfung (Sicherheit, neue Bibliotheken, schnelle Tests – Sekunden), und du kannst sichtbare Änderungen sofort in der Vorschau ausprobieren. Kleine Wünsche zwischendurch („Knopf größer“) setzt er sofort um (Werkstatt). Steht das Grundgerüst, beginnt von selbst die **Fertigstellung**: Der Tester macht alles robust, dann prüfen Reviewer, Designer (mit Videos der wichtigsten Abläufe) und bei Bedarf der Sicherheitsprüfer, und eine Feinschliff-Runde setzt die 3 stärksten Wow-Stellen um. Erst danach kommt der Stand nach `main`. Willst du nur das Grundgerüst, sag „nur Aufbau“; später „fertigstellen“. Kundenprojekte bleiben streng. Für den Wow-Effekt legt der Designer Vorbilder und eine Bewegungssprache fest, und der Oberflächen-Standard enthält einen Werkzeugkasten mit geprüften Bibliotheken (Animationen, Effekte, Spiele-Grafik, Symbole). Fehler in der Browser-Konsole und Build-Warnungen machen die Prüfung rot.
 

@@ -22,7 +22,7 @@ Du bist der verantwortliche Projektleiter. Zuerst wählst du die **Besetzung** (
 - Auftrag „nur analysieren“: Phasen 1–4 plus Bericht, ohne Dateien im Projekt zu ändern.
 
 ## Besetzung wählen
-`"besetzung"` in `.claude/dev-team.json`, sonst: Eigenbedarf oder internes Werkzeug ohne sensible Kundendaten → **Solo**; Kundenprojekt → **Kunde**; Berechnungen mit Geldfolgen, Gesundheits- oder Finanzdaten vieler Nutzer, viele Nutzer mit Rechten → **Voll**. Nenne die Besetzung in der Startfreigabe mit einem Satz Grund. Für alle Besetzungen gelten: Startfreigabe bzw. Autopilot, stiller Durchlauf, Kontext-Wächter, Schranken, Gegenfrage, Merge nach `main` am Ende.
+`"besetzung"` in `.claude/dev-team.json`, sonst: Eigenbedarf oder internes Werkzeug ohne sensible Kundendaten → **Solo**; Eigenbedarf, bei dem die Planung oder die Richtigkeit das Schwierige ist (Rechenregeln, Spielregeln, Datenmodell, Schnittstelle), das Bauen aber nicht → **Gemischt**; Kundenprojekt → **Kunde**; Berechnungen mit Geldfolgen, Gesundheits- oder Finanzdaten vieler Nutzer, viele Nutzer mit Rechten → **Voll**. Nenne die Besetzung in der Startfreigabe mit einem Satz Grund. Für alle Besetzungen gelten: Startfreigabe bzw. Autopilot, stiller Durchlauf, Kontext-Wächter, Schranken, Gegenfrage, Merge nach `main` am Ende.
 
 ### Solo
 Solo läuft in **zwei Phasen** (Simons Vorgabe: erst schnell das Grundgerüst, robust gebaut wird, wenn das Produkt fertiggestellt wird). Auch Solo endet erst, wenn **alle** Anforderungen fertig sind (Grundgesetz „Eigenständig bauen“) – nach einem ersten lauffähigen Stand geht es mit der nächsten Anforderung weiter, ohne zu fragen. Naheliegende Pflichtpunkte aus den Projektregeln (z. B. Tokens verschlüsseln) machst du einfach.
@@ -39,7 +39,17 @@ Solo läuft in **zwei Phasen** (Simons Vorgabe: erst schnell das Grundgerüst, r
 6. Parallel: `reviewer` Modus `gesamt` über `<Auftragsbasis>..HEAD` (Sicherheit, Wartbarkeit, jede Schranken-Warnung); bei Oberfläche `designer` Modus `treue` (Bildschirmfotos **und Videos** der Hauptabläufe, Screenshot-Test, Mängelliste); bei Risiko-Auslösern (Anmeldung, personenbezogene oder Gesundheitsdaten, Schnittstelle nach außen, Geheimnisse) `sicherheitspruefer` Modus `code` und `angriff` in einem Lauf. Befunde selbst beheben; erneut prüfen lässt du nur bei „kritisch“ oder „hoch“.
 7. **Feinschliff-Runde** (Produkte mit Nutzern bzw. Oberfläche): `gastgeber` Modus `nachschliff` und der Designer (aus seinem `treue`-Bericht) nennen je die **3 Stellen mit dem größten Wow-Potenzial**; du setzt die Schnittmenge bzw. die 3 stärksten um (Aufwand S/M), Rest unter „Als Nächstes“.
 8. Ende: Schranke `--rolle projektleiter` (inkl. `meilensteinbefehle`: Build ohne Warnungen, Konsolen-Wächter), Merge nach `main` (Phase 9, Punkt 11), kurzer Abschlussbericht.
-Kein Architekt, keine verdeckten Abnahmetests, keine Abwägungsrunde – außer Simon will es oder der Umfang wird groß (dann Kunde). In Phase A kommt nichts nach `main`.
+Kein Architekt, keine verdeckten Abnahmetests, keine Abwägungsrunde – außer Simon will es oder der Umfang wird groß (dann Gemischt oder Kunde). In Phase A kommt nichts nach `main`.
+
+### Gemischt (Team plant und testet, dann Solo)
+Für Projekte, bei denen ein guter Plan und gute Tests den Unterschied machen, das Bauen danach aber einfach ist. Auch hier gilt: bis alle Anforderungen fertig sind, ohne Zwischenfragen.
+1. **Planung mit Team:** Lastenheft wie bei Solo (A1 …, prüfbare Sätze). Dann `architekt` Modus `entwurf` (Rückgrat, Datenmodell, Paketschnitt) und bei Oberfläche zugleich `designer` Modus `entwurf`; danach `kritiker` (Plan) und bei Berechnungen `fachpruefer` Modus `plan` parallel. Rückfragen in einer Runde an den Architekten. Kein Gastgeber, keine Abwägungsrunde.
+2. Startfreigabe bzw. Autopilot (wie Solo, mit Plan und Paketreihenfolge).
+3. **Tests vor dem Bauen:** `tester` Modus `abnahme-entwurf` schreibt aus jeder Anforderung verdeckte Abnahmetests (Phase 6), Prüfsummen festhalten.
+4. **Bauen wie Solo Phase A** (Schnellprüfung, Vorschau, Werkstatt) in der Paketreihenfolge des Architekten. Zusätzlich je Abschnitt (3–6 Features) der blinde Lauf der verdeckten Tests: `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/verdeckt_blind.py"` – rot heißt „Anforderung A3 noch nicht erfüllt“, nie Testnamen nachschlagen.
+5. **Fertigstellung wie Solo Phase B** (tester `haerten` deckt die verdeckten Tests auf und ergänzt, volle Schranke, reviewer, designer mit Video, ggf. sicherheitspruefer, Feinschliff), Ende mit Schranke `--rolle projektleiter` (prüft auch die Prüfsummen) und Merge nach `main`.
+Simon kann jederzeit „ab jetzt Solo“ oder „ab jetzt Team“ sagen – du wechselst ab dem nächsten Paket und vermerkst es in `docs/ENTSCHEIDUNGEN.md`.
+
 
 ### Kunde
 1. Phase 1 vollständig (Lastenheft mit Abnahmekriterien in Simons Worten).

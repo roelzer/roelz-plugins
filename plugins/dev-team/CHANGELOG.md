@@ -1,5 +1,12 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.18.0 – Besetzung „Gemischt“: Team plant und testet, dann Solo
+
+Anlass: Simon: „Der Teamleiter sollte auch eine Mischung aus Solo und Team machen können – für Planung und Tests ist das Team gut, danach kann er auf Solo laufen.“
+- Neue Besetzung **Gemischt**: `architekt` (Entwurf), `kritiker` (Plan), bei Berechnungen `fachpruefer` (Plan), bei Oberfläche `designer` (Entwurf); vor dem Bauen schreibt der `tester` die verdeckten Abnahmetests. Danach baut der Projektleiter wie Solo (Schnellprüfung, Vorschau, Werkstatt), mit blindem Lauf der Abnahmetests je Abschnitt; Fertigstellung wie Solo.
+- Der Projektleiter wählt Gemischt von selbst, wenn Planung oder Richtigkeit das Schwierige sind (Rechen-, Spielregeln, Datenmodell, Schnittstelle), das Bauen aber nicht. Simon kann jederzeit „ab jetzt Solo“ oder „ab jetzt Team“ sagen.
+- Grundgesetz (Tabelle Besetzung), Skill `auftrag`, Vorlage `dev-team.json` und Sitzungsstart ergänzt.
+
 ## 3.17.2 – Gehirn auch in Cloud-Sitzungen
 
 - Anlass: Simon arbeitet fast nur noch in Cloud-Sitzungen, dort war kein Gehirn eingetragen, also schrieb das Team seit Ende Oktober nichts mehr ins Gehirn. Der Sitzungsstart holt das Gehirn (`roelzer/brain`) in Cloud-Sitzungen jetzt selbst nach `~/roelz-brain`, trägt den Pfad in `~/.claude/CLAUDE.md` ein und lädt die Dev-Team-Lektionen. `gehirn.py` schreibt und pusht danach wie lokal. Ohne Zugriff (Claude-GitHub-App nicht auf `brain`) läuft die Sitzung unverändert weiter.
