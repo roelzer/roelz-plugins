@@ -106,7 +106,7 @@ if [ -n "$team" ]; then
   echo "Festes Dev-Team: $team"
   echo "Baut Simon etwas (auch ohne /dev-team-auftrag): Ablauf nach Skill auftrag, Durchlauf-Marke anlegen und bis zum Ende durcharbeiten – nie nach einem Teilstand fragen, womit du weitermachen sollst."
   besetzung="$(sed -n 's/^[[:space:]]*"besetzung":[[:space:]]*"\([a-z]*\)".*/\1/p' "$projekt/.claude/dev-team.json" 2>/dev/null | head -n 1)"
-  echo "Besetzung: ${besetzung:-nicht festgelegt – wähle sie nach dem Grundgesetz (Standard solo)}. Solo: du baust selbst – erst Aufbau (Schnellprüfung --schnell nach jedem Feature, Vorschau), dann Fertigstellung (tester härtet, volle Schranke, Prüfer, Feinschliff). Gemischt: architekt, kritiker und tester (verdeckte Abnahmetests) planen und testen vorab, dann baust du wie Solo, mit blindem Lauf der Abnahmetests je Abschnitt. Kunde: du baust selbst, mit Tests und voller Schranke nach jedem Paket. Voll: Code = entwickler, Tests = tester, Struktur = architekt."
+  echo "Besetzung nach Bedarf (Mindestmaß: ${besetzung:-bedarf}): Du baust selbst (Aufbau mit Schnellprüfung, dann Fertigstellung) und holst je Aufgabe nur die Rollen, die das Risiko spürbar senken – Teamplan Aufgabe → wer → warum in der Startfreigabe, Untergrenzen aus dem Grundgesetz."
 fi
 
 # Hinweis, wenn das Projekt noch nicht im Dev-Team aufgenommen ist.

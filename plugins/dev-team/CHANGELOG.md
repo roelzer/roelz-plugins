@@ -1,5 +1,13 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.19.0 – Besetzung nach Bedarf: der Projektleiter entscheidet selbst
+
+Anlass: Simon: „Ich würde das alles variabel gestalten – der Projektleiter soll überlegen, wen er für was braucht, und was einfach solo läuft. Und zwar immer.“
+- Keine festen Besetzungen mehr (ersetzt auch „Gemischt“ aus 3.18.0). Der Projektleiter baut selbst und erstellt je Auftrag einen **Teamplan** (*Aufgabe → wer → warum*) für Planung, Gestaltung, Tests vorab, Bauen, Prüfen, Übergabe; unterwegs hoch- oder herunterstufen, vermerkt in `docs/ENTSCHEIDUNGEN.md`.
+- Grundgesetz: Tabelle „Rolle – holen, wenn …“ und feste **Untergrenzen** (Schranken immer; Review vor `main`; Kundendaten → verdeckte Abnahmetests, Sicherheitsprüfung, Übergabe; Geldfolgen → Fachprüfer, Abnahmetests, Mutationstest; viele Nutzer mit Rechten/sensiblen Daten → Prüfung je Paket).
+- `"besetzung"` in `.claude/dev-team.json` ist nur noch ein Mindestmaß: `bedarf` (Standard), `kunde`, `voll`; `solo` und `gemischt` wirken wie `bedarf`.
+- Skill `auftrag` (Teamplan, Ablauf „Aufbau → Fertigstellung“ als Grundlage), Sitzungsstart, Vorlage, Designer/Reviewer-Steckbriefe, ANLEITUNG angepasst.
+
 ## 3.18.0 – Besetzung „Gemischt“: Team plant und testet, dann Solo
 
 Anlass: Simon: „Der Teamleiter sollte auch eine Mischung aus Solo und Team machen können – für Planung und Tests ist das Team gut, danach kann er auf Solo laufen.“
