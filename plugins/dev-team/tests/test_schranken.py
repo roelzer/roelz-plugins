@@ -426,6 +426,70 @@ class TestSchranke(unittest.TestCase):
         code, aus = self.lauf("--rolle", "projektleiter", "--ohne-lauf")
         self.assertNotIn("Dev-Team-Einstellungen (.claude/dev-team.json) geändert", aus)
 
+    def _auftrag_laeuft(self, plan=True, berichte=("reviewer",)):
+        from datetime import datetime as _dt, timedelta as _td
+        self.schreibe(".dev-team/plugin-version", "3.20.0\n")
+        if plan:
+            self.schreibe("docs/TEAMPLAN.md", "| Aufgabe | wer | warum |\n|---|---|---|\n| Bauen | ich | einfach |\n"
+                          "| Prüfen | `reviewer` | Untergrenze |\n| Planung | `kritiker` | viele Pakete |\n")
+        zeit = (_dt.now() + _td(seconds=5)).strftime("%Y%m%d-%H%M%S")
+        for r in berichte:
+            self.schreibe("docs/pruefberichte/%s-%s-abc123.md" % (zeit, r), "# Bericht\n🟢\n")
+
+    def test_teamplan_und_untergrenzen(self):
+        self.schreibe(".dev-team/plugin-version", "3.20.0\n")
+        code, aus = self.lauf("--rolle", "projektleiter", "--ohne-lauf")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("Kein Teamplan", aus)
+        self.assertIn("`reviewer` ist seit Auftragsbeginn nicht gelaufen", aus)
+        self._auftrag_laeuft()
+        code, aus = self.lauf("--rolle", "projektleiter", "--ohne-lauf")
+        self.assertNotIn("Kein Teamplan", aus)
+        self.assertIn("Untergrenze erfüllt: reviewer", aus)
+        self.assertIn("Im Teamplan, aber nicht gelaufen: kritiker", aus)
+
+    def test_teamplan_nur_im_laufenden_auftrag(self):
+        code, aus = self.lauf("--rolle", "projektleiter", "--ohne-lauf")
+        self.assertNotIn("Teamplan", aus)
+
+    def test_risiko_im_code_braucht_sicherheitspruefer(self):
+        self._auftrag_laeuft()
+        self.schreibe("src/anmeldung.py", "def pruefe(password):\n    return bool(password)\n")
+        git(self.p, "add", "src/anmeldung.py")
+        git(self.p, "commit", "-qm", "anmeldung")
+        code, aus = self.lauf("--rolle", "projektleiter", "--ohne-lauf")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("Risiko-Auslöser im Code", aus)
+        self._auftrag_laeuft(berichte=("reviewer", "sicherheitspruefer"))
+        code, aus = self.lauf("--rolle", "projektleiter", "--ohne-lauf")
+        self.assertIn("Untergrenze erfüllt: sicherheitspruefer", aus)
+
+    def test_kundendaten_untergrenzen(self):
+        self.konfig({"testbefehl": "x", "kundendaten": True})
+        git(self.p, "add", "-A")
+        git(self.p, "commit", "-qm", "kundendaten")
+        self.basis = git(self.p, "rev-parse", "HEAD").strip()
+        self._auftrag_laeuft()
+        code, aus = self.lauf("--rolle", "projektleiter", "--ohne-lauf")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("verdeckte Abnahmetests fehlen", aus)
+        self.assertIn("`sicherheitspruefer` ist seit Auftragsbeginn nicht gelaufen", aus)
+
+    def test_besetzung_nur_hochstufen(self):
+        self.konfig({"testbefehl": "%s -m unittest discover -s tests -t . -v" % sys.executable,
+                     "testzahl_muster": r"Ran (\d+) tests?", "besetzung": "kunde"})
+        git(self.p, "add", "-A")
+        git(self.p, "commit", "-qm", "kunde")
+        self.basis = git(self.p, "rev-parse", "HEAD").strip()
+        self.konfig({"testbefehl": "%s -m unittest discover -s tests -t . -v" % sys.executable,
+                     "testzahl_muster": r"Ran (\d+) tests?", "besetzung": "bedarf"})
+        code, aus = self.lauf("--rolle", "projektleiter", "--ohne-lauf")
+        self.assertIn("Dev-Team-Einstellungen (.claude/dev-team.json) geändert", aus)
+        self.konfig({"testbefehl": "%s -m unittest discover -s tests -t . -v" % sys.executable,
+                     "testzahl_muster": r"Ran (\d+) tests?", "besetzung": "voll", "kundendaten": True})
+        code, aus = self.lauf("--rolle", "projektleiter", "--ohne-lauf")
+        self.assertNotIn("Dev-Team-Einstellungen (.claude/dev-team.json) geändert", aus)
+
     def test_besetzung_selbst_einstellen(self):
         self.konfig({"testbefehl": "%s -m unittest discover -s tests -t . -v" % sys.executable,
                      "testzahl_muster": r"Ran (\d+) tests?", "besetzung": "kunde"})
