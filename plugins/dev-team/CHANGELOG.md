@@ -1,5 +1,15 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.20.0 – Besetzung nach Bedarf, mechanisch abgesichert
+
+Anlass: Simon: „Bau Sinnvolles ein und sichere die Risiken.“ Risiken der freien Wahl: Der Projektleiter spart an Prüfungen, oder Entscheidungen werden unvorhersehbar.
+- **Untergrenzen ohne KI geprüft:** Die Schranke `--rolle projektleiter` verlangt im laufenden Auftrag (`.dev-team/plugin-version`) einen Teamplan (`docs/TEAMPLAN.md`) und Berichte der Pflichtrollen seit Auftragsbeginn in `docs/pruefberichte/`: immer `reviewer`; bei `"kundendaten": true` bzw. `kunde`/`voll` zusätzlich `sicherheitspruefer` und verdeckte Abnahmetests; bei Profil `fachsoftware` der `fachpruefer`. Ohne sie kein Merge. Simon kann mit einer Freigabe (Geltung `teamplan`) eine Ausnahme machen.
+- **Risiko-Auslöser erkennt die Schranke selbst:** neue Codezeilen mit Passwort, Anmeldung, Schlüssel, Token, Zahlung o. Ä. → `sicherheitspruefer` ist Pflicht.
+- **Kein Herunterstufen ohne Simon:** `besetzung` darf nur steigen (bedarf → kunde → voll), `kundendaten` nur auf true – zurück nur mit Freigabe.
+- **Teamplan mit Bilanz:** Vorlage `vorlagen/teamplan.md` (Aufgabe → wer → warum, Änderungen unterwegs, Bilanz: was hat jede Rolle gefunden, hat es sich gelohnt). Rollen im Plan, die nie liefen, meldet die Schranke als Warnung.
+- **Klare Regeln zum Hochstufen:** zweimal rot an derselben Stelle → Reviewer/Architekt; Rechen-/Regelfrage → Tester/Fachprüfer; neuer Risiko-Auslöser → Sicherheitsprüfer. Im Zweifel holen.
+- Tests: Teamplan und Untergrenzen, nur im laufenden Auftrag, Risiko im Code, Kundendaten, nur hochstufen.
+
 ## 3.19.0 – Besetzung nach Bedarf: der Projektleiter entscheidet selbst
 
 Anlass: Simon: „Ich würde das alles variabel gestalten – der Projektleiter soll überlegen, wen er für was braucht, und was einfach solo läuft. Und zwar immer.“

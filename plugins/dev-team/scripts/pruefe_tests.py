@@ -472,8 +472,9 @@ def vorarbeit_dateien(e, wurzel, hauptordner, basis, team):
 
 
 VERSCHAERFBAR = ("zusatzbefehle", "meilensteinbefehle")
-FREI_EINSTELLBAR = ("kontext_grenze", "kontext_grenze_agent", "_hilfe", "besetzung", "autopilot",
+FREI_EINSTELLBAR = ("kontext_grenze", "kontext_grenze_agent", "_hilfe", "autopilot",
                     "schnelltestbefehl")  # Schnelltest ergibt nie einen Grün-Nachweis, also frei
+NUR_STRENGER = ("kundendaten",)  # darf ohne Freigabe auf true, nie zurück
 
 
 def _mutation_echt(befehl):
@@ -483,6 +484,10 @@ def _mutation_echt(befehl):
         return True
     m = re.search(r"--schwelle\s+(\d+)", befehl)
     return bool(re.match(r"\s*(python3?|py)\b[^;&|]*mutationstest\.py", befehl)) and bool(m) and int(m.group(1)) >= 60
+
+
+def _rang(besetzung):
+    return {"kunde": 1, "voll": 2}.get(str(besetzung or "").lower(), 0)
 
 
 def nur_verschaerft(vorher, nachher):
@@ -499,6 +504,10 @@ def nur_verschaerft(vorher, nachher):
         a, n = alt.get(k), neu.get(k)
         if a == n or k in FREI_EINSTELLBAR:
             continue
+        if k in NUR_STRENGER and n is True and not a:
+            continue
+        if k == "besetzung" and _rang(n) >= _rang(a):
+            continue  # hochstufen frei, herunterstufen nur mit Freigabe
         if k in VERSCHAERFBAR and isinstance(n, list) and isinstance(a or [], list) and n[:len(a or [])] == (a or []):
             if all(_mutation_echt(str(b)) for b in n[len(a or []):]):
                 continue
@@ -619,6 +628,66 @@ def pruefe_freigabe(e, hauptordner, stichwort):
     e.f("Freigabe '%s' steht nicht in .claude/freigaben.md. Technische Freigaben trägt der Projektleiter nach Prüfung durch einen frischen kritiker (Modus freigabe) ein, fachliche nur Simon "
         "(Datum | Stichwort | Geltung | Grund)." % stichwort)
     return Freigabe()
+
+
+RISIKO_MUSTER = re.compile(r"(passw(or)?t|password|\blogin\b|oauth|\bjwt\b|bcrypt|argon2|api[_-]?key|secret|stripe|paypal|"
+                           r"payment|zahlung|\biban\b|session[_-]?(id|token)|set-cookie|access[_-]?token)", re.IGNORECASE)
+
+
+def _berichte_seit(hauptordner, seit_ts):
+    """Agenten, die seit dem Zeitpunkt einen Bericht in docs/pruefberichte/ hinterlegt haben (Dateiname
+    JJJJMMTT-HHMMSS-<agent>-<id>.md, vom Agenten-Log-Hook geschrieben)."""
+    gelaufen = set()
+    ordner = os.path.join(hauptordner, "docs", "pruefberichte")
+    grenze = datetime.fromtimestamp(seit_ts).strftime("%Y%m%d-%H%M%S")
+    for name in (os.listdir(ordner) if os.path.isdir(ordner) else []):
+        m = re.match(r"^(\d{8}-\d{6})-([a-z-]+?)-[A-Za-z0-9_-]+\.md$", name)
+        if m and m.group(1) >= grenze:
+            gelaufen.add(m.group(2))
+    return gelaufen
+
+
+def teamplan_pruefen(e, wurzel, hauptordner, basis, konfig, fg):
+    """Besetzung nach Bedarf, mechanisch abgesichert: Teamplan vorhanden, Untergrenzen tatsächlich gelaufen.
+    Aktiv nur in einem laufenden Auftrag (.dev-team/plugin-version vorhanden)."""
+    if not os.path.isfile(os.path.join(hauptordner, ".dev-team", "plugin-version")):
+        return
+    melde = lambda text: (e.w if fg.deckt("teamplan") else e.f)(text + fg.text("teamplan"))
+    plan = os.path.join(hauptordner, "docs", "TEAMPLAN.md")
+    geplant = set()
+    if not os.path.isfile(plan):
+        melde("Kein Teamplan (docs/TEAMPLAN.md): Wer hat was übernommen und warum? Vorlage vorlagen/teamplan.md.")
+    else:
+        with open(plan, encoding="utf-8", errors="replace") as f:
+            geplant = set(re.findall(r"`([a-z-]+)`", f.read()))
+    try:
+        seit = int(git(wurzel, "log", "-1", "--format=%ct", basis).strip())
+    except (RuntimeError, ValueError):
+        return
+    gelaufen = _berichte_seit(hauptordner, seit)
+    pflicht = {"reviewer": "Untergrenze: ein unabhängiges Review vor dem Merge nach main"}
+    besetzung = str((konfig or {}).get("besetzung") or "bedarf").lower()
+    if besetzung in ("kunde", "voll") or (konfig or {}).get("kundendaten"):
+        pflicht["sicherheitspruefer"] = "Untergrenze bei Kundendaten: Sicherheitsprüfung"
+        if not os.path.isfile(os.path.join(hauptordner, "docs", "ABNAHME_PRUEFSUMMEN.txt")):
+            melde("Untergrenze bei Kundendaten: verdeckte Abnahmetests fehlen (keine docs/ABNAHME_PRUEFSUMMEN.txt).")
+    if (konfig or {}).get("profil") == "fachsoftware":
+        pflicht["fachpruefer"] = "Untergrenze bei Berechnungen: Fachprüfung"
+    diff = sh(["git", "diff", "--unified=0", basis, "HEAD", "--", ".", ":(exclude)docs", ":(exclude)tests",
+               ":(exclude)*.md", ":(exclude)*.lock", ":(exclude)package-lock.json"], wurzel).stdout or ""
+    neu = "\n".join(z for z in diff.splitlines() if z.startswith(("+", "diff --git")) and not z.startswith("+++"))
+    treffer = RISIKO_MUSTER.search(neu)
+    if treffer:
+        pflicht.setdefault("sicherheitspruefer", "Risiko-Auslöser im Code (z. B. '%s')" % treffer.group(0))
+    for rolle, grund in pflicht.items():
+        if rolle not in gelaufen:
+            melde("%s – `%s` ist seit Auftragsbeginn nicht gelaufen (kein Bericht in docs/pruefberichte/)." % (grund, rolle))
+        else:
+            e.o("Untergrenze erfüllt: %s ist gelaufen." % rolle)
+    for rolle in sorted(geplant - gelaufen - set(pflicht)):
+        if rolle in {"kritiker", "architekt", "tester", "designer", "fachpruefer", "sicherheitspruefer", "gastgeber",
+                     "produktpruefer", "entwickler", "rechercheur", "langfrist-architekt", "auditor", "pragmatiker"}:
+            e.w("Im Teamplan, aber nicht gelaufen: %s – geplant geändert? Dann in docs/TEAMPLAN.md nachtragen." % rolle)
 
 
 def sicherheit_pruefen(e, wurzel, basis, rolle, konfig, fg):
@@ -826,6 +895,7 @@ def main():
         freigabe = (freigabe + " ; " if freigabe else "") + zeile
     if arg.rolle == "projektleiter":
         abdeckung_pruefen(e, wurzel, hauptordner, konfig, fg)
+        teamplan_pruefen(e, wurzel, hauptordner, basis, konfig, fg)
     wt_ordner = os.path.join(wurzel, ".claude", "worktrees")
     if not ist_worktree and os.path.isdir(wt_ordner) and os.listdir(wt_ordner):
         e.w("Im Hauptordner liegen Entwickler-Worktrees (.claude/worktrees/). Der Testbefehl darf sie "

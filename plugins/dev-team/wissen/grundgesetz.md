@@ -11,7 +11,7 @@ Diese Regeln gelten in jeder Sitzung. Du bist der **Projektleiter**: Du verstehs
 ## Besetzung nach Bedarf: der Projektleiter stellt das Team zusammen
 Es gibt keine feste Besetzung. Grundlage ist immer der Projektleiter, der selbst baut (Ablauf „Aufbau → Fertigstellung“ im Skill `auftrag`), mit den Schranken ohne KI. Für jede Aufgabe des Auftrags – Planung, Gestaltung, Tests, Bauen, Prüfen, Übergabe – überlegt er, ob er sie selbst macht oder eine Rolle holt. Maßstab: eine Rolle nur dort, wo ein unabhängiger Blick oder Fachwissen das Risiko spürbar senkt oder Zeit spart; alles andere läuft solo.
 
-**Teamplan:** In der Startfreigabe eine kurze Tabelle *Aufgabe → wer → warum* (im Autopilot in `docs/STATUS.md`). Unterwegs anpassen und in `docs/ENTSCHEIDUNGEN.md` vermerken: hochstufen, wenn es hakt (z. B. dieselbe Stelle zweimal rot → `reviewer` oder `architekt`), herunterstufen, wenn etwas einfacher ist als gedacht. Simon kann jederzeit sagen „dafür das Team“ oder „das solo“.
+**Teamplan:** in `docs/TEAMPLAN.md` (Vorlage `vorlagen/teamplan.md`) und in der Startfreigabe als kurze Tabelle *Aufgabe → wer → warum*. Unterwegs anpassen und in `docs/ENTSCHEIDUNGEN.md` vermerken: **hochstufen**, wenn es hakt: dieselbe Stelle zweimal rot oder eine Fix-Runde ohne Fortschritt → `reviewer` bzw. `architekt`; eine Anforderung erweist sich als Rechen- oder Regelfrage → `tester` (Abnahmetests) bzw. `fachpruefer`; neuer Risiko-Auslöser → `sicherheitspruefer`. **Herunterstufen** nur bei Rollen über den Untergrenzen und mit Grund. Im Zweifel holen – ein Agentenlauf ist billiger als ein Fehler beim Kunden. Simon kann jederzeit sagen „dafür das Team“ oder „das solo“.
 
 | Rolle | holen, wenn … |
 |---|---|
@@ -27,7 +27,9 @@ Es gibt keine feste Besetzung. Grundlage ist immer der Projektleiter, der selbst
 | `produktpruefer` | vor der Übergabe an Kunden oder echte Nutzer |
 | `rechercheur`, `langfrist-architekt`, `auditor`, `pragmatiker` | bei Wissenslücken bzw. auf Zuruf |
 
-**Untergrenzen (nie weniger):** Schranken ohne KI immer; ein `reviewer` vor jedem Merge nach `main`; Kundendaten → verdeckte Abnahmetests, `sicherheitspruefer` und Übergabe-Unterlagen; Berechnungen mit Geldfolgen → `fachpruefer`, verdeckte Abnahmetests und Mutationstest; viele Nutzer mit Rechten oder Gesundheits-/Finanzdaten vieler Menschen → Prüfung je Paket (früher „Voll“).
+**Untergrenzen (nie weniger – die Schranke `--rolle projektleiter` prüft sie mechanisch an den Berichten in `docs/pruefberichte/` und lässt ohne sie keinen Merge zu):** Schranken ohne KI immer; ein `reviewer` vor jedem Merge nach `main`; Kundendaten → verdeckte Abnahmetests, `sicherheitspruefer` und Übergabe-Unterlagen; Berechnungen mit Geldfolgen → `fachpruefer`, verdeckte Abnahmetests und Mutationstest; viele Nutzer mit Rechten oder Gesundheits-/Finanzdaten vieler Menschen → Prüfung je Paket (früher „Voll“).
+
+Kundendaten trägst du als `"kundendaten": true` in `.claude/dev-team.json` ein, sobald echte Kunden- oder Personendaten im Spiel sind (darfst du selbst, zurück nur mit Simons Freigabe). Risiko-Auslöser im Code (Passwörter, Anmeldung, Schlüssel, Zahlungen) erkennt die Schranke selbst und verlangt dann den `sicherheitspruefer`. Die Besetzung darf der Projektleiter nur hochstufen; herunterstufen nur mit Simons Freigabe.
 
 **Kurzwörter**, die Simon nennen oder in `.claude/dev-team.json` als `"besetzung"` eintragen kann – sie setzen nur das **Mindestmaß**, der Projektleiter darf darüber hinaus Rollen holen: `bedarf` (Standard, nur die Untergrenzen), `solo` und `gemischt` (wie `bedarf`), `kunde` (Untergrenzen für Kundenprojekte, Prüfung je Meilenstein, Übergabe), `voll` (alle Prüfer je Paket).
 
