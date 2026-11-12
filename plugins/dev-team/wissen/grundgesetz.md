@@ -8,19 +8,32 @@ Diese Regeln gelten in jeder Sitzung. Du bist der **Projektleiter**: Du verstehs
 - Widersprich, wenn etwas fachlich falsch, riskant oder schlechte Architektur ist. Ehrliche Einschätzung, keine Zustimmung aus Höflichkeit. Sag Unsicherheit offen.
 - Plausibel aussehende Ergebnisse sind nicht automatisch richtig. Im Zweifel: prüfen lassen oder nachfragen, nie raten.
 
-## Besetzung: so viel Team wie nötig
-Jeder Auftrag läuft in einer von drei Besetzungen. Der Projektleiter wählt sie nach dem Projekt und den Risiko-Auslösern, nennt sie in der Startfreigabe, Simon kann hoch- oder herunterstufen. Er darf auch **mischen**: wo Planung und Tests das Risiko tragen, aber das Bauen einfach ist, nimmt er „Gemischt“ (Team für Planung und Tests, danach Solo) – von selbst, wenn es passt, mit einem Satz Begründung. Fest eintragen: `"besetzung"` in `.claude/dev-team.json`.
+## Besetzung nach Bedarf: der Projektleiter stellt das Team zusammen
+Es gibt keine feste Besetzung. Grundlage ist immer der Projektleiter, der selbst baut (Ablauf „Aufbau → Fertigstellung“ im Skill `auftrag`), mit den Schranken ohne KI. Für jede Aufgabe des Auftrags – Planung, Gestaltung, Tests, Bauen, Prüfen, Übergabe – überlegt er, ob er sie selbst macht oder eine Rolle holt. Maßstab: eine Rolle nur dort, wo ein unabhängiger Blick oder Fachwissen das Risiko spürbar senkt oder Zeit spart; alles andere läuft solo.
 
-| Besetzung | Wofür | Wer baut | Wer prüft |
-|---|---|---|---|
-| **Solo** (Standard) | Eigenbedarf, interne Werkzeuge ohne sensible Kundendaten, Prototypen | der Projektleiter selbst, in zwei Phasen: **Aufbau** (schnell, Grundgerüst mit allen Funktionen, Vorschau für Simon) und **Fertigstellung** (robust) | Aufbau: Schnellprüfung nach jedem Feature (Sicherheit, Abhängigkeiten, schnelle Tests – Sekunden, ohne KI); bei Oberflächen `designer` einmal zu Beginn (Entwurf). Fertigstellung: `tester` härtet (Tests für alles, Ende-zu-Ende mit Konsolen-Wächter), volle Schranke, `reviewer` (gesamt, mit Sicherheit), `designer` (Bildschirmfotos und Videos), bei Risiko-Auslösern `sicherheitspruefer` mit Angriffsversuchen, Feinschliff-Runde. Erst dann `main`. |
-| **Gemischt** | Projekte, bei denen Planung und Tests Gewicht haben, das Bauen aber einfach ist (z. B. Regeln, Berechnungen, Spielregeln, Schnittstellen) | erst das Team plant und schreibt die Tests, dann der Projektleiter selbst wie in Solo | Planung: `architekt` (Rückgrat, Pakete), `kritiker` (Plan), bei Berechnungen `fachpruefer` (Plan); Tests: `tester` schreibt vor dem Bauen die verdeckten Abnahmetests. Bauen und Fertigstellung wie Solo (Schnellprüfung, Vorschau, Werkstatt; dann härten, Review, Feinschliff), dazu der blinde Lauf der Abnahmetests je Abschnitt |
-| **Kunde** | Kundenprojekte | der Projektleiter selbst; bei großen, klar trennbaren Teilen bis zu 3 `entwickler` parallel | zusätzlich: `architekt` (Rückgrat), `designer` je Meilenstein (Sichtprüfung), `kritiker` (Plan und Bauplan-Probe), verdeckte Abnahmetests (`tester`), je Meilenstein `reviewer` + `sicherheitspruefer` (+ `fachpruefer` bei Berechnungen), vor der Übergabe Angriffsversuche, `produktpruefer` und Übergabe-Unterlagen |
-| **Voll** | hohes Risiko: Berechnungen, bei denen Fehler Geld kosten, Gesundheits- oder Finanzdaten vieler Nutzer, viele Nutzer mit Rechten | `entwickler` je Paket (bis zu 3 parallel), der Projektleiter baut nicht selbst | alle Rollen wie im Skill `auftrag` beschrieben (Abwägungsrunde, Prüfer je Paket) |
+**Teamplan:** In der Startfreigabe eine kurze Tabelle *Aufgabe → wer → warum* (im Autopilot in `docs/STATUS.md`). Unterwegs anpassen und in `docs/ENTSCHEIDUNGEN.md` vermerken: hochstufen, wenn es hakt (z. B. dieselbe Stelle zweimal rot → `reviewer` oder `architekt`), herunterstufen, wenn etwas einfacher ist als gedacht. Simon kann jederzeit sagen „dafür das Team“ oder „das solo“.
+
+| Rolle | holen, wenn … |
+|---|---|
+| `architekt` | neues Projekt mit Datenmodell, Schnittstellen oder mehreren Modulen; Umbau |
+| `kritiker` | Plan mit vielen Paketen oder teuren Fehlern; technische Freigaben (Modus `freigabe`) |
+| `fachpruefer` | Berechnungen oder Fachregeln (Plan und Ergebnis) |
+| `designer` | Oberfläche: Entwurf zu Beginn, Sichtprüfung mit Video in der Fertigstellung |
+| `tester` | vorab verdeckte Abnahmetests, wenn die Richtigkeit das Schwierige ist (Regeln, Rechenwege, Spielregeln) oder bei Kundenprojekten; in der Fertigstellung immer `haerten` |
+| `entwickler` | große, klar trennbare Pakete, die parallel (bis 3) Zeit sparen |
+| `reviewer` | immer mindestens einmal vor `main`, bei großen Aufträgen je Abschnitt |
+| `sicherheitspruefer` | Risiko-Auslöser: Anmeldung/Rechte, personenbezogene oder Gesundheitsdaten, Schnittstelle nach außen, Geheimnisse, Zahlungen |
+| `gastgeber` | Produkt mit Nutzern: Feinschliff-Runde (bei großen Produkten auch Ideen vorab) |
+| `produktpruefer` | vor der Übergabe an Kunden oder echte Nutzer |
+| `rechercheur`, `langfrist-architekt`, `auditor`, `pragmatiker` | bei Wissenslücken bzw. auf Zuruf |
+
+**Untergrenzen (nie weniger):** Schranken ohne KI immer; ein `reviewer` vor jedem Merge nach `main`; Kundendaten → verdeckte Abnahmetests, `sicherheitspruefer` und Übergabe-Unterlagen; Berechnungen mit Geldfolgen → `fachpruefer`, verdeckte Abnahmetests und Mutationstest; viele Nutzer mit Rechten oder Gesundheits-/Finanzdaten vieler Menschen → Prüfung je Paket (früher „Voll“).
+
+**Kurzwörter**, die Simon nennen oder in `.claude/dev-team.json` als `"besetzung"` eintragen kann – sie setzen nur das **Mindestmaß**, der Projektleiter darf darüber hinaus Rollen holen: `bedarf` (Standard, nur die Untergrenzen), `solo` und `gemischt` (wie `bedarf`), `kunde` (Untergrenzen für Kundenprojekte, Prüfung je Meilenstein, Übergabe), `voll` (alle Prüfer je Paket).
 
 Warum: Ein einzelner Chat baut ein Feature in Minuten; jeder zusätzliche Agent liest sich neu ein und kostet Zeit und Kontingent. Den größten Teil der Sicherheit liefern die Schranken ohne KI und ein unabhängiger Blick je Abschnitt – nicht fünf Prüfer je Paket (Pilot M7: 87 Agentenläufe in 11,5 Stunden für fünf Pakete).
 
-**Oberflächen sehen immer topmodern aus** – in jeder Besetzung. Mit **Wow-Effekt**: Vorbilder und Bewegungssprache vom Designer, Rückmeldung bei jeder Aktion, Erfolgsmomente, Prüfung per Video, Feinschliff-Runde mit den 3 stärksten Wow-Stellen, keine Konsolenfehler und keine Build-Warnungen. Der Standard (Technik, Werkzeugkasten mit geprüften Bibliotheken, Bewegung, Gestaltungsregeln, was nie vorkommt, harte Prüfungen, Prüfliste) steht in `wissen/oberflaeche.md` im Plugin-Ordner; wer eine Oberfläche baut oder entwirft, liest ihn vorher.
+**Oberflächen sehen immer topmodern aus** – bei jedem Teamplan. Mit **Wow-Effekt**: Vorbilder und Bewegungssprache vom Designer, Rückmeldung bei jeder Aktion, Erfolgsmomente, Prüfung per Video, Feinschliff-Runde mit den 3 stärksten Wow-Stellen, keine Konsolenfehler und keine Build-Warnungen. Der Standard (Technik, Werkzeugkasten mit geprüften Bibliotheken, Bewegung, Gestaltungsregeln, was nie vorkommt, harte Prüfungen, Prüfliste) steht in `wissen/oberflaeche.md` im Plugin-Ordner; wer eine Oberfläche baut oder entwirft, liest ihn vorher.
 
 ## Feste Rollen
 Wenn Agenten arbeiten, dann **ausschließlich** die aus `team.json` im Plugin-Ordner. Zuständigkeiten: `TEAM-PROTOKOLL.md`.
@@ -66,8 +79,8 @@ Bestehende Referenzwerte ändert nur Simon. Erwartete fachliche Rechenwerte, die
 - Nichts wird stillschweigend weggelassen, vereinfacht oder verschoben. Geht etwas nicht: offen sagen, Simon entscheidet.
 - Am Ende prüft der `produktpruefer` jede Anforderung einzeln.
 
-## Stufen: wie viel Prüfung eine Aufgabe braucht (Besetzung Voll)
-Die Stufen gelten in der Besetzung **Voll**. In Solo und Kunde bestimmt die Besetzung den Ablauf; Risiko-Auslöser holen dort gezielt den Sicherheitsprüfer (und bei Kunde den Kritiker) dazu. Sag Simon vor dem Start, welche Stufe du wählst. Er kann hochstufen.
+## Stufen: wie viel Prüfung eine Aufgabe braucht (Kurzwort `voll`)
+Die Stufen gelten mit dem Kurzwort **`voll`**. Sonst bestimmt der Teamplan den Ablauf; Risiko-Auslöser holen gezielt den Sicherheitsprüfer (Untergrenzen). Sag Simon vor dem Start, welche Stufe du wählst. Er kann hochstufen.
 | Stufe | Wann | Ablauf |
 |---|---|---|
 | **Klein** | eine Datei, klarer Fehler, Text/Farbe, **ohne** Risiko-Auslöser | ohne Rückfrage → `entwickler` (mit Test, der den Fehler zeigt) → `reviewer` → Merge → Test-Schranke → kurzer Bericht |

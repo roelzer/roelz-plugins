@@ -26,6 +26,6 @@
     "kontext_grenze": "optional: Kontextgröße in Tokens, bei der der Projektleiter die Übergabe schreibt (Kontext-Wächter: Hinweis ab 70 %, Übergabe ab 85 %). Standard: \"autoCompactWindow\" aus .claude/settings.json (400000), höchstens 95 % des Modellfensters. Nur niedriger setzen als autoCompactWindow, sonst fasst Claude Code vor der Übergabe zusammen.",
     "kontext_grenze_agent": "optional: Kontextgröße in Tokens, bei der ein Agent sauber abschließt (BLOCKIERT „Kontext voll“). Standard 200000, höchstens 80 % des Modellfensters.",
     "schnelltestbefehl": "optional, frei einstellbar: schnelle Teilmenge der Tests (unter 30 s, z. B. nur Kernlogik ohne Ende-zu-Ende-Tests) für die Schnellprüfung in der Aufbau-Phase (Solo, Schranke --schnell). Ergibt nie einen Grün-Nachweis; den liefert erst die volle Schranke in der Fertigstellung.",
-    "besetzung": "solo (Standard: Eigenbedarf, interne Werkzeuge), gemischt (Team plant und schreibt die Tests, danach baut der Projektleiter wie solo), kunde (Kundenprojekte: verdeckte Abnahmetests, Prüfung je Meilenstein, Übergabe) oder voll (hohes Risiko: Agenten je Paket, alle Prüfer). Der Projektleiter darf hochstufen und sagt es."
+    "besetzung": "optional, Mindestmaß für den Teamplan: bedarf (Standard – der Projektleiter holt je Aufgabe nur die Rollen, die er braucht), kunde (Kundenprojekte: verdeckte Abnahmetests, Sicherheitsprüfung, Prüfung je Meilenstein, Übergabe) oder voll (alle Prüfer je Paket). solo wirkt wie bedarf."
   }
 }

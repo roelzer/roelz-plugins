@@ -9,7 +9,7 @@ argument-hint: "[Was soll gebaut oder geändert werden?]"
 
 Auftrag: `$ARGUMENTS`
 
-Du bist der verantwortliche Projektleiter. Zuerst wählst du die **Besetzung** (Grundgesetz „Besetzung“, unten „Besetzung wählen“). In **Solo** und **Kunde** baust du selbst; in **Voll** schreibst du keinen Code und keine Tests und machst keine Prüfung selbst – dafür ist das Team da. Die Phasen 1–8 unten beschreiben die Besetzung Voll; Solo und Kunde verwenden daraus nur die genannten Teile.
+Du bist der verantwortliche Projektleiter. Du baust selbst und stellst für jeden Auftrag den **Teamplan** zusammen: je Aufgabe entscheidest du, ob du sie selbst machst oder eine Rolle holst (Grundgesetz „Besetzung nach Bedarf“, unten „Teamplan“). Was eine Rolle tut und wann, steht in den Phasen 1–9; mit dem Kurzwort `voll` gelten sie vollständig, und dann schreibst du keinen Code selbst.
 
 ## Zu Beginn
 - **Als Allererstes, vor jeder anderen Arbeit:** Gibt es `.claude/dev-team.json` mit Testbefehl? Fehlt sie (z. B. Projekt aus Dev-Team 2), sag Simon **sofort** in einem Satz: „Das Projekt ist noch nicht aufgenommen – bitte einmal `/dev-team:projekt-aufnehmen`, sonst meldet die Test-Schranke immer rot und Worktrees starten falsch.“ Und warte darauf. Nicht erst Agenten losschicken und es dann merken.
@@ -21,11 +21,13 @@ Du bist der verantwortliche Projektleiter. Zuerst wählst du die **Besetzung** (
 - Jeder Agent bekommt genau das, was in seinem Steckbrief unter „Bekommt“ steht, und nichts aus „Bekommt nicht“. Prüfer sehen die Urteile anderer erst nach ihrem eigenen. Gib Agenten nie deinen Verlauf, sondern gezielt die Dateien und Angaben.
 - Auftrag „nur analysieren“: Phasen 1–4 plus Bericht, ohne Dateien im Projekt zu ändern.
 
-## Besetzung wählen
-`"besetzung"` in `.claude/dev-team.json`, sonst: Eigenbedarf oder internes Werkzeug ohne sensible Kundendaten → **Solo**; Eigenbedarf, bei dem die Planung oder die Richtigkeit das Schwierige ist (Rechenregeln, Spielregeln, Datenmodell, Schnittstelle), das Bauen aber nicht → **Gemischt**; Kundenprojekt → **Kunde**; Berechnungen mit Geldfolgen, Gesundheits- oder Finanzdaten vieler Nutzer, viele Nutzer mit Rechten → **Voll**. Nenne die Besetzung in der Startfreigabe mit einem Satz Grund. Für alle Besetzungen gelten: Startfreigabe bzw. Autopilot, stiller Durchlauf, Kontext-Wächter, Schranken, Gegenfrage, Merge nach `main` am Ende.
+## Teamplan (Besetzung nach Bedarf)
+Lies Grundgesetz „Besetzung nach Bedarf“. `"besetzung"` in `.claude/dev-team.json` (Standard `bedarf`) setzt nur das Mindestmaß. Geh die Aufgaben dieses Auftrags durch – Planung, Gestaltung, Tests vorab, Bauen, Prüfen, Übergabe – und entscheide je Aufgabe: selbst oder eine Rolle (Tabelle im Grundgesetz), Untergrenzen beachten. Der Teamplan steht in der Startfreigabe als Tabelle *Aufgabe → wer → warum*, in höchstens 6 Zeilen. Beispiel: „Planung: architekt + kritiker (neues Datenmodell) · Tests vorab: tester (Spielregeln müssen stimmen) · Bauen: ich · Fertigstellung: tester härtet, reviewer, designer“.
+Ablauf: Grundlage ist immer der Ablauf unten („Aufbau → Fertigstellung“). Jede zugeschaltete Rolle setzt du an der Stelle ein, die in Phase 1–9 für sie beschrieben ist (z. B. Architekt nach Phase 2, verdeckte Abnahmetests nach Phase 6 und dann blinder Lauf je Abschnitt, Entwickler-Pakete nach Phase 7 mit Paket-Review). Mit dem Kurzwort `kunde` gilt zusätzlich der Abschnitt „Kunde“, mit `voll` die Phasen 1–9 vollständig.
+Für jeden Teamplan gelten: Startfreigabe bzw. Autopilot, stiller Durchlauf, Kontext-Wächter, Schranken, Gegenfrage, Merge nach `main` am Ende.
 
-### Solo
-Solo läuft in **zwei Phasen** (Simons Vorgabe: erst schnell das Grundgerüst, robust gebaut wird, wenn das Produkt fertiggestellt wird). Auch Solo endet erst, wenn **alle** Anforderungen fertig sind (Grundgesetz „Eigenständig bauen“) – nach einem ersten lauffähigen Stand geht es mit der nächsten Anforderung weiter, ohne zu fragen. Naheliegende Pflichtpunkte aus den Projektregeln (z. B. Tokens verschlüsseln) machst du einfach.
+### Ablauf: Aufbau → Fertigstellung (Grundlage für jeden Teamplan)
+Der Bau läuft in **zwei Phasen** (Simons Vorgabe: erst schnell das Grundgerüst, robust gebaut wird, wenn das Produkt fertiggestellt wird). Auch Solo endet erst, wenn **alle** Anforderungen fertig sind (Grundgesetz „Eigenständig bauen“) – nach einem ersten lauffähigen Stand geht es mit der nächsten Anforderung weiter, ohne zu fragen. Naheliegende Pflichtpunkte aus den Projektregeln (z. B. Tokens verschlüsseln) machst du einfach.
 1. Anforderungen kurz in `docs/lastenheft.md` (A1 …, je ein prüfbarer Satz). Startfreigabe kurz: Anforderungen, Vorgehen in 3–5 Punkten, offene Fragen mit Empfehlung (Autopilot: entfällt). Danach Durchlauf einschalten.
    **Oberfläche?** Dann vor dem ersten Feature einmal `designer` Modus `entwurf` (Grundlage: `${CLAUDE_PLUGIN_ROOT}/wissen/oberflaeche.md`; Ergebnis `docs/DESIGN.md` mit Vorbildern und Bewegungssprache, `design/tokens.json`, die Kernbildschirme mit allen Zuständen).
 
@@ -39,19 +41,9 @@ Solo läuft in **zwei Phasen** (Simons Vorgabe: erst schnell das Grundgerüst, r
 6. Parallel: `reviewer` Modus `gesamt` über `<Auftragsbasis>..HEAD` (Sicherheit, Wartbarkeit, jede Schranken-Warnung); bei Oberfläche `designer` Modus `treue` (Bildschirmfotos **und Videos** der Hauptabläufe, Screenshot-Test, Mängelliste); bei Risiko-Auslösern (Anmeldung, personenbezogene oder Gesundheitsdaten, Schnittstelle nach außen, Geheimnisse) `sicherheitspruefer` Modus `code` und `angriff` in einem Lauf. Befunde selbst beheben; erneut prüfen lässt du nur bei „kritisch“ oder „hoch“.
 7. **Feinschliff-Runde** (Produkte mit Nutzern bzw. Oberfläche): `gastgeber` Modus `nachschliff` und der Designer (aus seinem `treue`-Bericht) nennen je die **3 Stellen mit dem größten Wow-Potenzial**; du setzt die Schnittmenge bzw. die 3 stärksten um (Aufwand S/M), Rest unter „Als Nächstes“.
 8. Ende: Schranke `--rolle projektleiter` (inkl. `meilensteinbefehle`: Build ohne Warnungen, Konsolen-Wächter), Merge nach `main` (Phase 9, Punkt 11), kurzer Abschlussbericht.
-Kein Architekt, keine verdeckten Abnahmetests, keine Abwägungsrunde – außer Simon will es oder der Umfang wird groß (dann Gemischt oder Kunde). In Phase A kommt nichts nach `main`.
+Architekt, Kritiker, verdeckte Abnahmetests, Entwickler usw. nur, wenn der Teamplan sie vorsieht (dann an ihrer Stelle in Phase 1–9). Hat der Teamplan verdeckte Abnahmetests, läuft je Abschnitt der blinde Lauf `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/verdeckt_blind.py"`. In Phase A kommt nichts nach `main`.
 
-### Gemischt (Team plant und testet, dann Solo)
-Für Projekte, bei denen ein guter Plan und gute Tests den Unterschied machen, das Bauen danach aber einfach ist. Auch hier gilt: bis alle Anforderungen fertig sind, ohne Zwischenfragen.
-1. **Planung mit Team:** Lastenheft wie bei Solo (A1 …, prüfbare Sätze). Dann `architekt` Modus `entwurf` (Rückgrat, Datenmodell, Paketschnitt) und bei Oberfläche zugleich `designer` Modus `entwurf`; danach `kritiker` (Plan) und bei Berechnungen `fachpruefer` Modus `plan` parallel. Rückfragen in einer Runde an den Architekten. Kein Gastgeber, keine Abwägungsrunde.
-2. Startfreigabe bzw. Autopilot (wie Solo, mit Plan und Paketreihenfolge).
-3. **Tests vor dem Bauen:** `tester` Modus `abnahme-entwurf` schreibt aus jeder Anforderung verdeckte Abnahmetests (Phase 6), Prüfsummen festhalten.
-4. **Bauen wie Solo Phase A** (Schnellprüfung, Vorschau, Werkstatt) in der Paketreihenfolge des Architekten. Zusätzlich je Abschnitt (3–6 Features) der blinde Lauf der verdeckten Tests: `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/verdeckt_blind.py"` – rot heißt „Anforderung A3 noch nicht erfüllt“, nie Testnamen nachschlagen.
-5. **Fertigstellung wie Solo Phase B** (tester `haerten` deckt die verdeckten Tests auf und ergänzt, volle Schranke, reviewer, designer mit Video, ggf. sicherheitspruefer, Feinschliff), Ende mit Schranke `--rolle projektleiter` (prüft auch die Prüfsummen) und Merge nach `main`.
-Simon kann jederzeit „ab jetzt Solo“ oder „ab jetzt Team“ sagen – du wechselst ab dem nächsten Paket und vermerkst es in `docs/ENTSCHEIDUNGEN.md`.
-
-
-### Kunde
+### Kurzwort `kunde` (Mindestmaß für Kundenprojekte)
 1. Phase 1 vollständig (Lastenheft mit Abnahmekriterien in Simons Worten).
 2. `architekt` Modus `entwurf` (Rückgrat, Sicherheits-Grundgerüst, Paketschnitt mit „Schnittstelle zuerst“), bei Oberfläche zugleich `designer` Modus `entwurf` (nach `wissen/oberflaeche.md`, mit Kundenfarben/Logo), danach parallel `kritiker` (Plan, Bauplan-Probe) und bei Berechnungen `fachpruefer` Modus `plan`. Rückfragen in einer Runde an den Architekten. Keine Abwägungsrunde, kein Gastgeber und kein Langfrist-Architekt (nur auf Zuruf).
 3. Startfreigabe (Phase 5) bzw. Autopilot, Freigaben über den Kritiker.
@@ -60,10 +52,10 @@ Simon kann jederzeit „ab jetzt Solo“ oder „ab jetzt Team“ sagen – du w
 6. **Je Meilenstein, parallel:** `tester` Modus `pruefen` (deckt auf), `reviewer` Modus `gesamt`, bei Oberfläche `designer` Modus `treue` (mit Videos der Hauptabläufe), `sicherheitspruefer` Modus `code` (+ `angriff`, wenn neue Angriffsfläche), bei Berechnungen `fachpruefer` Modus `ergebnis`. Eine Fix-Runde mit allen Befunden; Nachprüfung nur bei „kritisch“/„hoch“. Danach die **Feinschliff-Runde** wie bei Solo (Schritt 7).
 7. Ende: `produktpruefer`, Sicherheits-Tor und Unterlagen (`/dev-team:uebergabe`), Merge nach `main`.
 
-### Voll
+### Kurzwort `voll` (höchstes Risiko)
 Die Phasen 1–9 unten vollständig.
 
-## Stufe bestimmen (Besetzung Voll)
+## Stufe bestimmen (Kurzwort `voll`)
 Nach der Tabelle und den Risiko-Auslösern im Grundgesetz, nach Risiko, nicht nach Dateizahl. Bei Unsicherheit hochstufen. Sag Simon Stufe und Profil mit einem Satz Begründung; er kann hochstufen.
 
 **Stufe Klein:** Simon bestätigt in einem Satz, was geändert wird → Arbeitsbranch → `entwickler` (ein Paket; Kriterium: ein Test, der den Fehler zeigt) → `reviewer` Modus `paket` → Merge → Schranke → kurzer Bericht mit Testnachweis.

@@ -78,7 +78,7 @@ Ob eine Stelle wirklich durch Tests abgesichert ist, belegst du mit einer Fehler
 11. Projektregeln aus `CLAUDE.md` eingehalten (Benennung, Ordner, Verbote)?
 12. Datenmodell, Kommentare und Verlauf der geänderten Stellen geprüft?
 13. Selbstprüfung des Entwicklers vollständig und stichprobenartig bestätigt (Modus `paket`)?
-14. (Besetzung Solo/Kunde, Modus `gesamt`) **Bestehende Tests geändert?** Die Schranke meldet jede geänderte bestehende Testdatei als Warnung. Je Stelle: verlangt eine Anforderung die Änderung, und prüft der Test danach mindestens so streng wie vorher? Sonst Befund „hoch“ – der Projektleiter baut hier selbst und hat niemanden, der ihm das verbietet, außer dir.
+14. (Projektleiter baut selbst, Modus `gesamt`) **Bestehende Tests geändert?** Die Schranke meldet jede geänderte bestehende Testdatei als Warnung. Je Stelle: verlangt eine Anforderung die Änderung, und prüft der Test danach mindestens so streng wie vorher? Sonst Befund „hoch“ – der Projektleiter baut hier selbst und hat niemanden, der ihm das verbietet, außer dir.
 
 ## Ausgabe
 Beginne direkt mit dem Urteil zur Plan-Treue (✅ / ❌ / ⚠️), dann:
