@@ -147,6 +147,9 @@ class GehirnAbgleich(unittest.TestCase):
         with tempfile.TemporaryDirectory() as t:
             quelle = os.path.join(t, "start")
             os.makedirs(os.path.join(quelle, "05 Lektionen"))
+            os.makedirs(os.path.join(quelle, "01 Projekte"))
+            with open(os.path.join(quelle, "01 Projekte", "Projektübersicht.md"), "w", encoding="utf-8") as f:
+                f.write("# Übersicht\n")
             with open(os.path.join(quelle, "00 Start.md"), "w", encoding="utf-8") as f:
                 f.write("# Start\n")
             git(quelle, "init", "-q")
@@ -175,6 +178,8 @@ class GehirnAbgleich(unittest.TestCase):
             self.assertIn("Regel von A", aus)
             # Neu in 3.21: auch Vorschläge gelten sofort, als „vorläufig“ markiert.
             self.assertIn("(vorläufig) [T] Vorschlag von A", aus)
+            # Neu in 3.21.1: Projekt-Check – der Sitzungsstart nennt die Projektübersicht.
+            self.assertIn("Projektübersicht im Gehirn", aus)
 
 
 class GehirnInDerCloud(unittest.TestCase):

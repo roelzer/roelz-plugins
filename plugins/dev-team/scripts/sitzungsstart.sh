@@ -85,6 +85,9 @@ if [ -n "$gehirn" ] && [ -f "$gehirn/00 Start.md" ]; then
     sed -n '/^## Lektionen/,/^## /p' "$gl" 2>/dev/null | grep '^- '
     sed -n '/^## Vorgeschlagen/,/^## /p' "$gl" 2>/dev/null | grep '^- ' | sed 's/^- /- (vorläufig) /'
   fi
+  if [ -f "$gehirn/01 Projekte/Projektübersicht.md" ]; then
+    echo "Projektübersicht im Gehirn: $gehirn/01 Projekte/Projektübersicht.md – bei einem neuen Projekt oder Auftrag zuerst lesen: Ist es eine Erweiterung eines bestehenden Projekts? Dann Simon fragen, ob darauf aufgebaut werden soll."
+  fi
   pname="$(basename "$projekt")"
   if [ -f "$gehirn/01 Projekte/$pname.md" ]; then
     echo

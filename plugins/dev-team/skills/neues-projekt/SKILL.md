@@ -9,6 +9,9 @@ argument-hint: "[Projektname]"
 
 Projektname: `$ARGUMENTS` (fehlt er, frag danach). Ordnername: Kleinbuchstaben mit Bindestrichen.
 
+## Projekt-Check zuerst (aus dem Gehirn)
+Bevor du etwas anlegst: Lies im Gehirn `01 Projekte/Projektübersicht.md` (Pfad: Zeile „Gehirn:“ in `~/.claude/CLAUDE.md`; in Cloud-Sitzungen `~/roelz-brain`) und, falls vorhanden, `03 Arbeitsweise/Projekte – Übersicht.md`. Frag dich: Ist das wirklich ein neues Projekt, oder die Erweiterung eines bestehenden (gleiches Fachgebiet, gleiche Daten, gleiches Werkzeug)? Passt etwas, sag Simon in einem Satz: „Das klingt nach einer Erweiterung von <Projekt>. Darauf aufbauen?“ und warte auf seine Antwort, bevor du ein neues Projekt anlegst. Prüfe auch die Lektionen im Gehirn („Dev-Team-Lektionen“) und nutze Bausteine aus dem Baukasten, statt Vorhandenes neu zu bauen. Gibt es kein Gehirn, überspring diesen Schritt.
+
 ## Grundregel
 **Ein Kunde = ein eigenes Repo.** Niemals Code oder Daten mehrerer Kunden in einem Ordner. Prüfe, dass du nicht in einem bestehenden Projekt- oder Kundenordner stehst. Wenn doch: Simon fragen, wo das Projekt hin soll.
 
