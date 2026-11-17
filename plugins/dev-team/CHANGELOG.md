@@ -1,5 +1,13 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.21.0 – Lernen zählt: vorgeschlagene Lektionen gelten sofort
+
+Anlass: Simon: „Das Lernen soll wichtiger werden, damit wir wirklich Fortschritt machen.“ Neun Vorschläge warteten auf seine Bestätigung, und der Sitzungsstart lud nur bestätigte Lektionen – das Gelernte kam nie an.
+- **Sitzungsstart und Agenten-Kontext** laden außer „## Lektionen“ jetzt auch „## Vorgeschlagen“, markiert als „(vorläufig)“. Grenze für Agenten von 6000 auf 8000 Zeichen.
+- **Grundgesetz:** Lektionen gelten ab der nächsten Sitzung sofort als vorläufig; Simon streicht nur Falsches, bestätigen ist optional. Vor dem Eintragen auf Doppeltes prüfen.
+- Fachregeln bleiben unverändert: Nur bestätigte zählen für Tests und Berechnung.
+- Test: `test_sitzungsstart_laedt_vorgeschlagene_lektionen`.
+
 ## 3.20.0 – Besetzung nach Bedarf, mechanisch abgesichert
 
 Anlass: Simon: „Bau Sinnvolles ein und sichere die Risiken.“ Risiken der freien Wahl: Der Projektleiter spart an Prüfungen, oder Entscheidungen werden unvorhersehbar.

@@ -206,7 +206,7 @@ Eigenständig heißt: selbst arbeiten innerhalb dieser Grenzen, nicht: alles dü
 ## Mehrere Projekte: getrennt arbeiten, gemeinsam lernen
 - Jedes Projekt ist ein eigenes Repo mit eigener Sitzung. Du liest und änderst nur das Projekt, in dem du gestartet wurdest.
 - Geteilt wird über das **Gehirn** (siehe unten). Ohne Gehirn: die Lessons-Datei und die Fachwissen-Bibliothek im Plugin, beide ohne Projekt-, Kunden- oder Firmennamen und ohne interne Werte.
-- Kein Projekt schreibt bestätigte Lektionen direkt. Vorschläge gehen ins Gehirn unter „Vorgeschlagen“ (bzw. `docs/LEKTIONEN_VORSCHLAEGE.md`); bestätigt nur über `/dev-team:lektion` nach Simons OK.
+- Lernen zählt: Jede Lektion, die ein Agent aus einem Fehler, Umweg oder falschen Annahme zieht, geht sofort ins Gehirn unter „Vorgeschlagen“ (bzw. `docs/LEKTIONEN_VORSCHLAEGE.md`) und **gilt ab der nächsten Sitzung für alle Agenten als vorläufig**, ohne auf Simon zu warten. Simon streicht nur, was falsch ist; „bestätigt“ (Abschnitt „Lektionen“) wird sie über `/dev-team:lektion` nach seinem OK. Vor dem Eintragen prüfen, ob es sie schon gibt (dann nicht doppelt).
 
 ## Gehirn: alles, was wir wissen, steht in Obsidian
 Das Gehirn ist Simons privater Obsidian-Tresor (Repo `roelzer/brain`, Pfad in der Zeile „Gehirn:“ im Block „dev-team“). **Es ist die Quelle** für Lektionen, Fachwissen, Projektstand und Entscheidungen – projektübergreifend und für alle Werkzeuge, nicht nur das Dev-Team.

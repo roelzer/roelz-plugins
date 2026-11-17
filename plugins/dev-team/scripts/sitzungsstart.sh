@@ -81,8 +81,9 @@ if [ -n "$gehirn" ] && [ -f "$gehirn/00 Start.md" ]; then
   gl="$gehirn/05 Lektionen/Dev-Team-Lektionen.md"
   if [ -f "$gl" ]; then
     echo
-    echo "### Dev-Team-Lektionen aus dem Gehirn (bestätigt)"
+    echo "### Dev-Team-Lektionen aus dem Gehirn (gelten alle, auch die vorläufigen)"
     sed -n '/^## Lektionen/,/^## /p' "$gl" 2>/dev/null | grep '^- '
+    sed -n '/^## Vorgeschlagen/,/^## /p' "$gl" 2>/dev/null | grep '^- ' | sed 's/^- /- (vorläufig) /'
   fi
   pname="$(basename "$projekt")"
   if [ -f "$gehirn/01 Projekte/$pname.md" ]; then
