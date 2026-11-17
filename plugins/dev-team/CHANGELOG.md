@@ -1,5 +1,11 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.21.1 – Projekt-Check beim Start
+
+Anlass: Simon fing ein „neues“ Projekt an, das sich als Erweiterung eines bestehenden herausstellte; das Wissen über alte Projekte kam nicht mit.
+- Sitzungsstart nennt die Projektübersicht im Gehirn und fordert auf, bei neuem Projekt oder Auftrag zuerst zu prüfen, ob es eine Erweiterung ist.
+- Skill `neues-projekt`: Schritt „Projekt-Check zuerst“ (Projektübersicht, Lektionen, Baukasten lesen; bei Treffer Simon fragen, bevor ein neues Projekt angelegt wird).
+
 ## 3.21.0 – Lernen zählt: vorgeschlagene Lektionen gelten sofort
 
 Anlass: Simon: „Das Lernen soll wichtiger werden, damit wir wirklich Fortschritt machen.“ Neun Vorschläge warteten auf seine Bestätigung, und der Sitzungsstart lud nur bestätigte Lektionen – das Gelernte kam nie an.
