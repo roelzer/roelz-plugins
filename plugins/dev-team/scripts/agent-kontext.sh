@@ -22,8 +22,8 @@ if [ -n "${gehirn:-}" ] && [ -f "$gehirn/00 Start.md" ]; then
   wissen="$gehirn/02 Wissen/"
   gl="$gehirn/05 Lektionen/Dev-Team-Lektionen.md"
   if [ -f "$gl" ]; then
-    # Nur bestätigte Lektionen, als eine Zeile (JSON-tauglich).
-    gehirn_text="$(sed -n '/^## Lektionen/,/^## /p' "$gl" 2>/dev/null | grep '^- ' | tr -d '"\\\r' | tr '\n' ' ' | cut -c1-6000)"
+    # Bestätigte und vorläufige (vorgeschlagene) Lektionen, als eine Zeile (JSON-tauglich).
+    gehirn_text="$( { sed -n '/^## Lektionen/,/^## /p' "$gl" 2>/dev/null | grep '^- '; sed -n '/^## Vorgeschlagen/,/^## /p' "$gl" 2>/dev/null | grep '^- ' | sed 's/^- /- (vorläufig) /'; } | tr -d '"\\\r' | tr '\n' ' ' | cut -c1-8000)"
     lessons="$gl"
   fi
 fi
@@ -32,7 +32,7 @@ fi
 saeubern() { printf '%s' "$1" | tr -d '"\r\n'; }
 p="$(saeubern "$plugin_fwd")"; l="$(saeubern "$lessons")"; w="$(saeubern "$wissen")"
 zusatz=""
-[ -n "$gehirn_text" ] && zusatz=" Bestätigte Dev-Team-Lektionen aus dem Gehirn (gelten für dich): $(saeubern "$gehirn_text")"
+[ -n "$gehirn_text" ] && zusatz=" Dev-Team-Lektionen aus dem Gehirn (gelten für dich, auch die vorläufigen): $(saeubern "$gehirn_text")"
 
 printf '{"hookSpecificOutput":{"hookEventName":"SubagentStart","additionalContext":"Dev-Team-Pfade: Plugin-Ordner = %s ; Lessons-Datei = %s ; Fachwissen-Bibliothek = %s . Wo deine Anweisungen auf den Block dev-team in ~/.claude/CLAUDE.md verweisen, gelten diese Pfade. Berichte an Simon mit Ampel und in einfacher Sprache.%s"}}\n' "$p" "$l" "$w" "$zusatz"
 exit 0

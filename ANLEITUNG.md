@@ -1,6 +1,6 @@
 # Dev-Team – Anleitung
 
-Stand: November 2026 · Version 3.20.0
+Stand: November 2026 · Version 3.21.0
 
 Dieses Repo enthält zwei Plugins für Claude Code: **`dev-team`** und **`tool-scout`**. Beide enthalten kein Firmen- oder Kundenwissen und dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
 
@@ -130,7 +130,7 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
 - **Getrennt arbeiten:** Jedes Projekt hat seinen eigenen Ordner und sein eigenes VS-Code-Fenster. Mehrere können gleichzeitig laufen, ohne sich zu sehen.
 - **Gemeinsam lernen – über das Gehirn (neu in 3.7):** Alles, was das Team dauerhaft weiß, steht in deinem Obsidian-Tresor (Repo `roelzer/brain`). Das Team schreibt selbst hinein, über `scripts/gehirn.py`:
   - nach jedem Auftrag den **Projektstand** in `01 Projekte/<Projekt>.md` (nur der Bereich zwischen den Dev-Team-Markern wird ersetzt, deine eigenen Notizen bleiben) und die Zeile in der Projektübersicht,
-  - **Lektionsvorschläge** unter „Vorgeschlagen“ in `05 Lektionen/Dev-Team-Lektionen.md`; bestätigst du sie, wandern sie nach oben und gelten ab der nächsten Sitzung für alle Agenten,
+  - **Lektionsvorschläge** unter „Vorgeschlagen“ in `05 Lektionen/Dev-Team-Lektionen.md`; sie gelten **sofort** (als „vorläufig“) ab der nächsten Sitzung für alle Agenten; du streichst nur, was falsch ist, oder bestätigst sie, dann wandern sie nach oben,
   - **Entscheidungen**, die du getroffen hast, in den Entscheidungslog,
   - von dir bestätigtes **Fachwissen** in `02 Wissen/` (bestehende Zeilen werden nie gestrichen).
   Vorher holt das Skript den neuesten Stand (`git pull`), danach committet und pusht es. Auch jeder Sitzungsstart holt das Gehirn zuerst von GitHub (höchstens 8 Sekunden). So hat der zweite Laptop neue Lektionen sofort, selbst wenn Obsidian dort geschlossen ist. Zugangsdaten und Wörter aus der Notiz „Sperrwörter“ im Gehirn werden geblockt (dort steht z. B., dass Firmenwissen deines Arbeitgebers draußen bleibt). Ohne Gehirn (Cloud, fremder Rechner) sammelt der Projektleiter alles in `docs/GEHIRN_NACHTRAG.md`.

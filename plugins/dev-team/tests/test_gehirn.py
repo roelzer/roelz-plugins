@@ -143,7 +143,7 @@ class Gehirn(unittest.TestCase):
 class GehirnAbgleich(unittest.TestCase):
     """Sitzungsstart holt Lektionen, die auf dem anderen Laptop geschrieben wurden."""
 
-    def test_zweiter_laptop_bekommt_neue_lektion(self):
+    def test_zweiter_laptop_bekommt_neue_lektion(self):  # auch test_sitzungsstart_laedt_vorgeschlagene_lektionen
         with tempfile.TemporaryDirectory() as t:
             quelle = os.path.join(t, "start")
             os.makedirs(os.path.join(quelle, "05 Lektionen"))
@@ -160,6 +160,9 @@ class GehirnAbgleich(unittest.TestCase):
             r = subprocess.run([sys.executable, SKRIPT, "lektion", "--text", "[T] Regel von A. (T, 2026)", "--bestaetigt"],
                                capture_output=True, text=True, env=dict(os.environ, DEV_TEAM_GEHIRN_TEST=a))
             self.assertEqual(r.returncode, 0, r.stdout)
+            r = subprocess.run([sys.executable, SKRIPT, "lektion", "--text", "[T] Vorschlag von A. (T, 2026)"],
+                               capture_output=True, text=True, env=dict(os.environ, DEV_TEAM_GEHIRN_TEST=a))
+            self.assertEqual(r.returncode, 0, r.stdout)
             heim = os.path.join(t, "heim", ".claude")
             os.makedirs(heim)
             with open(os.path.join(heim, "CLAUDE.md"), "w", encoding="utf-8") as f:
@@ -170,6 +173,8 @@ class GehirnAbgleich(unittest.TestCase):
                                  capture_output=True, text=True, env=env).stdout
             self.assertIn("abgeglichen mit GitHub", aus)
             self.assertIn("Regel von A", aus)
+            # Neu in 3.21: auch Vorschläge gelten sofort, als „vorläufig“ markiert.
+            self.assertIn("(vorläufig) [T] Vorschlag von A", aus)
 
 
 class GehirnInDerCloud(unittest.TestCase):
