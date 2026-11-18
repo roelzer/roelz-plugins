@@ -115,5 +115,17 @@ claude plugin eval <plugin-ordner> --runs 3 --threshold 0.8 --trust-plugin --no-
 - **Bei jedem Modellwechsel** laufen alle Testfälle neu. Was das Modell inzwischen auch ohne den Agenten besteht, ist ein Kandidat zum Streichen.
 - **Keeper-Test:** Würden wir ihn mit heutigem Wissen wieder einstellen? Wenn nicht: streichen oder mit einer anderen Rolle zusammenlegen. Das entscheidet Simon.
 
+## 9. Lektionen aus echten Einstellungen
+Aus dem Video-Editor (18.11.2026). Herkunft und Belege: `docs/personal/personal-lektionen.md`.
+1. **Maßstab und Machbarkeit zuerst.** Simons Vorbild für „Spitzenniveau“ früh zerlegen und mit einem kleinen Test messen, ob Hardware und kostenlose Werkzeuge es schaffen. Testfall: `evals/grenzfall-hardware`.
+2. **Ausgaben, die ein Text-Prüfer nicht sehen kann** (Video, Bild, Ton), in drei Schichten prüfen: Weg-Prüfung im Eval, festes Messskript über beide Arme, externer Kritiker als Vorfilter. Der Mensch entscheidet.
+3. **Messschwellen an den Negativbeispielen des Probelaufs eichen.** Eine Schwelle, an der die schlechten Ergebnisse bestehen, prüft nichts.
+4. **Muss-Fälle müssen die schlechte Handlung ermöglichen** (Werkzeuge breit genug freigeben). Auch ein von einer Sperre geblockter Versuch zählt als Fehlschlag.
+5. **Pflichtschritte als Sperre bauen**, wenn sie im Probelauf übersprungen wurden (z. B. Messen vor „fertig“ als Stop-Hook).
+6. **Probelauf-Material dauerhaft ablegen** und als Vergleich lieber den Ohne-Arm des Evals nehmen.
+7. **Vergleichsbasis festlegen**, wenn es fertige Werkzeug-Skills gibt, damit Δ den eigenen Beitrag misst.
+8. **Zielplattform prüfen** (Simon: Windows): Hooks und Skripte plattformneutral, Rauchtest auf seinem Rechner vor „eingestellt“.
+9. **Testläufer-Fallen:** `claude plugin eval` als root versiegelt das Dateisystem, dann einen eigenen Läufer mit `claude -p --allowedTools` nutzen. Läufe, die am Nutzungslimit scheitern (Antwort „You've hit your … limit“), sind ungültig und zählen nicht als Fehlschlag.
+
 ## Quellen (Auswahl)
 Anthropic skill-creator und Blog „Improving skill-creator“ (2026); Claude-Code-Doku zu plugin-evals, Skills und Subagents; „Skill authoring best practices“; „Demystifying evals for AI agents“ (2026); „Harness design for long-running apps“ (2026); obra/superpowers writing-skills; BMad Builder; SkillsBench (arXiv 2602.12670); Wharton „Playing Pretend“ (arXiv 2512.05858); Hamel Husain/Shreya Shankar „AI Evals FAQ“; wshobson/agents plugin-eval. Vollständige Liste mit Links in `docs/VORBILDER.md`.

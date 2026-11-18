@@ -1,5 +1,10 @@
 # Änderungsprotokoll Video-Editor
 
+## 0.1.1 – Zurückgestellt bis bessere Hardware
+
+Simon an Stopp 2 (18.11.2026): „ansich alles ned schlecht, aber is ja jetz auch nichts besonderes … die gut aufgelösten oder geil animierten dinger sind ja die mit wow effekt“, danach: „video geht nur mit besserer hardware … wir widmen uns dem website bauer“.
+- Nicht eingestellt. Das Plugin bleibt im Repo, damit es mit Grafikkarte weitergehen kann. Ergebnisse und offene Punkte: `docs/personal/video-editor/probearbeit.md`. Wissen fürs Gehirn: Notiz „Video-Produktion mit Claude“.
+
 ## 0.1.0 – Erste Einstellung durch den Personaler
 
 Anlass: Simon: „Ich will einen Agenten für Videoerstellung, der alle Tools kennt … ich hab noch gar keine Videos gemacht, weil alle Ergebnisse von Claude bis jetzt richtiger Müll waren. Ich will, dass das High-End wird.“ Gebaut vom Personaler nach Probelauf, Profi-Recherche und Stellenausschreibung (`docs/personal/video-editor/`).

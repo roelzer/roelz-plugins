@@ -9,3 +9,7 @@ Aus der ersten echten Einstellung (Video-Editor, 18.11.2026), gefunden vom perso
 5. **Maßstab „Spitzenniveau“ vom Menschen holen** (Vorbilder, Urteil über die Probelauf-Ergebnisse), nicht „besser als der Probelauf“.
 6. **Vergleichsbasis festlegen**, wenn es fertige Werkzeug-Skills gibt (z. B. „Claude + HyperFrames-Skills“), damit Δ den eigenen Beitrag misst.
 7. **Zielplattform des Menschen prüfen** (hier Windows): Hooks und Skripte plattformneutral, Rauchtest auf seinem Rechner vor „eingestellt“.
+8. **Maßstab und Machbarkeit früh prüfen:** Simons Vorbild (ein 3D-Short) erst an Stopp 2 ernst genommen; dabei zeigte sich, dass Wow 3D braucht und ohne Grafikkarte ca. 55 s pro Bild rendert. Gehört in Schritt 1 mit einem kleinen Test.
+9. **Pflichtschritte als Sperre:** Bei reinen Schnitten wurde weder gemessen noch der Kritiker gerufen, bis ein Stop-Hook es erzwang.
+
+Übernommen in `plugins/personal/wissen/handwerk.md` Abschnitt 9 und `einstellen` Schritt 1 (Personaler 1.1.0). Testfall dazu: `evals/grenzfall-hardware`.

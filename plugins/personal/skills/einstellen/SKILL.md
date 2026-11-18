@@ -27,9 +27,11 @@ Eine Nachricht mit höchstens 5 Fragen, jeweils mit deinem Vorschlag als Standar
 4. Was darf er nicht (Dateien, Geld, Dinge nach außen schicken)?
 5. 2–3 echte Fälle aus letzter Zeit, am besten mit dem, was damals schiefging.
 
+**Maßstab und Machbarkeit prüfen:** Lass dir für „Spitzenniveau“ ein echtes Vorbild zeigen (Link, Bild, Beispiel) und zerlege es: Was genau macht es gut? Prüf dann sofort mit einem kleinen Test, ob das mit Simons Rechner und kostenlosen Werkzeugen überhaupt geht (z. B. Renderzeit pro Bild, Speicher, Laufzeit). Geht es nicht, sag es jetzt, nicht erst an Stopp 2. Anlass: Beim Video-Editor zeigte sich erst nach der Probearbeit, dass Wow 3D braucht und ohne Grafikkarte etwa 55 s pro Bild dauert.
+
 **Nullvariante prüfen:** Gibt es das schon? Überfliege alle `plugins/*/agents/*.md` und `plugins/*/skills/*/SKILL.md` und lies `plugins/tool-scout/wissen/gepruefte-tools.md`. Bei Bedarf schlägst du Simon `/tool-scout:scout <wofür>` vor. Reicht eine Erweiterung (eine Regel, eine Wissensdatei, ein Modus), ist das deine Empfehlung.
 
-*Erfolgskriterium:* Aufgabe, Auslösesätze, Gütekriterium und mindestens zwei echte Fälle liegen vor. Dazu gibt es eine begründete Entscheidung: „neu“, „Erweiterung von X“ oder „brauchen wir nicht“. Fehlen echte Fälle, schreibst du Beispielfälle, markierst sie als erfunden und lässt sie an Stopp 1 bestätigen.
+*Erfolgskriterium:* Aufgabe, Auslösesätze, Gütekriterium mit Vorbild, ein Machbarkeitsbefund und mindestens zwei echte Fälle liegen vor. Dazu gibt es eine begründete Entscheidung: „neu“, „Erweiterung von X“ oder „brauchen wir nicht“. Fehlen echte Fälle, schreibst du Beispielfälle, markierst sie als erfunden und lässt sie an Stopp 1 bestätigen.
 
 ## 2. Probelauf ohne neuen Mitarbeiter (Ausgangswert)
 Mach aus den Fällen 3–5 Aufgaben, wie Simon sie schreiben würde, ohne Lösungsweg. Jede läuft in einem frischen Subagenten (`general-purpose`) in einem eigenen Temp-Ordner, ohne Hinweis auf den geplanten Mitarbeiter. Starte sie in einer Nachricht parallel. Lies die Ergebnisse vollständig und notiere je Aufgabe:

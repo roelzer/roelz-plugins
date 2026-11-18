@@ -1,5 +1,12 @@
 # Änderungsprotokoll Personaler
 
+## 1.1.0 – Lektionen aus der ersten Einstellung (Video-Editor)
+
+Anlass: Der Video-Editor war sauber, aber ohne Wow. Simon: „okay also auf deutsch video geht nur mit besserer hardware“. Dass Wow 3D braucht und ohne Grafikkarte etwa 55 s pro Bild rendert, fiel erst an Stopp 2 auf.
+- `einstellen` Schritt 1: **Maßstab und Machbarkeit prüfen.** Vorbild für „Spitzenniveau“ zeigen lassen, zerlegen und mit einem kleinen Test gegen Simons Hardware messen, bevor gebaut wird.
+- `handwerk.md` Abschnitt 9: neun Lektionen aus der Einstellung (Prüfung nicht-textlicher Ausgaben, Schwellen an Negativbeispielen eichen, Muss-Fälle, Pflichtschritte als Sperre, Testläufer-Fallen u. a.).
+- Neuer Testfall `grenzfall-hardware` (echter Fall). **Noch nicht gelaufen**, erst bei der nächsten Probearbeit.
+
 ## 1.0.0 – Der Personaler
 
 Anlass: Simon: „Ich will einen Agenten für Agentenerstellung, wie eine Art Personaler: Wenn ich schreib, ich will einen neuen Agenten für das und das, dann soll er den erstellen, und zwar so, wie ich das auch machen würde – intensiv recherchieren, was die besten Fachleute in dem Gebiet machen und was man sich von anderen Projekten abschauen kann.“
