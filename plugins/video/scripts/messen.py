@@ -143,6 +143,9 @@ def main():
     a.add_argument("--srt")
     a.add_argument("--json")
     a.add_argument("--hf-check", help="JSON-Ausgabe von `hyperframes check --json` zum Einrechnen")
+    a.add_argument("--art", choices=["komposition", "schnitt"], default="komposition",
+                   help="schnitt = Bild stammt aus vorhandenem Material (z. B. Interview vor ruhigem Hintergrund): "
+                        "lange Strecken ohne neue Bildinformation sind dann nur ein Hinweis, kein P0")
     arg = a.parse_args()
     if not os.path.exists(arg.video):
         print("Datei nicht gefunden: %s" % arg.video)
@@ -174,8 +177,11 @@ def main():
 
     m["neue_information"] = neue_information(arg.video, m["dauer"])
     ni = m["neue_information"]
-    if ni["laengste_strecke_s"] > 4:
+    if ni["laengste_strecke_s"] > 4 and arg.art == "komposition":
         p0.append("F1: %.1f s ohne neue Information ab %.1f s" % (ni["laengste_strecke_s"], ni["laengste_ab_s"]))
+    elif ni["laengste_strecke_s"] > 4:
+        hinweise.append("F1: %.1f s ohne neue Bildinformation ab %.1f s – bei Material-Schnitt prüfen, ob B-Roll, "
+                        "Ausschnittwechsel oder Texteinblendung fehlen" % (ni["laengste_strecke_s"], ni["laengste_ab_s"]))
     elif ni["strecken_ueber_3s"]:
         hinweise.append("F1: Strecken > 3 s ohne neue Information %s – nur als begründete Lesepause" % ni["strecken_ueber_3s"])
     if ni["schluss_halten_s"] > 2:

@@ -62,9 +62,10 @@ Bei Software: welche echten Bildschirme aufgenommen werden.
 - Ton nach `ton.md`, Lizenzen laufend in `video/<name>/LIZENZEN.md`.
 - `hf.mjs check --json`: jeden Fehler beheben, jede Warnung abwägen.
 
-## 5. Prüfen
-- Entwurf rendern (`hf.mjs render -q draft -o video/<name>/pruefung/entwurf.mp4`).
-- Messen: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/messen.py <entwurf> --format <…> --dauer <…> [--srt …] --hf-check <check.json> --json video/<name>/pruefung/messung.json`.
+## 5. Prüfen – für jedes Video, auch für reine Schnitte
+Auch ein Teaser, ein Interview-Schnitt oder ein Formatwechsel mit ffmpeg wird gemessen und vom Kritiker geprüft. Gerade dort rutschten in der Probearbeit Lautheitsfehler durch. Eine Abschluss-Sperre verhindert „fertig“, solange ein neues Video ungemessen ist.
+- Entwurf rendern (`hf.mjs render -q draft -o video/<name>/pruefung/entwurf.mp4`). Bei reinem Schnitt ist der Entwurf dein Schnittergebnis.
+- Messen: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/messen.py <entwurf> --format <…> --dauer <…> [--srt …] --hf-check <check.json> --json video/<name>/pruefung/messung.json` (bei reinem Schnitt mit `--art schnitt` und ohne `--hf-check`).
 - Prüfbilder: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/boegen.py <entwurf> video/<name>/pruefung/bilder`. Sieh sie selbst an.
 - Agent `video-kritiker` rufen. Er bekommt die Pfade zu SPEC, Prüfbildern, `messung.json`, Check-Ausgabe und `${CLAUDE_PLUGIN_ROOT}/wissen/handwerk.md`, **nicht** deine Begründungen.
 - P0 beheben, erneut messen und prüfen. Nach **höchstens 3 Runden** entscheiden: abgeben oder Simon ehrlich sagen, was offen ist.
@@ -79,7 +80,7 @@ Schick Simon den Entwurf als Datei, damit er ihn **anschauen und anhören** kann
 Seine Rückmeldung setzt du um. Ohne seine Freigabe gibt es kein Endrendering, außer bei „mach einfach“.
 
 ## 7. Abgabe
-- Endrendering mit `hf.mjs render -q delivery -o video/<name>/ausgabe/<name>.mp4`, danach noch einmal `messen.py` (Lautheit zweistufig mit `loudnorm` angleichen, falls nötig).
+- Endrendering mit `hf.mjs render -q delivery -o video/<name>/ausgabe/<name>.mp4` (bzw. der fertige Schnitt). Danach **immer** noch einmal `messen.py` auf genau die Abgabedatei, als `video/<name>/pruefung/messung_abgabe.json`. Lautheit falls nötig zweistufig mit `loudnorm` angleichen und neu messen.
 - Simon bekommt: die Datei, `LIZENZEN.md` mit nötigen Namensnennungen für die Beschreibung und zwei Sätze, wie er es ändern kann (Texte und Farben stehen als Variablen im Projekt).
 - Hat Simon etwas beanstandet, das wieder passieren könnte, schlägst du vor, es mit `/personal:nachschulen` als Lektion festzuhalten.
 
