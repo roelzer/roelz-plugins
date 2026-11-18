@@ -16,6 +16,7 @@ Sprich Deutsch, kurz, ohne Fachchinesisch. Simon hat **zwei Stopps**: die Storyl
 
 ## 0. Einrichten (einmal je Video)
 - `node ${CLAUDE_PLUGIN_ROOT}/scripts/hf.mjs pruefen`: Fehlt Node 22 oder ffmpeg, sag Simon den einen Installationsbefehl (Windows: `winget install ffmpeg`, Node von nodejs.org) und halte an.
+- Python-Skripte startest du mit `python3`. Unter Windows heißt der Befehl meist `python` oder `py -3`, deshalb nimmst du den, der eine Version meldet.
 - Arbeitsordner `video/<kurzer-name>/` im Projekt anlegen (`arbeit/`, `ausgabe/`, `pruefung/`). Jede Eingabedatei von Simon mit Pfad in `video/<name>/ORIGINALE.txt` eintragen, danach nur noch mit Kopien in `arbeit/` arbeiten.
 - HyperFrames-Skills lesen: Den Pfad liefert `node ${CLAUDE_PLUGIN_ROOT}/scripts/hf.mjs skills-pfad`. Lies `hyperframes/SKILL.md` und die Referenzen, die es für deine Videoart nennt (z. B. `types/explainer.md`, `types/vertical.md`, `types/launch.md`, `story.md`, `spec.md`, `motion.md`, `look.md`, `review.md`). CLI-Befehle daraus führst du immer als `node ${CLAUDE_PLUGIN_ROOT}/scripts/hf.mjs <befehl>` aus.
 

@@ -171,6 +171,7 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
 | `/dev-team:uebergabe` | Übergabe an Kunden vorbereiten |
 | `/dev-team:einrichten privat\|arbeit` | einmalige Einrichtung pro Rechner |
 | `/tool-scout:scout <wofür>` | fremde Plugins/Skills suchen und prüfen |
+| `/video:machen <was für ein Video>` | Video-Editor: Erklär-, Produkt- und Vorführvideos, Reels, Trailer, Schnitte (Pausen raus, Untertitel). Zwei Stopps: Storylines mit Stilproben, dann Vorschau. Einrichtung siehe „Video-Editor einrichten“ |
 | `/personal:einstellen <wofür>` | neuen Agenten, Skill oder Plugin einstellen lassen: Probelauf ohne ihn, Profi-Recherche, Stellenausschreibung zur Freigabe, gemessene Probearbeit, Pull Request |
 | `/personal:nachschulen <wer, was>` | bestehenden Agenten nach einem Fehler verbessern (erst Testfall, dann Regel); `pruefen <plugin>`, `modellwechsel <plugin>` |
 | `@dev-team:<agent>` | einen Agenten gezielt rufen, z. B. `@dev-team:fachpruefer` |
@@ -191,6 +192,7 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
    claude plugin install tool-scout@roelz-plugins
    claude plugin install dev-team-tafel@roelz-plugins
    claude plugin install personal@roelz-plugins
+   claude plugin install video@roelz-plugins
    ```
    **Automatische Updates einschalten:** in Claude Code `/plugin` → Marketplaces → `roelz-plugins` → Auto-update aktivieren. Dann holt jeder Rechner neue Versionen beim Start selbst; ein Update-Befehl ist nicht nötig (von Hand: `claude plugin marketplace update roelz-plugins`). Neue Versionen werden nur erkannt, wenn die Versionsnummer in `plugin.json` steigt, das tut sie bei jeder Änderung.
    **Lektionen und Wissen** landen im Gehirn (`roelzer/brain`), nicht mehr im Plugin-Ordner. Deshalb braucht es keinen lokalen Klon mehr; das Gehirn richtest du in Schritt 4 pro Rechner ein.
@@ -263,3 +265,27 @@ Damit der Lauf nicht bei der ersten Rückfrage stehen bleibt, braucht Claude Cod
 - **Tokens:** Abwägungsrunde und Recherche kosten spürbar mehr. Deshalb die Stufen nutzen und nach jeder Aufgabe `/clear`.
 - **Grenzen:** Alle Agenten sind Claude. Mehrere Instanzen haben ähnliche blinde Flecken. Das Team mildert das mit unterschiedlichen Modellen, Werkzeugen ohne KI (Tests, Linter, Scanner) und verdeckten Tests. Die stärkste Absicherung bleiben deine Referenzfälle, die von dir bestätigten Fachregeln und eure gegenseitige Abnahme vor Kundenauslieferungen.
 - **Parallele Entwickler** sparen Zeit nur bei wirklich unabhängigen Paketen. Eine Studie von 2026 (CAID) fand das beste Ergebnis bei etwa vier parallelen Entwicklern; mit mehr wurde es wieder schlechter. Wir starten vorsichtig mit **höchstens drei** und erhöhen erst, wenn die eigenen Messwerte (`.dev-team/kennzahlen.jsonl`) es rechtfertigen. Kollidieren zwei beim Zusammenführen, wird das Paket neu gebaut, nicht von Hand geflickt. Das kostet Tokens; der Pragmatiker prüft vorher, ob sich die Parallelität lohnt.
+
+
+## Video-Editor einrichten (einmal je Rechner)
+
+Der Video-Editor (`/video:machen`) arbeitet nur mit kostenlosen Werkzeugen auf deinem Rechner.
+1. **Programme** (Windows, in PowerShell):
+   ```
+   winget install OpenJS.NodeJS.LTS
+   winget install Gyan.FFmpeg
+   winget install Python.Python.3.12
+   ```
+   Danach VS Code neu starten. HyperFrames lädt der Video-Editor beim ersten Mal selbst, in einer festen Version.
+2. **Python-Pakete** für Messung und Untertitel:
+   ```
+   py -3 -m pip install numpy faster-whisper
+   ```
+3. **Musiksammlung** (einmalig, ca. 30 Minuten): Lege den Ordner `%USERPROFILE%\.roelz-video\musik\` mit Unterordnern `ruhig`, `positiv`, `filmisch`, `warm`, `dezent` an.
+   - Lade je Stimmung 5–10 Stücke von **pixabay.com/music** oder **mixkit.co/free-stock-music** (kostenlos, kommerziell erlaubt, ohne Namensnennung). Nur von Hand, nicht per Programm, das verbieten beide.
+   - Schreib in jeden Ordner eine `LIZENZEN.md` mit Titel, Urheber, Quelle (Link) und Lizenz.
+   - Keine Musik aus Charts, YouTube oder Spotify und nie Stücke mit „NC“ (nicht kommerziell).
+4. **Stimmen (optional, für Sprecher und Charakterstimmen):** `py -3 -m pip install pocket-tts` (schnell). Für Charakterstimmen mit Gefühl zusätzlich `py -3 -m pip install voxcpm`. Ohne NVIDIA-Grafikkarte ist es langsam (etwa 5 Minuten für 30 Sekunden Sprache), der erste Start lädt etwa 5 GB. Deine eigene Stimme nur mit deiner Einwilligungsdatei, fremde Stimmen nie.
+5. **Prüfen:** In Claude Code `/video:machen mach mir ein 10-Sekunden-Testvideo`. Der Video-Editor prüft beim Start selbst, ob Node und ffmpeg da sind.
+
+**Was er nie tut:** etwas bezahlen, hochladen oder teilen (auch nicht auf Zuruf), Telemetrie senden, Originale verändern oder Musik ohne Lizenz verwenden. Eine Sperre blockt bekannte Befehle dafür.

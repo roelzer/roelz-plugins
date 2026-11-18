@@ -162,6 +162,21 @@ def ein_lauf(fall, arm, nr, ziel, hf_plugin):
                        capture_output=True, text=True)
         if os.path.exists(aus):
             messung = json.load(open(aus, encoding="utf-8"))
+    # Aufräumen: Zwischendateien (node_modules, Einzelbilder, große Zwischenstände) – Ergebnis und Texte bleiben
+    for wurzel, ordner, dateien in os.walk(ws, topdown=True):
+        for o in list(ordner):
+            if o in ("node_modules", ".hyperframes", "frames", ".cache"):
+                shutil.rmtree(os.path.join(wurzel, o), ignore_errors=True)
+                ordner.remove(o)
+        for dname in dateien:
+            p = os.path.join(wurzel, dname)
+            if os.path.relpath(p, ws).startswith(("ausgabe", "material")):
+                continue
+            try:
+                if os.path.getsize(p) > 5_000_000:
+                    os.remove(p)
+            except OSError:
+                pass
     return {"fall": fall, "arm": arm, "nr": nr, "score": score, "graders": ergebnisse, "fehler": fehler,
             "kosten_usd": ende.get("total_cost_usd"), "dauer_s": round(time.time() - start), "zuege": ende.get("num_turns"),
             "p0": (messung or {}).get("p0"), "ordner": lauf}

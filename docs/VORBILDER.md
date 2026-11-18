@@ -109,3 +109,29 @@ Drei Recherchen: (1) wie die Besten Agenten bauen, die selbst Agenten bauen, (2)
 | Smart/Street „Who“ (Scorecard); Sackett u. a. 2022 (strukturierte Auswahl); Gawande/Boorman (Checklisten); Klein (Critical Decision Method, ACTA); Commander's Intent | Fachliteratur | Stellenausschreibung mit Auftrag, messbaren Ergebnissen und Arbeitsprobe; Recherche nach Fällen statt Prinzipien; Probezeit und Keeper-Test |
 
 **Bewusst nicht übernommen:** die „elite AI agent architect“-Persona und Beispiele in der Beschreibung aus Anthropics `agent-creator` (veraltet, kostet Kontext); selbst geschriebene und selbst bewertete Auslösetests (beweisen nichts); Optimierungs-Frameworks (DSPy/GEPA) und OpenAI Agent Builder (zu schwer, fremde Plattform); BMad-Personas und Rituale; 100–200 Eich-Beispiele je Fehlerart (zu viel für eine Person, stattdessen ~20 und Wachstum in der Probezeit); Bar Raiser als zusätzlicher Agent mit Vetorecht (dafür der `personal-pruefer`).
+
+## Video-Editor (Plugin `video`, 18.11.2026)
+
+Die erste Einstellung durch den Personaler. Probelauf, Recherche, Stellenausschreibung und Probearbeit liegen in `docs/personal/video-editor/`. Die wichtigsten Vorbilder:
+
+| Vorbild | Lizenz bzw. Art | Übernommen |
+|---|---|---|
+| [HyperFrames](https://github.com/heygen-com/hyperframes) (HeyGen) mit Agenten-Skills | Apache-2.0 | Kernwerkzeug (HTML → Video, Bild für Bild) und Handwerksregeln für Story, Bewegung, Look und Prüfung, in fester Version 0.9.65; ohne Telemetrie, ohne HeyGen-Bezahldienste, ohne Uploads |
+| Netflix Timed Text Style Guide, BBC Subtitle Guidelines | Normen | Lesezeit (≤ 20 Zeichen/s), Zeilenlänge, Mindest-Schriftgröße in % der Bildhöhe |
+| EBU R95, EBU R128 | Normen | sichere Ränder, Lautheit und True Peak |
+| Google ABCD (Kantar), TikTok, LinkedIn, Meta, Apple App Previews | Plattform-Leitfäden | Haken in den ersten Sekunden, stumm verständlich, Safe Zones, echte App statt Nachbau |
+| UX in Motion (Willenskomer), School of Motion, 12 Animationsprinzipien | Fachpraxis | nie linear, gestaffelt, Übergänge mit Bedeutung |
+| Anthropic frontend-design-Skill, Harness-Design (2026) | offiziell | Standardlösungen benennen und verbieten, unabhängiger skeptischer Prüfer |
+| [browser-use/video-use](https://github.com/browser-use/video-use) | MIT | Schnitt erst nach bestätigter Strategie, Prüfung an jeder Schnittgrenze, „du kannst nicht hören – sag es“ |
+| TOMATO (ICLR 2025) | Studie | Bewegung nie aus einem Bogen beurteilen; Bildstreifen und Messwerte |
+| VoxCPM2 (OpenBMB), Pocket TTS (Kyutai) | Apache-2.0; MIT/CC BY 4.0 | lokale deutsche Stimmen, Charakterstimmen aus Beschreibung |
+| ACE-Step 1.5 | MIT | Musik-KI als späterer Weg mit Grafikkarte |
+
+**Bewusst nicht übernommen:**
+- Remotion: ab 4 Mitarbeitern Firmenlizenz.
+- HeyGen-Stimmen, -Avatare und -Cloud sowie Telemetrie: kostenpflichtig bzw. Datenabfluss.
+- MusicGen, Stable Audio, YuE2, F5-TTS, XTTS, Fish: nicht-kommerzielle oder umsatzbegrenzte Lizenzen.
+- Kokoro: kein Deutsch.
+- Edge-TTS: inoffizieller Online-Dienst.
+- DaVinci Resolve Free: nicht automatisierbar.
+- Selbst synthetisierte Musik.

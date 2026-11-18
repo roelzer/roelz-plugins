@@ -1,6 +1,6 @@
 {
   "name": "roelz-plugins",
-  "description": "Simons Claude-Code-Plugins: Dev-Team, Team-Tafel, Tool-Scout und Personaler. Ohne Firmen- oder Kundenwissen, auch auf Arbeitsrechnern nutzbar.",
+  "description": "Simons Claude-Code-Plugins: Dev-Team, Team-Tafel, Tool-Scout, Personaler und Video-Editor. Ohne Firmen- oder Kundenwissen, auch auf Arbeitsrechnern nutzbar.",
   "owner": {
     "name": "Simon Rölz"
   },
@@ -27,6 +27,12 @@
       "name": "personal",
       "source": "./plugins/personal",
       "description": "Personaler: stellt neue KI-Mitarbeiter ein – Agenten, Skills und Plugins mit Profi-Recherche, Stellenausschreibung zur Freigabe und gemessener Probearbeit; schult bestehende Agenten nach.",
+      "category": "productivity"
+    },
+    {
+      "name": "video",
+      "source": "./plugins/video",
+      "description": "Video-Editor: Erklär-, Produkt- und Vorführvideos, Reels, Trailer und Schnitte auf Profi-Niveau – nur kostenlose lokale Werkzeuge (HyperFrames, ffmpeg), mit Storyline-Freigabe, unabhängigem Kritiker und Sperre gegen Kosten und Uploads.",
       "category": "productivity"
     }
   ]
