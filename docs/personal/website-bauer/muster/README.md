@@ -9,6 +9,6 @@ Machbarkeitstest vor Stopp 1 (Lehre aus dem Video-Editor: Maßstab und Machbarke
 - **Schrift:** Mona Sans (OFL, selbst gehostet), die Schrift der Lando-Seite. Keine fremden Server.
 - **Werkzeug:** three.js 0.187.0 (MIT), lokal.
 
-Ergebnis (Bildschirmfotos , , ): Der Hocker wirkt echt, weil Form und Oberfläche aus Fotos stammen. Am Handy ist der Schriftzug zu klein und der Hocker zu breit, das wäre die nächste Korrektur. Bauzeit etwa 45 Minuten.
+Ergebnis (Bildschirmfotos `desktop_start.png`, `desktop_ende.png`, `handy_start.png`): Der Hocker wirkt echt, weil Form und Oberfläche aus Fotos stammen. Am Handy ist der Schriftzug zu klein und der Hocker zu breit, das wäre die nächste Korrektur. Bauzeit etwa 45 Minuten.
 
 Für echte Seiten gilt: Das Objekt muss vom Auftraggeber kommen (eigenes Möbelstück fotografiert bzw. mit dem Handy gescannt, oder ein passendes freies Modell, klar gekennzeichnet). Der Hocker hier ist ein fremdes Möbel und nur Platzhalter für die Bauweise.
