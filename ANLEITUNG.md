@@ -2,7 +2,7 @@
 
 Stand: November 2026 · Version 3.22.1
 
-Dieses Repo enthält zwei Plugins für Claude Code: **`dev-team`** und **`tool-scout`**. Beide enthalten kein Firmen- oder Kundenwissen und dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
+Dieses Repo enthält Plugins für Claude Code, vor allem **`dev-team`**, **`tool-scout`** und den Personaler **`personal`**. Keines enthält Firmen- oder Kundenwissen; sie dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
 
 Du richtest alles **einmal pro Rechner** ein, danach gilt es in **jedem Projekt**, im Terminal genauso wie in VS Code.
 
@@ -171,6 +171,8 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
 | `/dev-team:uebergabe` | Übergabe an Kunden vorbereiten |
 | `/dev-team:einrichten privat\|arbeit` | einmalige Einrichtung pro Rechner |
 | `/tool-scout:scout <wofür>` | fremde Plugins/Skills suchen und prüfen |
+| `/personal:einstellen <wofür>` | neuen Agenten, Skill oder Plugin einstellen lassen: Probelauf ohne ihn, Profi-Recherche, Stellenausschreibung zur Freigabe, gemessene Probearbeit, Pull Request |
+| `/personal:nachschulen <wer, was>` | bestehenden Agenten nach einem Fehler verbessern (erst Testfall, dann Regel); `pruefen <plugin>`, `modellwechsel <plugin>` |
 | `@dev-team:<agent>` | einen Agenten gezielt rufen, z. B. `@dev-team:fachpruefer` |
 
 ---
@@ -188,6 +190,7 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
    claude plugin install dev-team@roelz-plugins
    claude plugin install tool-scout@roelz-plugins
    claude plugin install dev-team-tafel@roelz-plugins
+   claude plugin install personal@roelz-plugins
    ```
    **Automatische Updates einschalten:** in Claude Code `/plugin` → Marketplaces → `roelz-plugins` → Auto-update aktivieren. Dann holt jeder Rechner neue Versionen beim Start selbst; ein Update-Befehl ist nicht nötig (von Hand: `claude plugin marketplace update roelz-plugins`). Neue Versionen werden nur erkannt, wenn die Versionsnummer in `plugin.json` steigt, das tut sie bei jeder Änderung.
    **Lektionen und Wissen** landen im Gehirn (`roelzer/brain`), nicht mehr im Plugin-Ordner. Deshalb braucht es keinen lokalen Klon mehr; das Gehirn richtest du in Schritt 4 pro Rechner ein.
