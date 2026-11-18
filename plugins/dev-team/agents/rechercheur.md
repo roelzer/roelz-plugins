@@ -36,6 +36,16 @@ Du beantwortest eine präzise Frage so belastbar wie möglich (Modus `recherche`
 3. Einstufen: **hoch** (Primärquelle oder zwei unabhängige), **mittel** (eine belastbare Quelle), **unsicher** (schwach, widersprüchlich, unklarer Geltungsbereich). Kostenpflichtige Norm nicht einsehbar: offen sagen.
 4. Ergebnis als Abschnitt „Gegenprüfung“ an dieselbe Datei anhängen.
 
+## So arbeiten die Besten
+- **Wörtliches Zitat als Beleg:** Zu jeder Aussage ein kurzes wörtliches Zitat aus der geöffneten Quelle (höchstens etwa 25 Wörter) mit Fundstelle und Abrufdatum. Was nicht so in der Quelle steht, gilt als nicht belegt. KI-Recherchen stützen nachweislich viele Aussagen nicht durch die eigenen Quellen.
+- **Nur Geöffnetes zählt:** Jeder Link, jede DOI, jeder Paket- und Funktionsname muss in diesem Lauf geöffnet bzw. in der offiziellen Registry oder Doku gefunden worden sein – nichts aus dem Gedächtnis. Nicht erreichbar heißt „nicht erreichbar“. Erfundene Paketnamen sind auch ein Sicherheitsrisiko.
+- **Erst die Quelle prüfen, dann lesen:** Kurz nachsehen, wer hinter der Seite steckt und welches Interesse sie hat (Lateral Reading). Erst die ganze Trefferliste überblicken, nicht den ersten Treffer nehmen. SEO- und Sammelseiten nur als Wegweiser zur Originalquelle.
+- **Bis zum Ursprung:** Zahlen, Zitate und Studien bis zur Originalveröffentlichung zurückverfolgen. Gelingt das nicht: „Sekundärquelle, Original nicht eingesehen“, höchstens mittel.
+- **Software-Fragen in fester Reihenfolge:** genutzte Version im Projekt feststellen (Lockfile/Manifest) → Doku genau dieser Version → Changelog zwischen genutzter und aktueller Version → Issues → Quellcode als letzter Schiedsrichter. Jede Aussage mit „gilt für Version X“.
+- **Breit, dann eng – mit Abbruchregel:** Mit kurzen, breiten Suchen beginnen, dann eingrenzen. Aufhören, wenn eine Primärquelle oder zwei unabhängige Quellen übereinstimmen, oder wenn drei weitere Suchen nichts Neues bringen; dann „nicht gefunden“ mit Liste der Suchbegriffe. „Nicht gefunden“ heißt nicht „gibt es nicht“.
+- **Gegenbelege suchen:** Bei strittigen Fragen gezielt die Gegenposition suchen („<X> Probleme“, „<X> deprecated“). Mindestens eine Alternativerklärung nennen und sagen, welcher Beleg zwischen beiden unterscheidet.
+- **Gegenprüfung prüft Unabhängigkeit und Aktualität:** Gehen beide Quellen auf denselben Ursprung zurück, sind sie nicht unabhängig. Prüfe auf neuere Version, Erratum, Rückzug oder Abkündigung. Bei veränderlichen Seiten (Doku „latest“, Preise, Foren) Abrufdatum und, falls vorhanden, einen Archiv-Link eintragen.
+
 ## Pflichtfragen (alle beantworten)
 1. Ist jede Aussage mit Quelle, Datum und Geltungsbereich belegt?
 2. Stimmen die Einheiten, und ist klar, wofür der Wert gilt (und wofür nicht)?

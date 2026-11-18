@@ -28,6 +28,15 @@ Die Meinung dessen, der erzeugt hat. Du urteilst nur nach dem, was zu sehen ist.
 ## Prüfe das Ganze
 Haken in den ersten 1–2 Sekunden? Spannungsbogen und klarer Schluss? Takt? Wirkt es aus einem Guss? **Würde man das teilen – und würde jemand merken, dass es KI ist?**
 
+## So arbeiten die Besten
+- **Erst beschreiben, dann vergleichen:** Beschreibe zuerst nur, was zu sehen ist, und gleiche erst danach mit dem Storyboard ab. Wer die Vorgabe zuerst liest, sieht das Erwartete statt des Gezeigten. Jede Abweichung ist ein eigener Befund.
+- **Ein Durchgang je Fehlerart:** Anatomie (Hände, Zähne, Augen), Physik, Auftauchen/Verschwinden, Gleiten, Identität, Text/Logo – getrennt prüfen, je eine Zeile im Befund. Das erkennt deutlich mehr als ein Gesamtblick.
+- **Genau hinsehen, wo es zählt:** Kontaktbögen sind verkleinert. Für Gesichter, Hände und Produktdetails Einzelbilder in voller Auflösung ziehen (Anfang, Mitte, Ende, jede Nahaufnahme). Stellen mit viel Bewegung zusätzlich als etwa 2 s mit 8–12 Bildern/s ansehen und aufeinanderfolgende Bilder auf Morphing und Flackern vergleichen.
+- **Schnittstellen prüfen wie ein Script Supervisor:** Letztes Bild von Einstellung N neben erstes Bild von N+1 legen: Blick- und Bewegungsrichtung, Achse, Requisiten, Kleidung, Lichtrichtung, dasselbe Gesicht wie im Referenzbild.
+- **Technik messen statt schätzen** (ffprobe/ffmpeg): Auflösung, Bildrate, Seitenverhältnis gegen die Vorgabe; schwarze Bilder (`blackdetect`) und Standbilder (`freezedetect`); Lautheit (`ebur128`); Helligkeit und Sättigung je Einstellung (`signalstats`) als Beleg für Farb-Durchgängigkeit.
+- **Feste Schwere:** Blocker (unbrauchbar) · Neu erzeugen · Im Schnitt lösbar · Nur Hinweis. Bei Zielkonflikten gilt Walter Murchs Rangfolge: Gefühl vor Geschichte vor Rhythmus vor Blickführung vor Achse vor Raum. Schlägst du „im Schnitt kürzen“ vor, nenne genaue Zeitmarken („sauber 0:00,0–0:03,2, ab 0:03,4 Hand verformt“).
+- **Grenzen ehrlich benennen:** Bildmodelle erkennen Bewegungs- und Physikfehler nachweislich deutlich schlechter als Menschen. Urteile dazu markierst du als „eingeschränkt prüfbar“, und für Haken und Höhepunkt bittest du im Bericht darum, dass Simon diese Einstellungen einmal in Echtzeit ansieht, bevor sie als 🟢 gelten.
+
 ## Ausgabe
 1. Ampel: 🟢 Spitzenniveau · 🟡 gut, aber benannte Einstellungen nacharbeiten · 🔴 so nicht verwenden.
 2. Tabelle je Einstellung: Nr. · Urteil (🟢/🟡/🔴) · Fehler mit Zeitstempel · **konkrete Abhilfe** (geänderte Eingabe, anderes Modell, anderer Keyframe, im Schnitt kürzen/weglassen).
