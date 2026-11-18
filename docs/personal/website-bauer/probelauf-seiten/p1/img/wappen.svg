@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 70">
+  <title>JFG Seenland Wappen (Entwurf)</title>
+  <path d="M30 2 L56 9 V34 C56 51 44 62 30 68 C16 62 4 51 4 34 V9 Z" fill="#0b2232" stroke="#d4ff3f" stroke-width="3.5" stroke-linejoin="round"/>
+  <g fill="#d4ff3f">
+    <circle cx="19" cy="20" r="3.6"/>
+    <circle cx="30" cy="17" r="3.6"/>
+    <circle cx="41" cy="20" r="3.6"/>
+  </g>
+  <g fill="none" stroke="#3cc6d6" stroke-width="3.6" stroke-linecap="round">
+    <path d="M13 33 q4.25 -4 8.5 0 t8.5 0 t8.5 0 t8.5 0"/>
+    <path d="M13 42 q4.25 -4 8.5 0 t8.5 0 t8.5 0 t8.5 0"/>
+    <path d="M17 51 q3.25 -4 6.5 0 t6.5 0 t6.5 0 t6.5 0"/>
+  </g>
+</svg>

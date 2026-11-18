@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Holzmann – Schreinerei (Muster)</title>
+<style>
+@font-face { font-family: "Mona Sans"; font-style: normal; font-display: swap; font-weight: 200 900; font-stretch: 75% 125%;
+  src: url(fonts/mona-sans-latin-wdth-normal.woff2) format("woff2-variations");
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: "Mona Sans"; font-style: normal; font-display: swap; font-weight: 200 900; font-stretch: 75% 125%;
+  src: url(fonts/mona-sans-latin-ext-wdth-normal.woff2) format("woff2-variations"); unicode-range: U+0100-02BA,U+1E00-1E9F; }
+:root { --grund: #d8d2c9; --text: #1d1915; --leise: #5f564c; --eiche: #8a5526; }
+* { box-sizing: border-box; margin: 0; }
+html { background: var(--grund); }
+body { font-family: "Mona Sans", system-ui, sans-serif; color: var(--text); background: var(--grund); }
+.platzhalter { outline: 1px dashed #b3402a; outline-offset: 2px; }
+header { position: fixed; inset: 0 0 auto 0; display: flex; justify-content: space-between; align-items: center; padding: 22px clamp(16px, 4vw, 48px); z-index: 5; font-size: 15px; }
+header a { color: inherit; text-decoration: none; }
+.marke { font-weight: 700; font-stretch: 110%; letter-spacing: -0.01em; }
+.anfrage { padding: 12px 18px; min-height: 44px; display: inline-flex; align-items: center; background: var(--text); color: var(--grund) !important; border-radius: 999px; font-weight: 600; }
+.held { position: relative; height: 230vh; }
+.buehne { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+.wort { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-58%); text-align: center; font-weight: 820; font-stretch: 125%;
+  font-size: clamp(64px, 17.5vw, 300px); letter-spacing: -0.045em; line-height: .8; color: #c3bbb0; user-select: none; will-change: transform; }
+canvas#szene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.unten { position: absolute; left: clamp(16px, 4vw, 48px); right: clamp(16px, 4vw, 48px); bottom: clamp(20px, 5vh, 48px); display: flex; justify-content: space-between; align-items: end; gap: 24px; }
+.unten h1 { font-size: clamp(22px, 2.4vw, 34px); font-weight: 560; font-stretch: 100%; letter-spacing: -0.02em; line-height: 1.12; max-width: 17ch; }
+.unten p { font-size: 15px; line-height: 1.5; color: var(--leise); max-width: 34ch; text-align: right; }
+.zwei { padding: 18vh clamp(16px, 4vw, 48px) 22vh; display: grid; grid-template-columns: 1fr 1fr; gap: 6vw; align-items: start; }
+.zwei h2 { font-size: clamp(36px, 5.2vw, 84px); font-weight: 760; font-stretch: 112%; letter-spacing: -0.035em; line-height: .95; }
+.zwei p { font-size: 18px; line-height: 1.6; color: var(--leise); max-width: 46ch; }
+.zwei p + p { margin-top: 1em; }
+.zwei .anfrage { margin-top: 28px; }
+footer { padding: 28px clamp(16px, 4vw, 48px); font-size: 13px; color: var(--leise); display: flex; justify-content: space-between; border-top: 1px solid #c3bbb0; }
+footer a { color: inherit; }
+.ohne3d .wort { color: var(--text); }
+@media (max-width: 760px) { .unten { flex-direction: column; align-items: start; } .unten p { text-align: left; } .zwei { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .held { height: 100vh; } }
+</style>
+</head>
+<body>
+<header>
+  <a class="marke" href="#">Holzmann</a>
+  <a class="anfrage" href="#kontakt">Projekt anfragen</a>
+</header>
+<main>
+  <section class="held" aria-label="Einstieg">
+    <div class="buehne">
+      <div class="wort" aria-hidden="true">HOLZMANN</div>
+      <canvas id="szene" aria-label="Hocker aus Massivholz, dreht sich beim Scrollen" role="img"></canvas>
+      <div class="unten">
+        <h1>Möbel, die man ein Leben lang benutzt.</h1>
+        <p>Schreinerei in <span class="platzhalter">Musterort</span>. Küchen, Einbaumöbel, Treppen und Türen, geplant und gebaut in der eigenen Werkstatt.</p>
+      </div>
+    </div>
+  </section>
+  <section class="zwei" id="kontakt">
+    <h2>Gefügt, nicht geschraubt.</h2>
+    <div>
+      <p>Jedes Stück entsteht bei uns von der ersten Skizze bis zur Montage. Sie sprechen die ganze Zeit mit denselben Leuten.</p>
+      <p>Rufen Sie an oder schreiben Sie uns, was Sie vorhaben. Ein Foto vom Raum reicht für den Anfang.</p>
+      <a class="anfrage platzhalter" href="mailto:info@schreinerei-holzmann.example">info@schreinerei-holzmann.example</a>
+    </div>
+  </section>
+</main>
+<footer><span>Muster · Hocker: „Wooden Stool 02“ von Kuutti Siitonen, Poly Haven (CC0)</span><a href="#">Impressum</a></footer>
+
+<script type="importmap">{ "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/jsm/" } }</script>
+<script type="module">
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { HDRLoader } from "three/addons/loaders/HDRLoader.js";
+
+const canvas = document.getElementById("szene");
+const ruhig = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" }); }
+catch (e) { document.body.classList.add("ohne3d"); canvas.remove(); throw e; }
+
+// Rechenlast deckeln: Pixeldichte am Desktop höchstens 1,25, am Handy höchstens 2 (Vorbild: landonorris.com)
+const dichte = () => Math.min(devicePixelRatio, innerWidth > 768 ? 1.25 : 2);
+renderer.setPixelRatio(dichte());
+renderer.toneMapping = THREE.AgXToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+const szene = new THREE.Scene();
+const kamera = new THREE.PerspectiveCamera(28, 1, 0.1, 50);   // lange Brennweite = wenig Verzerrung
+
+// Licht: echtes Studiofoto (HDRI) für Spiegelungen und weiches Grundlicht, dazu ein Hauptlicht für den Schatten
+new HDRLoader().load("assets/studio_1k.hdr", (hdr) => {
+  hdr.mapping = THREE.EquirectangularReflectionMapping;
+  szene.environment = hdr; szene.environmentIntensity = 0.9; zeichnen();
+});
+const sonne = new THREE.DirectionalLight(0xfff1e0, 2.2);
+sonne.position.set(2.5, 4, 2);
+sonne.castShadow = true;
+sonne.shadow.mapSize.set(1024, 1024);
+sonne.shadow.radius = 6;
+Object.assign(sonne.shadow.camera, { left: -1, right: 1, top: 1, bottom: -1, near: 0.5, far: 10 });
+szene.add(sonne);
+const boden = new THREE.Mesh(new THREE.PlaneGeometry(6, 6), new THREE.ShadowMaterial({ opacity: 0.22 }));
+boden.rotation.x = -Math.PI / 2; boden.receiveShadow = true; szene.add(boden);
+
+let hocker;
+new GLTFLoader().load("assets/stuhl/wooden_stool_02_1k.gltf", (g) => {
+  hocker = g.scene;
+  hocker.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  const box = new THREE.Box3().setFromObject(hocker), groesse = box.getSize(new THREE.Vector3());
+  hocker.position.y -= box.min.y;
+  hocker.userData.hoehe = groesse.y;
+  szene.add(hocker); groesseAnpassen(); zeichnen();
+});
+
+let fortschritt = 0;
+function zeichnen() {
+  const h = hocker ? hocker.userData.hoehe : 0.5;
+  // Kamera fährt langsam heran, der Hocker dreht sich um höchstens 20° (ruhige Bewegung, ein Wow-Moment)
+  const p = ruhig ? 0 : fortschritt;
+  const e = 1 - Math.pow(1 - p, 3);
+  kamera.position.set(0, h * (0.95 - 0.25 * e), h * (4.6 - 1.4 * e));
+  kamera.lookAt(0, h * 0.48, 0);
+  if (hocker) hocker.rotation.y = -0.55 + e * 0.35;
+  renderer.render(szene, kamera);
+}
+function groesseAnpassen() {
+  const w = canvas.clientWidth, hh = canvas.clientHeight;
+  renderer.setPixelRatio(dichte()); renderer.setSize(w, hh, false);
+  kamera.aspect = w / hh; kamera.fov = w < 760 ? 40 : 28; kamera.updateProjectionMatrix(); zeichnen();
+}
+addEventListener("resize", groesseAnpassen);
+const held = document.querySelector(".held"), wort = document.querySelector(".wort");
+let angefordert = false;
+addEventListener("scroll", () => {
+  if (angefordert) return; angefordert = true;
+  requestAnimationFrame(() => {
+    angefordert = false;
+    const r = held.getBoundingClientRect();
+    fortschritt = Math.min(1, Math.max(0, -r.top / (r.height - innerHeight)));
+    if (!ruhig) wort.style.transform = `translateY(-58%) translateX(${-fortschritt * 6}vw)`;
+    zeichnen();   // nur zeichnen, wenn sich etwas bewegt
+  });
+}, { passive: true });
+groesseAnpassen();
+</script>
+</body>
+</html>
