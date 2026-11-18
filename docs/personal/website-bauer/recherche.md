@@ -88,3 +88,21 @@ Impressum nach § 5 DDG bei geschäftsmäßigen Seiten. Ohne Cookies, Browser-Sp
 
 ## Unbelegt
 Vorbild-Bildschirmfotos als Beispiele für den KI-Kritiker bei Websites · automatische Erkennung leerer Flächen · Obergrenze für Draw Calls auf iGPU · Messungen auf echter Prozessorgrafik (nur SwiftShader) · Core Web Vitals der Preisträger · Prozessberichte weiterer Studios (Codrops blockiert) · Tagessieger bei Vereinsseiten · Impressumspflicht für Vereine.
+
+## Herkunft der Regeln im Plugin
+| Regel (Datei, Abschnitt) | gegen | Herkunft |
+|---|---|---|
+| handwerk.md 1 Idee, Markentausch, Plan gegen Standard und Gegenteil, keine Superlative | W1 | Lusion, OFF+BRAND/Lando, Anthropic-Skill frontend-design, Impeccable, Anthropic Harness-Artikel; echter Fall Dorfverein (Flutlicht) |
+| handwerk.md 2 Vorbilder öffnen, Tabelle der Werte | W3 | Probelauf P4, NN/g (2025), Impeccable, Anthropic Claude Design |
+| handwerk.md 3 KI-Merkmale | W1 | Anthropic-Skill 2026, Impeccable, Anthropic Cookbook; Probelauf P1/P2 |
+| handwerk.md 4 Zahlen | W1 | Messung an 11 Preisträgern (Strang D), NN/g, Material 3, Practical Typography, Apple HIG |
+| handwerk.md 5 Echtes Motiv, 3D aus Fotos | W2 | Strang D (11 Preisträger), Lusion, Immersive Garden, The Rundown, Muster vom 18.11. |
+| handwerk.md 6 Lesbarkeit | W9 | W3C F83/1.4.3, Deque axe-Doku, NN/g; Probelauf P3 |
+| handwerk.md 7 Nichts erfinden | W4 | Probelauf P2, Impeccable |
+| handwerk.md 9, pruefen.mjs W7 Lieferung | W7 | Probelauf P1/P3/P4 |
+| 3d-leistung.md | W6, W2 | Simons Laptop-Test, Strang D (Messung), web.dev Hobbit, Code landonorris.com, discoverthreejs, Don McCurdy, detect-gpu, CSS-Tricks, Blender-Messung 18.11. |
+| bilder.md | W2 | Lizenzseiten Unsplash, Pexels, Poly Haven, Openverse-API (selbst getestet 18.11.), LG München I |
+| recht.md | Recht | DDG § 5, TDDDG § 25, LG München I |
+| Skill: Kritiker, 3 Runden, beste Fassung behalten | W5, W8 | Anthropic Harness-Artikel, Sansford u. a. (Amazon), MLLM as a UI Judge, UICrit |
+| Skill: Stopp 1 mit grauen Rohfassungen | W1, W3 | Abeto (Igloo Inc), Bornfight, Ablauf Video-Editor |
+| Sperren und Abschluss-Sperre | Grenzen, W5 | Simons Entscheidungen 18.11., Lehre Video-Editor (Pflichtschritte als Sperre) |

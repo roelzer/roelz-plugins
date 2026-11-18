@@ -193,6 +193,7 @@ Hunderte Tests helfen nichts, wenn keiner prüft, ob ein Ergebnis **fachlich üb
    claude plugin install dev-team-tafel@roelz-plugins
    claude plugin install personal@roelz-plugins
    claude plugin install video@roelz-plugins
+   claude plugin install website@roelz-plugins
    ```
    **Automatische Updates einschalten:** in Claude Code `/plugin` → Marketplaces → `roelz-plugins` → Auto-update aktivieren. Dann holt jeder Rechner neue Versionen beim Start selbst; ein Update-Befehl ist nicht nötig (von Hand: `claude plugin marketplace update roelz-plugins`). Neue Versionen werden nur erkannt, wenn die Versionsnummer in `plugin.json` steigt, das tut sie bei jeder Änderung.
    **Lektionen und Wissen** landen im Gehirn (`roelzer/brain`), nicht mehr im Plugin-Ordner. Deshalb braucht es keinen lokalen Klon mehr; das Gehirn richtest du in Schritt 4 pro Rechner ein.
@@ -266,6 +267,20 @@ Damit der Lauf nicht bei der ersten Rückfrage stehen bleibt, braucht Claude Cod
 - **Grenzen:** Alle Agenten sind Claude. Mehrere Instanzen haben ähnliche blinde Flecken. Das Team mildert das mit unterschiedlichen Modellen, Werkzeugen ohne KI (Tests, Linter, Scanner) und verdeckten Tests. Die stärkste Absicherung bleiben deine Referenzfälle, die von dir bestätigten Fachregeln und eure gegenseitige Abnahme vor Kundenauslieferungen.
 - **Parallele Entwickler** sparen Zeit nur bei wirklich unabhängigen Paketen. Eine Studie von 2026 (CAID) fand das beste Ergebnis bei etwa vier parallelen Entwicklern; mit mehr wurde es wieder schlechter. Wir starten vorsichtig mit **höchstens drei** und erhöhen erst, wenn die eigenen Messwerte (`.dev-team/kennzahlen.jsonl`) es rechtfertigen. Kollidieren zwei beim Zusammenführen, wird das Paket neu gebaut, nicht von Hand geflickt. Das kostet Tokens; der Pragmatiker prüft vorher, ob sich die Parallelität lohnt.
 
+
+## Website-Bauer einrichten (einmal je Projekt)
+
+Der Website-Bauer (`/website:bauen`) ist **in der Probearbeit**, also noch nicht eingestellt. Er baut statische Seiten nur mit kostenlosen Werkzeugen.
+1. **Node** muss da sein (Windows: `winget install OpenJS.NodeJS.LTS`).
+2. **Playwright** für Bildschirmfotos und das Prüfskript, einmal im Projektordner (PowerShell):
+   ```
+   npm i -D playwright
+   npx playwright install chromium
+   ```
+3. **Ansehen:** Der Website-Bauer startet am Ende eine Vorschau. Öffne sie auf deinem Laptop und scroll einmal durch. Nur dort sieht man, ob es flüssig läuft.
+4. **Veröffentlichen:** nur, wenn du nach der Vorschau ausdrücklich Ja sagst. Dann kostenlos über Cloudflare, einmalig `npx wrangler login`. Claude Code fragt dich bei jedem Veröffentlichungs-Befehl noch einmal.
+
+**Was er nie tut:** fremde Server in die Seite einbauen (Google Fonts, Tracker, CDNs), Kunden, Zahlen oder Bewertungen erfinden, Dateien von fremden Seiten übernehmen oder ohne dein Ja veröffentlichen.
 
 ## Video-Editor einrichten (einmal je Rechner)
 

@@ -34,6 +34,12 @@
       "source": "./plugins/video",
       "description": "Video-Editor (zurückgestellt bis bessere Hardware): Erklär-, Produkt- und Vorführvideos, Reels, Trailer und Schnitte auf Profi-Niveau – nur kostenlose lokale Werkzeuge (HyperFrames, ffmpeg), mit Storyline-Freigabe, unabhängigem Kritiker und Sperre gegen Kosten und Uploads.",
       "category": "productivity"
+    },
+    {
+      "name": "website",
+      "source": "./plugins/website",
+      "description": "Website-Bauer: Vereins-, Firmen-, Muster- und Projektseiten mit 3D auf Spitzenniveau – nur kostenlose Werkzeuge, kein KI-Look. Vorbilder und Idee zuerst, echte Bilder, Prüfskript ohne KI, unabhängiger Kritiker, Veröffentlichen nur auf Simons Ja.",
+      "category": "productivity"
     }
   ]
 }

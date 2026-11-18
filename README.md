@@ -5,6 +5,7 @@ Claude-Code-Marktplatz mit diesen Plugins:
 - `plugins/dev-team` – festes Senior-Entwicklungsteam (Version 3): Projektleitung, Architekt, Entwickler (auch parallel), unabhängige Prüfer, verdeckte Abnahmetests, Teamzwang und Test-Schranke technisch erzwungen
 - `plugins/dev-team-tafel` – Tafel neben dem Chat: wer im Dev-Team gerade arbeitet, Ergebnisse, Sperren, Teststand
 - `plugins/tool-scout` – prüft fertige Skills/Agenten/Plugins vor der Installation
+- `plugins/website` – **in Probearbeit**, der Website-Bauer: Vereins-, Firmen-, Muster- und Projektseiten mit 3D auf Spitzenniveau, nur kostenlose Werkzeuge, kein KI-Look
 - `plugins/video` – **zurückgestellt bis bessere Hardware**, der Video-Editor: Erklär-, Produkt- und Vorführvideos, Reels, Trailer und Schnitte auf Profi-Niveau, nur mit kostenlosen lokalen Werkzeugen
 - `plugins/personal` – der Personaler: stellt neue Agenten, Skills und Plugins ein (Profi-Recherche, Stellenausschreibung, gemessene Probearbeit) und schult bestehende nach
 
