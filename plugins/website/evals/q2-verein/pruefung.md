@@ -1,4 +1,4 @@
 ---
-type: pruefung
-ohne: W1,W7,W9
+# alle harten Befunde zählen (Ausschreibung: 0 harte Treffer)
+ohne: 
 ---

@@ -75,7 +75,7 @@ Leg für alles Fehlende eine begründete Annahme fest: Zweck, Zielgruppe, was Be
   - bei Verbesserungen zusätzlich `arbeit/inhaltsliste.md`
 
   Er bekommt **nicht** deine Begründungen.
-- Korrigieren und neu prüfen, **höchstens 3 Runden**. Jede Runde sicherst du nach `arbeit/runden/<n>/` mit Note des Kritikers. **Am Ende gilt die Fassung mit der besten Note**, nicht automatisch die letzte.
+- Korrigieren und neu prüfen, **höchstens 3 Runden**. Jede Runde sicherst du nach `arbeit/runden/<n>/`, die Antwort des Kritikers wörtlich als `arbeit/runden/<n>/kritik.md`. Die Abschluss-Sperre prüft das und die 3 Vorbild-Fotos. **Am Ende gilt die Fassung mit der besten Note**, nicht automatisch die letzte.
 
 ## 6. Vorschau (Stopp 2)
 Simon öffnet die Seite **auf seinem Laptop**: `npx --yes serve website/<name>/site`, dann die angezeigte Adresse im Browser. Dazu kurz:

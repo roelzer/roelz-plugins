@@ -99,8 +99,21 @@ class Abschluss(unittest.TestCase):
     def test_gepruefte_seite_frei(self):
         open(os.path.join(self.ws, "website", "x", "site", "index.html"), "w").close()
         time.sleep(1.2)
-        open(os.path.join(self.ws, "website", "x", "arbeit", "pruefung", "pruefung.json"), "w").close()
+        arbeit = os.path.join(self.ws, "website", "x", "arbeit")
+        open(os.path.join(arbeit, "pruefung", "pruefung.json"), "w").close()
+        os.makedirs(os.path.join(arbeit, "vorbilder")); os.makedirs(os.path.join(arbeit, "runden", "1"))
+        for i in range(3):
+            open(os.path.join(arbeit, "vorbilder", "v%d.png" % i), "w").close()
+        open(os.path.join(arbeit, "runden", "1", "kritik.md"), "w").close()
         self.assertIsNone(hook("abschluss.mjs", {"cwd": self.ws}))
+
+    def test_ohne_kritik_und_vorbilder_blockt(self):
+        open(os.path.join(self.ws, "website", "x", "site", "index.html"), "w").close()
+        time.sleep(1.2)
+        open(os.path.join(self.ws, "website", "x", "arbeit", "pruefung", "pruefung.json"), "w").close()
+        r = hook("abschluss.mjs", {"cwd": self.ws})
+        self.assertEqual(r["decision"], "block")
+        self.assertIn("Vorbild", r["reason"]); self.assertIn("kritik.md", r["reason"])
 
     def test_nur_einmal_je_stopp(self):
         open(os.path.join(self.ws, "website", "x", "site", "index.html"), "w").close()

@@ -50,7 +50,7 @@ def wert(v):
     return v
 
 
-def bewerte(fall_ordner, ws, vorher, protokoll, letzte, pruefung=None):
+def bewerte(fall_ordner, ws, vorher, protokoll, letzte, pruefung=None, arm="mit"):
     ergebnisse = []
     werkzeugaufrufe = []
     for zeile in protokoll:
@@ -63,6 +63,8 @@ def bewerte(fall_ordner, ws, vorher, protokoll, letzte, pruefung=None):
     for g in sorted(glob.glob(os.path.join(fall_ordner, "graders", "*.md"))):
         f, rumpf = frontmatter(open(g, encoding="utf-8").read())
         typ, gewicht = wert(f.get("type")), float(wert(f.get("weight")) or 1)
+        if wert(f.get("arm")) == "mit" and arm != "mit":
+            continue   # Weg-Prüfpunkt des Plugins (Kritiker gerufen, idee.md …): zählt nur im Mit-Arm, nicht für Δ
         name = os.path.basename(g)[:-3]
         ok, info = False, ""
         alle = {os.path.relpath(p, ws).replace(os.sep, "/") for p in glob.glob(os.path.join(ws, "**", "*"), recursive=True) if os.path.isfile(p)}
@@ -143,7 +145,7 @@ def ein_lauf(fall, arm, nr, ziel):
     if arm == "mit":
         befehl += ["--plugin-dir", PLUGIN]
     env = dict(os.environ, DO_NOT_TRACK="1")
-    for k in ("GEMINI_API_KEY", "GOOGLE_API_KEY", "OPENROUTER_API_KEY", "OPENAI_API_KEY"):
+    for k in [k for k in os.environ if k.startswith("CLOUDFLARE_")] + ["GEMINI_API_KEY", "GOOGLE_API_KEY", "OPENROUTER_API_KEY", "OPENAI_API_KEY"]:
         env.pop(k, None)
     start = time.time()
     try:
@@ -161,6 +163,9 @@ def ein_lauf(fall, arm, nr, ziel):
         except ValueError:
             pass
     ende = next((z for z in reversed(protokoll) if z.get("type") == "result"), {})
+    # Welche Skills waren geladen? (Der Konto-Skill „website-bauen“ konkurriert in beiden Armen – sichtbar machen)
+    init = next((z for z in protokoll if z.get("type") == "system" and z.get("subtype") == "init"), {})
+    skills = [x if isinstance(x, str) else x.get("name", "") for x in init.get("skills", []) or []]
     letzte = ende.get("result") or ""
     with open(os.path.join(lauf, "letzte_nachricht.md"), "w", encoding="utf-8") as d:
         d.write(letzte)
@@ -173,7 +178,7 @@ def ein_lauf(fall, arm, nr, ziel):
         j = os.path.join(aus, "pruefung.json")
         if os.path.exists(j):
             pruefung = json.load(open(j, encoding="utf-8"))
-    score, ergebnisse = bewerte(fall_ordner, ws, vorher, protokoll, letzte, pruefung)
+    score, ergebnisse = bewerte(fall_ordner, ws, vorher, protokoll, letzte, pruefung, arm)
     # Aufräumen: Zwischendateien (node_modules, Einzelbilder, große Zwischenstände) – Ergebnis und Texte bleiben
     for wurzel, ordner, dateien in os.walk(ws, topdown=True):
         for o in list(ordner):
@@ -190,7 +195,7 @@ def ein_lauf(fall, arm, nr, ziel):
             except OSError:
                 pass
     return {"fall": fall, "arm": arm, "nr": nr, "score": score, "graders": ergebnisse, "fehler": fehler,
-            "kosten_usd": ende.get("total_cost_usd"), "dauer_s": round(time.time() - start), "zuege": ende.get("num_turns"),
+            "kosten_usd": ende.get("total_cost_usd"), "konto_skill_geladen": any("website-bauen" in x for x in skills), "dauer_s": round(time.time() - start), "zuege": ende.get("num_turns"),
             "p0": [b for b in (pruefung or {}).get("befunde", []) if b["schwere"] == "P0"] if pruefung else None, "ordner": lauf}
 
 
