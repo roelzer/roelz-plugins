@@ -1,5 +1,14 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.22.0 – Profi-Recherche: so arbeiten die Besten
+
+Anlass: Simon: „Für jeden Agenten recherchieren, wie die besten Fachleute in ihrem Gebiet arbeiten und wie die Besten ihre Agenten gestaltet haben – damit wir irgendwann das beste Dev-Team haben, das es gibt.“ Neun parallele Recherchen (je zwei Rollen plus eine rollenübergreifende zu Anthropic, Mitarbeitern und Experten), Quellen in `docs/VORBILDER.md`, Abschnitt „Profi-Recherche 2026-11“.
+- **Alle 15 Agenten** (und der Video-Kritiker im Video-Studio 1.1.0) haben einen neuen Abschnitt **„So arbeiten die Besten“** mit 7–8 prüfbaren Regeln aus zwei Fragen: Wie arbeiten die besten menschlichen Fachleute? Wie haben die Besten KI-Agenten für diese Rolle gebaut? Nur Lücken, keine Wiederholungen; Schreibbereiche, Werkzeuge und Schranken unverändert.
+- Durchgehende Muster: erst eigenes Urteil, dann fremde Behauptungen lesen (Reviewer, Kritiker, Video-Kritiker, Fachprüfer); jeden Befund vor der Meldung zu widerlegen versuchen (Reviewer, Sicherheitsprüfer); Erkanntes nicht kleinreden und nicht unter Druck kippen (Kritiker, Produktprüfer); Schwere nach festem Raster (Designer, Produktprüfer, Video-Kritiker); „nicht geprüft“ sichtbar machen statt still grün.
+- Auditor: „die zehn wichtigsten“ Schwachstellen heißt jetzt „bis zu zehn“ (keine Füllbefunde).
+- `wissen/oberflaeche.md`: keine Standardschrift Inter mehr, Schrift je Projekt begründet (Widerspruch zum Designer behoben).
+- Rollenübergreifende Vorschläge (Eichset für Prüfer, Grundgesetz entschlacken, Filter bei Prüfern, Auftragsvorlage, Lektionen konsolidieren, Wächter `onFailure: block`, `effort` je Rolle u. a.) sind **nicht** umgesetzt, sondern als Liste für Simons Entscheidung in `docs/VORBILDER.md`.
+
 ## 3.21.1 – Projekt-Check beim Start
 
 Anlass: Simon fing ein „neues“ Projekt an, das sich als Erweiterung eines bestehenden herausstellte; das Wissen über alte Projekte kam nicht mit.

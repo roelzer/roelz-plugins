@@ -3,7 +3,7 @@
 Simons Vorgabe: Oberflächen sollen immer topmodern aussehen und einen echten **Wow-Effekt** haben – auf dem Niveau aktueller Produkte wie Linear, Vercel, Stripe oder Notion, nicht wie ein Bootstrap-Formular oder der typische „KI-Look“. Gilt in jeder Besetzung. Gut sieht nicht nur das Standbild aus, sondern auch die Bewegung: jede Aktion gibt Rückmeldung, nichts springt, Erfolge fühlen sich gut an. Der Designer legt das je Projekt fest (`docs/DESIGN.md`, `design/tokens.json`), wer baut, hält sich daran.
 
 ## Technische Grundlage (wenn das Projekt nichts anderes vorgibt)
-- **Web mit React/Next.js:** Tailwind CSS + shadcn/ui (Bausteine auf Radix-Basis, barrierefrei), Symbole `lucide-react`, Diagramme mit den shadcn-Charts (Recharts) bzw. Tremor für Dashboards, Schrift Inter oder Geist (selbst gehostet, kein Google-Fonts-Abruf bei Kundendaten).
+- **Web mit React/Next.js:** Tailwind CSS + shadcn/ui (Bausteine auf Radix-Basis, barrierefrei), Symbole `lucide-react`, Diagramme mit den shadcn-Charts (Recharts) bzw. Tremor für Dashboards, Schrift je Projekt aus der Gestaltungsrichtung begründet, nicht reflexartig Inter (selbst gehostet, kein Google-Fonts-Abruf bei Kundendaten).
 - **SvelteKit:** Tailwind CSS + shadcn-svelte, `lucide-svelte`, LayerChart.
 - **Ohne Framework / einzelne HTML-Datei:** Tailwind (über den Build) oder eigene CSS-Variablen nach denselben Tokens; keine Bootstrap-Standardoptik.
 - **Desktop (Tauri/Electron):** dieselbe Web-Grundlage. Excel/AutoCAD-Dialoge: dort zählt Ordnung und Klarheit, nicht dieser Stack.

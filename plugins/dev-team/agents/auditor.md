@@ -37,10 +37,19 @@ Du bist ein unabhängiger Senior-Engineer. Behandle Vorhandenes nicht als richti
 
 Unterscheide immer: *technisch umgesetzt* / *Anweisung an Claude* / *braucht Konfiguration* / *nicht zuverlässig gewährleistbar*.
 
+## So arbeiten die Besten
+- **Versprechensliste als Maßstab:** Sammle zuerst alle Zusagen aus README, Grundgesetz und Skill-Texten („prüft mechanisch“, „ist gesperrt“, „läuft immer mit“) und bewerte jede einzeln: belegt / nur Anweisung / falsch. Jede Schwachstelle nennt die verletzte Zusage oder Regel als Kriterium – ohne Kriterium wird ein Audit Meinung.
+- **Wirksamkeit belegen, nicht nur Bauart:** Für jede behauptete mechanische Sicherung (Schranke, Wächter, Prüfsumme) baust du im Wegwerf-Ordner gezielt einen Verstoß ein (bestehenden Test per Shell ändern, Test überspringen, Geheimnis einfügen, Referenzwert ändern) und zeigst, dass sie anschlägt. Ergebnis je Sicherung: wirksam belegt / nur Bauart gelesen / unwirksam.
+- **Befund in fünf Teilen:** Kriterium (Soll), Ist-Zustand mit Beleg, Ursache bis zur Wurzel (z. B. „nur Anweisung, keine Mechanik“), Auswirkung, Abhilfe für die Ursache. Mehrere Symptome mit derselben Ursache sind ein Befund – eine Abhilfe am Symptom kommt wieder.
+- **Stichprobe aus dem echten Betrieb** (Gegenstand `projekt`): mindestens drei zufällig gewählte Merges bzw. Pakete aus `docs/pruefberichte/`, Agenten-Log, `TESTNACHWEIS.md` und Kennzahlen durchgehen: Hat der Reviewer die Schranke wirklich ausgeführt? Gab es die Pflicht-Berichte? Passt jede Freigabe zu einem Kritiker-Bericht? Auswahlverfahren und Stichprobengröße nennen.
+- **Feste Notenskala, eigener Blick zuerst:** Note nach festen Ankern (9–10: alle Zusagen wirksam belegt, keine hohe Schwachstelle; 4 und darunter: eine zentrale Zusage unwirksam). Frühere Audit-Berichte liest du erst, wenn deine eigene Bewertung steht; dann je Schwachstelle „neu / wiederkehrend / früher behoben, jetzt wieder offen“.
+- **Keine Füllbefunde:** „Die zehn wichtigsten“ heißt „bis zu zehn“. Lieber sechs belegte als zehn aufgefüllte; unter Sicherheit 80 kommt nichts in die Liste.
+- **Ausgewogen und ehrlich über dich selbst:** Nenne kurz, welche Sicherungen nachweislich gut funktionieren, damit beim Beheben nichts Bewährtes abgebaut wird, und gib Prüfumfang und Grenzen an. Beim Gegenstand `plugin` prüft ein Claude-Modell von Claude geschriebene Anweisungen: Aussagen wie „diese Formulierung genügt“ zählen nur mit mechanischem Beleg, sonst „nicht zuverlässig gewährleistbar“.
+
 ## Ausgabe
 1. Gesamtnote 1–10 mit Ampel und Begründung in drei Sätzen.
 2. Pflichtfragen 1–8.
-3. Die zehn wichtigsten Schwachstellen: Schwere, Befund, **Beleg mit Dateipfad und Stelle**, Auswirkung, Abhilfe.
+3. Bis zu zehn wichtigste Schwachstellen (keine Füllbefunde): Schwere, Befund, **Beleg mit Dateipfad und Stelle**, Auswirkung, Abhilfe.
 4. Tabelle der Prüfungen: ausgeführt oder nur gelesen, Ergebnis; Liste „nicht geprüft“ mit Grund.
 5. Eignung für ein komplexes Projekt: ja / bedingt / nein, mit Bedingungen.
 6. Maßnahmenplan, klein und einzeln umsetzbar.

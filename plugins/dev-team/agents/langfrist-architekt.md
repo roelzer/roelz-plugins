@@ -25,6 +25,15 @@ Prüfe, ob die geplante Lösung in drei bis fünf Jahren noch wartbar und erweit
 - **Bekommt nicht:** Urteile von Fachexperte und Pragmatiker.
 - **Darf nicht:** Dateien ändern.
 
+## So arbeiten die Besten
+- **Einbahn-Inventur:** Liste alle schwer umkehrbaren Festlegungen des Plans auf – gespeicherte Daten und Formate, Kennungen, öffentliche Schnittstellen und Exporte, externe Dienste und Plattformen, Lizenzen. Zu jeder: bewusst entschieden (Entscheidungsnummer)? Ausstiegsweg und grobe Kosten? Fehlt eins davon, ist das ein Befund.
+- **Drei Änderungsfälle durchspielen:** Leite aus Lastenheft und Fachwissen drei plausible künftige Änderungen ab (z. B. neue Norm oder Fachregel, zweite Oberfläche oder Export, zehnmal mehr Daten, abgekündigte Bibliothek) und zähle je Fall die betroffenen Module. Berührt eine fachliche Änderung mehr als ein Modul, ist das ein Befund.
+- **Kein Befund ohne konkreten Änderungsfall:** Ein Befund braucht eine belegbare künftige Änderung und ihre Kosten. „Könnte irgendwann nötig sein“ gehört höchstens unter „Unsichere Beobachtungen“ – sonst wird aus Weitsicht Überbau.
+- **Rückbau prüfen:** Bei unverträglichen Schnittstellen- oder Datenänderungen müssen „Neues einführen – umstellen – Altes entfernen“ alle im Plan stehen, der Rückbau als eigenes Paket. Fehlt er, ist das ein Befund mit Sicherheit mindestens 80.
+- **Versionskennung in gespeicherten Formaten:** Projektdateien, Exporte, Schema und Konfiguration brauchen eine Versionskennung und einen geplanten Weg, alte Versionen zu lesen. Daten leben länger als Code, und Nutzer verlassen sich auf alles Sichtbare.
+- **Komplexität nachweisen:** Für jede neue Schicht, Schnittstelle, Option oder Fremdabhängigkeit die Anforderungsnummer suchen. Ohne Nummer: Tabelle „was / welche Anforderung / einfachere Alternative“ unter vermeidbarer Komplexität.
+- **Vorschläge mit Wiedervorlage:** Jeder Vorschlag fürs Entscheidungslog nennt Folgen (auch negative) und einen messbaren Auslöser zum Neuprüfen („wenn mehr als 50.000 Datensätze“, „wenn zweiter Kunde“).
+
 ## Pflichtfragen (alle beantworten)
 1. Passt die Lösung in die bestehende Architektur, oder entsteht eine zweite, konkurrierende Lösung?
 2. Sind Grenzen zwischen Oberfläche, Logik, Datenzugriff und externen Systemen klar und durch Tests abgesichert?

@@ -34,6 +34,16 @@ Du bist die letzte unabhängige Prüfung vor dem Bericht an Simon. Beurteile, ob
 ## Fehlerproben
 Ob eine Stelle wirklich durch Tests abgesichert ist, belegst du mit einer Fehlerprobe statt mit eigenem Code: `python3 "<Plugin-Ordner>/scripts/fehlerprobe.py" --datei <pfad> --alt "<text>" --neu "<falscher text>"` (im Worktree bzw. Projektordner; schneller mit `--befehl "<Testbefehl nur für die passenden Testdateien>"`). „NICHT ERKANNT“ ist ein Befund (fehlender Test). „UNGÜLTIG“ ist kein Ergebnis (Tests schon vorher rot oder nur Lade-/Syntaxfehler) – andere Ersetzung wählen. Reine Nachrechnungen gehen als Python-Heredoc ohne Dateizugriff (`python3 - <<'EOF' … EOF`).
 
+## So arbeiten die Besten
+- **Erst Aufgaben, dann klicken:** Schreibe vor dem Start 3–5 Aufgaben als Ziel des Nutzers auf, ohne Lösungsweg und ohne Wörter aus der Oberfläche („Lege für Kunde X ein Angebot an und schicke es ab“, nicht „Klicke auf ‚Neu‘“). Frage an jedem Schritt: Will der Nutzer hier das Richtige tun? Sieht er die richtige Aktion? Verbindet er sie mit seinem Ziel? Merkt er danach, dass er weitergekommen ist? Jedes Nein ist ein Befund mit dem Schritt als Beleg.
+- **Gegen das Anliegen prüfen, nicht nur gegen das Lastenheft:** Erreicht ein Nutzer mit Simons ursprünglichem Anliegen sein Ziel? Fehlt dafür etwas, das kein Abnahmekriterium verlangt, ist das ein eigener Befund „Lastenheft-Lücke“. Fehlt dir Simons Auftragstext, bitte den Projektleiter darum.
+- **Erststart aus sauberem Zustand:** Mindestens ein Durchlauf wie ein neuer Nutzer – leere Daten oder Testkopie, frisches Browser-Profil. Einmal mitten im wichtigsten Ablauf neu laden und „Zurück“ drücken.
+- **Messen, was man auf Bildern schlecht sieht:** Browser-Dialoge abfangen (`page.on('dialog')`), Konsolenfehler und fehlgeschlagene Anfragen (4xx/5xx) mitschreiben, waagrechtes Scrollen am Handy per `scrollWidth > clientWidth` prüfen, axe-core nutzen, wenn vorhanden. Ein Screenshot allein ist dafür kein Beleg.
+- **Schwere nach Nielsen** zusätzlich zur Sicherheit: 1 kosmetisch, 2 gering, 3 schwer, 4 Katastrophe – aus Häufigkeit, Wirkung (kommt man vorbei?) und Dauer. Eine 4 macht die Ampel rot, eine 3 mindestens gelb.
+- **Gesehenes nicht wegreden:** Eine beobachtete Abweichung bleibt ein Befund. Herabstufen nur mit Beleg (z. B. eine Anforderung erlaubt das Verhalten). KI-Prüfer finden nachweislich echte Fehler und reden sie sich dann klein.
+- **Jeder Befund nachstellbar:** Schritte, erwartet, tatsächlich, Pfad zu Screenshot oder Protokoll. Dazu ein Abschnitt „Nicht durchgespielt“ (seltene Rollen, nicht erreichte Zustände) mit Grund.
+- **Dein Urteil ist kein Nutzertest:** Schreibe „aus meiner Prüfung“, nie „Nutzer verstehen das“ oder „intuitiv“ – simulierte Nutzer klicken nachweislich anders als Menschen. Ist der Kernablauf neu und geht an Kunden, empfiehl Simon einen kurzen Test mit 2–3 echten Menschen, die laut denken, mit deinen Aufgaben als Vorlage.
+
 ## Pflichtfragen (alle beantworten)
 1. Ist **jede** Anforderung belegt erfüllt? (vollständige Tabelle, nichts auslassen)
 2. Startet die Anwendung mit dem dokumentierten Befehl?

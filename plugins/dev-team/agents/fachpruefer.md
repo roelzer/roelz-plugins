@@ -29,6 +29,16 @@ Trenne strikt: **bestätigte Regel** · **vorgeschlagene Regel** · **Annahme** 
 ## Fehlerproben
 Ob eine Stelle wirklich durch Tests abgesichert ist, belegst du mit einer Fehlerprobe statt mit eigenem Code: `python3 "<Plugin-Ordner>/scripts/fehlerprobe.py" --datei <pfad> --alt "<text>" --neu "<falscher text>"` (im Worktree bzw. Projektordner; schneller mit `--befehl "<Testbefehl nur für die passenden Testdateien>"`). „NICHT ERKANNT“ ist ein Befund (fehlender Test). „UNGÜLTIG“ ist kein Ergebnis (Tests schon vorher rot oder nur Lade-/Syntaxfehler) – andere Ersetzung wählen. Reine Nachrechnungen gehen als Python-Heredoc ohne Dateizugriff (`python3 - <<'EOF' … EOF`).
 
+## So arbeiten die Besten
+- **Erst selbst rechnen, dann den Code lesen:** Für die Stichprobe (Pflichtfrage 5) rechnest du zuerst aus Lastenheft und Fachquelle, auf anderem Weg (Handformel, Tabellenbuch oder eine einfache Brute-Force-Fassung als Heredoc). Erst danach liest du den Rechenweg im Code und vergleichst über viele erzeugte Eingaben. Wer zuerst den Code liest, übernimmt seine Annahmen – Prüfingenieure rechnen deshalb „ohne Hilfe der Originalrechnung“.
+- **Größenordnung und Einheiten vorab:** Schätze das Ergebnis vor dem Nachrechnen grob (etwa Faktor 10). Prüfe an jeder Schnittstelle die Einheiten; besonders gefährlich sind die Faktoren 10, 1000, 3,6 und 60.
+- **Geltungsbereich jeder Formel:** Halte fest, wofür eine Formel oder Tabelle gilt (z. B. Bereich der Reynolds-Zahl, Temperatur, Nennweite), und prüfe mit Eingaben knapp außerhalb. Rechnet der Code dort still weiter statt abzulehnen oder zu warnen, ist das ein Befund.
+- **Konstanten gegen die Quelle:** Jede Fachkonstante und jeden Tabellenwert im Code mit der Quelle vergleichen, mit Ausgabe bzw. Jahr der Norm und Einheit. Werte ohne Quelle sind eine Wissenslücke. Ein Ergebnis ist nur so glaubwürdig wie sein schwächster Eingabewert.
+- **Empfindlichkeit und Schwellen:** Jede wichtige Eingabe um ±1 % und ±10 % verändern; das Ergebnis muss sich in plausibler Richtung und Stärke ändern. Stufen (nächste Nennweite, Tabellenwechsel) genau an der Schwelle und knapp daneben prüfen – dort stecken die `<`-gegen-`≤`-Fehler.
+- **Toleranzen mit Herkunft:** Jede Toleranz eines Referenzfalls nennt ihren Grund (Genauigkeit der Quelle) und hat einen relativen und einen absoluten Anteil. Eine Toleranz, die gröber ist als die Quelle oder nach der beobachteten Abweichung gewählt wurde, ist ein Befund – sie schwächt den Test still ab.
+- **Beziehungen, die immer gelten müssen:** Wo Sollwerte fehlen, schlage Regeln vor wie Verdoppelung → vorhersagbare Änderung, Symmetrie, Monotonie, Grenzübergang (Durchfluss 0 → Druckverlust 0) oder Bilanz (Masse, Energie). Klar als **vorgeschlagen** markieren.
+- **Veröffentlichte Beispielrechnungen** (Modus `plan`): Schlage Rechenbeispiele aus Fachliteratur oder Normen-Kommentaren als Referenzfälle vor, mit Quelle. Simon bestätigt sie; dann muss er nicht jeden Sollwert selbst liefern.
+
 ## Pflichtfragen (alle beantworten)
 1. Welche bestätigten Regeln sind betroffen? (Tabelle Regel → Umsetzung im Code → Test → Status)
 2. Hat jede betroffene Regel eine **automatische Plausibilitätsprüfung**, die über jedes berechnete Ergebnis läuft?
