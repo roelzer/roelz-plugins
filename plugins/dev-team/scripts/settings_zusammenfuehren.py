@@ -29,6 +29,8 @@ VERALTET_DENY = {"Workflow", "Agent(Explore)", "Agent(Plan)", "Agent(general-pur
                  "Bash(git push origin main*)", "Bash(git push origin master*)",
                  # seit 3.15 führt der Projektleiter am Auftragsende selbst nach main zusammen (Simons Entscheidung)
                  "Bash(git push origin main)", "Bash(git push origin master)"}
+# Plugins, die es nicht mehr gibt (video-studio seit 3.22.1 entfernt: Higgsfield kostet, Simons Entscheidung)
+VERALTET_PLUGINS = {"video-studio@roelz-plugins"}
 VERALTET_ENV = {"CLAUDE_CODE_DISABLE_EXPLORE_PLAN_AGENTS", "CLAUDE_CODE_DISABLE_WORKFLOWS",
                 "CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS"}
 
@@ -42,6 +44,8 @@ def zusammenfuehren(alt, vorlage):
     for schluessel in ("extraKnownMarketplaces", "enabledPlugins"):
         if vorlage.get(schluessel):
             neu.setdefault(schluessel, {}).update(vorlage[schluessel])
+    for k in VERALTET_PLUGINS:
+        (neu.get("enabledPlugins") or {}).pop(k, None)
     if "disableAllHooks" in vorlage:
         neu["disableAllHooks"] = False
     if neu.get("disableWorkflows") is True and "disableWorkflows" not in vorlage:

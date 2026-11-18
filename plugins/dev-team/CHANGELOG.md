@@ -1,5 +1,11 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.22.1 – Video-Studio entfernt
+
+Anlass: Simon: „Das Video-Studio können wir löschen, Higgsfield kostet ja und ist somit für uns raus.“
+- Plugin `video-studio` (samt Video-Kritiker) aus dem Repo und dem Marktplatz entfernt.
+- Projektvorlage schaltet es nicht mehr ein; `settings_zusammenfuehren.py` nimmt den alten Eintrag in bestehenden Projekten beim nächsten Abgleich heraus (`/dev-team:projekt-aufnehmen`). Test: `test_entferntes_plugin_wird_ausgeschaltet`.
+
 ## 3.22.0 – Profi-Recherche: so arbeiten die Besten
 
 Anlass: Simon: „Für jeden Agenten recherchieren, wie die besten Fachleute in ihrem Gebiet arbeiten und wie die Besten ihre Agenten gestaltet haben – damit wir irgendwann das beste Dev-Team haben, das es gibt.“ Neun parallele Recherchen (je zwei Rollen plus eine rollenübergreifende zu Anthropic, Mitarbeitern und Experten), Quellen in `docs/VORBILDER.md`, Abschnitt „Profi-Recherche 2026-11“.

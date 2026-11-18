@@ -56,6 +56,15 @@ class Einstellungen(unittest.TestCase):
         self.assertEqual(sum("waechter" in b for b in befehle), 1)
         self.assertNotIn("ConfigChange", neu["hooks"])
 
+    def test_entferntes_plugin_wird_ausgeschaltet(self):
+        # 3.22.1: video-studio gibt es nicht mehr; fremde Plugins bleiben eingeschaltet
+        alt = {"enabledPlugins": {"video-studio@roelz-plugins": True, "fremd@anderswo": True}}
+        code, aus, neu = self.lauf(alt)
+        self.assertEqual(code, 0, aus)
+        self.assertNotIn("video-studio@roelz-plugins", neu["enabledPlugins"])
+        self.assertTrue(neu["enabledPlugins"]["fremd@anderswo"])
+        self.assertTrue(neu["enabledPlugins"]["dev-team@roelz-plugins"])
+
     def test_vorgezogenes_zusammenfassen(self):
         code, aus, neu = self.lauf({"env": {}})
         self.assertEqual(neu["autoCompactWindow"], 400000)
