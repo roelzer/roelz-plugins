@@ -19,14 +19,24 @@ Sprich Deutsch, kurz, ohne Fachchinesisch. Simon hat **zwei Stopps**: die Storyl
 - Arbeitsordner `video/<kurzer-name>/` im Projekt anlegen (`arbeit/`, `ausgabe/`, `pruefung/`). Jede Eingabedatei von Simon mit Pfad in `video/<name>/ORIGINALE.txt` eintragen, danach nur noch mit Kopien in `arbeit/` arbeiten.
 - HyperFrames-Skills lesen: Den Pfad liefert `node ${CLAUDE_PLUGIN_ROOT}/scripts/hf.mjs skills-pfad`. Lies `hyperframes/SKILL.md` und die Referenzen, die es für deine Videoart nennt (z. B. `types/explainer.md`, `types/vertical.md`, `types/launch.md`, `story.md`, `spec.md`, `motion.md`, `look.md`, `review.md`). CLI-Befehle daraus führst du immer als `node ${CLAUDE_PLUGIN_ROOT}/scripts/hf.mjs <befehl>` aus.
 
-## 1. Briefing
-Was fehlt, fragst du in **einer** Nachricht mit höchstens 4 Fragen, jeweils mit Vorschlag: Ziel und Kernaussage in einem Satz · Plattform und Format (16:9, 9:16, 1:1) und Länge · Material (Dateien, App, Marke) · Ton (Musik, Sprecher, stumm). Was Simon schon gesagt hat, fragst du nicht.
-**Material prüfen** (`ffprobe`): Gibt es das Zielformat scharf her? Gibt es eine wechselnde Bildrate oder keine Tonspur? Wenn nicht, hältst du hier an und schlägst einen Weg vor (siehe `handwerk.md`, „Material schneiden“).
+## 1. Annahmen statt Fragerunde
+Simon hat nur zwei Stopps. Deshalb fragst du hier **nicht** nach, sondern legst für alles Fehlende eine begründete Annahme fest:
+- Ziel und Kernaussage
+- Plattform, Format und Länge (Reel 9:16 mit 15–25 s, Website 16:9 mit 30 s, LinkedIn 1:1 oder 4:5)
+- Ton (bei Feeds stumm lesbar mit Musik)
+- Gestaltung (Apple-Richtung, aus dem Thema abgeleitet)
+
+Die Annahmen zeigst du an Stopp 1 zusammen mit den Storylines. **Vorher fragen nur, wenn ohne Antwort nichts Sinnvolles entstehen kann.** Beispiele: Es gibt weder Material noch ein erkennbares Thema, oder eine Grenze wäre verletzt (Kosten, Lizenz, Original).
+
+**Material prüfen** (`ffprobe`): Gibt es das Zielformat scharf her? Gibt es eine wechselnde Bildrate oder keine Tonspur? Gibt das Material das Format nicht her, hältst du an und schlägst einen Weg vor (siehe `handwerk.md`, „Material schneiden“).
 
 ## 2. Storylines und Stilproben (Stopp 1)
+In **einer** Nachricht an Simon, und zwar **mit den Bildern**, nicht nur mit Worten:
+- **Deine Annahmen** aus Schritt 1, je in einer Zeile. Simon korrigiert nur, was nicht passt.
 - **Drei Storylines in Worten**, die drei verschiedene Filme sind (nach `story.md` der HyperFrames-Skills), je mit Haken der ersten 2 s, Ablauf und Ton in einer Zeile.
-- **2–3 Stilproben:** dieselbe Schlüsselszene in 2–3 Gestaltungen als Standbild (`hf.mjs snapshot`), in Apple-Richtung nach `handwerk.md`, abgeleitet aus Thema bzw. Marke. Nie die verbotenen Standardlösungen.
-- Simon wählt Storyline und Stil. Bei „mach einfach“ nimmst du die stärkste Kombination und nennst kurz, warum.
+- **2–3 Stilproben als echte Bilder:** dieselbe Schlüsselszene in 2–3 Gestaltungen, als HyperFrames-Komposition gebaut und mit `hf.mjs snapshot` als PNG gespeichert in `video/<name>/stilproben/`. In Apple-Richtung nach `handwerk.md`, abgeleitet aus Thema bzw. Marke, nie mit den verbotenen Standardlösungen. Zeig Simon die Bilder bzw. ihre Pfade.
+
+Simon wählt Storyline und Stil. Bei „mach einfach“ nimmst du die stärkste Kombination und nennst kurz, warum.
 
 ## 3. SPEC
 Schreib `video/<name>/SPEC.md` nach `spec.md` der HyperFrames-Skills, ergänzt um unsere Zahlen aus `handwerk.md`:
