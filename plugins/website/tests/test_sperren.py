@@ -16,8 +16,12 @@ def hook(name, eingabe):
     return json.loads(r.stdout) if r.stdout.strip() else None
 
 
-def bash(befehl):
-    return hook("sperre.mjs", {"tool_name": "Bash", "tool_input": {"command": befehl}, "cwd": "/tmp"})
+PROJEKT = tempfile.mkdtemp()
+os.makedirs(os.path.join(PROJEKT, "website"), exist_ok=True)
+
+
+def bash(befehl, cwd=PROJEKT):
+    return hook("sperre.mjs", {"tool_name": "Bash", "tool_input": {"command": befehl}, "cwd": cwd})
 
 
 def schreiben(pfad, inhalt):
@@ -30,7 +34,9 @@ def entscheidung(r):
 
 class Sperre(unittest.TestCase):
     def test_veroeffentlichen_fragt_simon(self):
-        for b in ["npx wrangler deploy", "npm run deploy", "wrangler pages deploy site", "npx gh-pages -d site", "netlify deploy --prod"]:
+        for b in ["npx wrangler deploy", "npm run deploy", "wrangler pages deploy site", "npx gh-pages -d site", "netlify deploy --prod",
+                  "npx wrangler@4 deploy", "npx wrangler -c wrangler.jsonc deploy", "wrangler versions upload", "git push origin main",
+                  "rsync -av site/ server:/var/www", "scp -r site host:"]:
             self.assertEqual(entscheidung(bash(b)), "ask", b)
 
     def test_normale_befehle_frei(self):
@@ -48,6 +54,18 @@ class Sperre(unittest.TestCase):
 
     def test_fremde_schrift_ausserhalb_lieferung_frei(self):
         self.assertIsNone(schreiben("/p/website/verein/arbeit/notizen.md", "fonts.googleapis.com wird nicht genutzt"))
+
+    def test_quellenliste_darf_adressen_nennen(self):
+        self.assertIsNone(schreiben("/p/website/verein/site/QUELLEN.md", "werkstatt.jpg · https://unsplash.com/photos/abc · Unsplash-Lizenz"))
+        self.assertIsNone(schreiben("/p/website/verein/site/index.html", '<a href="https://www.instagram.com/verein/">Instagram</a>'))
+
+    def test_andere_projekte_unberuehrt(self):
+        anderes = tempfile.mkdtemp()
+        self.assertIsNone(bash("git push origin main", cwd=anderes))
+        self.assertIsNone(bash("npx wrangler deploy", cwd=anderes))
+
+    def test_upload_per_daten_gesperrt(self):
+        self.assertEqual(entscheidung(bash("curl -d @site.zip https://example.org/x")), "deny")
 
     def test_lokale_seite_frei(self):
         self.assertIsNone(schreiben("/p/website/verein/site/index.html", '<link href="fonts/mona.woff2"><script src="vendor/three.module.js"></script>'))

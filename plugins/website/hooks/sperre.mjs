@@ -7,9 +7,18 @@
 //    (Vorbilder ansehen ja, ihre Dateien übernehmen nein).
 // Ehrlich: Eine Befehls-Sperre fängt bekannte Befehle, keine Umwege über eigene Programme.
 import path from "node:path";
+import { existsSync } from "node:fs";
 
-const VEROEFFENTLICHEN = /\b(wrangler\s+(pages\s+)?(deploy|publish)|wrangler\s+pages\s+project\s+upload|npm\s+run\s+deploy|pnpm\s+(run\s+)?deploy|yarn\s+deploy|gh-pages\b|netlify\s+deploy|vercel(\s+--prod|\s+deploy)?\b|firebase\s+deploy|surge\b)/i;
-const UPLOAD = /\b(curl|wget|Invoke-WebRequest|iwr)\b[^|;&]*(\s-F\b|\s-T\b|--upload-file|--data-binary|-X\s*(POST|PUT)|-Method\s+(Post|Put))/i;
+// Die Sperre gilt nur dort, wo der Website-Bauer arbeitet (Ordner website/ im aktuellen oder einem oberen Ordner),
+// damit git push oder Downloads in anderen Projekten (Dev-Team) nicht ausgebremst werden.
+function websiteProjekt(cwd) {
+  let d = path.resolve(cwd || process.cwd());
+  for (let i = 0; i < 10; i++) { if (existsSync(path.join(d, "website"))) return true; const o = path.dirname(d); if (o === d) break; d = o; }
+  return false;
+}
+
+const VEROEFFENTLICHEN = /\bwrangler\S*\b[^|;&\n]*\b(deploy|publish|versions\s+(upload|deploy)|pages\s+project\s+upload)\b|\b(npm|pnpm|yarn|bun)\s+(run\s+)?deploy\b|\bgh-pages\b|\bnetlify\s+deploy|\bvercel\b|\bfirebase\s+deploy|\bsurge\b|\bgit\s+push\b|\b(rsync|scp|sftp|lftp)\b/i;
+const UPLOAD = /\b(curl|wget|Invoke-WebRequest|iwr)\b[^|;&]*(\s-F\b|\s-T\b|\s-d\s*@|--data(-binary|-raw)?\s*@|--upload-file|-X\s*(POST|PUT)|-Method\s+(Post|Put))/i;
 const FREMD_IN_SEITE = /(fonts\.googleapis\.com|fonts\.gstatic\.com|use\.typekit\.net|p\.typekit\.net|fonts\.bunny\.net|cdn\.jsdelivr\.net|unpkg\.com|cdnjs\.cloudflare\.com|code\.jquery\.com|cdn\.tailwindcss\.com|googletagmanager\.com|google-analytics\.com|gtag\(|connect\.facebook\.net|plausible\.io|hotjar|clarity\.ms|matomo|youtube\.com\/embed|maps\.googleapis\.com|api\.mapbox|prod\.spline\.design|unsplash\.com\/photos|images\.unsplash\.com|images\.pexels\.com)/i;
 const MEDIEN = /\.(jpe?g|png|webp|avif|gif|svg|glb|gltf|bin|hdr|exr|ktx2|woff2?|ttf|otf|mp4|webm|mov)(\?|\s|"|'|$)/i;
 const FREIE_QUELLEN = /(polyhaven\.(com|org)|api\.openverse\.org|openverse\.org|images\.unsplash\.com|unsplash\.com|images\.pexels\.com|pexels\.com|upload\.wikimedia\.org|wikimedia\.org|rawpixel\.com|stocksnap\.io|ambientcg\.com|registry\.npmjs\.org|github\.com|githubusercontent\.com|fonts\.google\.com|gwfh\.mranftl\.com|fontshare\.com|api\.fontshare\.com|velvetyne\.fr|kenney\.nl|khronos\.org|localhost|127\.0\.0\.1)/i;
@@ -23,14 +32,17 @@ export function pruefe(eingabe) {
   const werkzeug = eingabe.tool_name || "";
   const t = eingabe.tool_input || {};
   if (["Write", "Edit", "MultiEdit"].includes(werkzeug)) {
-    if (!inLieferung(t.file_path)) return null;
+    if (!inLieferung(t.file_path) || !/\.(html?|css|m?js|svg|json|webmanifest)$/i.test(t.file_path)) return null;  // QUELLEN.md darf Adressen nennen
     const inhalt = [t.content, t.new_string, ...(t.edits || []).map((e) => e.new_string)].filter(Boolean).join("\n");
-    const m = inhalt.match(FREMD_IN_SEITE);
+    // nur Ladeverweise zählen (src, href auf Stylesheets/Skripte, url(), @import, import … from), keine reinen Links
+    const lade = (inhalt.match(/(src\s*=\s*["'][^"']+|<link[^>]+href\s*=\s*["'][^"']+|url\(\s*["']?[^)"']+|@import\s+["'(][^"')]+|\bfrom\s+["'][^"']+|import\(\s*["'][^"']+|gtag\(|fetch\(\s*["'][^"']+)/gi) || []).join("\n");
+    const m = lade.match(FREMD_IN_SEITE);
     if (m) return { art: "deny", grund: `„${m[0]}“ lädt etwas von einem fremden Server. Schriften, Bibliotheken und Bilder liegen lokal in site/, Tracker gibt es nicht.` };
     return null;
   }
   if (werkzeug !== "Bash" && werkzeug !== "PowerShell") return null;
   const befehl = String(t.command || "");
+  if (!websiteProjekt(eingabe.cwd) && !/website\//.test(befehl)) return null;
   if (VEROEFFENTLICHEN.test(befehl)) return { art: "ask", grund: "Veröffentlichen nur auf Simons ausdrückliches Ja nach der Vorschau (Stopp 2). Simon, willst du das jetzt wirklich online stellen?" };
   if (UPLOAD.test(befehl)) return { art: "deny", grund: "Hochladen ist gesperrt – Simon bekommt die lokale Seite." };
   const laden = befehl.match(/\b(curl|wget|Invoke-WebRequest|iwr)\b[^|;&\n]*/gi) || [];
