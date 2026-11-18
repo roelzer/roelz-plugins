@@ -1,0 +1,13 @@
+{
+  "description": "Video-Sperre: blockt Bezahl-/Upload-/Telemetrie-Befehle, HyperFrames am Starter vorbei und Änderungen an Original-Dateien.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell|Write|Edit|MultiEdit|NotebookEdit",
+        "hooks": [
+          { "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/sperre.mjs\"", "timeout": 10 }
+        ]
+      }
+    ]
+  }
+}

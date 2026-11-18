@@ -1,6 +1,6 @@
 # Stellenausschreibung: Video-Editor
 
-Stand: 18.11.2026 · Version 2 (nach Prüfung durch den personal-pruefer, 🟡 → nachgebessert) · Status: wartet auf Simons Freigabe
+Stand: 18.11.2026 · Version 2 (nach Prüfung durch den personal-pruefer, 🟡 → nachgebessert) · Status: **von Simon freigegeben am 18.11.2026** (mit den Entscheidungen unten)
 
 ## 1. Auftrag in einem Satz
 Er macht für Simon Videos auf Profi-Niveau, nur mit kostenlosen Werkzeugen: Erklär- und Produktvideos aus Code, Vorführvideos seiner Software, Social-Reels und Schnitte aus vorhandenem Material.
@@ -145,6 +145,14 @@ Die ersten etwa 10 Videos. Jede Beanstandung wird erst ein Testfall, dann eine R
 4. Sprecherstimme „thorsten“ (kostenlos, lokal) oder lieber Musik mit Texteinblendungen?
 5. Testaufwand: volle Variante (3 Läufe, ≈ 100–260 $ Nutzung) oder Spar-Variante (2 Läufe)?
 6. „Nichts nach außen“ gilt auch, wenn du selbst „lad hoch“ sagst? Vorschlag: Ja, er liefert immer nur die Datei.
+
+## Simons Entscheidungen an Stopp 1 (18.11.2026)
+1. **Maßstab:** Probevideo 1 und 2 sehen „krass nach KI“ aus, 3 ist ganz gut, 4 lässt sich an Standbildern schwer beurteilen. Deshalb bekommt Simon an Stopp 2 die **Videos selbst** zum Anschauen und Anhören. Gestaltung **in Apple-Richtung, nicht sichtbar KI**: Apples Prinzipien (Zurückhaltung, echtes Produkt im Mittelpunkt, präzise Typografie, ruhige und bestimmte Kamera, Licht und Luft), nicht Apples Marke oder die Schrift SF Pro (deren Lizenz gilt nur für Apple-Plattformen).
+2. Die Aufgaben passen.
+3. Noch keine eigene Marke. Gestaltung je Video aus dem Thema, in Apple-Richtung.
+4. **Keine Stimme „thorsten“.** Gewünscht sind verschiedene Stimmen, auch Charakterstimmen mit Gefühl, etwa für Trailer. Das wird gesondert recherchiert: kostenlos, kommerziell nutzbar, lokal, Deutsch. Stimmen echter Personen nur mit deren Einwilligung.
+5. Testaufwand: die **volle Variante** („was ich für ein optimales Ergebnis brauche“).
+6. „Nichts nach außen“ gilt auch, wenn Simon „lad hoch“ sagt: Er bekommt immer nur die Datei.
 
 ## Änderungen nach der Prüfung (personal-pruefer, Version 1 → 2)
 - Qualitätsfälle in drei Schichten. Der externe Kritiker ist nur Vorfilter, Simon entscheidet (K1).
