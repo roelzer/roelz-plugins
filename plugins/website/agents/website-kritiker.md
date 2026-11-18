@@ -48,6 +48,8 @@ Je Kriterium eine Note 1–10 mit einem Satz Begründung und einem Bildbeleg. Ge
 6. Steht irgendwo eine Aussage, die erfunden wirkt (Zahlen, Kunden, Versprechen, Lebenslauf)?
 7. Stimmen die Messwerte des Prüfskripts mit deinem Eindruck überein?
 8. Bei Verbesserung: Sind alle Inhalte und Funktionen aus der Inhaltsliste erhalten?
+9. Sind Hausschrift, Farben und Sprüche des Auftraggebers erhalten (falls es welche gibt)?
+10. Sind auf Fotos erkennbare Kinder, und steht die Einwilligung in der Austauschliste?
 
 ## Ausgabe
 1. Ampel: 🟢 auf Höhe der Vorbilder · 🟡 gut, mit benannten Schwächen · 🔴 sieht nach Vorlage oder KI aus.

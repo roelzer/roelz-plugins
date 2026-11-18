@@ -106,3 +106,32 @@ Vorbild-Bildschirmfotos als Beispiele für den KI-Kritiker bei Websites · autom
 | Skill: Kritiker, 3 Runden, beste Fassung behalten | W5, W8 | Anthropic Harness-Artikel, Sansford u. a. (Amazon), MLLM as a UI Judge, UICrit |
 | Skill: Stopp 1 mit grauen Rohfassungen | W1, W3 | Abeto (Igloo Inc), Bornfight, Ablauf Video-Editor |
 | Sperren und Abschluss-Sperre | Grenzen, W5 | Simons Entscheidungen 18.11., Lehre Video-Editor (Pflichtschritte als Sperre) |
+
+## Sicherheit (Strang E, 18.11.2026, auf Simons Wunsch „keine Sicherheitslücken, keine Daten im Frontend, nicht angreifbar“)
+| Praktik | Quelle | Belastbarkeit |
+|---|---|---|
+| Header über `_headers` statt `<meta>` (nur so wirkt `frame-ancestors` gegen Clickjacking); Grenzen 100 Regeln, 2000 Zeichen je Zeile | Cloudflare Static Assets Headers; OWASP CSP Cheat Sheet | hoch |
+| Strenge CSP `default-src 'none'`, nur `'self'`, Inline nur per sha256-Hash, kein `unsafe-inline`/`unsafe-eval` in `script-src`; per JS gesetzte `element.style`-Werte bleiben erlaubt (GSAP läuft) | Mozilla HTTP Observatory (Bewertung aus `charts.js`), MDN style-src, OWASP | hoch |
+| Nichts von fremden Servern (Lieferkette): polyfill.io 2024 traf über 100.000 Seiten; OWASP Top 10 2025 A03 Supply Chain | Sansec, Cloudflare-Blog, OWASP Top 10 2025 | hoch |
+| Lieferordner gegen Positivliste prüfen, `.assetsignore` (Source Maps, .env, .git, Pakete) | Cloudflare Docs, Vite build-options | hoch |
+| Geheimnisse suchen (gitleaks plus eigene Muster) | gitleaks README | hoch |
+| Metadaten entfernen: Fotos (EXIF/GPS), PDFs (exiftool löscht bei PDF nicht wirklich, erst `qpdf --linearize`). **Beim SFH-Neubau gefunden: Autorennamen von Privatpersonen in 3 PDFs** | exiftool FAQ und PDF-Tags | hoch |
+| Eigener Code ohne innerHTML/eval/document.write; Text mit textContent | OWASP DOM-XSS Cheat Sheet | hoch |
+| `npm ci --ignore-scripts`, `npm audit` | npm Docs | hoch |
+| HSTS 2 Jahre, ohne preload (monatelang nicht rücknehmbar) | OWASP, hstspreload.org, Mozilla | hoch |
+| Cloudflare: Always HTTPS, TLS ≥ 1.2 an; Bot Fight Mode aus (kollidiert mit CSP); Email Obfuscation nach Livegang prüfen | Cloudflare Docs | hoch |
+Umsetzung: `scripts/kopfzeilen.mjs` (Header mit Hashes), Prüfungen in `pruefen.mjs` (Kennung „Sicherheit“), `wissen/sicherheit.md`, Testseite `tests/seiten/unsicher`.
+
+## Recht (Strang F, 18.11.2026)
+| Regel | Quelle | Belastbarkeit |
+|---|---|---|
+| Impressum § 5 DDG, § 18 MStV, auf jeder Seite, höchstens zwei Klicks; Pflichtangaben je Fall (e. V., Einzelunternehmer, Handwerk) | gesetze-im-internet.de, BGH I ZR 228/03 | hoch |
+| Ohne Cookies, Speicher und fremde Server kein Banner (§ 25 TDDDG); Fremdinhalte übertragen IP (DSK Rn. 99); Google Fonts von Google unzulässig | TDDDG, DSK OH Telemedien, LG München I 3 O 17493/20 | hoch |
+| Datenschutzerklärung auch ohne Cookies (Art. 13 DSGVO): Hoster, Server-Logs, mailto; Cloudflare-DPA im Free-Vertrag, USA über DPF, Rückfall SCC (DPF beim EuGH angegriffen, C-703/25 P) | dsgvo-gesetz.de, Cloudflare DPA und Privacy Policy, EU-Kommission | hoch/mittel |
+| Kinderfotos nur mit bestätigter Elterneinwilligung (Aufsicht uneinig: BayLDA großzügiger, Stiftung Datenschutz „fast immer notwendig“) | KUG § 22, BayLDA FAQ, Stiftung Datenschutz | hoch (strenge Linie) |
+| Fotografen-Namensnennung, OSM-Vermerk, Unsplash ohne Personen-/Markenfreigabe | UrhG § 13, OSM Copyright, Unsplash License | hoch |
+| Musterseiten nur mit erfundenen Namen bzw. lokal/noindex; echte Firmennamen nur mit Ja | MarkenG § 15 | mittel |
+| BFSG: reine Präsentationsseiten, Kleinstunternehmen-Dienstleister, B2B nicht betroffen; betroffen z. B. Online-Terminbuchung ab 10 Beschäftigten | BFSG §§ 2, 3, 14; Bundesfachstelle FAQ 14, 19 | hoch |
+| Link zur EU-OS-Plattform entfernen (abgeschaltet 20.07.2025); § 36 VSBG erst ab 11 Beschäftigten | IHK Osnabrück, VO (EU) 2024/3228, VSBG | hoch |
+| Preise nur als Gesamtpreis inkl. MwSt. | PAngV § 3 | hoch |
+Umsetzung: `wissen/recht.md` (mit Gerüsten), Prüfungen in `pruefen.mjs` (Kennung „Recht“: Impressum-Link auf jeder Seite, OS-Plattform), Austauschliste im Skill, Kritiker-Pflichtfrage zu Kinderfotos.

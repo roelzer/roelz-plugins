@@ -5,7 +5,9 @@ Negativbeispiele: die Probelauf-Seiten in docs/personal/website-bauer/probelauf-
 Schreinerei) und kleine Testseiten in tests/seiten. Positivbeispiel: tests/seiten/gut.
 - P1 und P2 müssen bei W1 (KI-Look) anschlagen, P4 bei W2 (leere Foto-Platzhalter).
 - tests/seiten/w8-leer muss W8 (leere schwarze Fläche), w9-kontrast muss W9 (Text über hellem Bild) auslösen.
-- tests/seiten/gut darf keinen harten Befund haben.
+- tests/seiten/gut darf keinen harten Befund haben (mit _headers aus scripts/kopfzeilen.mjs).
+- tests/seiten/unsicher muss die Sicherheits- und Rechtsprüfungen auslösen (Inline-Ereignis, Schlüssel, Source Map,
+  EXIF/GPS im Foto, Autor im PDF, fehlende Header, OS-Plattform-Link).
 Hinweis: Der schwarze Balken aus P4 war ein Zustand beim Laden und ließ sich nicht wieder hervorrufen; W8 wird deshalb
 an einer Testseite geprüft. P3 (3D-Rundgang) ist ohne Grafikkarte zu langsam für einen Test.
 Braucht Node und Playwright mit Chromium. Dauer: einige Minuten.
@@ -55,9 +57,16 @@ class Eichung(unittest.TestCase):
         e = pruefen(os.path.join(SEITEN, "gut"))
         self.assertEqual(e["p0"], 0, [b["text"] for b in e["befunde"] if b["schwere"] == "P0"])
 
+    def test_unsichere_seite(self):
+        e = pruefen(os.path.join(SEITEN, "unsicher"))
+        texte = " | ".join(b["text"] for b in harte(e, "Sicherheit"))
+        for erwartet in ("Inline-Ereignis", "Schlüssel", "Interne Angabe", "EXIF", "PDF-Metadaten", "_headers fehlt"):
+            self.assertIn(erwartet, texte)
+        self.assertTrue(any("OS-Plattform" in b["text"] for b in harte(e, "Recht")))
+
     def test_lieferordner_mit_arbeitsdateien(self):
         d = tempfile.mkdtemp()
-        for f in ("index.html", "impressum.html", "datenschutz.html"):
+        for f in ("index.html", "impressum.html", "datenschutz.html", "_headers"):
             with open(os.path.join(SEITEN, "gut", f)) as q, open(os.path.join(d, f), "w") as z:
                 z.write(q.read())
         os.makedirs(os.path.join(d, "_pruefung"))

@@ -8,6 +8,8 @@ Stand 18.11.2026. Jede Regel stammt aus dem Probelauf (Fehler W1–W9, `docs/per
 - **Plan vor Code:** 4–6 Farben mit Hex-Wert und Herkunft, Schriftrollen, eine grobe Skizze des Aufbaus. Dann prüfen: „Käme ich bei einem ähnlichen Auftrag genauso hierhin?“ Ausgeschlossen sind **die Standardseite der Branche und ihr vorhersehbares Gegenteil**. Beispiele: SaaS-Schwarzweiß mit Kacheln bzw. Dark Mode mit Neon (Sport), Creme mit Serife und Terrakotta (Handwerk, „edel“).
 - Keine Superlative im eigenen Plan („preisverdächtig“, „museumsreif“). Sie führen nachweislich zu Einheitsergebnissen. Beschreib stattdessen konkret, was zu sehen ist.
 
+**Was der Auftraggeber schon hat, bleibt** (Simon zur SFH-Seite, 18.11.2026: „schriftart sollte aber die von der website davor bleiben, das is ja so bisschen unsere corporate schrift“). Hausschrift, Farben, Logo und eigene Sprüche des Auftraggebers werden übernommen, nicht durch eigene Ideen ersetzt. Gibt es eine bisherige Seite oder Drucksachen, prüfst du sie zuerst darauf. Eigene Sprüche schlägst du an Stopp 1 als Annahme vor, Simon korrigiert sie („Ein Dorf. Ein Verein.“ war „nicht so unsers“, besser „Grün-Weiß, ein Leben lang“).
+
 ## 2. Vorbilder wirklich ansehen (gegen W3)
 - Öffne **mindestens 3 Vorbilder** und fotografiere sie (Playwright, 1440 px und 390 px) nach `arbeit/vorbilder/`. Simons Vorbilder (Lando, Igloo) sind immer dabei. Dazu 1–2 aus der Branche, z. B. von Awwwards (Kategorie und Jury-Note ansehen).
 - Leite daraus eine Tabelle in `arbeit/idee.md` ab: **Vorbild → übernommener Gestaltungswert** (Schriftgrößen-Verhältnis, Laufweite, Farbanzahl, Art und Dauer der Bewegung, wie Text auf Bild steht). Jeder Wert der Seite stammt aus dieser Tabelle oder aus dem Auftraggeber.
@@ -30,6 +32,7 @@ Gegenmittel ist nicht „das Gegenteil“, sondern die Herleitung aus dem Auftra
 - **Schriften:** Display-Grotesk, oft mit einer Serife als Kontrast. Kostenlos und selbst hostbar sind z. B. Mona Sans (die Schrift der Lando-Seite), Work Sans, IBM Plex. Fontshare ist kostenlos kommerziell nutzbar, aber nicht OFL: Lizenzdatei lesen.
 - **Bewegung:** Bedienelemente 150–400 ms, große einmalige Auftritte 600–1000 ms, immer abbremsend (z. B. `cubic-bezier(.19,1,.22,1)` oder `cubic-bezier(.22,1,.36,1)`), nie linear. NN/g: Ab 500 ms wirken wiederkehrende Animationen zäh.
 - **Ein Wow-Moment je Seite.** Daneben nur ruhige Einblendungen.
+- **Wow heißt nicht laut** (Simon: „sehr in die fresse, könnte teilweise noch bisschen dezenter sein“). Nur der eine große Moment darf riesig sein. Überschriften sonst etwa 40–90 px am Desktop, Fließtext-Sätze normal fett, viel Luft. Lieber eine kräftige Form (z. B. eine dicke Ziffer als Fenster ins Foto) als viele große Schriften.
 
 ## 5. Echtes Motiv (gegen W2)
 - **Das echte Motiv trägt die Seite, 3D ist Zugabe.** Bei allen 11 gemessenen Preisträgern liegt 3D auf etwas Echtem (Helm auf echtem Porträt, Gläser mit echten Etiketten).

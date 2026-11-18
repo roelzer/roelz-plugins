@@ -1,5 +1,25 @@
 # Änderungsprotokoll Website-Bauer
 
+## 0.2.0 – Sicherheit, Recht und Simons erstes Feedback
+
+Anlass: Simon: „was du auch noch ausführlich recherchieren musst für unser plugin sind sicherheitslücken, keine daten im frontend, keine rechtlichen lücken allgemein, die website einfach nicht angreifbar“. Dazu sein Feedback zur Beispielseite (Neubau SFH): Hausschrift beibehalten, eigener Spruch statt „Ein Dorf. Ein Verein.“, „sehr in die fresse, könnte teilweise noch bisschen dezenter sein“, „die 77 aber noch dicker machen“.
+- **Sicherheit** (`wissen/sicherheit.md`, Recherche-Strang E): strenge Header mit CSP, neues Skript `scripts/kopfzeilen.mjs` (Hashes für eingebettete Stile und Skripte, HSTS ohne preload, `.assetsignore`). `pruefen.mjs` prüft jetzt ohne Browser:
+  - Positivliste der Dateien
+  - Schlüssel und Passwörter, Source Maps, interne Pfade
+  - Inline-Ereignisse, eval, document.write, innerHTML
+  - EXIF/GPS in Fotos, Autoren in PDF-Metadaten (beim SFH-Neubau gefunden)
+  - fehlende oder schwache `_headers`, CSP-Hashes, die nicht zu den eingebetteten Blöcken passen
+- **Recht** (`wissen/recht.md`, Strang F): Impressum je Fall, Datenschutz-Gerüst (Cloudflare-DPA, DPF mit SCC-Rückfall), Kinderfotos nur mit bestätigter Elterneinwilligung, Musterseiten, BFSG-Ausnahmen, OS-Plattform-Link entfernen. `pruefen.mjs` meldet einen fehlenden Impressum-Link auf jeder Seite und den OS-Plattform-Link als harten Befund.
+- **Handwerk:** Hausschrift, Farben und Sprüche des Auftraggebers bleiben. „Wow heißt nicht laut“: nur ein großer Moment, sonst maßvolle Größen. Der Kritiker fragt beides ab, dazu Kinderfotos.
+- **Prüfer-Befunde eingearbeitet:**
+  - Veröffentlichungs-Sperre erfasst wrangler@x, versions, git push, rsync/scp und gilt nur in Website-Projekten.
+  - QUELLEN.md darf Adressen nennen.
+  - Weg-Prüfpunkte zählen nur im Mit-Arm.
+  - Die Abschluss-Sperre verlangt 3 Vorbild-Fotos und eine gesicherte Kritik.
+  - Der Läufer meldet, ob der Konto-Skill geladen war.
+- Prüfskript: Texte, die feste Leisten berühren oder verdeckt sind, werden nicht gemessen (Fehlalarme an der SFH-Seite).
+- Tests: Eichung 8 und Sperren 17 Tests, alle grün. Neue Testseite `tests/seiten/unsicher`.
+
 ## 0.1.0 – Gebaut vom Personaler, in Probearbeit
 
 Anlass: Simon: „website bauen soll ähnlich wie grad mit den videos laufen, ich will dass ich das beste vom besten erschaffen kann. also brauch ich da auch bessere recherche“. Seine Vorbilder: landonorris.com und igloo.inc („die sind irre gut“). Unterlagen: `docs/personal/website-bauer/` (Bedarf, Probelauf mit 4 Seiten, Recherche in 4 Strängen, Muster, Stellenausschreibung, von Simon freigegeben am 18.11.2026).

@@ -8,7 +8,7 @@ argument-hint: "[Für wen und wozu? | mach einfach …]"
 
 Auftrag: `$ARGUMENTS`
 
-Du baust Seiten, die nach den Besten aussehen und nicht nach KI. Simons Maßstab: **landonorris.com** und **igloo.inc** (Site of the Year 2025 und 2024). Lies zuerst `${CLAUDE_PLUGIN_ROOT}/wissen/handwerk.md`. Bei 3D oder Kamerafahrt liest du zusätzlich `3d-leistung.md`, für Bilder, Modelle und Schriften `bilder.md`, für Impressum, Datenschutz und Cookies `recht.md`.
+Du baust Seiten, die nach den Besten aussehen und nicht nach KI. Simons Maßstab: **landonorris.com** und **igloo.inc** (Site of the Year 2025 und 2024). Lies zuerst `${CLAUDE_PLUGIN_ROOT}/wissen/handwerk.md`. Bei 3D oder Kamerafahrt liest du zusätzlich `3d-leistung.md`, für Bilder, Modelle und Schriften `bilder.md`, für Impressum, Datenschutz, Bildrechte und Cookies `recht.md`. **Immer** liest du `sicherheit.md`: Die Seite soll nicht angreifbar sein und keine Daten preisgeben.
 
 **Grenzen, die nicht verhandelbar sind:**
 - Nur kostenlose Werkzeuge.
@@ -59,9 +59,14 @@ Leg für alles Fehlende eine begründete Annahme fest: Zweck, Zielgruppe, was Be
 
 ## 4. Bauen
 - Nach `handwerk.md`, mit echten Bildern nach `bilder.md`. Bei 3D nach `3d-leistung.md`: Stufen, gedeckelte Pixeldichte, Rückfall ohne WebGL.
+- Hausschrift, Farben, Logo und Sprüche des Auftraggebers übernehmen (`handwerk.md` Abschnitt 1).
 - Statische Seite: HTML/CSS/JS, bei mehreren Seiten Astro. Bibliotheken mit fester Version lokal in `site/vendor/`. Bewegung mit CSS Scroll-driven Animations, GSAP nur für Aufwendiges.
 - `site/impressum.html` und `site/datenschutz.html` mit markierten Platzhaltern.
-- `site/QUELLEN.md` für jede fremde Datei. `arbeit/austauschliste.md` für jeden Platzhalter.
+- `site/QUELLEN.md` für jede fremde Datei. `arbeit/austauschliste.md` für jeden Platzhalter und jede offene Freigabe: Impressumsangaben, **Einwilligung der Eltern bei erkennbaren Kindern auf Fotos**, Fotografen, Logos.
+- Sicherheit nach `sicherheit.md`:
+  - Fotos und PDFs ohne Metadaten neu speichern, nicht verlinkte Dateien raus.
+  - Kein `style=` und kein `onclick=` im HTML.
+  - Zum Schluss `node ${CLAUDE_PLUGIN_ROOT}/scripts/kopfzeilen.mjs website/<name>/site` (strenge Sicherheits-Header mit Hashes, `.assetsignore`). Nach jeder Änderung an eingebetteten Stilen oder Skripten neu laufen lassen.
 
 ## 5. Prüfen (für jede Fassung, auch kleine Änderungen)
 - `node ${CLAUDE_PLUGIN_ROOT}/scripts/pruefen.mjs website/<name>/site`. Es schreibt `arbeit/pruefung/pruefung.json` und Bildschirmfotos. Jeder P0 wird behoben. Hinweise wägst du ab und begründest sie.

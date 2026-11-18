@@ -52,6 +52,77 @@ const fremdeDateien = dateien.filter((f) => NICHT_IN_LIEFERUNG.test(f));
 const groesseKB = Math.round(dateien.reduce((s, f) => s + fs.statSync(path.join(site, f)).size, 0) / 1024);
 if (fremdeDateien.length) befund("P0", "W7", `${fremdeDateien.length} Arbeits- oder Prüfdateien liegen in der Lieferung`, fremdeDateien.slice(0, 6).join(", "));
 
+// ---------- Sicherheit und Recht ohne Browser (wissen/sicherheit.md, wissen/recht.md) ----------
+import crypto from "node:crypto";
+const ERLAUBT = /\.(html?|css|m?js|json|webmanifest|svg|png|jpe?g|webp|avif|gif|ico|woff2?|pdf|glb|gltf|bin|hdr|ktx2|mp4|webm|txt|xml)$/i;
+const SONDER = new Set(["_headers", "_redirects", ".assetsignore", "QUELLEN.md", "robots.txt"]);
+const ausserListe = dateien.filter((f) => !ERLAUBT.test(f) && !SONDER.has(f) && !fremdeDateien.includes(f));
+if (ausserListe.length) befund("P0", "Sicherheit", `${ausserListe.length} Dateien außerhalb der Positivliste (öffentlich lesbar)`, ausserListe.slice(0, 6).join(", "));
+const lies = (f) => fs.readFileSync(path.join(site, f), "utf8");
+const textdateien = dateien.filter((f) => /\.(html?|css|m?js|json|svg|webmanifest|txt|xml)$/i.test(f));
+const bibliothek = (f) => /(^|\/)(vendor|lib|libs|node_modules)\//i.test(f) || /(three|gsap|lenis|scrolltrigger)[\w.-]*\.m?js$/i.test(f) || /\.min\.m?js$/i.test(f);
+const html = dateien.filter((f) => /\.html?$/i.test(f));
+const SCHLUESSEL = /(AKIA[0-9A-Z]{16}|sk_live_[0-9a-zA-Z]{16,}|ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|AIza[0-9A-Za-z_-]{35}|xox[baprs]-[0-9A-Za-z-]{10,}|-----BEGIN [A-Z ]*PRIVATE KEY-----|\b(api[_-]?key|secret|access[_-]?token|passw(or)?d)\b\s*[:=]\s*["'][^"'\s]{8,}["'])/i;
+const INTERN = /(sourceMappingURL=|\blocalhost:\d|\b127\.0\.0\.1\b|[A-Z]:\\\\Users\\\\|\/home\/[a-z][\w-]+\/|\/Users\/[A-Z][\w-]+\/)/;
+for (const f of textdateien) {
+  const t = lies(f);
+  const k = t.match(SCHLUESSEL); if (k) befund("P0", "Sicherheit", `Möglicher Schlüssel oder Passwort in ${f}`, k[0].slice(0, 40) + "…");
+  if (!bibliothek(f)) { const i = t.match(INTERN); if (i) befund("P0", "Sicherheit", `Interne Angabe in ${f} (Source Map, lokaler Pfad oder Testadresse)`, i[0]); }
+  if (/ec\.europa\.eu\/consumers\/odr|OS-Plattform/i.test(t)) befund("P0", "Recht", `Link bzw. Hinweis auf die abgeschaltete EU-OS-Plattform in ${f} (seit 20.07.2025 entfernen)`);
+}
+for (const f of html) {
+  const t = lies(f);
+  const ev = t.match(/<[a-z][^>]*\son[a-z]+\s*=\s*["']/i); if (ev) befund("P0", "Sicherheit", `Inline-Ereignis (onclick o. ä.) in ${f} – mit strenger CSP blockiert, addEventListener nehmen`, ev[0].slice(0, 60));
+  const st = (t.match(/<[a-z][^>]*\sstyle\s*=\s*["']/gi) || []).length; if (st) befund("Hinweis", "Sicherheit", `${st} style-Attribute in ${f} – mit strenger CSP blockiert, Klassen nehmen`);
+  if (!/impressum/i.test(t)) befund("P0", "Recht", `Kein Impressum-Link auf ${f} (Pflicht auf jeder Seite)`);
+  for (const m of t.matchAll(/<a\s[^>]*target=["']_blank["'][^>]*>/gi)) if (!/rel=["'][^"']*noopener/i.test(m[0])) { befund("Hinweis", "Sicherheit", `Link mit target=_blank ohne rel="noopener" in ${f}`); break; }
+}
+for (const f of dateien.filter((f) => /\.m?js$/i.test(f) && !bibliothek(f))) {
+  const t = lies(f);
+  if (/\beval\s*\(|new\s+Function\s*\(|document\.write\s*\(/.test(t)) befund("P0", "Sicherheit", `eval/new Function/document.write im eigenen Code (${f})`);
+  if (/\.(innerHTML|outerHTML)\s*=|insertAdjacentHTML\s*\(/.test(t)) befund("Hinweis", "Sicherheit", `innerHTML o. ä. im eigenen Code (${f}) – textContent nehmen`);
+}
+for (const f of html) {
+  const t = lies(f);
+  if (/\.(innerHTML|outerHTML)\s*=|insertAdjacentHTML\s*\(|\beval\s*\(|document\.write\s*\(/.test([...t.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi)].map((m) => m[1]).join("\n")))
+    befund("Hinweis", "Sicherheit", `innerHTML, eval oder document.write in eingebettetem Skript (${f}) prüfen`);
+}
+// Metadaten in Fotos und PDFs
+for (const f of dateien.filter((f) => /\.(jpe?g|png|webp|avif)$/i.test(f))) {
+  const b = fs.readFileSync(path.join(site, f));
+  const kopf = b.subarray(0, Math.min(b.length, 256 * 1024)).toString("latin1");
+  if (/Exif\x00\x00|eXIf|EXIF/.test(kopf)) { befund("P0", "Sicherheit", `Metadaten (EXIF, ggf. GPS) im Foto ${f} – beim Neuspeichern entfernen`); }
+}
+for (const f of dateien.filter((f) => /\.pdf$/i.test(f))) {
+  const t = fs.readFileSync(path.join(site, f)).toString("latin1");
+  const a = t.match(/\/Author\s*\((?!\))([^)]{1,60})\)|<dc:creator>[\s\S]{0,200}?<\/dc:creator>|\/Author\s*<(?!>)[0-9A-Fa-f]{4,}>/);
+  if (a) befund("P0", "Sicherheit", `Autor in den PDF-Metadaten (${f}) – mit qpdf --linearize bzw. neu schreiben entfernen`);
+}
+// Sicherheits-Header
+const kopfDatei = path.join(site, "_headers");
+if (!fs.existsSync(kopfDatei)) befund("P0", "Sicherheit", "Keine Sicherheits-Header (site/_headers fehlt) – node <Plugin>/scripts/kopfzeilen.mjs <site>");
+else {
+  const k = fs.readFileSync(kopfDatei, "utf8");
+  const csp = (k.match(/Content-Security-Policy:\s*(.*)/i) || [])[1] || "";
+  const fehlt = ["default-src", "frame-ancestors", "base-uri", "object-src", "form-action"].filter((d) => !csp.includes(d));
+  if (!csp) befund("P0", "Sicherheit", "_headers ohne Content-Security-Policy");
+  else {
+    if (fehlt.length) befund("P0", "Sicherheit", `CSP ohne ${fehlt.join(", ")}`);
+    const sk = (csp.match(/script-src([^;]*)/) || [])[1] || "";
+    if (/'unsafe-inline'|'unsafe-eval'|\s\*(\s|$)|\shttps?:(\s|$)/.test(sk)) befund("P0", "Sicherheit", "script-src erlaubt unsafe-inline, unsafe-eval oder beliebige Server");
+    const h = (s) => `'sha256-${crypto.createHash("sha256").update(s, "utf8").digest("base64")}'`;
+    const stilHashes = (csp.match(/style-src([^;]*)/) || [])[1] || "";
+    for (const f of html) {
+      const t = lies(f);
+      for (const m of t.matchAll(/<script(?![^>]*\bsrc=)(?![^>]*type=["']application\/ld\+json["'])(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)) if (!sk.includes(h(m[1])) && !/'unsafe-inline'/.test(sk)) { befund("P0", "Sicherheit", `Eingebettetes Skript in ${f} passt nicht zur CSP (Hash fehlt) – kopfzeilen.mjs neu laufen lassen`); break; }
+      for (const m of t.matchAll(/<style(?:\s[^>]*)?>([\s\S]*?)<\/style>/gi)) if (!stilHashes.includes(h(m[1])) && !/'unsafe-inline'/.test(stilHashes)) { befund("P0", "Sicherheit", `Eingebetteter Stil in ${f} passt nicht zur CSP (Hash fehlt) – kopfzeilen.mjs neu laufen lassen`); break; }
+    }
+  }
+  for (const nötig of ["Strict-Transport-Security", "X-Content-Type-Options", "Referrer-Policy", "Permissions-Policy"]) if (!new RegExp(nötig, "i").test(k)) befund("Hinweis", "Sicherheit", `Header ${nötig} fehlt in _headers`);
+  if (/preload/i.test(k)) befund("Hinweis", "Sicherheit", "HSTS mit preload – nur nach Simons ausdrücklichem Ja (monatelang nicht rücknehmbar)");
+  if (k.split("\n").some((z) => z.length > 2000)) befund("P0", "Sicherheit", "Eine Zeile in _headers ist länger als 2000 Zeichen (Grenze von Cloudflare)");
+}
+
 // ---------- lokaler Server ----------
 const TYPEN = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".mjs": "text/javascript", ".css": "text/css",
   ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp", ".avif": "image/avif",
@@ -150,6 +221,9 @@ for (const [name, breite, hoehe] of GERAETE) {
       const sichtbar = (r) => r.width > 4 && r.height > 4 && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth;
       const deckkraft = (e) => { let o = 1; for (let n = e; n && n.nodeType === 1; n = n.parentElement) { const s = getComputedStyle(n); o *= parseFloat(s.opacity); if (s.visibility === "hidden" || s.display === "none") return 0; } return o; };
       const texte = [];
+      // feste Leisten (Kopf, Fuß, Hinweise): Texte, die sie berühren, werden nicht gemessen (Messung würde die Leiste mitnehmen)
+      const fest = [...document.querySelectorAll("body *")].filter((x) => { const st = getComputedStyle(x).position; if (st !== "fixed" && st !== "sticky") return false; const q = x.getBoundingClientRect(); return q.height > 0 && q.height < innerHeight * 0.4 && q.width > innerWidth * 0.5; }).map((x) => x.getBoundingClientRect());
+      const beruehrt = (r) => fest.some((q) => r.top < q.bottom + 6 && r.bottom > q.top - 6);
       for (const e of document.querySelectorAll("h1,h2,h3,h4,p,li,a,button,span,label,blockquote,figcaption,dd,dt,td,th,small,strong,em")) {
         const eigen = [...e.childNodes].filter((n) => n.nodeType === 3 && n.textContent.trim().length > 1).map((n) => n.textContent.trim()).join(" ");
         if (!eigen || e.closest("[aria-hidden='true']")) continue;  // Deko-Schrift zählt nicht (WCAG: beiläufiger Text)
@@ -166,7 +240,7 @@ for (const [name, breite, hoehe] of GERAETE) {
         }
         if (!r) continue;
         r = { x: r.left, y: r.top, width: r.right - r.left, height: r.bottom - r.top, left: r.left, top: r.top, right: r.right, bottom: r.bottom };
-        if (!sichtbar(r)) continue;
+        if (!sichtbar(r) || (beruehrt(r) && !e.closest("[style*='fixed'],header,footer,nav"))) continue;
         // verdeckt (z. B. hinter fester Kopfleiste)? Dann sieht ihn niemand – nicht werten
         // an Mitte und beiden Ecken muss der Text selbst oben liegen (sonst teilweise verdeckt oder weggeschnitten)
         const trifft = (x, y) => { const o = document.elementFromPoint(Math.min(innerWidth - 1, Math.max(0, x)), Math.min(innerHeight - 1, Math.max(0, y))); return o && (o === e || e.contains(o) || o.contains(e)); };
