@@ -34,6 +34,8 @@ Sprich Deutsch, kurz, ohne Fachchinesisch. Simon hat **zwei Stopps**: die Richtu
 - Playwright prüfen: `node -e "require('playwright')"` im Projekt. Fehlt es: `npm i -D playwright` und `npx playwright install chromium` (kostenlos). Unter Windows gleiche Befehle in PowerShell.
 - **Bestehende Seite verbessern** („mach … schöner“): Original nach `arbeit/original/` kopieren. Schreib `arbeit/inhaltsliste.md`: alle Inhalte, Seiten, Links und Funktionen (Formulare, Filter, Downloads). Sie müssen danach alle noch da sein. Dann zuerst `pruefen.mjs` auf das Original laufen lassen, damit die Fehler messbar sind.
   - **Altbestand bringt KI-Reste mit.** Alles, was du aus alten Fassungen übernimmst (Schriften, Labels über Überschriften, kursive Einschübe, Laufbänder), prüfst du gegen `handwerk.md` Abschnitt 3, bevor es in die neue Seite kommt. Im SFH-Test kamen die kursive Serife und die Großbuchstaben-Labels genau so zurück.
+  - **Wunschliste vor dem Umbau:** `arbeit/wuensche.md` mit jedem früheren Wunsch des Auftraggebers (Chat, README, DESIGN.md, Commit-Texte) und Datum. Am Ende jeden abhaken. Die Abschluss-Sperre verlangt die Datei, sonst gehen Wünsche verloren (SFH: die „50“ mit Foto).
+  - **Toten Code mitnehmen:** Was der Umbau ersetzt (alte Komponenten, ihr Code in Skripten und Stilen, unbenutzte Bilder), kommt raus.
   - **Eigene Klassen mit Präfix** (z. B. `s-`) oder komponentenweise gekapselt, wenn alte Stile weiterleben. Gleichnamige alte Klassen (`.vorspann`, `.station`) haben im SFH-Test neue Texte fast unsichtbar gemacht.
 
 ## 1. Briefing: Annahmen statt Fragerunde
@@ -69,6 +71,13 @@ Im SFH-Test kam das erst am Ende auf: Domain und Mail bei IONOS, die Seite lief 
 ## 4. Bauen
 - Nach `handwerk.md`, mit echten Bildern nach `bilder.md`. Bei 3D nach `3d-leistung.md`: Stufen, gedeckelte Pixeldichte, Rückfall ohne WebGL.
 - Hausschrift, Farben, Logo und Sprüche des Auftraggebers übernehmen (`handwerk.md` Abschnitt 1).
+- **Schrift tauschen heißt alle Regeln prüfen**, die sie benutzen (`font-style`, `<em>`, Stärken). Eine Schrift ohne Kursivschnitt wird sonst künstlich schräg.
+- **Unterlagen im selben Schritt anpassen:** `QUELLEN.md` (jede Bibliothek, jede Schrift), Design-Notizen, Pflege-Anleitung. `__pycache__` und Ähnliches gehören in `.gitignore`.
+- Regeln für Scroll-Bühnen und 3D stehen in `handwerk.md` Abschnitt 11 und `3d-leistung.md`. Kurz:
+  - höchstens etwa 300vh,
+  - 3D erst bei der ersten Bewegung laden, am Handy ohne Schatten,
+  - Layout und Kamera nach derselben Regel umschalten,
+  - `<noscript>` zeigt den End-Zustand.
 - Statische Seite: HTML/CSS/JS, bei mehreren Seiten Astro. Bibliotheken mit fester Version lokal in `site/vendor/`. Bewegung mit CSS Scroll-driven Animations, GSAP nur für Aufwendiges.
 - `site/impressum.html` und `site/datenschutz.html` mit markierten Platzhaltern.
 - `site/QUELLEN.md` für jede fremde Datei. `arbeit/austauschliste.md` für jeden Platzhalter und jede offene Freigabe: Impressumsangaben, **Einwilligung der Eltern bei erkennbaren Kindern auf Fotos**, Fotografen, Logos.
@@ -80,7 +89,8 @@ Im SFH-Test kam das erst am Ende auf: Domain und Mail bei IONOS, die Seite lief 
 ## 5. Prüfen (für jede Fassung, auch kleine Änderungen)
 - `node ${CLAUDE_PLUGIN_ROOT}/scripts/pruefen.mjs website/<name>/site`. Es schreibt `arbeit/pruefung/pruefung.json` und Bildschirmfotos. Jeder P0 wird behoben. Hinweise wägst du ab und begründest sie.
 - Sieh die Bildschirmfotos selbst an, besonders Handy und alle Stellen mit Text auf Bild.
-- **Scroll-Abläufe** (feststehende Bühne, 3D, Übergänge) prüfst du nach jeder sichtbaren Änderung mit `node ${CLAUDE_PLUGIN_ROOT}/scripts/ablauf.mjs website/<name>/site website/<name>/arbeit/ablauf --abschnitt "<css>" --stellen 0,0.3,0.6,0.9`. Es fotografiert dieselben Stellen auf drei Laptop-Größen und am Handy. Im SFH-Test fand es die meisten Fehler, schneller als das Prüfskript.
+- **Leistung im Handy-Profil** nach jeder größeren Änderung: `node ${CLAUDE_PLUGIN_ROOT}/scripts/leistung.mjs website/<name>/site` (Lighthouse, Ziel mindestens 90, schreibt `arbeit/pruefung/leistung.json`). Die Abschluss-Sperre verlangt die Messung.
+- **Scroll-Abläufe** (feststehende Bühne, 3D, Übergänge) prüfst du nach jeder sichtbaren Änderung mit `node ${CLAUDE_PLUGIN_ROOT}/scripts/ablauf.mjs website/<name>/site website/<name>/arbeit/ablauf --abschnitt "<css>" --stellen 0,0.3,0.6,0.9`. Es fotografiert dieselben Stellen auf drei Laptop-Größen und am Handy, hochkant und quer. Mit `--ohne-js` zusätzlich ohne JavaScript. Im SFH-Test fand es die meisten Fehler, schneller als das Prüfskript.
 - Eine **bewusst dunkle Szene** (Nacht in 3D) markierst du mit `data-pruefen="dunkel"` am umgebenden Element und begründest es im Code. Sonst meldet das Prüfskript eine leere schwarze Fläche (W8).
 - Agent `website-kritiker` rufen. Er bekommt die Pfade:
   - `site/`

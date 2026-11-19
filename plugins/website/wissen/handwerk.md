@@ -76,3 +76,20 @@ Gilt für Simon und als Ausgangspunkt für Auftraggeber, die er mitbringt. Jede 
   - Überlappen und Enge („da überlappt es und alles is sehr eng“)
   - zu laut („sehr in die fresse“)
   - runde Formen, wo er Relief erwartet („3D aber nicht rund“)
+
+## 11. Umbauen ohne Rückschritte (Durchsicht des Entwurfs „Kombi“, 19.11.2026)
+Eine zweite Sitzung hat den Entwurf durchgesehen und zehn Fehler gefunden. Jeder steht hier als Regel. Wo möglich prüft ihn das Prüfskript oder die Abschluss-Sperre.
+1. **Leistung messen, nicht hoffen.** Nach jeder größeren Änderung `scripts/leistung.mjs` (Lighthouse, Handy-Profil), Ziel mindestens 90.
+   - Im Entwurf fiel die Handy-Leistung von 98 auf 62, mit 12 s Blockierzeit, weil das 3D beim Laden mitkam.
+   - Die Abschluss-Sperre verlangt die Messung.
+2. **Wünsche des Auftraggebers mitnehmen.** Vor einem Umbau `arbeit/wuensche.md` schreiben: Jeder frühere Wunsch aus Chat, README, DESIGN.md und Commits, mit Datum. Am Ende jeden abhaken.
+   - Im Entwurf fehlte die „50“ mit dem Stadtmeister-Foto, die Simon am 15.11. ausdrücklich verlangt hatte.
+   - Die Abschluss-Sperre verlangt die Datei bei jedem Umbau.
+3. **Schrift tauschen heißt alle Regeln prüfen**, die sie benutzen: `font-style: italic`, `<em>`, `font-weight`, Fallbacks. Eine Schrift ohne Kursivschnitt verzerrt der Browser schräg. Das Prüfskript meldet „künstlich kursiv“.
+4. **Feststehende Scroll-Bühnen höchstens etwa 300vh.** Das nächste Wichtige (z. B. das nächste Spiel) muss schnell erreichbar sein. Prüfskript W11, seitliche Galerien sind ausgenommen.
+5. **Hochkant keine Lücke:** Text direkt unter dem Objekt, nicht oben das Objekt und unten der Text mit leerer Fläche dazwischen. Prüfen mit `ablauf.mjs`.
+6. **Layout und 3D-Kamera schalten nach derselben Regel.** Entscheidet die Kamera nach Seitenverhältnis, schaltet das CSS auch nach Seitenverhältnis (`@media (min-aspect-ratio: 4/5)`), nicht nach Breite. Sonst überlagern sich Objekt und Text am quer gehaltenen Handy. `ablauf.mjs` fotografiert dafür auch quer.
+7. **Ohne JavaScript den End-Zustand zeigen** (`<noscript>` mit Stil, der die Bühne auf den Tag-Zustand setzt). Prüfskript W12 meldet eine Seite, die beim Scrollen stillsteht.
+8. **Toten Code beim Umbau mitnehmen:** Komponenten, die niemand mehr benutzt, und ihr Code in Skripten und Stilen kommen raus, ebenso unbenutzte Bilder. Das Prüfskript meldet mitgelieferte Dateien, auf die nichts verweist (Ballast).
+9. **Kein Müll im Repository:** `__pycache__`, `.pyc`, `.DS_Store` gehören in `.gitignore`. Die Abschluss-Sperre meldet sie.
+10. **Unterlagen im selben Schritt wie die Änderung anpassen:** `QUELLEN.md` (jede Bibliothek, jede Schrift mit Lizenz), Design-Notizen, Pflege-Anleitung, offene Fragen. Das Prüfskript meldet Bibliotheken und Schriften, die in `QUELLEN.md` fehlen.

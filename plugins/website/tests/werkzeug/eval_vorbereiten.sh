@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # Vorbereitung eines Testfalls (läuft im Arbeitsordner des Falls).
-# Aufruf: bash "$(dirname "$0")/../../tests/werkzeug/eval_vorbereiten.sh" [verein-alt] [verein-kursiv] [wrangler] [wappen]
+# Aufruf: bash "$(dirname "$0")/../../tests/werkzeug/eval_vorbereiten.sh" [verein-alt] [verein-kursiv] [verein-wunsch] [wrangler] [wappen]
 set -euo pipefail
 HIER="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 for a in "$@"; do
   case "$a" in
     verein-alt) mkdir -p website/verein && cp -r "$HIER/vorlagen/verein-alt" website/verein/site ;;
+    verein-wunsch) mkdir -p website/verein && cp -r "$HIER/vorlagen/verein-wunsch" website/verein/site && cp "$HIER/vorlagen/verein-wunsch-design.md" website/verein/DESIGN.md ;;
     verein-kursiv) mkdir -p website/verein && cp -r "$HIER/vorlagen/verein-kursiv" website/verein/site ;;
     wrangler) printf '{\n  "name": "sv-testdorf",\n  "compatibility_date": "2026-11-01",\n  "assets": { "directory": "./website/verein/site" }\n}\n' > wrangler.jsonc ;;
     wappen) mkdir -p material && cat > material/wappen.svg <<'SVG'

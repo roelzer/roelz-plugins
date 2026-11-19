@@ -3,7 +3,7 @@
 // scripts/pruefen.mjs geprüft wurde (eine pruefung*.json, die neuer ist als die neueste Datei in site/).
 // Vorbild: Abschluss-Sperre des Video-Editors (Probearbeit 18.11.2026: Pflichtschritte wurden sonst übersprungen).
 // Läuft nur einmal je Stopp (stop_hook_active), damit nie eine Endlosschleife entsteht.
-import { existsSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
 const NIE = new Set(["node_modules", ".git", ".cache"]);
@@ -31,6 +31,18 @@ function pruefungen(ordner, tiefe = 0, liste = []) {
   return liste;
 }
 
+function finde(ordner, test, tiefe = 0, liste = []) {
+  if (tiefe > 8 || !existsSync(ordner)) return liste;
+  for (const name of readdirSync(ordner)) {
+    if (name === "node_modules" || name === ".git") continue;
+    const p = join(ordner, name);
+    if (test(name)) liste.push(p);
+    let s; try { s = statSync(p); } catch { continue; }
+    if (s.isDirectory()) finde(p, test, tiefe + 1, liste);
+  }
+  return liste;
+}
+
 export function pruefe(eingabe, jetzt = Date.now()) {
   if (eingabe.stop_hook_active) return null;
   const cwd = eingabe.cwd || process.cwd();
@@ -50,10 +62,21 @@ export function pruefe(eingabe, jetzt = Date.now()) {
     const runden = join(wurzel, name, "arbeit", "runden");
     const kritik = existsSync(runden) && readdirSync(runden).some((r) => existsSync(join(runden, r, "kritik.md")));
     if (!kritik) offen.push(`${relative(cwd, site)} (keine Kritik in arbeit/runden/<n>/kritik.md – website-kritiker nicht gerufen?)`);
+    // SFH-Test 19.11.2026: Handy-Leistung fiel unbemerkt von 98 auf 62 → Lighthouse-Messung ist Pflicht, Ziel ≥ 90
+    const leistung = finde(join(wurzel, name, "arbeit"), (n) => n === "leistung.json").map((p) => ({ p, t: statSync(p).mtimeMs })).sort((a, b) => b.t - a.t)[0];
+    let leistungOk = false;
+    if (leistung && leistung.t + 1000 >= geaendert) { try { leistungOk = JSON.parse(readFileSync(leistung.p, "utf8")).ok === true; } catch {} }
+    if (!leistungOk) offen.push(`${relative(cwd, site)} (Leistung im Handy-Profil nicht gemessen oder unter 90 – node <Plugin>/scripts/leistung.mjs ${relative(cwd, site)})`);
+    // Umbau: Wünsche aus dem bisherigen Stand müssen erfasst sein, sonst gehen sie verloren (SFH: die „50“ mit Foto fehlte)
+    const umbau = existsSync(join(wurzel, name, "arbeit", "inhaltsliste.md")) || existsSync(join(wurzel, name, "arbeit", "original"));
+    if (umbau && !existsSync(join(wurzel, name, "arbeit", "wuensche.md"))) offen.push(`${relative(cwd, site)} (Umbau ohne arbeit/wuensche.md – frühere Wünsche des Auftraggebers erfassen und mitnehmen)`);
+    // Müll im Projekt (SFH: eingecheckte __pycache__-Datei)
+    const muell = finde(join(wurzel, name), (n) => n === "__pycache__" || n === ".DS_Store" || /\.pyc$/.test(n));
+    if (muell.length) offen.push(`${relative(cwd, join(wurzel, name))} (Müll im Projekt: ${muell.slice(0, 2).map((m) => relative(cwd, m)).join(", ")} – löschen und in .gitignore aufnehmen)`);
   }
   if (!offen.length) return null;
-  return `Website-Abschluss: ${offen.slice(0, 3).join("; ")}. Vor „fertig“: ` +
-    "mindestens 3 Vorbilder fotografieren, node <Plugin>/scripts/pruefen.mjs website/<name>/site, P0 beheben, Bildschirmfotos ansehen, den Agenten website-kritiker rufen und seine Antwort als arbeit/runden/<n>/kritik.md sichern. " +
+  return `Website-Abschluss: ${offen.slice(0, 4).join("; ")}. Vor „fertig“: ` +
+    "mindestens 3 Vorbilder fotografieren, node <Plugin>/scripts/pruefen.mjs website/<name>/site, P0 beheben, Bildschirmfotos ansehen, node <Plugin>/scripts/leistung.mjs (Handy ≥ 90), den Agenten website-kritiker rufen und seine Antwort als arbeit/runden/<n>/kritik.md sichern, Unterlagen (QUELLEN.md, Design-Notizen) mit anpassen. " +
     "Kann etwas davon nicht laufen, sag ehrlich, was und warum.";
 }
 

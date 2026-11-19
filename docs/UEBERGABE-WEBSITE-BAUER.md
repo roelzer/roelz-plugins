@@ -11,9 +11,9 @@ Für die nächste Sitzung mit Simon. Erst ganz lesen, dann `plugins/personal/wis
 - Laptop: 8 GB RAM, keine eigene Grafikkarte.
 
 ## Stand
-- **Website-Bauer** (`plugins/website`, **0.2.3, in Probearbeit, nicht eingestellt**). Alle Unterlagen in `docs/personal/website-bauer/`.
-- **Tests:** `python3 -m pytest plugins/website/tests`: 29 grün (19.11.2026, Dauer etwa 5 Minuten).
-- **Testfälle (Evals):** 16, neu ist `k2-altbestand`. Läufer: `tests/werkzeug/probearbeit.py`.
+- **Website-Bauer** (`plugins/website`, **0.2.4, in Probearbeit, nicht eingestellt**). Alle Unterlagen in `docs/personal/website-bauer/`.
+- **Tests:** `python3 -m pytest plugins/website/tests`: 36 grün (19.11.2026, Dauer etwa 7 Minuten).
+- **Testfälle (Evals):** 17, neu sind `k2-altbestand` und `k3-wunsch-erhalten`. Läufer: `tests/werkzeug/probearbeit.py`.
 
 ## Was am 19.11. im Test mit der Vereinsseite (SFH) entstand
 Simon hat den Test für beendet erklärt. Die SFH-Seite selbst arbeitet er im Chat zum Vereins-Repo weiter (privates Repo, Fahrplan in dessen `docs/FAHRPLAN.md`).
@@ -38,6 +38,13 @@ Simon hat den Test für beendet erklärt. Die SFH-Seite selbst arbeitet er im Ch
   - Prüfskript: neue Prüfung W10 (überlappender Text), Fehlalarme zurückgenommen (Daten-Blöcke, gewollt dunkle Szenen, Server-Schnittstelle in der lokalen Vorschau).
   - Skill: Stopp 1 knapp, früher Entwurf, Fragen nach Betrieb (Domain, E-Mail, Webspace, Pflege), Altbestand prüfen, Klassen mit Präfix, „fertig“ erst nach Simons Laptop-Test, automatisches Veröffentlichen gehört zur Abgabe, Webspace als Alternative.
   - Einzelfälle mit Begründung: `docs/personal/personal-lektionen.md` Punkte 10 bis 12.
+
+- **0.2.4** (zehn Funde aus der Durchsicht des Entwurfs durch eine zweite Sitzung):
+  - `leistung.mjs` (Lighthouse Handy ≥ 90, von der Abschluss-Sperre verlangt).
+  - Neue Prüfungen: künstlich kursiv, Bühnenlänge, ohne JavaScript, Ballast, Quellenangaben.
+  - Wunschliste bei Umbauten Pflicht, Müll-Sperre.
+  - Regeln in `handwerk.md` Abschnitt 11.
+  - Gegenprobe am alten und am aufgeräumten SFH-Stand: alt schlägt überall an, aufgeräumt null harte Befunde.
 
 ## Ehrlich offen
 1. **Der formale Ablauf lief im Test nicht vollständig:** kein Kritiker-Agent, keine drei Vorbild-Fotos, kein blinder Vergleich. Für die Probearbeit zählt der Lauf nur halb.

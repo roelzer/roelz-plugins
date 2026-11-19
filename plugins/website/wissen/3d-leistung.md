@@ -29,10 +29,22 @@ Simon zum Vereinswappen: „ein geiles 3D-Modell vom Logo, in so ner Metall-Opti
 3. **Klare Kanten:** `bevelSegments: 1` (gefräste Schräge statt Rundung, Simon: „die sind wie so abgerundet“). Fasen klein halten: Chrom 0,09–0,11, Rand 0,04, Weiß 0,02 bei 10 Einheiten Wappenhöhe. Danach `toCreasedNormals(geo, 30°)`, sonst flimmern die Kanten.
 4. **Ein Grün für alles** (Rand, Feld, Schrift, Ball): ein einziges Material. Simon: „der Rand muss genau das gleiche Grün haben wie der Rest“. Tone Mapping `NeutralToneMapping` hält die Farben kräftig.
 5. **Licht wie im Fotostudio:** dunkler Raum mit großen Lichtflächen über `PMREMGenerator.fromScene`, eine davon hinter der Kamera. Dazu ein gerichtetes Licht mit weichem Schatten (Schattenkarte 2048²): Dann werfen die erhabenen Teile Schatten, das gibt „mehr 3D innen“.
-6. **Auf der Seite:** Nur zeichnen, wenn sich etwas ändert (Scrollen), Pixeldichte am Desktop höchstens 1,5. Wird es langsam, die Pixeldichte senken. Bis das 3D geladen ist, steht die SVG. Gesamt etwa 80.000 Dreiecke.
+6. **Auf der Seite:**
+   - Erst bei der ersten Bewegung laden.
+   - Nur zeichnen, wenn sich etwas ändert (Scrollen).
+   - Pixeldichte am Desktop höchstens 1,5; wird es langsam, senken.
+   - Am Handy keine Schatten.
+   - Bis das 3D geladen ist, steht die SVG.
+   - Gesamt etwa 80.000 Dreiecke.
 7. **Einstieg mit Geschichte statt Effekt:** Das Wappen dreht sich beim Scrollen aus dem Dunkel nach vorn, während eine wahre Geschichte des Auftraggebers passiert. Beim Verein: das Flutlicht geht an, „Es werde Licht“ von 2020. Die Umgebung (Platz, Masten, Lichtkegel) ist ebenfalls 3D, sonst beißt sich eine flache Zeichnung mit dem echten Objekt. Umgebung und Objekt auf zwei Zeichenflächen, damit eine helle Fläche dazwischen den Übergang machen kann.
 
 ## Pflicht bei jedem Echtzeit-3D
+- **Erst bei der ersten Bewegung laden** (erstes Scrollen, Tippen oder Tastendruck), nicht beim `load`. Bis dahin steht ein Standbild bzw. die Vektorgrafik.
+  - SFH-Test: beim `load` geladen gab es Handy-Leistung 62 und 12 s Blockierzeit. Nach der Umstellung waren es 100.
+  - **Am Handy ohne Schatten.**
+  - Danach `scripts/leistung.mjs`, Ziel mindestens 90.
+- **Layout und Kamera nach derselben Regel umschalten** (Seitenverhältnis in JS und `@media (min-aspect-ratio: …)` im CSS).
+- **`<noscript>` zeigt den End-Zustand** der Szene, damit die Seite ohne JavaScript nicht stillsteht.
 - **Stufen:** Ohne WebGL oder bei sehr schwacher Grafik ein Standbild (gleiche Szene, vorab gerendert oder als Bildschirmfoto). Mit `prefers-reduced-motion` keine Kamerafahrt.
 - **Pixeldichte deckeln:** am Desktop höchstens 1,25, am Handy höchstens 2 (`Math.min(devicePixelRatio, innerWidth > 768 ? 1.25 : 2)`, so macht es die Site of the Year 2025). Die Größe der Zeichenfläche ist der wirksamste Hebel (web.dev, The Hobbit: 50 % Fläche brachte 16 → 33 fps).
 - **Nur zeichnen, wenn sich etwas bewegt** (beim Scrollen bzw. während einer Animation), nicht dauernd.

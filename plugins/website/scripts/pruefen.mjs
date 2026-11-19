@@ -87,6 +87,33 @@ for (const f of html) {
   if (/\.(innerHTML|outerHTML)\s*=|insertAdjacentHTML\s*\(|\beval\s*\(|document\.write\s*\(/.test([...t.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi)].map((m) => m[1]).join("\n")))
     befund("Hinweis", "Sicherheit", `innerHTML, eval oder document.write in eingebettetem Skript (${f}) prüfen`);
 }
+// Ballast: Bilder, Schriften, Modelle und PDFs, auf die keine Seite, kein Stil und kein Skript verweist
+// (SFH-Test 19.11.2026: zwei unbenutzte Fotos und toter Code wurden mit ausgeliefert)
+{
+  const alleTexte = textdateien.map((f) => lies(f)).join("\n");
+  const MEDIEN = /\.(png|jpe?g|webp|avif|gif|svg|woff2?|glb|gltf|bin|hdr|ktx2|mp4|webm|pdf)$/i;
+  const ungenutzt = dateien.filter((f) => MEDIEN.test(f) && !/^(favicon|apple-touch-icon|icon|vorschau|og-image)/i.test(path.basename(f)) && !alleTexte.includes(path.basename(f)));
+  if (ungenutzt.length) befund("P0", "Ballast", `${ungenutzt.length} mitgelieferte Dateien, auf die nichts verweist – löschen`, ungenutzt.slice(0, 6).join(", "));
+  // Quellenangaben: Jede Bibliothek und jede Schriftdatei muss in QUELLEN.md stehen (Lizenz, Herkunft)
+  const quellen = [path.join(site, "QUELLEN.md"), path.join(site, "..", "QUELLEN.md"), path.join(site, "..", "..", "QUELLEN.md")].find((q) => fs.existsSync(q));
+  const js = dateien.filter((f) => /\.m?js$/i.test(f)).map((f) => lies(f)).join("\n");
+  const benutzt = [];
+  if (/REVISION\s*=\s*["']\d+|three\.module|THREE\.WebGLRenderer|WebGLRenderer/.test(js)) benutzt.push(["three.js", /three/i]);
+  if (/gsap|GreenSock/.test(js)) benutzt.push(["GSAP", /gsap/i]);
+  if (/lenis/i.test(js)) benutzt.push(["Lenis", /lenis/i]);
+  for (const f of dateien.filter((f) => /\.(woff2?|otf|ttf)$/i.test(f))) {
+    // „kelly-slab-latin.CmV-vOqR.woff2“ → „kelly slab“ (Hash nach dem ersten Punkt und Teilmengen-Namen weg)
+    const fam = path.basename(f).split(".")[0].split(/[-_]/).filter((w) => w.length > 2 && !/^(latin|ext|subset|wght|regular|bold|italic|variable|var|vf)$/i.test(w));
+    if (fam.length) benutzt.push([`Schrift ${fam.join(" ")}`, new RegExp(fam.join("[\\s_-]*"), "i")]);
+  }
+  if (!quellen && benutzt.length) befund("Hinweis", "Unterlagen", "Keine QUELLEN.md gefunden (Bibliotheken und Schriften mit Lizenz nennen)", benutzt.map((b) => b[0]).join(", "));
+  else if (quellen) {
+    const q = fs.readFileSync(quellen, "utf8");
+    const fehlt = [...new Map(benutzt.map((b) => [b[0], b])).values()].filter(([, re]) => !re.test(q)).map(([n]) => n);
+    if (fehlt.length) befund("P0", "Unterlagen", `QUELLEN.md nennt nicht: ${fehlt.join(", ")} – Unterlagen im selben Schritt wie die Änderung anpassen`, path.relative(process.cwd(), quellen));
+  }
+}
+
 // Metadaten in Fotos und PDFs
 for (const f of dateien.filter((f) => /\.(jpe?g|png|webp|avif)$/i.test(f))) {
   const b = fs.readFileSync(path.join(site, f));
@@ -362,6 +389,23 @@ for (const [name, breite, hoehe] of GERAETE) {
     fremde_hosts: [...fremd], fehlende_dateien: fehlend.slice(0, 8), cookies, ...info };
   await ctx.close();
 }
+// Ohne JavaScript: Scrollen muss etwas zeigen (SFH: Einstieg blieb vier Bildschirmhöhen lang dunkel, Menü kaum lesbar)
+{
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, javaScriptEnabled: false });
+  const page = await ctx.newPage();
+  await page.goto(basis, { waitUntil: "load", timeout: 60000 }).catch(() => {});
+  await page.waitForTimeout(800);
+  const bilder = [];
+  for (let i = 0; i < 5; i++) {
+    const y = await page.evaluate((y) => { window.scrollTo(0, y); return window.scrollY; }, i * 900).catch(() => 0);
+    if (i && y <= bilder[bilder.length - 1].y) break;   // Seitenende erreicht: kurze Seiten sind kein Stillstand
+    await page.waitForTimeout(250); bilder.push({ y, b: await page.screenshot().catch(() => null) });
+  }
+  let gleich = 0, laengste = 0;
+  for (let i = 1; i < bilder.length; i++) { const a = bilder[i - 1].b, b = bilder[i].b; const g = a && b && (a.equals(b) || Math.abs(a.length - b.length) / a.length < 0.002); gleich = g ? gleich + 1 : 0; laengste = Math.max(laengste, gleich); }
+  if (laengste >= 2) befund("P0", "W12", `Ohne JavaScript steht die Seite über ${laengste + 1} Bildschirmhöhen still – mit <noscript> gleich den End-Zustand zeigen`);
+  await ctx.close();
+}
 await browser.close();
 server.close();
 
@@ -410,6 +454,20 @@ async function stilAnalyse(page) {
     const pfeilKnoepfe = [...document.querySelectorAll("a,button")].filter((e) => /[→↗]\s*$/.test(e.textContent.trim())).length;
     const akkordeon = document.querySelectorAll("details").length;
     const glas = alle.filter((e) => /blur\(/.test(getComputedStyle(e).backdropFilter || "")).length;
+    // Künstlich kursiv: kursiv gesetzt in einer Webschrift, die keinen Kursivschnitt hat (der Browser verzerrt sie schräg).
+    // SFH-Test 19.11.2026: Schrift ausgetauscht, aber an zehn Stellen font-style: italic stehen lassen.
+    const schnitte = new Map();
+    for (const f of document.fonts) { const fam = f.family.replace(/["']/g, "").trim().toLowerCase(); if (!schnitte.has(fam)) schnitte.set(fam, new Set()); schnitte.get(fam).add(f.style); }
+    const kunstKursiv = [...document.querySelectorAll("body *")].filter((e) => {
+      if (![...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) return false;
+      const st = getComputedStyle(e); if (st.fontStyle === "normal") return false;
+      const fam = st.fontFamily.split(",")[0].replace(/["']/g, "").trim().toLowerCase();
+      const set = schnitte.get(fam); return !!set && ![...set].some((x) => x !== "normal");
+    }).map((e) => e.textContent.trim().slice(0, 30));
+    // Lange Scroll-Bühnen (feststehender Einstieg): mehr als 3,2 Bildschirmhöhen ist zu lang (SFH: 420vh, nächstes Spiel erst nach 3500 px)
+    // seitlich laufende Spuren (Chronik, Galerie) ausgenommen: Ihre Länge folgt aus der Breite der Spur
+    const buehnen = [...document.querySelectorAll("body *")].filter((e) => getComputedStyle(e).position === "sticky" && e.parentElement && e.getBoundingClientRect().height > innerHeight * 0.6 && e.scrollWidth < innerWidth * 1.5)
+      .map((e) => ({ h: e.parentElement.getBoundingClientRect().height / innerHeight, k: String(e.parentElement.className || e.parentElement.tagName).slice(0, 30) })).filter((b) => b.h > 3.2);
     // Kursive Serife als „edle“ Überschrift oder Einschub (Simon 19.11.2026: „diese kursiv schrift is auch KI typisch“)
     const kursivSerif = [...document.querySelectorAll("h1,h2,h3,h1 *,h2 *,h3 *,[class*=hero] *,[class*=held] *,[class*=title] *")].filter((e) => {
       const st = getComputedStyle(e); if (st.fontStyle !== "italic" || parseFloat(st.fontSize) < 20 || !e.textContent.trim()) return false;
@@ -429,7 +487,7 @@ async function stilAnalyse(page) {
     const reduzierteBewegung = [...document.styleSheets].some((sh) => { try { return [...sh.cssRules].some((r) => String(r.conditionText || r.media?.mediaText || "").includes("reduced-motion")); } catch { return false; } }) || /prefers-reduced-motion/.test([...document.scripts].map((s) => s.textContent).join(" "));
     return { dunkelAnteil, dunkleNeutral, akzente: [...akzente], neon, zinnober, hauptschriften, ueberschriften: [...new Set(ueberschriften)], fliess, groesste, laufweite,
       zeilenlaenge: Math.round(zeilenlaenge), labelsUeberUeberschrift, pfeilKnoepfe, akkordeon, glas, emoji, lilaVerlauf, karten, fotos, platzhalterFotos,
-      kursivSerif: [...new Set(kursivSerif)].slice(0, 3), laengsteUebergang: Math.max(0, ...dauern), lineareUebergaenge: linear.length, pflicht, reduzierteBewegung };
+      kursivSerif: [...new Set(kursivSerif)].slice(0, 3), kunstKursiv: [...new Set(kunstKursiv)].slice(0, 4), buehnen, laengsteUebergang: Math.max(0, ...dauern), lineareUebergaenge: linear.length, pflicht, reduzierteBewegung };
   }).catch((e) => ({ fehler: String(e) }));
 }
 
@@ -441,6 +499,8 @@ if (s.dunkelAnteil > 0.45 && s.neon) befund("P0", "W1", "Dunkle Fläche mit Neon
 if (s.dunkleNeutral > 0.3 && s.zinnober && !s.neon) befund("Hinweis", "W1", "Fast schwarz mit einer grellen Zinnober-Akzentfarbe (steht auf Anthropics Liste der KI-Merkmale)", `neutral dunkel ${Math.round(s.dunkleNeutral * 100)} %`);
 if (s.lilaVerlauf) befund("P0", "W1", "Lila-Verlauf", "Anthropic Cookbook");
 if (s.emoji) befund("P0", "W1", "Emoji in Überschriften oder Knöpfen", "Impeccable");
+if (s.kunstKursiv?.length) befund("P0", "W1", "Künstlich kursiv: kursiv gesetzt in einer Schrift ohne Kursivschnitt (wird schräg verzerrt) – beim Schrifttausch alle Regeln prüfen", s.kunstKursiv.join(" · "));
+for (const b of s.buehnen || []) befund("P0", "W11", `Scroll-Bühne ist ${b.h.toFixed(1)} Bildschirmhöhen lang (höchstens etwa 3; wichtige Inhalte rücken sonst zu weit nach unten)`, b.k);
 if (s.kursivSerif?.length) befund("P0", "W1", "Kursive Serife in Überschriften (KI-Merkmal, steht in handwerk.md Abschnitt 3)", s.kursivSerif.join(" · "));
 const beiwerk = [s.labelsUeberUeberschrift >= 3 && `${s.labelsUeberUeberschrift}× Großbuchstaben-Label über Überschrift`, s.pfeilKnoepfe >= 3 && `${s.pfeilKnoepfe}× „→“ an Knöpfen`,
   s.akkordeon >= 4 && `FAQ-Akkordeon (${s.akkordeon})`, s.glas >= 3 && `${s.glas}× Glas-Effekt`, s.karten >= 4 && `${s.karten} gleich große Karten (Baukasten)`].filter(Boolean);

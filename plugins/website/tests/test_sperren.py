@@ -105,7 +105,44 @@ class Abschluss(unittest.TestCase):
         for i in range(3):
             open(os.path.join(arbeit, "vorbilder", "v%d.png" % i), "w").close()
         open(os.path.join(arbeit, "runden", "1", "kritik.md"), "w").close()
+        with open(os.path.join(arbeit, "pruefung", "leistung.json"), "w") as d:
+            d.write('{"ok": true}')
         self.assertIsNone(hook("abschluss.mjs", {"cwd": self.ws}))
+
+    def _fast_fertig(self, leistung='{"ok": true}'):
+        open(os.path.join(self.ws, "website", "x", "site", "index.html"), "w").close()
+        time.sleep(1.2)
+        arbeit = os.path.join(self.ws, "website", "x", "arbeit")
+        open(os.path.join(arbeit, "pruefung", "pruefung.json"), "w").close()
+        os.makedirs(os.path.join(arbeit, "vorbilder")); os.makedirs(os.path.join(arbeit, "runden", "1"))
+        for i in range(3):
+            open(os.path.join(arbeit, "vorbilder", "v%d.png" % i), "w").close()
+        open(os.path.join(arbeit, "runden", "1", "kritik.md"), "w").close()
+        if leistung is not None:
+            with open(os.path.join(arbeit, "pruefung", "leistung.json"), "w") as d:
+                d.write(leistung)
+        return arbeit
+
+    def test_ohne_leistungsmessung_blockt(self):
+        self._fast_fertig(leistung=None)
+        r = hook("abschluss.mjs", {"cwd": self.ws})
+        self.assertIn("Leistung", r["reason"])
+
+    def test_leistung_unter_90_blockt(self):
+        self._fast_fertig(leistung='{"ok": false}')
+        self.assertIn("Leistung", hook("abschluss.mjs", {"cwd": self.ws})["reason"])
+
+    def test_umbau_ohne_wunschliste_blockt(self):
+        arbeit = self._fast_fertig()
+        open(os.path.join(arbeit, "inhaltsliste.md"), "w").close()
+        self.assertIn("wuensche.md", hook("abschluss.mjs", {"cwd": self.ws})["reason"])
+        open(os.path.join(arbeit, "wuensche.md"), "w").close()
+        self.assertIsNone(hook("abschluss.mjs", {"cwd": self.ws}))
+
+    def test_muell_im_projekt_blockt(self):
+        arbeit = self._fast_fertig()
+        os.makedirs(os.path.join(arbeit, "werk", "__pycache__"))
+        self.assertIn("Müll", hook("abschluss.mjs", {"cwd": self.ws})["reason"])
 
     def test_ohne_kritik_und_vorbilder_blockt(self):
         open(os.path.join(self.ws, "website", "x", "site", "index.html"), "w").close()

@@ -9,6 +9,8 @@ Schreinerei) und kleine Testseiten in tests/seiten. Positivbeispiel: tests/seite
 - Aus dem SFH-Test (19.11.2026): tests/seiten/w10-ueberlappung muss W10 (Texte überlappen) auslösen, kursiv muss
   „Kursive Serife“ (W1) melden, gut-sonderfaelle (gewollt dunkle 3D-Fläche, Datenblock, Schnittstelle nur online) darf
   keinen harten Befund haben.
+- Aus der Durchsicht des Entwurfs „Kombi“ (19.11.2026): kunstkursiv (Schrift ohne Kursivschnitt kursiv gesetzt) → W1,
+  ballast (unbenutzte Datei) → Ballast, buehne-ohne-js (420vh-Bühne, ohne JavaScript Stillstand) → W11 und W12.
 - tests/seiten/unsicher muss die Sicherheits- und Rechtsprüfungen auslösen (Inline-Ereignis, Schlüssel, Source Map,
   EXIF/GPS im Foto, Autor im PDF, fehlende Header, OS-Plattform-Link).
 Hinweis: Der schwarze Balken aus P4 war ein Zustand beim Laden und ließ sich nicht wieder hervorrufen; W8 wird deshalb
@@ -77,12 +79,23 @@ class Eichung(unittest.TestCase):
         e = pruefen(os.path.join(SEITEN, "gut-sonderfaelle"))
         self.assertEqual(e["p0"], 0, [b["text"] for b in e["befunde"] if b["schwere"] == "P0"])
 
+    def test_kuenstlich_kursiv(self):
+        self.assertTrue(any("Künstlich kursiv" in b["text"] for b in harte(pruefen(os.path.join(SEITEN, "kunstkursiv")), "W1")))
+
+    def test_ballast(self):
+        self.assertTrue(harte(pruefen(os.path.join(SEITEN, "ballast")), "Ballast"))
+
+    def test_lange_buehne_und_ohne_javascript(self):
+        e = pruefen(os.path.join(SEITEN, "buehne-ohne-js"))
+        self.assertTrue(harte(e, "W11"))
+        self.assertTrue(harte(e, "W12"))
+
     def test_ablauf_bildserie(self):
         aus = tempfile.mkdtemp()
         r = subprocess.run(["node", os.path.join(PLUGIN, "scripts", "ablauf.mjs"), os.path.join(SEITEN, "gut"), aus,
                             "--stellen", "0,1", "--warten", "500"], capture_output=True, text=True, timeout=600)
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
-        self.assertEqual(len([f for f in os.listdir(aus) if f.endswith(".png")]), 8)
+        self.assertEqual(len([f for f in os.listdir(aus) if f.endswith(".png")]), 10)
 
     def test_lieferordner_mit_arbeitsdateien(self):
         d = tempfile.mkdtemp()

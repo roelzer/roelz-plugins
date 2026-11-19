@@ -1,5 +1,18 @@
 # Änderungsprotokoll Website-Bauer
 
+## 0.2.4 – Zehn Funde aus der Durchsicht des Entwurfs „Kombi“
+- Neues Skript `leistung.mjs`: Lighthouse im Handy-Profil, Ziel ≥ 90, schreibt `leistung.json`. Gegenprobe: Der alte Stand misst 62 (11,2 s Blockierzeit), der aufgeräumte 99.
+- Prüfskript:
+  - künstlich kursive Schrift (W1),
+  - Scroll-Bühne über 3,2 Bildschirmhöhen (W11),
+  - Stillstand ohne JavaScript (W12),
+  - unbenutzte mitgelieferte Dateien (Ballast),
+  - Bibliotheken und Schriften fehlen in `QUELLEN.md` (Unterlagen).
+- Abschluss-Sperre: verlangt Leistungsmessung ≥ 90, bei Umbauten `arbeit/wuensche.md`, kein `__pycache__`/`.pyc`/`.DS_Store`.
+- `ablauf.mjs`: Handy auch quer, Option `--ohne-js`.
+- `handwerk.md` Abschnitt 11 (zehn Regeln), `3d-leistung.md` (3D erst bei der ersten Bewegung, am Handy ohne Schatten, gleiche Umschaltregel, `<noscript>`), Skill entsprechend.
+- Testfall `k3-wunsch-erhalten`, Eichungsseiten `kunstkursiv`, `ballast`, `buehne-ohne-js`, vier neue Sperren-Tests.
+
 ## 0.2.3 – Nachschulung aus dem SFH-Test
 - Neues Skript `ablauf.mjs`: Bildserie eines Scroll-Ablaufs auf drei Laptop-Größen und am Handy.
 - Prüfskript: neue Prüfung W10 „Texte überlappen“ (je Textzeile gemessen). Daten-Blöcke (`application/json`) zählen nicht mehr als CSP-Fehler. Bewusst dunkle Szenen lassen sich mit `data-pruefen="dunkel"` ausnehmen. Eine fehlende Server-Schnittstelle (`/api/…`) in der lokalen Vorschau ist nur noch ein Hinweis.

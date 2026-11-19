@@ -9,7 +9,10 @@
 //                Die Stellen sind dann Anteile seines Scrollwegs. Ohne: Anteile der ganzen Seite.
 //   --stellen    Komma-Liste von Anteilen zwischen 0 und 1 (Standard 0,0.25,0.5,0.75,1)
 //   --warten     Millisekunden je Stelle, bis Übergänge und 3D nachgezogen haben (Standard 3500)
-// Ergebnis: <ziel>/<gerät>-<stelle>.png für 1366×768, 1440×900, 1920×1080 und iPhone 13.
+//   --ohne-js    zusätzlich eine Serie ohne JavaScript (zeigt, was bei <noscript> zu sehen ist)
+// Das Handy kommt hochkant und quer: Quer hat im SFH-Test Kamera und Text gegeneinander verschoben,
+// weil das 3D nach Seitenverhältnis und das CSS nach Breite umschaltete.
+// Ergebnis: <ziel>/<gerät>-<stelle>.png für 1366×768, 1440×900, 1920×1080, iPhone 13 hochkant und quer.
 import { createRequire } from "node:module";
 import http from "node:http";
 import fs from "node:fs";
@@ -51,7 +54,9 @@ const geraete = [
   ["laptop-1440", { viewport: { width: 1440, height: 900 } }],
   ["desktop-1920", { viewport: { width: 1920, height: 1080 } }],
   ["handy", { ...pw.devices["iPhone 13"] }],
+  ["handy-quer", { ...pw.devices["iPhone 13 landscape"] }],
 ];
+if (args.includes("--ohne-js")) geraete.push(["laptop-1440-ohne-js", { viewport: { width: 1440, height: 900 }, javaScriptEnabled: false }], ["handy-ohne-js", { ...pw.devices["iPhone 13"], javaScriptEnabled: false }]);
 const fehler = [];
 for (const [name, opt] of geraete) {
   const ctx = await browser.newContext(opt);
