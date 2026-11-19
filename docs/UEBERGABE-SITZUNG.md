@@ -2,6 +2,8 @@
 
 Für die nächste Sitzung, die mit Simon am Dev-Team (roelz-plugins) weiterarbeitet. Erst ganz lesen.
 
+> **Neuer:** Personaler, Video-Editor (zurückgestellt) und Website-Bauer: siehe `docs/UEBERGABE-WEBSITE-BAUER.md` (Stand 19.11.2026).
+
 ## Simon
 - Spricht Deutsch, ist kein Programmierer, liest keinen Code. Kurz, klar, ehrlich, mit Empfehlung antworten.
 - Arbeitet **nur in Cloud-Sitzungen** (Claude-App). Max-Abo mit Wochenlimit → sparsam mit Agenten und Tokens.
@@ -24,7 +26,7 @@ Für die nächste Sitzung, die mit Simon am Dev-Team (roelz-plugins) weiterarbei
 
 ## Projekte (alle mit Dev-Team eingerichtet)
 - **ichkannalles** (privat, Besetzung Kunde): M7 lief in eigener Sitzung weiter. Falls die Schranke „Eintrag … fehlt“ meldet: `abnahme_pruefsummen.py --schreiben --freigabe m5-format-v3`.
-- **SiRo/ENERPLAN** (privat, ENERPIPE-intern mit echten Kundendaten → Kunde).
+- **Ein privates Projekt mit echten Kundendaten** → Kunde.
 - **Simfit** (Solo, Fitness-App, Garmin): eingerichtet, erste Version gebaut; Sitzung wartete auf Simons Antworten H1–H4. Garmin-Login macht Simon selbst.
 - **W-rmenetz-Dorf** (Solo, Handyspiel): Sitzung lief zuletzt mit Opus, Denkaufwand „medium“, ~250k Kontext. Empfehlung an Simon war: neue Sitzung, Opus + Denkaufwand hoch, Spielregeln in `docs/lastenheft.md` mit Tests.
 

@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Fuge – Software-Verbindungen für kleine Betriebe</title>
+  <meta name="description" content="Individuelle Schnittstellen, Überwachungs-Tools und Automatisierungen für kleine Betriebe. Ihre Programme bleiben – das fehlende Stück dazwischen baue ich.">
+  <meta name="theme-color" content="#000000">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Fuge – Ihre Programme. Endlich verbunden.">
+  <meta property="og:description" content="Schnittstellen, Überwachung und Automatisierungen für kleine Betriebe. Keine neue Software – die fehlende Verbindung.">
+  <meta property="og:image" content="assets/og.png">
+  <meta property="og:locale" content="de_DE">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="assets/fonts/inter-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script>
+    // Bewegung nur, wenn JS läuft und der Besucher keine reduzierte Bewegung eingestellt hat.
+    document.documentElement.classList.add('js');
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.documentElement.classList.add('motion');
+    }
+  </script>
+</head>
+<body>
+  <a class="skip" href="#inhalt">Zum Inhalt springen</a>
+
+  <header class="nav" id="nav">
+    <div class="nav__inner">
+      <a class="brand" href="#top" aria-label="Fuge – zum Seitenanfang">
+        <svg class="brand__mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="4" width="9" height="16" rx="2.2"/><rect x="14" y="4" width="9" height="16" rx="2.2"/><rect class="brand__joint" x="11.1" y="2" width="1.8" height="20" rx=".9"/></svg>
+        <span>Fuge</span>
+      </a>
+      <nav class="nav__links" aria-label="Hauptnavigation">
+        <a href="#leistungen">Leistungen</a>
+        <a href="#ablauf">Ablauf</a>
+        <a href="#beispiele">Beispiele</a>
+        <a href="#fragen">Fragen</a>
+      </nav>
+      <a class="btn btn--small" href="#kontakt">Anfragen</a>
+    </div>
+  </header>
+
+  <main id="inhalt">
+    <!-- ============ HERO + SZENE (der eine starke Moment) ============ -->
+    <section class="scene" id="top" aria-labelledby="hero-title">
+      <div class="scene__pin">
+        <div class="hero">
+          <p class="eyebrow hero__eyebrow">Software-Verbindungen für kleine Betriebe</p>
+          <h1 class="hero__title" id="hero-title">
+            <span class="line"><span>Ihre Programme.</span></span>
+            <span class="line line--dim"><span>Endlich verbunden.</span></span>
+          </h1>
+          <p class="hero__sub">Ich verbinde die Software, die Sie schon haben&nbsp;– damit nichts mehr abgetippt, kopiert oder vergessen wird.</p>
+          <div class="hero__cta">
+            <a class="btn" href="#kontakt">Gespräch vereinbaren</a>
+            <a class="link-arrow" href="#so-gehts">So funktioniert’s</a>
+          </div>
+        </div>
+
+        <ol class="captions" id="so-gehts" aria-label="So funktioniert es">
+          <li class="caption" data-step="1">
+            <p class="caption__kicker"><span>01</span> Heute</p>
+            <h2>Jedes Programm ist eine Insel.</h2>
+            <p>Was in der Tabelle steht, muss ins Angebot. Also tippt jemand ab&nbsp;– und irgendwann passiert ein Zahlendreher.</p>
+          </li>
+          <li class="caption" data-step="2">
+            <p class="caption__kicker"><span>02</span> Dann</p>
+            <h2>Ich baue die Verbindung dazwischen.</h2>
+            <p>Ihre Programme bleiben, wie sie sind. Dazwischen kommt ein kleines Stück Software, das beide Seiten versteht.</p>
+          </li>
+          <li class="caption" data-step="3">
+            <p class="caption__kicker"><span>03</span> Ab jetzt</p>
+            <h2>Die Werte kommen von selbst.</h2>
+            <p>Neue Zeile in der Tabelle&nbsp;– schon steht sie im Angebot. Geprüft. Und wenn etwas nicht passt, bekommen Sie Bescheid.</p>
+          </li>
+        </ol>
+
+        <div class="stage" id="stage" aria-hidden="true">
+          <svg class="wires" id="wires"></svg>
+
+          <!-- Quelle: Tabelle -->
+          <div class="win win--sheet" id="winSheet">
+            <div class="win__bar">
+              <svg viewBox="0 0 16 16" class="win__icon"><rect x="2" y="1.5" width="12" height="13" rx="2"/><path d="M2 6h12M2 10h12M7 6v8.5"/></svg>
+              <span class="win__name">Aufmass_KW47.xlsx</span>
+              <span class="win__app">Tabelle</span>
+            </div>
+            <div class="sheet">
+              <div class="sheet__row sheet__head"><span class="c-pos">A</span><span class="c-txt">B</span><span class="c-unit">C</span><span class="c-qty">D</span></div>
+              <div class="sheet__row sheet__label"><span class="c-pos">Pos</span><span class="c-txt">Bezeichnung</span><span class="c-unit">Einh.</span><span class="c-qty">Menge</span></div>
+              <div class="sheet__row" data-row="0"><span class="c-pos">1</span><span class="c-txt">Fliesen Bad EG</span><span class="c-unit">m²</span><span class="c-qty">24,6</span></div>
+              <div class="sheet__row" data-row="1"><span class="c-pos">2</span><span class="c-txt">Sockelleiste</span><span class="c-unit">m</span><span class="c-qty">38,2</span></div>
+              <div class="sheet__row" data-row="2"><span class="c-pos">3</span><span class="c-txt">Abdichtung Dusche</span><span class="c-unit">m²</span><span class="c-qty">6,5</span></div>
+              <div class="sheet__row" data-row="3"><span class="c-pos">4</span><span class="c-txt">Silikonfuge</span><span class="c-unit">m</span><span class="c-qty">41,0</span></div>
+            </div>
+          </div>
+
+          <!-- Ziel: Angebot -->
+          <div class="win win--doc" id="winDoc">
+            <div class="win__bar">
+              <svg viewBox="0 0 16 16" class="win__icon"><path d="M4 1.5h5.5L13 5v9.5H4z"/><path d="M9.5 1.5V5H13M6.5 8.5h4M6.5 11h4"/></svg>
+              <span class="win__name">Angebot 2026-118</span>
+              <span class="win__app">Angebote</span>
+            </div>
+            <div class="doc">
+              <div class="doc__row doc__head"><span class="d-txt">Leistung</span><span class="d-qty">Menge</span><span class="d-ep">EP €</span><span class="d-gp">Gesamt €</span></div>
+              <div class="doc__row" data-row="0"><span class="d-txt">Fliesen Bad EG</span><span class="d-qty"><b class="v">24,6</b><b class="typo">42,6</b></span><span class="d-ep">68,00</span><span class="d-gp"><b class="v">1.672,80</b></span></div>
+              <div class="doc__row" data-row="1"><span class="d-txt">Sockelleiste</span><span class="d-qty"><b class="v">38,2</b></span><span class="d-ep">14,50</span><span class="d-gp"><b class="v">553,90</b></span></div>
+              <div class="doc__row" data-row="2"><span class="d-txt">Abdichtung Dusche</span><span class="d-qty"><b class="v">6,5</b></span><span class="d-ep">42,00</span><span class="d-gp"><b class="v">273,00</b></span></div>
+              <div class="doc__row" data-row="3"><span class="d-txt">Silikonfuge</span><span class="d-qty"><b class="v">41,0</b></span><span class="d-ep">6,80</span><span class="d-gp"><b class="v">278,80</b></span></div>
+              <div class="doc__sum"><span>Summe netto</span><b id="sum">2.778,50</b></div>
+            </div>
+            <span class="flag" id="flag">Zahlendreher</span>
+          </div>
+
+          <!-- Meldung -->
+          <div class="toast" id="toast">
+            <span class="toast__dot"></span>
+            <span class="toast__text"><b>4 Positionen übertragen</b><span>geprüft · gerade eben</span></span>
+          </div>
+
+          <svg class="cursor" id="cursor" viewBox="0 0 20 24"><path d="M2 1.5v18.2l4.6-4.3 3 6.9 3.1-1.4-3-6.8h6.4z"/></svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ AUSSAGE ============ -->
+    <section class="statement section--light" aria-label="Worum es geht">
+      <p class="statement__text" id="statement">Ich verkaufe Ihnen keine neue Software. Ich baue das fehlende Stück zwischen den Programmen, die Sie schon haben.</p>
+    </section>
+
+    <!-- ============ LEISTUNGEN ============ -->
+    <section class="services section--light" id="leistungen" aria-labelledby="leistungen-title">
+      <div class="wrap">
+        <header class="section-head reveal">
+          <p class="eyebrow">Leistungen</p>
+          <h2 id="leistungen-title">Was ich baue.</h2>
+        </header>
+
+        <div class="bento">
+          <article class="tile tile--wide reveal">
+            <div class="tile__copy">
+              <h3>Schnittstellen</h3>
+              <p class="tile__lead">Programme, die miteinander reden.</p>
+              <p>CAD an Excel, Webshop an Warenwirtschaft, Formular an Kalender. Wenn zwei Programme dieselben Daten brauchen, sorge ich dafür, dass sie sie bekommen.</p>
+            </div>
+            <div class="demo demo--link" aria-hidden="true">
+              <span class="node">CAD-Plan</span>
+              <span class="pipe"><i></i><i></i><i></i></span>
+              <span class="node">Kalkulation</span>
+            </div>
+          </article>
+
+          <article class="tile reveal">
+            <div class="tile__copy">
+              <h3>Überwachung</h3>
+              <p class="tile__lead">Ein Auge auf alles, was läuft.</p>
+              <p>Termine, Lagerbestände, Messwerte, Fristen. Das Werkzeug schaut regelmäßig nach und meldet sich nur, wenn etwas nicht stimmt.</p>
+            </div>
+            <ul class="demo demo--watch" aria-hidden="true">
+              <li><i class="ok"></i>Lager Fliesenkleber<span>ausreichend</span></li>
+              <li class="watch-flip"><i class="ok"></i>Abgabe Bauantrag<span class="s-ok">im Plan</span><span class="s-warn">in 2 Tagen</span></li>
+              <li><i class="ok"></i>Server-Sicherung<span>heute 03:00</span></li>
+            </ul>
+          </article>
+
+          <article class="tile reveal">
+            <div class="tile__copy">
+              <h3>Automatisierung</h3>
+              <p class="tile__lead">Nie wieder abtippen.</p>
+              <p>Werte von einer Excel in die andere, Berichte, die sich selbst zusammenstellen, Rechnungen, die von allein im richtigen Ordner landen.</p>
+            </div>
+            <div class="demo demo--cells" aria-hidden="true">
+              <div class="mini"><span>12,4</span><span>8,0</span><span>31,5</span></div>
+              <svg viewBox="0 0 40 12" class="mini__arrow"><path d="M0 6h36M31 1.5 36.5 6 31 10.5"/></svg>
+              <div class="mini mini--to"><span>12,4</span><span>8,0</span><span>31,5</span></div>
+            </div>
+          </article>
+
+          <article class="tile tile--wide reveal">
+            <div class="tile__copy">
+              <h3>Kleine Werkzeuge</h3>
+              <p class="tile__lead">Genau das Werkzeug, das fehlt.</p>
+              <p>Eine Zeiterfassung, die gleich die Rechnung vorbereitet. Ein Formular fürs Handy auf der Baustelle. Klein, schnell, gebaut für Ihren Ablauf&nbsp;– nicht für tausend andere.</p>
+            </div>
+            <div class="demo demo--tool" aria-hidden="true">
+              <div class="phone">
+                <span class="phone__label">Stunden heute</span>
+                <span class="phone__value"><b>7,5</b> h</span>
+                <span class="phone__btn">Erfassen</span>
+              </div>
+              <svg viewBox="0 0 40 12" class="mini__arrow"><path d="M0 6h36M31 1.5 36.5 6 31 10.5"/></svg>
+              <div class="invoice">
+                <span>Rechnung · Entwurf</span>
+                <span class="invoice__line"><em>Montage</em><em>7,5 h</em></span>
+                <span class="invoice__line"><em>Anfahrt</em><em>1×</em></span>
+                <span class="invoice__ok">bereit zum Versand</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ NICHT / SONDERN ============ -->
+    <section class="contrast section--dark" aria-labelledby="contrast-title">
+      <div class="wrap wrap--narrow">
+        <p class="eyebrow reveal">Was Sie nicht bekommen</p>
+        <h2 class="visually-hidden" id="contrast-title">Was Sie nicht bekommen und was stattdessen</h2>
+        <ul class="strike">
+          <li><span>Noch eine Software mit 200 Funktionen.</span></li>
+          <li><span>Ein Abo pro Mitarbeiter.</span></li>
+          <li><span>Ein IT-Projekt, das zwei Jahre dauert.</span></li>
+          <li><span>Stundenzettel, die keiner versteht.</span></li>
+        </ul>
+        <p class="contrast__answer reveal">Sondern eine Lösung für genau Ihr Problem. Mit festem Preis, bevor ich anfange.</p>
+      </div>
+    </section>
+
+    <!-- ============ ABLAUF ============ -->
+    <section class="process section--light" id="ablauf" aria-labelledby="ablauf-title">
+      <div class="wrap">
+        <header class="section-head reveal">
+          <p class="eyebrow">Ablauf</p>
+          <h2 id="ablauf-title">Drei Schritte.<br>Kein Fachchinesisch.</h2>
+        </header>
+        <ol class="steps" id="steps">
+          <li class="step">
+            <span class="step__num">1</span>
+            <h3>Zuhören</h3>
+            <p>Ich komme vorbei und schaue mir an, wie Sie heute arbeiten. Wo wird abgetippt, wo wird gesucht, wo geht etwas verloren?</p>
+          </li>
+          <li class="step">
+            <span class="step__num">2</span>
+            <h3>Festpreis</h3>
+            <p>Sie bekommen eine klare Beschreibung, was das Werkzeug können wird, und einen festen Preis. Keine Stundenzettel, keine Überraschung.</p>
+          </li>
+          <li class="step">
+            <span class="step__num">3</span>
+            <h3>Bauen und übergeben</h3>
+            <p>Ich baue, Sie testen mit echten Daten. Fertig ist es erst, wenn es in Ihrem Alltag läuft&nbsp;– und ich bleibe erreichbar.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ============ BEISPIELE ============ -->
+    <section class="examples section--light" id="beispiele" aria-labelledby="beispiele-title">
+      <div class="wrap">
+        <header class="section-head section-head--row reveal">
+          <div>
+            <p class="eyebrow">Beispiele</p>
+            <h2 id="beispiele-title">Aus dem Alltag<br>kleiner Betriebe.</h2>
+          </div>
+          <div class="rail-nav" aria-hidden="false">
+            <button class="rail-btn" type="button" data-dir="-1" aria-label="Vorheriges Beispiel"><svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></button>
+            <button class="rail-btn" type="button" data-dir="1" aria-label="Nächstes Beispiel"><svg viewBox="0 0 16 16"><path d="m6 3 5 5-5 5"/></svg></button>
+          </div>
+        </header>
+      </div>
+      <div class="rail" id="rail" tabindex="0" aria-label="Beispiele, seitlich scrollbar">
+        <article class="card">
+          <p class="card__trade">Handwerk</p>
+          <h3>Das Aufmaß landet direkt im Angebot.</h3>
+          <dl class="card__ba"><div><dt>Vorher</dt><dd>Werte aus der Aufmaß-Tabelle von Hand ins Angebotsprogramm.</dd></div><div><dt>Nachher</dt><dd>Ein Klick, alle Positionen übernommen. Sie prüfen nur noch.</dd></div></dl>
+        </article>
+        <article class="card">
+          <p class="card__trade">Planungsbüro</p>
+          <h3>Die Stückliste geht vom Plan in die Kalkulation.</h3>
+          <dl class="card__ba"><div><dt>Vorher</dt><dd>Mengen aus dem CAD-Plan zählen und in Excel eintragen.</dd></div><div><dt>Nachher</dt><dd>Der Plan liefert die Liste, die Kalkulation rechnet sofort.</dd></div></dl>
+        </article>
+        <article class="card">
+          <p class="card__trade">Handel</p>
+          <h3>Die Nachbestellung schreibt sich selbst.</h3>
+          <dl class="card__ba"><div><dt>Vorher</dt><dd>Bestand prüfen, wenn es einem einfällt&nbsp;– oft zu spät.</dd></div><div><dt>Nachher</dt><dd>Fällt ein Artikel unter die Mindestmenge, liegt der Bestellentwurf im Postfach.</dd></div></dl>
+        </article>
+        <article class="card">
+          <p class="card__trade">Hausverwaltung</p>
+          <h3>Zählerstände per Handyfoto.</h3>
+          <dl class="card__ba"><div><dt>Vorher</dt><dd>Zettel, Fotos und Mails sammeln, dann abtippen.</dd></div><div><dt>Nachher</dt><dd>Foto hochladen, der Wert steht in der Abrechnungstabelle.</dd></div></dl>
+        </article>
+        <article class="card">
+          <p class="card__trade">Büro</p>
+          <h3>Rechnungen sortieren sich von allein.</h3>
+          <dl class="card__ba"><div><dt>Vorher</dt><dd>Anhänge speichern, umbenennen, in Ordner ziehen.</dd></div><div><dt>Nachher</dt><dd>Jede Rechnung liegt im richtigen Ordner, mit einem Namen, den man findet.</dd></div></dl>
+        </article>
+      </div>
+      <div class="wrap"><p class="note">Beispiele zur Veranschaulichung, typische Aufgaben&nbsp;– keine Kundenprojekte.</p></div>
+    </section>
+
+    <!-- ============ ÜBER MICH ============ -->
+    <section class="about section--dark" aria-labelledby="about-title">
+      <div class="wrap about__grid">
+        <h2 class="about__title reveal" id="about-title">Ein Ansprechpartner.<br><span class="dim">Von der ersten Frage bis zum laufenden Werkzeug.</span></h2>
+        <div class="about__copy reveal">
+          <p>Ich bin Simon. Ich komme selbst aus einem Planungsberuf und kenne die Excel-Liste, die keiner mehr anfassen will, aus eigener Erfahrung.</p>
+          <p>Bei mir gibt es keine Projektleiter, keine Weitergabe an Unbekannte. Sie sprechen mit dem, der baut. Moderne Werkzeuge&nbsp;– auch KI&nbsp;– helfen mir, das schneller und günstiger umzusetzen, als Sie es von klassischen IT-Projekten kennen.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FRAGEN ============ -->
+    <section class="faq section--light" id="fragen" aria-labelledby="fragen-title">
+      <div class="wrap wrap--narrow">
+        <header class="section-head reveal">
+          <p class="eyebrow">Fragen</p>
+          <h2 id="fragen-title">Gut zu wissen.</h2>
+        </header>
+        <div class="faq__list">
+          <details>
+            <summary>Muss ich meine Programme austauschen?</summary>
+            <p>Nein. Genau darum geht es: Ihre Programme bleiben. Ich baue die Verbindung, damit sie zusammenarbeiten.</p>
+          </details>
+          <details>
+            <summary>Was kostet das?</summary>
+            <p>Das hängt vom Umfang ab. Nach dem ersten Gespräch bekommen Sie einen festen Preis für ein klar beschriebenes Ergebnis&nbsp;– nicht für Stunden.</p>
+          </details>
+          <details>
+            <summary>Wie lange dauert es?</summary>
+            <p>Kleine Automatisierungen oft wenige Tage, größere Verbindungen einige Wochen. Den Zeitplan sehen Sie vorher.</p>
+          </details>
+          <details>
+            <summary>Was passiert mit meinen Daten?</summary>
+            <p>Wir klären vorab gemeinsam, wo Ihre Daten liegen und wer sie sieht. Wo es geht, läuft das Werkzeug auf Ihren eigenen Rechnern oder bei einem Anbieter in der EU.</p>
+          </details>
+          <details>
+            <summary>Und wenn sich später etwas ändert?</summary>
+            <p>Dann passe ich es an. Neue Spalte in der Tabelle, neues Programm im Betrieb&nbsp;– das Werkzeug wächst mit.</p>
+          </details>
+          <details>
+            <summary>Ist mein Problem nicht zu klein dafür?</summary>
+            <p>Wahrscheinlich nicht. Gerade die kleinen, täglichen Handgriffe kosten über das Jahr die meiste Zeit. Erzählen Sie es mir einfach.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ KONTAKT ============ -->
+    <section class="contact section--dark" id="kontakt" aria-labelledby="kontakt-title">
+      <div class="wrap wrap--narrow contact__inner">
+        <h2 class="contact__title reveal" id="kontakt-title">Was tippen Sie<br>heute noch ab?</h2>
+        <p class="contact__sub reveal">Beschreiben Sie es in einem Satz. Ich melde mich innerhalb eines Werktags.</p>
+        <form class="ask reveal" id="ask" novalidate>
+          <label class="visually-hidden" for="askText">Ihre Aufgabe in einem Satz</label>
+          <textarea id="askText" name="text" rows="3" maxlength="600" placeholder="Zum Beispiel: Jeden Freitag übertrage ich die Stunden aus der Zeiterfassung in die Lohnliste."></textarea>
+          <div class="ask__row">
+            <span class="ask__hint" id="askHint">Öffnet Ihr E-Mail-Programm. Nichts wird auf dieser Seite gespeichert.</span>
+            <button class="btn" type="submit">Als E-Mail senden</button>
+          </div>
+        </form>
+        <p class="contact__alt reveal">Lieber direkt? <a href="mailto:hallo@ihre-domain.de" id="mailLink">hallo@ihre-domain.de</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer__inner">
+      <a class="brand brand--footer" href="#top" aria-label="Fuge – zum Seitenanfang">
+        <svg class="brand__mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="4" width="9" height="16" rx="2.2"/><rect x="14" y="4" width="9" height="16" rx="2.2"/><rect class="brand__joint" x="11.1" y="2" width="1.8" height="20" rx=".9"/></svg>
+        <span>Fuge</span>
+      </a>
+      <p class="footer__claim">Software-Verbindungen für kleine Betriebe.</p>
+      <nav class="footer__links" aria-label="Rechtliches">
+        <a href="impressum.html">Impressum</a>
+        <a href="datenschutz.html">Datenschutz</a>
+      </nav>
+      <p class="footer__copy">© 2026</p>
+    </div>
+  </footer>
+
+  <script src="assets/vendor/gsap.min.js" defer></script>
+  <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
+  <script src="assets/js/main.js" defer></script>
+</body>
+</html>

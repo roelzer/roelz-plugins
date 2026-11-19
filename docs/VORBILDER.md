@@ -69,7 +69,7 @@ Stand: 18.11.2026 (Dev-Team 3.22.0, Video-Studio 1.1.0). Neun parallele Recherch
 | produktpruefer | Anthropic Harness-Design und „Effective harnesses for long-running agents“; NN/g Severity; Cagan „Four Big Risks“; Cognitive Walkthrough; Krug; Studie zu simulierten Nutzern (arXiv 2605.18302) | Aufgaben vor dem Klicken, Prüfung gegen das Anliegen, Erststart sauber, Messen statt Bild, Schwere 0–4, nicht wegreden, nachstellbar + „nicht durchgespielt“, eigenes Urteil ist kein Nutzertest |
 | fachexperte | Anthropic „Reduce hallucinations“; Example Mapping, Adzic „Specification by Example“; Evans (Ubiquitous Language); Brandolini (Event Storming); Klein (Critical Decision Method, Knowledge Audit); Jobs-to-be-Done | Herkunft je Aussage, Lehrbuch vs. Praxis, Beispiel und Gegenbeispiel, Begriffsabgleich, Ereigniskette, alle Rollen, Plausibilitätsprobe des Profis, Fragen zum letzten echten Fall |
 | rechercheur | Anthropic „How we built our multi-agent research system“; DeepTRACE (arXiv 2509.04499); Studien zu erfundenen URLs und Paketnamen (arXiv 2604.03173, USENIX Security 2025); Caulfield SIFT, Stanford Lateral Reading; Bellingcat; Heuer (ACH) | Wörtliches Zitat, nur Geöffnetes zählt, Lateral Reading, bis zum Ursprung, Versionsreihenfolge bei Software, breit→eng mit Abbruchregel, Gegenbelege, Unabhängigkeit und Aktualität prüfen |
-| video-kritiker | GenVideoLens (arXiv 2603.18625), Artifact-Bench (arXiv 2605.18984), Spotlight (arXiv 2511.18102); Netflix QC; ffmpeg-Filter; Script-Supervisor-Praxis; Walter Murch „In the Blink of an Eye“ | Erst beschreiben, dann vergleichen, ein Durchgang je Fehlerart, Vollauflösung und hohe Bildrate an kritischen Stellen, Schnittstellen-Continuity, Technik messen, feste Schwere und Murch-Rangfolge, Grenzen ehrlich benennen |
+| video-kritiker (Plugin am 18.11.2026 entfernt) | GenVideoLens (arXiv 2603.18625), Artifact-Bench (arXiv 2605.18984), Spotlight (arXiv 2511.18102); Netflix QC; ffmpeg-Filter; Script-Supervisor-Praxis; Walter Murch „In the Blink of an Eye“ | Erst beschreiben, dann vergleichen, ein Durchgang je Fehlerart, Vollauflösung und hohe Bildrate an kritischen Stellen, Schnittstellen-Continuity, Technik messen, feste Schwere und Murch-Rangfolge, Grenzen ehrlich benennen |
 
 **Bewusst nicht übernommen (Auswahl):** mehrere parallele Prüfer oder Debattenrunden zwischen Agenten (widerspricht dem festen Team; der Gewinn kommt laut Studien fast nur aus Mehrheitsentscheid); Persona- oder „fünf simulierte Nutzer“-Tests (keine Treffsicherheit belegt); Teile der Anthropic-Ausschlussliste für Sicherheitsreviews (Log-Injection, Rate-Limiting, veraltete Bibliotheken, Nutzerinhalt im Systemprompt, UUIDs); feste Schriftlisten und „Museumsqualität“ als Designziel (führt wieder zu Einheitslook); Wackeltests löschen (Tester löscht nie Tests); automatische Video-Bewertung mit VBench/VideoScore (braucht GPU, erfasst Physik schwach); volle ATAM-, PRISMA- oder ACH-Verfahren (zu teuer für jeden Auftrag); Zeilenabdeckung als Ziel.
 
@@ -90,3 +90,48 @@ Aus der rollenübergreifenden Recherche, nach Nutzen sortiert. Nichts davon ist 
 11. **Gemeinsamen Agenten-Block nur einmal pflegen** (per SubagentStart-Hook einspielen statt 15 Kopien).
 12. **Anforderungsstatus als JSON** neben dem Lastenheft; **Zeitsignal** (verstrichen/geschätzt) für den Projektleiter; **Belegquote** der Reviewer-Befunde in den Kennzahlen; begründet abgelehnte Befundarten als Lektion festhalten.
 13. **Stilregeln für alle Agenten-Texte:** weniger Fettdruck und „NIE/IMMER“ (nur echte Null-Ausnahme-Regeln, sonst mit Ausweg), Regeln mit Halbsatz Begründung, positiv formulieren, keine Widersprüche zwischen Dateien, kein „sei streng/zurückhaltend“ bei Prüfern. Kleinere Spannungen: Selbstprüfung 3 des Entwicklers (null/NaN „auch wenn nie“) kann Absicherungscode für unmögliche Fälle erzeugen; `wissen/oberflaeche.md` „feine, gedämpfte Linien“ vs. WCAG 3:1 für Bedienelemente.
+
+## Personaler (Plugin `personal`, 18.11.2026)
+
+Drei Recherchen: (1) wie die Besten Agenten bauen, die selbst Agenten bauen, (2) wie menschliche Fachleute Rollen zuschneiden und Expertenwissen erheben, (3) wie man Agenten testet und misst. Übernommen wurden Ideen, keine Texte.
+
+| Vorbild | Lizenz bzw. Art | Übernommen |
+|---|---|---|
+| [anthropics/skills skill-creator](https://github.com/anthropics/skills/tree/main/skills/skill-creator) und [Blog 2026](https://claude.com/blog/improving-skill-creator-test-measure-and-refine-agent-skills) | Apache-2.0 | Vergleich mit/ohne als Pflicht, Bewerter kritisiert die Prüfpunkte, Transkripte lesen, Auslösetests mit Beinahe-Treffern, wiederholte Hilfsskripte ins Skript |
+| [Claude Code: plugin-evals](https://code.claude.com/docs/en/plugin-evals), [Skills](https://code.claude.com/docs/en/skills), [Subagents](https://code.claude.com/docs/en/sub-agents) | offizielle Doku | `claude plugin eval` als Messweg (3 Läufe je Arm, Δ), Prüfpunkt-Typen, Plugin-Einschränkungen bei Agenten-Feldern |
+| [Skill authoring best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices) | offizielle Doku | „Claude ist schon klug“, Freiheitsgrad nach Zerbrechlichkeit, Testfälle vor dem Text, Claude A baut / Claude B testet |
+| [Demystifying evals for AI agents](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents) | Anthropic-Blog 2026 | Fallarten, binäre Urteile, pass^k für Muss-Fälle, Beschwerden werden Testfälle |
+| [obra/superpowers writing-skills](https://github.com/obra/superpowers/tree/main/skills/writing-skills) | MIT | Kein Agent ohne vorher sichtbare Lücke, Regelform passend zur Fehlerart, keine Ablauf-Zusammenfassung in der Beschreibung, Druckszenarien |
+| [BMad Builder](https://bmad-builder-docs.bmad-method.org/) | MIT | „Im Zweifel mit einem Ablauf beginnen“, Schreib- und Sperrbereiche, Skripte für Mechanisches und Prompts für Urteile („Intelligence Placement“) |
+| [SkillsBench](https://arxiv.org/abs/2602.12670) | Studie 2026 | Selbst erzeugte Anleitungen bringen nichts (−1,3 Punkte), kuratierte viel (+16): Der Wert kommt aus Recherche, echten Fällen, Messung |
+| [Wharton „Playing Pretend“](https://arxiv.org/abs/2512.05858) | Studie 2025 | keine „Weltklasse-Experten“-Persona |
+| Hamel Husain/Shreya Shankar, [AI Evals FAQ](https://hamel.dev/blog/posts/evals-faq/) | Praxis | erst Fehleranalyse, dann Metriken; LLM-Prüfer erst nach Eichung an Simons Urteil |
+| Smart/Street „Who“ (Scorecard); Sackett u. a. 2022 (strukturierte Auswahl); Gawande/Boorman (Checklisten); Klein (Critical Decision Method, ACTA); Commander's Intent | Fachliteratur | Stellenausschreibung mit Auftrag, messbaren Ergebnissen und Arbeitsprobe; Recherche nach Fällen statt Prinzipien; Probezeit und Keeper-Test |
+
+**Bewusst nicht übernommen:** die „elite AI agent architect“-Persona und Beispiele in der Beschreibung aus Anthropics `agent-creator` (veraltet, kostet Kontext); selbst geschriebene und selbst bewertete Auslösetests (beweisen nichts); Optimierungs-Frameworks (DSPy/GEPA) und OpenAI Agent Builder (zu schwer, fremde Plattform); BMad-Personas und Rituale; 100–200 Eich-Beispiele je Fehlerart (zu viel für eine Person, stattdessen ~20 und Wachstum in der Probezeit); Bar Raiser als zusätzlicher Agent mit Vetorecht (dafür der `personal-pruefer`).
+
+## Video-Editor (Plugin `video`, 18.11.2026)
+
+Die erste Einstellung durch den Personaler. Probelauf, Recherche, Stellenausschreibung und Probearbeit liegen in `docs/personal/video-editor/`. Die wichtigsten Vorbilder:
+
+| Vorbild | Lizenz bzw. Art | Übernommen |
+|---|---|---|
+| [HyperFrames](https://github.com/heygen-com/hyperframes) (HeyGen) mit Agenten-Skills | Apache-2.0 | Kernwerkzeug (HTML → Video, Bild für Bild) und Handwerksregeln für Story, Bewegung, Look und Prüfung, in fester Version 0.9.65; ohne Telemetrie, ohne HeyGen-Bezahldienste, ohne Uploads |
+| Netflix Timed Text Style Guide, BBC Subtitle Guidelines | Normen | Lesezeit (≤ 20 Zeichen/s), Zeilenlänge, Mindest-Schriftgröße in % der Bildhöhe |
+| EBU R95, EBU R128 | Normen | sichere Ränder, Lautheit und True Peak |
+| Google ABCD (Kantar), TikTok, LinkedIn, Meta, Apple App Previews | Plattform-Leitfäden | Haken in den ersten Sekunden, stumm verständlich, Safe Zones, echte App statt Nachbau |
+| UX in Motion (Willenskomer), School of Motion, 12 Animationsprinzipien | Fachpraxis | nie linear, gestaffelt, Übergänge mit Bedeutung |
+| Anthropic frontend-design-Skill, Harness-Design (2026) | offiziell | Standardlösungen benennen und verbieten, unabhängiger skeptischer Prüfer |
+| [browser-use/video-use](https://github.com/browser-use/video-use) | MIT | Schnitt erst nach bestätigter Strategie, Prüfung an jeder Schnittgrenze, „du kannst nicht hören – sag es“ |
+| TOMATO (ICLR 2025) | Studie | Bewegung nie aus einem Bogen beurteilen; Bildstreifen und Messwerte |
+| VoxCPM2 (OpenBMB), Pocket TTS (Kyutai) | Apache-2.0; MIT/CC BY 4.0 | lokale deutsche Stimmen, Charakterstimmen aus Beschreibung |
+| ACE-Step 1.5 | MIT | Musik-KI als späterer Weg mit Grafikkarte |
+
+**Bewusst nicht übernommen:**
+- Remotion: ab 4 Mitarbeitern Firmenlizenz.
+- HeyGen-Stimmen, -Avatare und -Cloud sowie Telemetrie: kostenpflichtig bzw. Datenabfluss.
+- MusicGen, Stable Audio, YuE2, F5-TTS, XTTS, Fish: nicht-kommerzielle oder umsatzbegrenzte Lizenzen.
+- Kokoro: kein Deutsch.
+- Edge-TTS: inoffizieller Online-Dienst.
+- DaVinci Resolve Free: nicht automatisierbar.
+- Selbst synthetisierte Musik.

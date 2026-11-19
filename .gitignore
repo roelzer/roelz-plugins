@@ -8,3 +8,6 @@ Thumbs.db
 ~$*
 __pycache__/
 *.pyc
+
+# Ergebnisse von claude plugin eval
+**/evals/results/

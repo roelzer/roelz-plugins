@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+bash "$(dirname "$0")/../../tests/werkzeug/eval_vorbereiten.sh" sintel.mp4

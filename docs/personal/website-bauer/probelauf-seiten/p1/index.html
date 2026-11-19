@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JFG Seenland – Jugendfußball von U9 bis U19</title>
+  <meta name="description" content="JFG Seenland: Jugendfußball aus drei Dörfern, von der U9 bis zur U19. Mannschaften, Trainingszeiten, Neuigkeiten und kostenloses Probetraining.">
+  <meta name="theme-color" content="#061019">
+  <meta property="og:title" content="JFG Seenland – Drei Dörfer. Ein Team.">
+  <meta property="og:description" content="Jugendfußball von U9 bis U19. Komm zum Probetraining!">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="img/wappen.svg" type="image/svg+xml">
+  <link rel="preload" href="fonts/big-shoulders-display-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="skip" href="#inhalt">Zum Inhalt springen</a>
+
+  <div class="entwurf" id="entwurf" hidden>
+    <p><strong>Entwurf:</strong> Orte, Zeiten, Neuigkeiten und Kontaktdaten sind Beispiele und werden noch ersetzt.</p>
+    <button type="button" id="entwurfZu" aria-label="Hinweis schließen">&times;</button>
+  </div>
+
+  <header class="kopf" id="kopf">
+    <a class="marke" href="#start" aria-label="JFG Seenland – zum Seitenanfang">
+      <img src="img/wappen.svg" alt="" width="36" height="42">
+      <span>JFG <b>Seenland</b></span>
+    </a>
+    <nav class="nav" id="nav" aria-label="Hauptmenü">
+      <ul>
+        <li><a href="#mannschaften">Mannschaften</a></li>
+        <li><a href="#training">Training</a></li>
+        <li><a href="#neuigkeiten">Neuigkeiten</a></li>
+        <li><a href="#fragen">Fragen</a></li>
+        <li><a class="knopf knopf--klein" href="#mitmachen">Mitmachen</a></li>
+      </ul>
+    </nav>
+    <button class="menu-knopf" id="menuKnopf" aria-expanded="false" aria-controls="nav">
+      <span class="sr">Menü</span><span class="burger" aria-hidden="true"></span>
+    </button>
+  </header>
+
+  <main id="inhalt">
+    <noscript><style>.zeigen{opacity:1!important;transform:none!important}</style><p class="abschnitt">Mannschaften, Trainingszeiten und Neuigkeiten werden mit JavaScript angezeigt. Bitte JavaScript einschalten oder uns per E-Mail fragen.</p></noscript>
+    <!-- ===== HERO ===== -->
+    <section class="hero" id="start" aria-labelledby="hero-titel">
+      <svg class="hero__feld" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <g fill="none" stroke="currentColor" stroke-width="2">
+          <rect class="linie" x="40" y="40" width="1120" height="720" pathLength="1"/>
+          <line class="linie" x1="600" y1="40" x2="600" y2="760" pathLength="1"/>
+          <circle class="linie" cx="600" cy="400" r="120" pathLength="1"/>
+          <rect class="linie" x="40" y="220" width="170" height="360" pathLength="1"/>
+          <rect class="linie" x="990" y="220" width="170" height="360" pathLength="1"/>
+          <path class="linie" d="M210 330 A 90 90 0 0 1 210 470" pathLength="1"/>
+          <path class="linie" d="M990 330 A 90 90 0 0 0 990 470" pathLength="1"/>
+        </g>
+        <circle cx="600" cy="400" r="5" fill="currentColor"/>
+      </svg>
+      <div class="hero__licht" aria-hidden="true"></div>
+
+      <div class="hero__inhalt">
+        <p class="hero__kicker">Jugendfußball im Seenland <span class="punkt" aria-hidden="true"></span> U9 bis U19</p>
+        <h1 id="hero-titel" class="hero__titel">
+          <span class="zeile"><span>Drei Dörfer.</span></span>
+          <span class="zeile zeile--licht"><span>Ein Team.</span></span>
+        </h1>
+        <p class="hero__text">Rund <span data-feld="kinder">180</span> Kinder und Jugendliche, sechs Mannschaften, eine Leidenschaft. Komm vorbei – dein erstes Training ist kostenlos.</p>
+        <div class="hero__knoepfe">
+          <a class="knopf" href="#mitmachen">Probetraining ausmachen <svg class="pfeil" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          <a class="knopf knopf--rand" href="#training">Trainingszeiten</a>
+        </div>
+      </div>
+
+      <div class="ball" id="ballBox" aria-hidden="true">
+        <canvas id="ball" width="600" height="600"></canvas>
+        <div class="ball__schatten"></div>
+      </div>
+      <p class="ball__tipp" id="ballTipp" aria-hidden="true">Ball anfassen und drehen</p>
+
+      <a class="hero__runter" href="#ueber" aria-label="Weiter nach unten">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v13M6 12l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </section>
+
+    <!-- ===== LAUFBAND ===== -->
+    <div class="band" aria-hidden="true">
+      <div class="band__spur">
+        <span>U9</span><i></i><span>U11</span><i></i><span>U13</span><i></i><span>U15</span><i></i><span>U17</span><i></i><span>U19</span><i></i><span>Mädchen &amp; Jungs willkommen</span><i></i><span>Probetraining kostenlos</span><i></i>
+        <span>U9</span><i></i><span>U11</span><i></i><span>U13</span><i></i><span>U15</span><i></i><span>U17</span><i></i><span>U19</span><i></i><span>Mädchen &amp; Jungs willkommen</span><i></i><span>Probetraining kostenlos</span><i></i>
+      </div>
+    </div>
+
+    <!-- ===== ÜBER UNS ===== -->
+    <section class="abschnitt ueber" id="ueber" aria-labelledby="ueber-titel">
+      <div class="ueber__text zeigen">
+        <p class="kicker">Wer wir sind</p>
+        <h2 id="ueber-titel" class="titel">Aus drei Vereinen wird <em>eine</em> Mannschaft.</h2>
+        <p>Die JFG Seenland ist eine <strong>Jugendfördergemeinschaft</strong>: Die Jugendabteilungen von <span data-feld="stammvereine">drei Stammvereinen</span> spielen zusammen. So hat jeder Jahrgang genug Spielerinnen und Spieler für eine eigene Mannschaft – und niemand muss weit fahren, um richtig Fußball zu spielen.</p>
+        <p>Bei uns zählt nicht nur das Ergebnis. Wir wollen, dass Kinder gern kommen, Freunde finden und mit jedem Training ein Stück besser werden.</p>
+      </div>
+      <dl class="zahlen">
+        <div class="zahl zeigen"><dt>Dörfer</dt><dd data-zaehlen="3">3</dd></div>
+        <div class="zahl zeigen"><dt>Mannschaften</dt><dd data-zaehlen="6">6</dd></div>
+        <div class="zahl zeigen"><dt>Kinder, ungefähr</dt><dd data-zaehlen="180">180</dd></div>
+        <div class="zahl zeigen"><dt>Jahrgänge</dt><dd>U9–U19</dd></div>
+      </dl>
+    </section>
+
+    <!-- ===== MANNSCHAFTEN ===== -->
+    <section class="abschnitt" id="mannschaften" aria-labelledby="ms-titel">
+      <div class="abschnitt__kopf zeigen">
+        <p class="kicker">Saison <span data-feld="saison">2026/27</span></p>
+        <h2 id="ms-titel" class="titel">Unsere Mannschaften</h2>
+        <p class="abschnitt__unter">Finde dein Team über deinen Jahrgang. Ein Klick auf „Training“ zeigt dir gleich die passenden Zeiten.</p>
+      </div>
+      <div class="teams" id="teams" role="list">
+        <!-- wird aus js/daten.js gefüllt -->
+      </div>
+    </section>
+
+    <!-- ===== TRAINING ===== -->
+    <section class="abschnitt training" id="training" aria-labelledby="tr-titel">
+      <div class="abschnitt__kopf zeigen">
+        <p class="kicker">Jede Woche</p>
+        <h2 id="tr-titel" class="titel">Trainingszeiten</h2>
+        <p class="abschnitt__unter">Wähl deine Mannschaft – wir merken uns die Auswahl für deinen nächsten Besuch.</p>
+      </div>
+
+      <div class="filter" role="group" aria-label="Mannschaft auswählen" id="filter">
+        <!-- Knöpfe aus daten.js -->
+      </div>
+
+      <div class="woche" id="woche" aria-live="polite">
+        <!-- Wochenplan aus daten.js -->
+      </div>
+
+      <div class="training__fuss">
+        <p class="hinweis" id="trainingHinweis"></p>
+        <button class="knopf knopf--rand" id="kalender" type="button" hidden>
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 10h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span>In meinen Kalender</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===== NEUIGKEITEN ===== -->
+    <section class="abschnitt" id="neuigkeiten" aria-labelledby="nw-titel">
+      <div class="abschnitt__kopf zeigen">
+        <p class="kicker">Was los ist</p>
+        <h2 id="nw-titel" class="titel">Neuigkeiten</h2>
+      </div>
+      <div class="news" id="news">
+        <!-- aus daten.js -->
+      </div>
+    </section>
+
+    <!-- ===== MITMACHEN ===== -->
+    <section class="abschnitt mitmachen" id="mitmachen" aria-labelledby="mm-titel">
+      <div class="mitmachen__links">
+        <p class="kicker">Mitmachen</p>
+        <h2 id="mm-titel" class="titel titel--riesig">Komm zum <span class="licht">Probe&shy;training.</span></h2>
+        <ol class="schritte">
+          <li class="zeigen"><b>1</b><div><h3>Melden</h3><p>Schick uns kurz Vornamen und Jahrgang deines Kindes. Wir sagen dir, welche Mannschaft passt.</p></div></li>
+          <li class="zeigen"><b>2</b><div><h3>Reinschnuppern</h3><p>Einfach mit Sportsachen und Trinkflasche vorbeikommen. Zwei, drei Mal ausprobieren – ganz ohne Verpflichtung.</p></div></li>
+          <li class="zeigen"><b>3</b><div><h3>Dabei sein</h3><p>Gefällt's? Dann wirst du Mitglied in einem unserer drei Stammvereine und spielst für die JFG.</p></div></li>
+        </ol>
+      </div>
+
+      <form class="formular zeigen" id="formular" novalidate>
+        <h3>Probetraining anfragen</h3>
+        <p class="formular__info">Beim Absenden öffnet sich dein E-Mail-Programm mit einer fertigen Nachricht. Auf dieser Website wird nichts gespeichert.</p>
+        <div class="feld">
+          <label for="f-name">Vorname des Kindes</label>
+          <input id="f-name" name="name" type="text" autocomplete="off" required>
+        </div>
+        <div class="feld">
+          <label for="f-jahr">Geburtsjahr</label>
+          <select id="f-jahr" name="jahr" required>
+            <option value="">Bitte wählen</option>
+          </select>
+        </div>
+        <p class="vorschlag" id="vorschlag" aria-live="polite" hidden></p>
+        <div class="feld">
+          <label for="f-kontakt">Deine Telefonnummer oder E-Mail</label>
+          <input id="f-kontakt" name="kontakt" type="text" autocomplete="email" required>
+        </div>
+        <div class="feld">
+          <label for="f-text">Nachricht <span class="optional">(freiwillig)</span></label>
+          <textarea id="f-text" name="text" rows="3"></textarea>
+        </div>
+        <p class="fehler" id="formFehler" role="alert" hidden></p>
+        <button class="knopf knopf--voll" type="submit">Anfrage schreiben <svg class="pfeil" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </form>
+    </section>
+
+    <!-- ===== HELFEN ===== -->
+    <section class="abschnitt helfen" aria-labelledby="hf-titel">
+      <h2 id="hf-titel" class="titel titel--mittel zeigen">Nicht nur auf dem Platz gesucht</h2>
+      <div class="helfen__karten">
+        <a class="karte zeigen" data-mail="Trainer werden" href="#">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M14 30l7-7 5 5 9-10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h3>Trainer werden</h3>
+          <p>Du hast Lust, Kinder zu begleiten? Wir helfen dir beim Einstieg.</p>
+          <span class="karte__link">Melde dich</span>
+        </a>
+        <a class="karte zeigen" data-mail="Eltern und Helfer" href="#">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="17" cy="17" r="6" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="32" cy="19" r="5" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M6 40c1-7 6-11 11-11s10 4 11 11M27 40c.5-5 3-9 6-9s7 3 8 9" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+          <h3>Eltern &amp; Helfer</h3>
+          <p>Kuchen, Fahrdienst, Turniere, Platzpflege – jede Hand zählt.</p>
+          <span class="karte__link">Mithelfen</span>
+        </a>
+        <a class="karte zeigen" data-mail="Sponsoring" href="#">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 6l5.3 11 12 1.6-8.8 8.3 2.2 12L24 33.2 13.3 39l2.2-12-8.8-8.3 12-1.6z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></svg>
+          <h3>Sponsor werden</h3>
+          <p>Trikots, Bälle, Busfahrten: Unterstütze den Nachwuchs aus der Region.</p>
+          <span class="karte__link">Kontakt aufnehmen</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ===== FRAGEN ===== -->
+    <section class="abschnitt fragen" id="fragen" aria-labelledby="fq-titel">
+      <div class="abschnitt__kopf zeigen">
+        <p class="kicker">Für Eltern</p>
+        <h2 id="fq-titel" class="titel">Häufige Fragen</h2>
+      </div>
+      <div class="fragen__liste" id="fragenListe">
+        <!-- aus daten.js -->
+      </div>
+    </section>
+  </main>
+
+  <footer class="fuss" id="kontakt">
+    <div class="fuss__gross" aria-hidden="true">Seenland</div>
+    <div class="fuss__raster">
+      <div>
+        <a class="marke" href="#start"><img src="img/wappen.svg" alt="" width="36" height="42"><span>JFG <b>Seenland</b></span></a>
+        <p class="fuss__klein">Jugendfördergemeinschaft der Vereine <span data-feld="stammvereine">aus drei Orten</span>.</p>
+      </div>
+      <div>
+        <h2 class="fuss__titel">Kontakt</h2>
+        <ul class="fuss__liste" id="kontaktListe"></ul>
+      </div>
+      <div>
+        <h2 class="fuss__titel">Rechtliches</h2>
+        <ul class="fuss__liste">
+          <li><a href="impressum.html">Impressum</a></li>
+          <li><a href="datenschutz.html">Datenschutz</a></li>
+        </ul>
+        <p class="fuss__klein">Keine Cookies, kein Tracking, keine fremden Server.</p>
+      </div>
+    </div>
+    <p class="fuss__zeile">© <span id="jahr">2026</span> JFG Seenland</p>
+  </footer>
+
+  
+  <script src="js/daten.js"></script>
+  <script src="js/ball.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

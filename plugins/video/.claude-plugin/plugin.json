@@ -1,0 +1,10 @@
+{
+  "name": "video",
+  "displayName": "Video-Editor",
+  "version": "0.1.1",
+  "description": "Video-Editor (zurückgestellt bis bessere Hardware): Erklär- und Produktvideos aus Code, Vorführvideos eigener Software, Social-Reels, Trailer und Schnitte aus Material – auf Profi-Niveau, nur mit kostenlosen lokalen Werkzeugen (HyperFrames, ffmpeg). Storylines und Vorschau zur Freigabe, unabhängiger Kritiker, Messung ohne KI, Sperre gegen Kosten und Uploads.",
+  "author": {
+    "name": "Simon Rölz"
+  },
+  "keywords": ["video", "hyperframes", "ffmpeg", "reel", "erklaervideo"]
+}

@@ -1,0 +1,20 @@
+{
+  "description": "Website-Sperre: Veröffentlichen nur nach Simons Ja (Rückfrage), keine fremden Server in der Lieferung, keine Dateien fremder Vorbild-Seiten. Abschluss-Sperre: kein „fertig“, solange die Seite ungeprüft ist.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell|Write|Edit|MultiEdit",
+        "hooks": [
+          { "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/sperre.mjs\"", "timeout": 10 }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/abschluss.mjs\"", "timeout": 10 }
+        ]
+      }
+    ]
+  }
+}

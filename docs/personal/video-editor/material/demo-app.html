@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rohrcheck</title>
+<style>
+  body { font-family: Inter, system-ui, sans-serif; background: #f4f6f8; margin: 0; color: #1c2430; }
+  header { background: #12324f; color: #fff; padding: 16px 32px; font-weight: 700; font-size: 20px; }
+  main { max-width: 720px; margin: 40px auto; background: #fff; border-radius: 10px; padding: 32px; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
+  label { display: block; margin-top: 16px; font-weight: 600; }
+  input, select { width: 100%; padding: 10px; margin-top: 6px; border: 1px solid #c7ced6; border-radius: 6px; font-size: 16px; box-sizing: border-box; }
+  button { margin-top: 24px; background: #1f7a4d; color: #fff; border: 0; padding: 12px 24px; border-radius: 6px; font-size: 16px; cursor: pointer; }
+  #ergebnis { margin-top: 24px; padding: 16px; border-radius: 6px; background: #e9f6ef; display: none; font-size: 18px; }
+</style>
+</head>
+<body>
+<header>Rohrcheck – Heizungsrohre richtig dimensionieren</header>
+<main>
+  <label for="leistung">Heizleistung (kW)</label>
+  <input id="leistung" type="number" placeholder="z. B. 12">
+  <label for="spreizung">Temperaturspreizung (K)</label>
+  <input id="spreizung" type="number" placeholder="z. B. 10">
+  <label for="material">Rohrmaterial</label>
+  <select id="material"><option>Kupfer</option><option>Mehrschichtverbund</option><option>Stahl</option></select>
+  <button id="rechnen">Dimension berechnen</button>
+  <div id="ergebnis"></div>
+</main>
+<script>
+document.getElementById('rechnen').onclick = () => {
+  const q = parseFloat(document.getElementById('leistung').value) || 0;
+  const dt = parseFloat(document.getElementById('spreizung').value) || 1;
+  const m = q / (1.163 * dt);            // Massenstrom in m³/h (Näherung Wasser)
+  const dn = m < 0.6 ? 'DN 15' : m < 1.2 ? 'DN 20' : m < 2.2 ? 'DN 25' : 'DN 32';
+  const e = document.getElementById('ergebnis');
+  e.style.display = 'block';
+  e.innerHTML = '<b>Empfehlung: ' + dn + '</b><br>Volumenstrom ' + m.toFixed(2) + ' m³/h · Fließgeschwindigkeit im grünen Bereich';
+};
+</script>
+</body>
+</html>
