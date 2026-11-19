@@ -12,6 +12,13 @@ Simon (8 GB RAM, keine eigene Grafikkarte) über landonorris.com: „geht bei mi
 | Rundgang durch ein Haus, Kamerafahrt | **Vorab rendern** (Blender) als Bildfolge auf `<canvas>` oder als Video, mit Datenbudget. Echtzeit-3D nur auf Knopfdruck („Im 3D ansehen“, Vorbild belgradearbor.rs) |
 | Stimmung ohne Objekt | Foto oder Video, Typografie, Parallaxe auf Ebenen. Kein WebGL nötig |
 
+## Rezept: Logo oder Wappen als 3D-Objekt (starker, eigener Wow-Moment)
+Simon zum Vereinswappen: „ein geiles 3D-Modell vom Logo, in so ner Metall-Optik, aber schon grün-weiß“. Muster vom 19.11.2026 im privaten Vereins-Repo (`neubau/3d-wappen/README.md`).
+1. Vektor holen: beste Lösung ist eine echte SVG vom Auftraggeber oder sauber nachgebaut. Sonst die PNG 4-fach vergrößern, je Farbe eine Maske, weichzeichnen und schwellen, mit potrace nachzeichnen.
+2. three.js `SVGLoader` + `ExtrudeGeometry` mit Fase. Grundform tief (Metall), farbige Teile erhaben (lackiertes Metall mit Klarlack), Kanten poliert.
+3. Licht wie im Fotostudio: dunkler Raum mit wenigen großen Lichtflächen (eine hinter der Kamera, sonst wird die Vorderseite dunkel) über `PMREMGenerator.fromScene`. RoomEnvironment allein wirkt flach und grau.
+4. Kamera-Fernebene groß genug (sonst wird das Objekt abgeschnitten). Ein Objekt, Pixeldichte gedeckelt, nur bei Bewegung zeichnen.
+
 ## Pflicht bei jedem Echtzeit-3D
 - **Stufen:** Ohne WebGL oder bei sehr schwacher Grafik ein Standbild (gleiche Szene, vorab gerendert oder als Bildschirmfoto). Mit `prefers-reduced-motion` keine Kamerafahrt.
 - **Pixeldichte deckeln:** am Desktop höchstens 1,25, am Handy höchstens 2 (`Math.min(devicePixelRatio, innerWidth > 768 ? 1.25 : 2)`, so macht es die Site of the Year 2025). Die Größe der Zeichenfläche ist der wirksamste Hebel (web.dev, The Hobbit: 50 % Fläche brachte 16 → 33 fps).

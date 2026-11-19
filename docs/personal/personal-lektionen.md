@@ -13,3 +13,4 @@ Aus der ersten echten Einstellung (Video-Editor, 18.11.2026), gefunden vom perso
 9. **Pflichtschritte als Sperre:** Bei reinen Schnitten wurde weder gemessen noch der Kritiker gerufen, bis ein Stop-Hook es erzwang.
 
 Übernommen in `plugins/personal/wissen/handwerk.md` Abschnitt 9 und `einstellen` Schritt 1 (Personaler 1.1.0). Testfall dazu: `evals/grenzfall-hardware`.
+10. **Beispielseite muss den Maßstab zeigen, nicht nur sauber sein** (Website-Bauer, 19.11.2026): Simon zur ersten Beispielseite: „4K, 3D oder Apple-Design ist gar nicht drin“. Wenn das Vorbild 3D ist (Lando, Igloo), braucht Stopp 1 mindestens eine Richtung mit echtem 3D-Objekt aus dem Auftraggeber (z. B. Logo als Metall-Abzeichen). Typografie-Effekte allein gelten nicht als 3D.

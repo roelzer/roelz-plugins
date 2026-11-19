@@ -1,5 +1,9 @@
 # Änderungsprotokoll Website-Bauer
 
+## 0.2.1 – Rezept 3D-Logo
+
+Simons Urteil über die Beispielseite: „4K, 3D oder Apple-Design ist gar nicht drin“. Danach entstand ein Muster: das Vereinswappen als 3D-Abzeichen in Metall-Optik. Das Rezept steht in `wissen/3d-leistung.md`. Übergabe: `docs/UEBERGABE-WEBSITE-BAUER.md`.
+
 ## 0.2.0 – Sicherheit, Recht und Simons erstes Feedback
 
 Anlass: Simon: „was du auch noch ausführlich recherchieren musst für unser plugin sind sicherheitslücken, keine daten im frontend, keine rechtlichen lücken allgemein, die website einfach nicht angreifbar“. Dazu sein Feedback zur Beispielseite (Neubau SFH): Hausschrift beibehalten, eigener Spruch statt „Ein Dorf. Ein Verein.“, „sehr in die fresse, könnte teilweise noch bisschen dezenter sein“, „die 77 aber noch dicker machen“.

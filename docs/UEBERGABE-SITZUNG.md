@@ -2,6 +2,8 @@
 
 Für die nächste Sitzung, die mit Simon am Dev-Team (roelz-plugins) weiterarbeitet. Erst ganz lesen.
 
+> **Neuer:** Personaler, Video-Editor (zurückgestellt) und Website-Bauer: siehe `docs/UEBERGABE-WEBSITE-BAUER.md` (Stand 19.11.2026).
+
 ## Simon
 - Spricht Deutsch, ist kein Programmierer, liest keinen Code. Kurz, klar, ehrlich, mit Empfehlung antworten.
 - Arbeitet **nur in Cloud-Sitzungen** (Claude-App). Max-Abo mit Wochenlimit → sparsam mit Agenten und Tokens.
