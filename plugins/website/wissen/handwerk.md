@@ -61,3 +61,18 @@ Gegenmittel ist nicht „das Gegenteil“, sondern die Herleitung aus dem Auftra
 ## 9. Lieferung (gegen W7)
 - `website/<name>/site/` enthält nur, was auf den Server gehört. Vorbilder, Rohfassungen, Prüfungen, Quellcode zum Bauen, `node_modules` und Berichte liegen in `website/<name>/arbeit/`.
 - `site/QUELLEN.md` darf mit (Lizenzen und Namensnennungen).
+
+## 10. Simons Geschmack (aus dem SFH-Test, 19.11.2026)
+Gilt für Simon und als Ausgangspunkt für Auftraggeber, die er mitbringt. Jede Zeile ist ein Zitat oder eine umgesetzte Anmerkung.
+- **Ja:**
+  - kräftige, dicke Schrift („gern noch bissle dicker“)
+  - klare, gefräste Kanten bei 3D („die sind wie so abgerundet“ war Kritik)
+  - das eigene Logo oder Wappen als 3D-Objekt („so richtig geil, wie in der Sportschau“)
+  - ein Grün statt mehrerer Töne
+  - Geschichten beim Scrollen (seitlich laufende Chronik: „fand ich cool“)
+  - „mach und zeig“ statt langer Abstimmung
+- **Nein:**
+  - kursive Serife („auch KI typisch“)
+  - Überlappen und Enge („da überlappt es und alles is sehr eng“)
+  - zu laut („sehr in die fresse“)
+  - runde Formen, wo er Relief erwartet („3D aber nicht rund“)

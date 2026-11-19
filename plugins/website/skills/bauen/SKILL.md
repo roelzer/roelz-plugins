@@ -33,9 +33,17 @@ Sprich Deutsch, kurz, ohne Fachchinesisch. Simon hat **zwei Stopps**: die Richtu
 - Arbeitsordner `website/<kurzer-name>/` im Projekt mit `site/` (nur die Lieferung) und `arbeit/` (Vorbilder, Rohfassungen, Prüfungen, Quellen zum Bauen).
 - Playwright prüfen: `node -e "require('playwright')"` im Projekt. Fehlt es: `npm i -D playwright` und `npx playwright install chromium` (kostenlos). Unter Windows gleiche Befehle in PowerShell.
 - **Bestehende Seite verbessern** („mach … schöner“): Original nach `arbeit/original/` kopieren. Schreib `arbeit/inhaltsliste.md`: alle Inhalte, Seiten, Links und Funktionen (Formulare, Filter, Downloads). Sie müssen danach alle noch da sein. Dann zuerst `pruefen.mjs` auf das Original laufen lassen, damit die Fehler messbar sind.
+  - **Altbestand bringt KI-Reste mit.** Alles, was du aus alten Fassungen übernimmst (Schriften, Labels über Überschriften, kursive Einschübe, Laufbänder), prüfst du gegen `handwerk.md` Abschnitt 3, bevor es in die neue Seite kommt. Im SFH-Test kamen die kursive Serife und die Großbuchstaben-Labels genau so zurück.
+  - **Eigene Klassen mit Präfix** (z. B. `s-`) oder komponentenweise gekapselt, wenn alte Stile weiterleben. Gleichnamige alte Klassen (`.vorspann`, `.station`) haben im SFH-Test neue Texte fast unsichtbar gemacht.
 
 ## 1. Briefing: Annahmen statt Fragerunde
 Leg für alles Fehlende eine begründete Annahme fest: Zweck, Zielgruppe, was Besucher tun sollen, Inhalte, Ton. Frag nicht vorab, außer ohne Antwort entsteht nichts Sinnvolles. **Frag an Stopp 1 nach echtem Material** (Fotos, Logo oder Wappen, Objekte, Texte). Das ist der größte Hebel gegen den KI-Look.
+
+**Frag an Stopp 1 auch nach Betrieb**, weil es die Technik bestimmt:
+- Wo liegen Domain und E-Mail (z. B. IONOS)?
+- Gibt es Webspace mit Dateizugang (SFTP, PHP) oder nur einen Baukasten?
+- Wer pflegt die Seite danach, und kann diese Person programmieren?
+Im SFH-Test kam das erst am Ende auf: Domain und Mail bei IONOS, die Seite lief im privaten Cloudflare-Konto.
 
 ## 2. Vorbilder, Idee, Plan
 - **Mindestens 3 Vorbilder öffnen und fotografieren:** Lando, Igloo und 1–2 aus der Branche, mit `node ${CLAUDE_PLUGIN_ROOT}/scripts/foto.mjs <adresse> website/<name>/arbeit/vorbilder/<kurz>`. Sieh die Bilder an.
@@ -55,6 +63,7 @@ Leg für alles Fehlende eine begründete Annahme fest: Zweck, Zielgruppe, was Be
   - die Bildschirmfotos der Richtungen, je mit einem Satz
   - die Bitte um echtes Material
 - Simon wählt. **In `site/` entsteht vor seiner Wahl nichts.**
+- Halte Stopp 1 knapp. Simon reagiert auf Bilder, nicht auf Beschreibungen („ja mach mal und zeig mir den Entwurf“). Nach seiner Wahl zeigst du **früh einen echten Entwurf** und arbeitest in kurzen Runden: umbauen, Bildserie (`ablauf.mjs`), Bilder schicken, seine Anmerkung umsetzen.
 - Bei „mach einfach“: nimm die stärkste Richtung und nenne kurz, warum.
 
 ## 4. Bauen
@@ -71,6 +80,8 @@ Leg für alles Fehlende eine begründete Annahme fest: Zweck, Zielgruppe, was Be
 ## 5. Prüfen (für jede Fassung, auch kleine Änderungen)
 - `node ${CLAUDE_PLUGIN_ROOT}/scripts/pruefen.mjs website/<name>/site`. Es schreibt `arbeit/pruefung/pruefung.json` und Bildschirmfotos. Jeder P0 wird behoben. Hinweise wägst du ab und begründest sie.
 - Sieh die Bildschirmfotos selbst an, besonders Handy und alle Stellen mit Text auf Bild.
+- **Scroll-Abläufe** (feststehende Bühne, 3D, Übergänge) prüfst du nach jeder sichtbaren Änderung mit `node ${CLAUDE_PLUGIN_ROOT}/scripts/ablauf.mjs website/<name>/site website/<name>/arbeit/ablauf --abschnitt "<css>" --stellen 0,0.3,0.6,0.9`. Es fotografiert dieselben Stellen auf drei Laptop-Größen und am Handy. Im SFH-Test fand es die meisten Fehler, schneller als das Prüfskript.
+- Eine **bewusst dunkle Szene** (Nacht in 3D) markierst du mit `data-pruefen="dunkel"` am umgebenden Element und begründest es im Code. Sonst meldet das Prüfskript eine leere schwarze Fläche (W8).
 - Agent `website-kritiker` rufen. Er bekommt die Pfade:
   - `site/`
   - `arbeit/pruefung/pruefung.json` und die Bildschirmfotos
@@ -87,13 +98,15 @@ Simon öffnet die Seite **auf seinem Laptop**: `npx --yes serve website/<name>/s
 - was die Seite in einem Satz macht und woher die Idee kommt,
 - die wichtigsten Bildschirmfotos (Handy und Desktop),
 - was das Prüfskript und der Kritiker noch bemängeln,
-- was niemand geprüft hat: mindestens wie flüssig es auf seinem Laptop läuft und wie es in Safari bzw. am iPhone aussieht. Bitte ihn, einmal durchzuscrollen.
+- was niemand geprüft hat: mindestens wie flüssig es auf seinem Laptop läuft und wie es in Safari bzw. am iPhone aussieht. Bitte ihn, einmal durchzuscrollen. **„Fertig“ meldest du erst nach seinem Test**, ohne Grafikkarte misst du die Leistung nicht.
 - die Austauschliste (was er liefern muss).
 
 Seine Rückmeldung setzt du um und prüfst neu (Schritt 5).
 
 ## 7. Abgabe und Veröffentlichen
-- Simon bekommt `site/`, `QUELLEN.md`, die Austauschliste und zwei Sätze, wie er Texte und Bilder selbst ändert.
+- Simon bekommt `site/`, `QUELLEN.md`, die Austauschliste und eine kurze **Pflege-Anleitung** (Inhalte als Dateien, Ändern im Browser auf GitHub).
+- **Selbst pflegen geht nur mit automatischem Veröffentlichen.** Gehört zur Abgabe, nicht als Nachtrag: Cloudflare Builds (Repo verbinden) oder eine GitHub-Action, die bei jeder Änderung auf `main` hochlädt. Zugangsdaten trägt der Auftraggeber selbst als GitHub-Secret ein, nie im Chat.
+- **Webspace statt Cloudflare** (z. B. IONOS): Die fertigen Dateien laufen auf jedem Webspace mit SFTP. Sicherheits-Header kommen in `.htaccess` statt `_headers`. Eine Server-Funktion (z. B. Live-Daten über `/api/…`) braucht dort ein kleines PHP-Skript. Die Datenschutzerklärung nennt den richtigen Anbieter.
 - **Veröffentlichen nur, wenn Simon nach der Vorschau ausdrücklich Ja zu dieser Fassung sagt.** Dann kostenlos über Cloudflare: Projekt mit `wrangler.jsonc` (statische Dateien aus `site/`), `npx wrangler deploy`. Die Sperre fragt Simon dabei noch einmal. Ohne Ja beschreibst du nur, wie er es selbst machen kann.
 - Hat Simon etwas beanstandet, das wieder passieren könnte, schlägst du `/personal:nachschulen` vor.
 

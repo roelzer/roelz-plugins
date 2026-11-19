@@ -1,57 +1,53 @@
-# Übergabe: Website-Bauer weiterentwickeln (Stand 19.11.2026)
+# Übergabe: Website-Bauer weiterentwickeln (Stand 19.11.2026, Abend)
 
 Für die nächste Sitzung mit Simon. Erst ganz lesen, dann `plugins/personal/wissen/handwerk.md` (Abschnitt 9) und `plugins/website/skills/bauen/SKILL.md`.
 
 ## Simon in einem Absatz
-Deutsch, kein Programmierer, kurz und ehrlich mit Empfehlung antworten. Will **„das Beste vom Besten“**: Vorbilder **landonorris.com** und **igloo.inc** (Awwwards Site of the Year 2025/2024). Wow heißt für ihn **echtes 3D, gestochen scharf („4K“), Apple-Design**, aber **nicht laut** („sehr in die fresse, könnte dezenter sein“). Nur kostenlose Werkzeuge. Nichts geht ohne sein Ja nach außen. Laptop: 8 GB RAM, keine eigene Grafikkarte; landonorris.com läuft dort, beim Scrollen könnte es flüssiger sein.
+- Spricht Deutsch, ist kein Programmierer und will kurze, ehrliche Antworten mit Empfehlung.
+- Will **„das Beste vom Besten“**. Vorbilder: **landonorris.com** und **igloo.inc**.
+- Wow heißt für ihn: echtes 3D, gestochen scharf, Apple-Design, aber **nicht laut**.
+- Nur kostenlose Werkzeuge. Nichts geht ohne sein Ja nach außen.
+- Sein Geschmack steht jetzt in `plugins/website/wissen/handwerk.md` Abschnitt 10.
+- Laptop: 8 GB RAM, keine eigene Grafikkarte.
 
-## Was in den Sitzungen vom 17.–19.11. entstand
-- **Personaler** (`plugins/personal`, 1.1.0): stellt Agenten ein (Probelauf ohne → Profi-Recherche → Stellenausschreibung → Bau → Probearbeit). Lektionen in `handwerk.md` Abschnitt 9, Einzelfälle in `docs/personal/personal-lektionen.md`.
-- **Video-Editor** (`plugins/video`, 0.1.1): **zurückgestellt bis bessere Hardware**. Wissen im Gehirn („Video-Produktion mit Claude“).
-- **Website-Bauer** (`plugins/website`, **0.2.0, in Probearbeit, nicht eingestellt**). Alle Unterlagen in `docs/personal/website-bauer/`:
-  - Bedarf, Probelauf (4 Seiten, Fehler W1–W9), Recherche in 6 Strängen (Studios, Agenten, Werkzeuge, Preisträger gemessen, Sicherheit, Recht)
-  - Muster (Hocker-3D)
-  - Stellenausschreibung, von Simon freigegeben mit diesen Entscheidungen: veröffentlichen nur auf sein Ja über Cloudflare, Probearbeit als Sparvariante mit 2 Läufen
-  - **Bestandteile:**
-    - Skill `/website:bauen`, Agent `website-kritiker`
-    - `scripts/pruefen.mjs`: misst ohne KI (KI-Look, Kontrast aus Pixeln, leere Flächen, Sicherheit, Recht), geeicht an den Probelauf-Seiten
-    - `scripts/kopfzeilen.mjs`: Sicherheits-Header mit CSP-Hashes
-    - `scripts/foto.mjs`
-    - Sperren: Veröffentlichen nur mit Rückfrage, keine fremden Server, Abschluss-Sperre (Prüfung, 3 Vorbilder, Kritik)
-    - Wissen: handwerk, 3d-leistung, bilder, sicherheit, recht
-    - 15 Testfälle mit eigenem Läufer `tests/werkzeug/probearbeit.py`
-  - **Tests:** `python3 -m pytest plugins/website/tests` (25 grün, Eichung dauert ~4 Min).
+## Stand
+- **Website-Bauer** (`plugins/website`, **0.2.3, in Probearbeit, nicht eingestellt**). Alle Unterlagen in `docs/personal/website-bauer/`.
+- **Tests:** `python3 -m pytest plugins/website/tests`: 29 grün (19.11.2026, Dauer etwa 5 Minuten).
+- **Testfälle (Evals):** 16, neu ist `k2-altbestand`. Läufer: `tests/werkzeug/probearbeit.py`.
 
-## Beispiel: Neubau der Vereinsseite (Simons privates Vereins-Repo)
-- Nach dem Ablauf gebaut: Stopp 1 mit drei Richtungen, Simon wählte A+C. Drei Kritiker-Runden (6,4 → 6,6 → behoben). Danach Simons Wünsche:
-  - Hausschrift Kelly Slab bleibt,
-  - Spruch „Grün-Weiß. ein Leben lang.“,
-  - dezenter,
-  - dicke 77.
-- **Simons Urteil (19.11.):** „zwei coole Sachen drin, aber 4K, 3D oder Apple-Design ist gar nicht drin, typische KI-Sachen teilweise drin, das ist noch nicht das, wo ich hin will.“
-- **Danach gebaut: Muster 3D-Wappen in Metall-Optik.** Simon wünschte ausdrücklich „ein geiles 3D-Modell vom SFH-Logo, in so ner Metall-Optik, aber schon grün-weiß“.
-  - Weg: Wappen-PNG → Masken → potrace → SVG → three.js `ExtrudeGeometry`, silberne Basis plus grün lackierte erhabene Teile, eigenes Studio-Licht über PMREM.
-  - Funktioniert, auch als Einzeldatei.
-  - Die Kanten sind vom Nachzeichnen noch nicht perfekt.
-- **Ablage:** lokaler Commit auf Branch `claude/neubau-website-bauer` im privaten Vereins-Repo (Ordner `neubau/` mit `site/`, `arbeit/`, `3d-wappen/` und READMEs). **Nicht gepusht:** Die Sicherheitsprüfung hat den Push angehalten, Simon muss ihn erlauben. Geht die alte Sitzung verloren, ist der Stand nur noch in den Dateien, die Simon geschickt bekam (SFH-Vorschau.html, SFH-3D-Wappen.html).
-- **Vor jeder Veröffentlichung:** Elterneinwilligung für Fotos mit erkennbaren Kindern, Fotografen, Vertretung im Impressum, Hosting (Austauschliste).
+## Was am 19.11. im Test mit der Vereinsseite (SFH) entstand
+Simon hat den Test für beendet erklärt. Die SFH-Seite selbst arbeitet er im Chat zum Vereins-Repo weiter (privates Repo, Fahrplan in dessen `docs/FAHRPLAN.md`).
+- **3D-Wappen:**
+  - Sauber als Vektor nachgebaut (Abweichung 8 % zum Original), dann als Metall-Abzeichen in 3D.
+  - Simons Runden: Rand im gleichen Grün, mehr Relief innen, Ball als flaches Relief statt Kugel, scharfe Kanten.
+  - Skripte im Vereins-Repo unter `neubau/wappen-v2/werk/`.
+- **Startseite „Es werde Licht“:**
+  - Nacht am Irle in 3D (Platz, Flutlichtmasten, Lichtkegel). Beim Scrollen gehen die Masten an, das Wappen dreht sich nach vorn, dann wird es Tag mit „Grün-Weiß. Ein Leben lang.“
+  - Danach hell und ruhig, Spieltag live vom BFV, seitlich laufende Chronik.
+  - Alle Unterseiten hell.
+  - Online unter der Cloudflare-Testadresse, veröffentlicht von Hand über die Cloudflare-Schnittstelle.
+- **Simons Urteil im Verlauf:** „mega“, „finde es cool“. Meine eigene Einschätzung gegen Lando: Einstieg etwa 3,5 von 5, ganze Seite etwa 3.
 
-## Nächste Schritte (Vorschlag, Simon entscheidet)
-1. **Vereinsseite auf Simons Niveau heben:**
-   - 3D-Wappen als Einstieg (Apple-Art: Produkt im Studiolicht, dreht sich beim Scrollen, viel Weiß),
-   - Wappen vorher sauber als Vektor nachbauen,
-   - der alte Lederball (Poly Haven „Dirty Football“, CC0) für „50 Jahre“,
-   - KI-Reste raus: kleine Beschriftungen über Überschriften, Einblenden von unten, gleiche Karten, „große Zahl, kleiner Text“, grüne Tönung überall.
+## Was ins Plugin nachgeschult wurde
+- **0.2.2:**
+  - Kursive Serife ist ein P0 im Prüfskript.
+  - Hausschrift mit nur einer Stärke wird über eine Kontur kräftiger.
+  - Neues Rezept „Logo oder Wappen als 3D-Objekt“ in `3d-leistung.md`.
+- **0.2.3:**
+  - Neues Skript `ablauf.mjs` für Bildserien vom Scroll-Ablauf.
+  - Prüfskript: neue Prüfung W10 (überlappender Text), Fehlalarme zurückgenommen (Daten-Blöcke, gewollt dunkle Szenen, Server-Schnittstelle in der lokalen Vorschau).
+  - Skill: Stopp 1 knapp, früher Entwurf, Fragen nach Betrieb (Domain, E-Mail, Webspace, Pflege), Altbestand prüfen, Klassen mit Präfix, „fertig“ erst nach Simons Laptop-Test, automatisches Veröffentlichen gehört zur Abgabe, Webspace als Alternative.
+  - Einzelfälle mit Begründung: `docs/personal/personal-lektionen.md` Punkte 10 bis 12.
 
-   Dann blind gegen Lando vergleichen (Skala 1–5).
-2. **Lehre für das Plugin** (nachschulen): Wenn der Auftraggeber ein Logo oder Wappen hat, ist ein 3D-Objekt daraus ein starker, eigener Wow-Moment. Rezept und Skript `logo3d` ins Plugin. Der Maßstab „4K, 3D, Apple“ gehört als Pflicht in Stopp 1 (mindestens eine Richtung mit echtem 3D).
-3. **Probearbeit** des Website-Bauers (Sparvariante, 2 Läufe, ca. 3,5–5 Mio. Tokens), danach Stopp 2 mit Simons blinder Note. Erst dann einstellen. Den Konto-Skill `website-bauen` abschalten (Simon hat zugestimmt).
-4. **Offen aus der Prüfung:**
-   - Das Prüfskript erkennt abgeschnittene Inhalte (overflow) und Karten-Baukasten noch schlecht.
-   - Das Fehlen eines Handy-Menüs fällt ihm nicht auf.
+## Ehrlich offen
+1. **Der formale Ablauf lief im Test nicht vollständig:** kein Kritiker-Agent, keine drei Vorbild-Fotos, kein blinder Vergleich. Für die Probearbeit zählt der Lauf nur halb.
+2. **Probearbeit** in der Sparvariante, 2 Läufe, etwa 3,5 bis 5 Mio. Tokens. Danach Stopp 2 mit Simons blinder Note, erst dann einstellen. Den Konto-Skill `website-bauen` abschalten (Simon hat zugestimmt).
+3. **Veröffentlichen ohne Wrangler-Anmeldung** ging nur mit viel Handarbeit über die Cloudflare-Schnittstelle (Manifest, Upload-Sitzung, Worker hochladen). Ein Skript, das das in einem Schritt mit einem API-Token erledigt, fehlt. Ungetestet nicht einbauen.
+4. **Prüfskript:** Abgeschnittene Inhalte (overflow) und ein fehlendes Handy-Menü erkennt es weiterhin nicht.
+5. **Leistung:** Ohne Grafikkarte nicht messbar. Simons Laptop entscheidet.
 
 ## Sicherheit und Regeln (unverändert wichtig)
 - Öffentliches Repo: keine Kunden-, Firmen- oder Privatdaten, keine echten Personenfotos.
-- Arbeitgeber-Name nie (alte Git-Historie noch offen, nur auf Simons Wort umschreiben).
+- Arbeitgeber-Name nie nennen. Die alte Git-Historie ist noch offen und wird nur auf Simons Wort umgeschrieben.
 - Merge, Push in fremde Repos und alles nach außen nur auf Simons Wort.
 - Gehirn (`roelzer/brain`): Regeln in dessen CLAUDE.md.

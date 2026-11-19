@@ -114,7 +114,7 @@ else {
     const stilHashes = (csp.match(/style-src([^;]*)/) || [])[1] || "";
     for (const f of html) {
       const t = lies(f);
-      for (const m of t.matchAll(/<script(?![^>]*\bsrc=)(?![^>]*type=["']application\/ld\+json["'])(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)) if (!sk.includes(h(m[1])) && !/'unsafe-inline'/.test(sk)) { befund("P0", "Sicherheit", `Eingebettetes Skript in ${f} passt nicht zur CSP (Hash fehlt) – kopfzeilen.mjs neu laufen lassen`); break; }
+      for (const m of t.matchAll(/<script(?![^>]*\bsrc=)(?![^>]*type=["'](?!module|text\/javascript)[^"']*["'])(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)) if (!sk.includes(h(m[1])) && !/'unsafe-inline'/.test(sk)) { befund("P0", "Sicherheit", `Eingebettetes Skript in ${f} passt nicht zur CSP (Hash fehlt) – kopfzeilen.mjs neu laufen lassen`); break; }
       for (const m of t.matchAll(/<style(?:\s[^>]*)?>([\s\S]*?)<\/style>/gi)) if (!stilHashes.includes(h(m[1])) && !/'unsafe-inline'/.test(stilHashes)) { befund("P0", "Sicherheit", `Eingebetteter Stil in ${f} passt nicht zur CSP (Hash fehlt) – kopfzeilen.mjs neu laufen lassen`); break; }
     }
   }
@@ -187,6 +187,7 @@ const GERAETE = schnell ? [["handy", 390, 844], ["desktop", 1440, 900]] : [["han
 const geraete = {};
 const kontrastFehler = new Map();
 const leereFlaechen = new Map();
+const ueberlappungen = [];
 let stilInfo = null;
 
 for (const [name, breite, hoehe] of GERAETE) {
@@ -253,12 +254,37 @@ for (const [name, breite, hoehe] of GERAETE) {
       }
       const medien = [];
       for (const e of document.querySelectorAll("img,canvas,video,figure,picture,[style*='background-image']")) {
+        if (e.closest("[data-pruefen~='dunkel']")) continue;  // bewusst dunkle Szene (z. B. Nacht in 3D), im Code begründen
         const r = e.getBoundingClientRect(); if (!sichtbar(r) || r.width < 120 || r.height < 80 || deckkraft(e) < 0.9) continue;
         medien.push({ x: r.x, y: r.y, w: r.width, h: r.height, tag: e.tagName.toLowerCase(), klasse: String(e.className?.baseVal ?? e.className ?? "").slice(0, 40) });
       }
       return { texte: texte.slice(0, 150), medien: medien.slice(0, 30) };
     }, gespeichert).catch(() => ({ texte: [], medien: [] }));
     const ziele = await abfrage(false);
+    const ueber = await page.evaluate(() => {
+      const kaesten = [];
+      for (const e of document.querySelectorAll("h1,h2,h3,h4,p,li,a,button,label,blockquote,figcaption,dd,dt,td,th")) {
+        if (!e.textContent.trim() || e.closest("[aria-hidden='true']")) continue;
+        let o = 1, weg = false; for (let n = e; n && n.nodeType === 1; n = n.parentElement) { const st = getComputedStyle(n); o *= parseFloat(st.opacity); if (st.visibility === "hidden" || st.display === "none") weg = true; }
+        if (weg || o < 0.5) continue;
+        // je Textzeile ein Kasten (umbrechende Links in einem Absatz würden als großer Kasten sonst fälschlich überlappen)
+        const rg = document.createRange(); rg.selectNodeContents(e);
+        const zeilen = [...rg.getClientRects()].filter((r) => r.width >= 4 && r.height >= 8 && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth);
+        if (zeilen.length) kaesten.push({ e, zeilen });
+      }
+      const treffer = [];
+      for (let a = 0; a < kaesten.length; a++) for (let b = a + 1; b < kaesten.length; b++) {
+        const A = kaesten[a], B = kaesten[b];
+        if (A.e.contains(B.e) || B.e.contains(A.e)) continue;
+        const deckt = A.zeilen.some((p) => B.zeilen.some((q) => {
+          const w = Math.min(p.right, q.right) - Math.max(p.left, q.left), h = Math.min(p.bottom, q.bottom) - Math.max(p.top, q.top);
+          return w > 0 && h > 0 && (w * h) / Math.min(p.width * p.height, q.width * q.height) > 0.15;
+        }));
+        if (deckt) treffer.push(`„${A.e.textContent.trim().slice(0, 24)}“ / „${B.e.textContent.trim().slice(0, 24)}“`);
+      }
+      return treffer.slice(0, 3);
+    }).catch(() => []);
+    if (ueber.length) ueberlappungen.push(`${name} ${path.basename(datei)}: ${ueber.join(", ")}`);
     // Medien: leere, gleichförmige Bänder (W8)
     if (ziele.medien.length && png) {
       const erg = await auswerten(analyse, png, ziele.medien);
@@ -429,14 +455,22 @@ if (s.fotos === 0) befund("Hinweis", "W2", "Kein einziges echtes Foto oder Video
 if (s.pflicht && !s.pflicht.impressum) befund("P0", "Recht", "Kein Impressum verlinkt");
 if (s.pflicht && !s.pflicht.datenschutz) befund("P0", "Recht", "Keine Datenschutzerklärung verlinkt");
 if (s.reduzierteBewegung === false) befund("Hinweis", "allgemein", "Keine Regel für „Bewegung reduzieren“ (prefers-reduced-motion) gefunden");
+if (ueberlappungen.length) befund("P0", "W10", `Texte überlappen sich (${ueberlappungen.length} Stellen)`, ueberlappungen.slice(0, 4).join(" · "));
 for (const [k, v] of leereFlaechen) befund("P0", "W8", `Leere schwarze Fläche in ${k} (${v.anteil} % der Höhe)`, `${v.geraet}, ${v.datei}`);
 const kontraste = [...kontrastFehler].sort((a, b) => a[1].kontrast - b[1].kontrast);
 if (kontraste.length) befund("P0", "W9", `${kontraste.length} Texte unter dem Mindestkontrast (aus Pixeln gemessen)`, kontraste.slice(0, 5).map(([t, v]) => `„${t}“ ${v.kontrast}:1 statt ${v.soll}:1 (${v.geraet}, ${v.datei})`).join(" · "));
 for (const [n, g] of Object.entries(geraete)) {
   if (g.fremde_hosts.length) befund("P0", "Grenze", `Fremde Server (${n})`, g.fremde_hosts.join(", "));
   if (g.cookies || g.speicher?.local || g.speicher?.session) befund("Hinweis", "Recht", `Cookies oder Browser-Speicher gesetzt (${n}) – ohne Not braucht das einen Hinweis bzw. eine Einwilligung`, JSON.stringify({ cookies: g.cookies, ...g.speicher }));
-  if (g.konsolenfehler.length) befund("P0", "Technik", `Konsolenfehler (${n})`, g.konsolenfehler.slice(0, 3).join(" | "));
-  if (g.fehlende_dateien.length) befund("P0", "Technik", `Fehlende Dateien (${n})`, g.fehlende_dateien.slice(0, 3).join(" | "));
+  const api = g.fehlende_dateien.filter((f) => /^\d+ \/api\//.test(f));
+  const dateien = g.fehlende_dateien.filter((f) => !api.includes(f));
+  let konsole = g.konsolenfehler;
+  if (api.length) {
+    befund("Hinweis", "Technik", `Server-Schnittstelle in der lokalen Vorschau nicht erreichbar (${n}) – online prüfen`, api.slice(0, 3).join(" | "));
+    let rest = api.length; konsole = konsole.filter((k) => !(/Failed to load resource/.test(k) && rest-- > 0));
+  }
+  if (konsole.length) befund("P0", "Technik", `Konsolenfehler (${n})`, konsole.slice(0, 3).join(" | "));
+  if (dateien.length) befund("P0", "Technik", `Fehlende Dateien (${n})`, dateien.slice(0, 3).join(" | "));
   if (g.seitlichScroll) befund("P0", "Technik", `Seite ist breiter als der Bildschirm (${n})`);
   if (n === "handy" && g.zuKleineTippflaechen > 3) befund("Hinweis", "allgemein", `${g.zuKleineTippflaechen} Tippflächen unter 44 px (Handy)`);
   if (g.langsame_stellen.length || g.fps_scroll === null) befund("Hinweis", "W6", `Sehr langsame Darstellung ohne Grafikkarte (${n}): Bildschirmfotos über 8 s bzw. Bildrate nicht messbar`, "nur Vergleich, Abnahme auf Simons Laptop");

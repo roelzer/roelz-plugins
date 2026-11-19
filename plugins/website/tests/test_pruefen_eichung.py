@@ -6,6 +6,9 @@ Schreinerei) und kleine Testseiten in tests/seiten. Positivbeispiel: tests/seite
 - P1 und P2 müssen bei W1 (KI-Look) anschlagen, P4 bei W2 (leere Foto-Platzhalter).
 - tests/seiten/w8-leer muss W8 (leere schwarze Fläche), w9-kontrast muss W9 (Text über hellem Bild) auslösen.
 - tests/seiten/gut darf keinen harten Befund haben (mit _headers aus scripts/kopfzeilen.mjs).
+- Aus dem SFH-Test (19.11.2026): tests/seiten/w10-ueberlappung muss W10 (Texte überlappen) auslösen, kursiv muss
+  „Kursive Serife“ (W1) melden, gut-sonderfaelle (gewollt dunkle 3D-Fläche, Datenblock, Schnittstelle nur online) darf
+  keinen harten Befund haben.
 - tests/seiten/unsicher muss die Sicherheits- und Rechtsprüfungen auslösen (Inline-Ereignis, Schlüssel, Source Map,
   EXIF/GPS im Foto, Autor im PDF, fehlende Header, OS-Plattform-Link).
 Hinweis: Der schwarze Balken aus P4 war ein Zustand beim Laden und ließ sich nicht wieder hervorrufen; W8 wird deshalb
@@ -63,6 +66,23 @@ class Eichung(unittest.TestCase):
         for erwartet in ("Inline-Ereignis", "Schlüssel", "Interne Angabe", "EXIF", "PDF-Metadaten", "_headers fehlt"):
             self.assertIn(erwartet, texte)
         self.assertTrue(any("OS-Plattform" in b["text"] for b in harte(e, "Recht")))
+
+    def test_ueberlappender_text(self):
+        self.assertTrue(harte(pruefen(os.path.join(SEITEN, "w10-ueberlappung")), "W10"))
+
+    def test_kursive_serife(self):
+        self.assertTrue(any("Kursive Serife" in b["text"] for b in harte(pruefen(os.path.join(SEITEN, "kursiv")), "W1")))
+
+    def test_sonderfaelle_ohne_fehlalarm(self):
+        e = pruefen(os.path.join(SEITEN, "gut-sonderfaelle"))
+        self.assertEqual(e["p0"], 0, [b["text"] for b in e["befunde"] if b["schwere"] == "P0"])
+
+    def test_ablauf_bildserie(self):
+        aus = tempfile.mkdtemp()
+        r = subprocess.run(["node", os.path.join(PLUGIN, "scripts", "ablauf.mjs"), os.path.join(SEITEN, "gut"), aus,
+                            "--stellen", "0,1", "--warten", "500"], capture_output=True, text=True, timeout=600)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertEqual(len([f for f in os.listdir(aus) if f.endswith(".png")]), 8)
 
     def test_lieferordner_mit_arbeitsdateien(self):
         d = tempfile.mkdtemp()

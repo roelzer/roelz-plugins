@@ -1,5 +1,12 @@
 # Änderungsprotokoll Website-Bauer
 
+## 0.2.3 – Nachschulung aus dem SFH-Test
+- Neues Skript `ablauf.mjs`: Bildserie eines Scroll-Ablaufs auf drei Laptop-Größen und am Handy.
+- Prüfskript: neue Prüfung W10 „Texte überlappen“ (je Textzeile gemessen). Daten-Blöcke (`application/json`) zählen nicht mehr als CSP-Fehler. Bewusst dunkle Szenen lassen sich mit `data-pruefen="dunkel"` ausnehmen. Eine fehlende Server-Schnittstelle (`/api/…`) in der lokalen Vorschau ist nur noch ein Hinweis.
+- Skill: Stopp 1 knapp, danach früher Entwurf und kurze Runden. An Stopp 1 nach Domain, E-Mail, Webspace und Pflege fragen. Altbestand gegen die KI-Merkmale prüfen, eigene Klassen mit Präfix. „Fertig“ erst nach Simons Test auf dem Laptop. Automatisches Veröffentlichen und Pflege-Anleitung gehören zur Abgabe. Webspace (IONOS) als Alternative beschrieben.
+- `handwerk.md` Abschnitt 10: Simons Geschmack.
+- Testfall `k2-altbestand`, Eichungs-Testseiten `w10-ueberlappung`, `kursiv`, `gut-sonderfaelle`.
+
 ## 0.2.2 – Lehren aus dem SFH-Wappen und der Kombi-Seite
 - Prüfskript: kursive Serife in Überschriften ist jetzt ein harter Befund (P0).
 - `handwerk.md`: kursive Serife in jeder Form ausgeschlossen; Hausschrift mit einer Stärke über Kontur kräftiger machen.
