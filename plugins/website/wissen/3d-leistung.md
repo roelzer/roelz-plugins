@@ -13,11 +13,24 @@ Simon (8 GB RAM, keine eigene Grafikkarte) über landonorris.com: „geht bei mi
 | Stimmung ohne Objekt | Foto oder Video, Typografie, Parallaxe auf Ebenen. Kein WebGL nötig |
 
 ## Rezept: Logo oder Wappen als 3D-Objekt (starker, eigener Wow-Moment)
-Simon zum Vereinswappen: „ein geiles 3D-Modell vom Logo, in so ner Metall-Optik, aber schon grün-weiß“. Muster vom 19.11.2026 im privaten Vereins-Repo (`neubau/3d-wappen/README.md`).
-1. Vektor holen: beste Lösung ist eine echte SVG vom Auftraggeber oder sauber nachgebaut. Sonst die PNG 4-fach vergrößern, je Farbe eine Maske, weichzeichnen und schwellen, mit potrace nachzeichnen.
-2. three.js `SVGLoader` + `ExtrudeGeometry` mit Fase. Grundform tief (Metall), farbige Teile erhaben (lackiertes Metall mit Klarlack), Kanten poliert.
-3. Licht wie im Fotostudio: dunkler Raum mit wenigen großen Lichtflächen (eine hinter der Kamera, sonst wird die Vorderseite dunkel) über `PMREMGenerator.fromScene`. RoomEnvironment allein wirkt flach und grau.
-4. Kamera-Fernebene groß genug (sonst wird das Objekt abgeschnitten). Ein Objekt, Pixeldichte gedeckelt, nur bei Bewegung zeichnen.
+Simon zum Vereinswappen: „ein geiles 3D-Modell vom Logo, in so ner Metall-Optik, aber schon grün-weiß“, dann „mehr 3D, cleanere Ränder, kräftigere Farben, so wie die Vereinswappen früher in der Sportschau“. Muster vom 19.11.2026 im privaten Vereins-Repo (`neubau/wappen-v2/`, Skripte `bau.py`, `ball.py`, `szene.js`).
+1. **Vektor sauber nachbauen statt nachzeichnen.** Gibt es keine SVG vom Auftraggeber:
+   - Außenkontur aus der Alpha-Maske messen (skimage `find_contours` auf der 4-fach vergrößerten Maske).
+   - Ecken festhalten, zwischen den Ecken glätten, eine Hälfte exakt spiegeln.
+   - Rand als gleichmäßiger Versatz (shapely `buffer(-d, join_style="mitre")`).
+   - Schrift: freie Schrift in derselben Form (z. B. TeX Gyre Adventor für Avant Garde) mit opentype.js in Polygone wandeln und **Buchstabe für Buchstabe** auf die Spalten des Originals einpassen.
+   - Gerade Formen als exakte Rechtecke, runde Buchstaben aus der Maske mit festen Ecken.
+   - Fußball als echtes abgestumpftes Ikosaeder, Drehung per Suche an das Original anpassen.
+   - **Kontrolle:** Rote Kanten über das Original legen und die Abweichung in Prozent der Pixel messen. Ziel unter 10 %, der Rest sind Unschärfe und Handzeichnung im Original.
+2. **Ebenen:** Je Farbe eine Polygonliste mit Löchern als JSON. Daraus `ExtrudeGeometry` direkt, ohne SVGLoader: Löcher bleiben sicher.
+   - Körper mit Chromkante, Rand erhaben.
+   - Weiße Emaille auf mittlerer Höhe, Schrift eingelassen.
+   - Ein Ball, der nicht rund wirken soll (Simon: „3D aber nicht rund“), wird ein flaches Relief: weiße Felder auf Emaille-Höhe, grüne Teile darüber.
+3. **Klare Kanten:** `bevelSegments: 1` (gefräste Schräge statt Rundung, Simon: „die sind wie so abgerundet“). Fasen klein halten: Chrom 0,09–0,11, Rand 0,04, Weiß 0,02 bei 10 Einheiten Wappenhöhe. Danach `toCreasedNormals(geo, 30°)`, sonst flimmern die Kanten.
+4. **Ein Grün für alles** (Rand, Feld, Schrift, Ball): ein einziges Material. Simon: „der Rand muss genau das gleiche Grün haben wie der Rest“. Tone Mapping `NeutralToneMapping` hält die Farben kräftig.
+5. **Licht wie im Fotostudio:** dunkler Raum mit großen Lichtflächen über `PMREMGenerator.fromScene`, eine davon hinter der Kamera. Dazu ein gerichtetes Licht mit weichem Schatten (Schattenkarte 2048²): Dann werfen die erhabenen Teile Schatten, das gibt „mehr 3D innen“.
+6. **Auf der Seite:** Nur zeichnen, wenn sich etwas ändert (Scrollen), Pixeldichte am Desktop höchstens 1,5. Wird es langsam, die Pixeldichte senken. Bis das 3D geladen ist, steht die SVG. Gesamt etwa 80.000 Dreiecke.
+7. **Einstieg mit Geschichte statt Effekt:** Das Wappen dreht sich beim Scrollen aus dem Dunkel nach vorn, während eine wahre Geschichte des Auftraggebers passiert. Beim Verein: das Flutlicht geht an, „Es werde Licht“ von 2020. Die Umgebung (Platz, Masten, Lichtkegel) ist ebenfalls 3D, sonst beißt sich eine flache Zeichnung mit dem echten Objekt. Umgebung und Objekt auf zwei Zeichenflächen, damit eine helle Fläche dazwischen den Übergang machen kann.
 
 ## Pflicht bei jedem Echtzeit-3D
 - **Stufen:** Ohne WebGL oder bei sehr schwacher Grafik ein Standbild (gleiche Szene, vorab gerendert oder als Bildschirmfoto). Mit `prefers-reduced-motion` keine Kamerafahrt.

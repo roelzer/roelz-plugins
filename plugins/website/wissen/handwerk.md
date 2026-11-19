@@ -18,7 +18,7 @@ Stand 18.11.2026. Jede Regel stammt aus dem Probelauf (Fehler W1–W9, `docs/per
 ## 3. KI-Merkmale: nicht verwenden (gegen W1)
 Quelle: Anthropic-Skill `frontend-design` (2026), Impeccable, Anthropic Cookbook. Das Prüfskript erkennt die messbaren davon.
 - **Farben:** fast schwarzer Grund mit **einer** grellen Akzentfarbe (Säuregrün, Neon-Gelbgrün, Zinnober). Nachtblau oder Schwarz mit Neon. Lila-Verläufe. Creme `#F4F1EA` mit Serifen-Titel und Terrakotta `#D97757`. Cyan auf Dunkel, Neon-Leuchtränder, Verlaufstext.
-- **Schrift:** Inter (auch Inter Tight), Roboto, Arial, Space Grotesk, Geist als Hauptschrift. Kursive Serife als „edler“ Titel.
+- **Schrift:** Inter (auch Inter Tight), Roboto, Arial, Space Grotesk, Geist als Hauptschrift. **Kursive Serife in jeder Form**: als „edler“ Titel, als zweite Zeile („am Irle.“), als Einschub („seit 1977“) oder in Kopf- und Fußzeile. Simon, 19.11.2026: „diese kursiv schrift is auch KI typisch“. Das Prüfskript meldet es als P0. Stattdessen die Hausschrift in der Akzentfarbe.
 - **Aufbau:** gleich große Karten mit einem Radius und weichem Schatten (Bento-Baukasten), Icon-Kachel über jeder Überschrift, Großbuchstaben-Label über jeder Überschrift, „01/02/03“ ohne echte Reihenfolge, große Zahl mit kleinem Label und Verlauf, ein einzeln eingefärbtes Wort im Titel, FAQ-Akkordeon als Füllung, durchgestrichene „Das bekommen Sie nicht“-Liste, „→“ an jedem Knopf.
 - **Bewegung:** jede Sektion gleitet von unten herein, Hover-Effekt auf jeder Karte, pulsierender Punkt, Laufband, Cursor-Blob, alles schwebt.
 - **Bilder:** selbst gezeichnete Szenen, Maskottchen, Emoji statt Symbolen, Glas-Effekte als Deko.
@@ -32,6 +32,7 @@ Gegenmittel ist nicht „das Gegenteil“, sondern die Herleitung aus dem Auftra
 - **Schriften:** Display-Grotesk, oft mit einer Serife als Kontrast. Kostenlos und selbst hostbar sind z. B. Mona Sans (die Schrift der Lando-Seite), Work Sans, IBM Plex. Fontshare ist kostenlos kommerziell nutzbar, aber nicht OFL: Lizenzdatei lesen.
 - **Bewegung:** Bedienelemente 150–400 ms, große einmalige Auftritte 600–1000 ms, immer abbremsend (z. B. `cubic-bezier(.19,1,.22,1)` oder `cubic-bezier(.22,1,.36,1)`), nie linear. NN/g: Ab 500 ms wirken wiederkehrende Animationen zäh.
 - **Ein Wow-Moment je Seite.** Daneben nur ruhige Einblendungen.
+- **Hausschrift mit nur einer Stärke kräftiger machen** (Simon: „Schriftart gern noch bissle dicker“): Kontur in der eigenen Farbe mit `-webkit-text-stroke: 0.06–0.08em currentColor; paint-order: stroke fill;` und Laufweite +0,02 em. Die Kontur wächst dann nach außen, die Buchstaben bleiben scharf.
 - **Wow heißt nicht laut** (Simon: „sehr in die fresse, könnte teilweise noch bisschen dezenter sein“). Nur der eine große Moment darf riesig sein. Überschriften sonst etwa 40–90 px am Desktop, Fließtext-Sätze normal fett, viel Luft. Lieber eine kräftige Form (z. B. eine dicke Ziffer als Fenster ins Foto) als viele große Schriften.
 
 ## 5. Echtes Motiv (gegen W2)

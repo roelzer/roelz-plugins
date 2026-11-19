@@ -1,5 +1,10 @@
 # Änderungsprotokoll Website-Bauer
 
+## 0.2.2 – Lehren aus dem SFH-Wappen und der Kombi-Seite
+- Prüfskript: kursive Serife in Überschriften ist jetzt ein harter Befund (P0).
+- `handwerk.md`: kursive Serife in jeder Form ausgeschlossen; Hausschrift mit einer Stärke über Kontur kräftiger machen.
+- `3d-leistung.md`: Rezept „Logo oder Wappen als 3D-Objekt“ neu: Vektor-Nachbau mit Messung, klare Fasen, ein Material je Farbe, Relief statt Kugel, Einstieg mit wahrer Geschichte und 3D-Umgebung.
+
 ## 0.2.1 – Rezept 3D-Logo
 
 Simons Urteil über die Beispielseite: „4K, 3D oder Apple-Design ist gar nicht drin“. Danach entstand ein Muster: das Vereinswappen als 3D-Abzeichen in Metall-Optik. Das Rezept steht in `wissen/3d-leistung.md`. Übergabe: `docs/UEBERGABE-WEBSITE-BAUER.md`.

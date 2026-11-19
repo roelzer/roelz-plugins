@@ -384,6 +384,11 @@ async function stilAnalyse(page) {
     const pfeilKnoepfe = [...document.querySelectorAll("a,button")].filter((e) => /[→↗]\s*$/.test(e.textContent.trim())).length;
     const akkordeon = document.querySelectorAll("details").length;
     const glas = alle.filter((e) => /blur\(/.test(getComputedStyle(e).backdropFilter || "")).length;
+    // Kursive Serife als „edle“ Überschrift oder Einschub (Simon 19.11.2026: „diese kursiv schrift is auch KI typisch“)
+    const kursivSerif = [...document.querySelectorAll("h1,h2,h3,h1 *,h2 *,h3 *,[class*=hero] *,[class*=held] *,[class*=title] *")].filter((e) => {
+      const st = getComputedStyle(e); if (st.fontStyle !== "italic" || parseFloat(st.fontSize) < 20 || !e.textContent.trim()) return false;
+      const f = st.fontFamily.toLowerCase(); return !/sans|grotesk|mono/.test(f) && /serif|garamond|playfair|fraunces|cormorant|baskerville|lora|georgia|times|instrument/.test(f);
+    }).map((e) => e.textContent.trim().slice(0, 30));
     const emoji = [...document.querySelectorAll("h1,h2,h3,button")].some((e) => /\p{Extended_Pictographic}/u.test(e.textContent));
     const lilaVerlauf = alle.some((e) => { const b = getComputedStyle(e).backgroundImage; if (!/gradient/.test(b)) return false; return (b.match(/rgba?\([^)]+\)/g) || []).some((c) => { const x = hsl(rgb(c)); return x.s > 0.4 && x.h >= 250 && x.h <= 300; }); });
     const karten = (() => { const m = new Map(); for (const e of alle) { const s = getComputedStyle(e); if (parseFloat(s.borderTopLeftRadius) >= 12 && (s.boxShadow !== "none" || s.borderTopWidth !== "0px")) { const r = e.getBoundingClientRect(); if (r.width > 180 && r.height > 120) { const k = `${Math.round(r.width / 20)}x${Math.round(r.height / 20)}`; m.set(k, (m.get(k) || 0) + 1); } } } return Math.max(0, ...m.values()); })();
@@ -398,7 +403,7 @@ async function stilAnalyse(page) {
     const reduzierteBewegung = [...document.styleSheets].some((sh) => { try { return [...sh.cssRules].some((r) => String(r.conditionText || r.media?.mediaText || "").includes("reduced-motion")); } catch { return false; } }) || /prefers-reduced-motion/.test([...document.scripts].map((s) => s.textContent).join(" "));
     return { dunkelAnteil, dunkleNeutral, akzente: [...akzente], neon, zinnober, hauptschriften, ueberschriften: [...new Set(ueberschriften)], fliess, groesste, laufweite,
       zeilenlaenge: Math.round(zeilenlaenge), labelsUeberUeberschrift, pfeilKnoepfe, akkordeon, glas, emoji, lilaVerlauf, karten, fotos, platzhalterFotos,
-      laengsteUebergang: Math.max(0, ...dauern), lineareUebergaenge: linear.length, pflicht, reduzierteBewegung };
+      kursivSerif: [...new Set(kursivSerif)].slice(0, 3), laengsteUebergang: Math.max(0, ...dauern), lineareUebergaenge: linear.length, pflicht, reduzierteBewegung };
   }).catch((e) => ({ fehler: String(e) }));
 }
 
@@ -410,6 +415,7 @@ if (s.dunkelAnteil > 0.45 && s.neon) befund("P0", "W1", "Dunkle Fläche mit Neon
 if (s.dunkleNeutral > 0.3 && s.zinnober && !s.neon) befund("Hinweis", "W1", "Fast schwarz mit einer grellen Zinnober-Akzentfarbe (steht auf Anthropics Liste der KI-Merkmale)", `neutral dunkel ${Math.round(s.dunkleNeutral * 100)} %`);
 if (s.lilaVerlauf) befund("P0", "W1", "Lila-Verlauf", "Anthropic Cookbook");
 if (s.emoji) befund("P0", "W1", "Emoji in Überschriften oder Knöpfen", "Impeccable");
+if (s.kursivSerif?.length) befund("P0", "W1", "Kursive Serife in Überschriften (KI-Merkmal, steht in handwerk.md Abschnitt 3)", s.kursivSerif.join(" · "));
 const beiwerk = [s.labelsUeberUeberschrift >= 3 && `${s.labelsUeberUeberschrift}× Großbuchstaben-Label über Überschrift`, s.pfeilKnoepfe >= 3 && `${s.pfeilKnoepfe}× „→“ an Knöpfen`,
   s.akkordeon >= 4 && `FAQ-Akkordeon (${s.akkordeon})`, s.glas >= 3 && `${s.glas}× Glas-Effekt`, s.karten >= 4 && `${s.karten} gleich große Karten (Baukasten)`].filter(Boolean);
 if (beiwerk.length >= 3) befund("P0", "W1", "Vorlagen-Beiwerk gehäuft", beiwerk.join(" · "));
