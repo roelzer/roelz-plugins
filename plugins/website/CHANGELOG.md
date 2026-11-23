@@ -1,5 +1,22 @@
 # Änderungsprotokoll Website-Bauer
 
+## 0.3.2 – Alles aus dem Schreinerei-Test im Skill (23.11.2026)
+Simon zur Schreinerei v2: „Ja is cool so, Bau alles in den skill ein.“
+- Neues Werkzeug `scripts/vorschau.mjs`:
+  - Packt die Seite in eine einzelne HTML-Datei für Simon (Doppelklick, Claude-App). Impressum und Datenschutz kommen als aufklappbare Abschnitte dazu.
+  - Mit `--pruefen` fotografiert es die Datei eingebettet und meldet, wenn der Moment nicht von selbst abspielt.
+  - Es meldet auch, wenn unten etwas unsichtbar bleibt oder sich nichts bewegt.
+  - Bisher hat der Bauer das jedes Mal von Hand gebastelt. Den leeren Team-Rahmen hätte das Werkzeug gefunden.
+- Skill:
+  - Stopp 2 liefert über `vorschau.mjs`.
+  - Bei Noten, die höchstens 0,4 auseinanderliegen, gilt die spätere Fassung, wenn sie benannte Fehler behebt.
+  - Nach der letzten Kritiker-Runde laufen Prüfskript und Vorschau-Prüfung erneut.
+- `handwerk.md`:
+  - §11.12: Der Kontakt bleibt immer erreichbar, auch während einer langen Bühne.
+  - 1b: Stolperstein IntersectionObserver bei auf null zugeschnittenen Elementen.
+- `3d-leistung.md`: pro Bild kein Layout lesen, Scroll-Ereignisse über `requestAnimationFrame`.
+- Neuer Test `tests/test_vorschau.py`.
+
 ## 0.3.1 – Nicht abfallen, nicht ruckeln (Schreinerei-Test, 23.11.2026)
 Simon zur fertigen Schreinerei: „find ich cool, wird nach unten hin immer langweilig und ruckelt bisschen“.
 - `handwerk.md` 1b: Nach dem Moment nicht abfallen. Jeder Abschnitt darunter bekommt eine kleine eigene Bewegung aus derselben Bildsprache (CSS/SVG beim Hineinscrollen), und der Schluss greift den Moment wieder auf.

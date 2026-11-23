@@ -11,7 +11,7 @@ Für die nächste Sitzung mit Simon. Erst ganz lesen, dann `plugins/personal/wis
 - Laptop: 8 GB RAM, keine eigene Grafikkarte.
 
 ## Stand
-- **Website-Bauer** (`plugins/website`, **0.3.0, nach der Probearbeit umgebaut, nicht eingestellt**). Alle Unterlagen in `docs/personal/website-bauer/`.
+- **Website-Bauer** (`plugins/website`, **0.3.2, nach Probearbeit und Schreinerei-Test umgebaut, nicht eingestellt**). Alle Unterlagen in `docs/personal/website-bauer/`.
 - **Tests:** `python3 -m pytest plugins/website/tests`: 40 grün (23.11.2026, Dauer etwa 7 Minuten).
 - **Testfälle (Evals):** 17, neu sind `k2-altbestand` und `k3-wunsch-erhalten`. Läufer: `tests/werkzeug/probearbeit.py`.
 
@@ -51,7 +51,12 @@ Simon hat den Test für beendet erklärt. Die SFH-Seite selbst arbeitet er im Ch
 - **Simons Urteil:** „haut mich jetz alles nicht so um“. Meins: 2 bis 3 von 5 gegen Lando, alle mit demselben Einstieg (Überschrift, zwei Knöpfe, Bild).
 - **Ursache:** Die Prüfungen zählten Fehler, nicht das Besondere, und ohne Simon an den Haltepunkten fehlte das Nachsteuern.
 - **Umbau 0.3.0 (Simon: „ja passt dann so umbauen“):** Hauptidee als Pflicht, Stopp 1b Entwurf, Kritiker mit Merk-Urteil, 3D klein planen, Sperre und Testfälle. Einzelheiten im CHANGELOG.
-- **Nächster Schritt:** Die Schreinerei (q3) neu bauen lassen, mit Simon an Stopp 1 und 1b. Erst wenn er dort „wow“ sagt, wieder eine Probearbeit.
+- **Schreinerei-Test (23.11.2026):**
+  - Idee A, ein Schrank, der sich beim Scrollen zusammensetzt und in eine Nische gleitet.
+  - Simon: „find ich cool“, dann „wird nach unten hin langweilig und ruckelt bisschen“, nach dem Umbau „Ja is cool so“.
+  - Kritiker: merkt man sich, Noten 6,2 bis 7,0.
+  - Lehren in 0.3.1 und 0.3.2.
+- **Nächster Schritt:** Plugin bei Simon aktualisieren und den Konto-Skill „website-bauen“ abschalten. Danach wieder eine Probearbeit (q1–q4) mit 0.3.2, um zu messen, ob die Seiten jetzt einen Moment haben.
 - Alle Seiten der Probearbeit als einzelne HTML-Dateien hat Simon bekommen (Packer im Scratchpad der Sitzung, nicht im Repo).
 
 ## Ehrlich offen

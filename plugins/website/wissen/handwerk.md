@@ -124,6 +124,6 @@ Eine zweite Sitzung hat den Entwurf durchgesehen und zehn Fehler gefunden. Jeder
    - Wenn die Seite eingebettet ist (`window.top !== window.self`) oder nicht scrollen kann, spielt der Moment einmal von selbst ab. Ein Knopf startet ihn neu.
    - Bei „Bewegung reduzieren“ steht der End-Zustand, und derselbe Knopf spielt den Moment auf Wunsch ab.
    - Ereignis-Handler nie direkt als Startfunktion mit Parametern übergeben (`addEventListener("pointerdown", start)` gibt das Ereignis als ersten Parameter mit). Im Test hat genau das den Rückfall ausgehebelt.
-   - Prüfen: die Seite einmal in einem `<iframe>` normaler Höhe öffnen und nach einigen Sekunden fotografieren.
-   - Simon bekommt zum Ansehen eine einzelne HTML-Datei und den Hinweis, sie per Doppelklick im Browser zu öffnen.
+   - Prüfen und Liefern mit `scripts/vorschau.mjs --pruefen`: Es packt die Seite in eine einzelne HTML-Datei, die Simon per Doppelklick öffnet, und fotografiert sie eingebettet nach 3 und 12 s.
+12. **Der Kontakt bleibt immer erreichbar** (Schreinerei-Test). Die Kopfleiste war am Desktop während der 260vh langen Bühne ausgeblendet, damit nichts überlappt. Wer schon beim Schrank anrufen wollte, fand keinen Weg. Blendest du die Navigation aus, bleibt mindestens der Kontakt-Knopf sichtbar, oben rechts, klein, ohne den Moment zu überdecken.
 
