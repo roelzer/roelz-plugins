@@ -35,6 +35,7 @@ In der Probearbeit waren alle Seiten des Website-Bauers fehlerfrei und bestanden
   - Der letzte Abschnitt greift den Moment wieder auf, z. B. eine leere Nische mit „Ihr Maß?“.
 
   Machart: CSS oder SVG, nur beim Hineinscrollen (IntersectionObserver), keine zweite WebGL-Fläche, bei reduzierter Bewegung ohne. Nicht: jeden Absatz von unten einblenden lassen. Das ist Stangenware.
+  Stolperstein: Ein Element, das bis zum Start auf null zugeschnitten ist (`clip-path: inset(0 0 100% 0)`, `scale(0)`), meldet der IntersectionObserver nie als sichtbar, also startet es nie. Beobachte den umgebenden Rahmen und schalte das Kind über ihn (Schreinerei: Teamfoto-Platzhalter blieb leer).
 
 ## 2. Vorbilder wirklich ansehen (gegen W3)
 - Öffne **mindestens 3 Vorbilder** und fotografiere sie (Playwright, 1440 px und 390 px) nach `arbeit/vorbilder/`. Simons Vorbilder (Lando, Igloo) sind immer dabei. Dazu 1–2 aus der Branche, z. B. von Awwwards (Kategorie und Jury-Note ansehen).
