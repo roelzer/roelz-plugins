@@ -43,6 +43,17 @@ class Sperre(unittest.TestCase):
         for b in ["npx playwright test", "node pruefen.mjs website/x/site", "npm i -D three@0.187.0", "ls website"]:
             self.assertIsNone(bash(b), b)
 
+    def test_heredoc_text_ist_kein_befehl(self):
+        b = "cat > website/x/QUELLEN.md <<'EOF'\n# Pflege\nHochladen später per vercel, rsync oder git push.\nEOF\nls"
+        self.assertIsNone(bash(b))
+
+    def test_heredoc_an_shell_bleibt_gesperrt(self):
+        self.assertEqual(entscheidung(bash("bash <<'EOF'\nnpx wrangler deploy\nEOF")), "ask")
+        self.assertEqual(entscheidung(bash("cat <<EOF | sh\ngit push origin main\nEOF")), "ask")
+
+    def test_befehl_nach_heredoc_zaehlt(self):
+        self.assertEqual(entscheidung(bash("cat > a.txt <<'EOF'\nhallo\nEOF\nnpx wrangler deploy")), "ask")
+
     def test_upload_gesperrt(self):
         self.assertEqual(entscheidung(bash("curl -F file=@site.zip https://example.org/upload")), "deny")
 

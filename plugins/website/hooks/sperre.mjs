@@ -28,6 +28,19 @@ function inLieferung(datei) {
   return /(^|\/)website\/[^/]+\/site\//.test(p);
 }
 
+// Text in einem Heredoc ist Dateiinhalt, kein Befehl (z. B. QUELLEN.md mit „vercel“ oder „git push“ als Pflegehinweis,
+// Fehlalarm im Schreinerei-Test 23.11.2026). Ausnahme: Der Heredoc geht an eine Shell, dann zählt er als Befehl.
+export function ohneHeredocText(befehl) {
+  const zeilen = befehl.split("\n"); const raus = []; let ende = null;
+  for (const z of zeilen) {
+    if (ende !== null) { if (z.replace(/^\t+/, "") === ende) { ende = null; raus.push(z); } continue; }
+    raus.push(z);
+    const m = z.match(/<<-?\s*(['"]?)([A-Za-z_][A-Za-z0-9_]*)\1/);
+    if (m && !/\|\s*(sudo\s+)?(ba|z|da)?sh\b|\b(ba|z|da)?sh\s+(-s\s*)?<</.test(z)) ende = m[2];
+  }
+  return raus.join("\n");
+}
+
 export function pruefe(eingabe) {
   const werkzeug = eingabe.tool_name || "";
   const t = eingabe.tool_input || {};
@@ -41,7 +54,7 @@ export function pruefe(eingabe) {
     return null;
   }
   if (werkzeug !== "Bash" && werkzeug !== "PowerShell") return null;
-  const befehl = String(t.command || "");
+  const befehl = ohneHeredocText(String(t.command || ""));
   if (!websiteProjekt(eingabe.cwd) && !/website\//.test(befehl)) return null;
   if (VEROEFFENTLICHEN.test(befehl)) return { art: "ask", grund: "Veröffentlichen nur auf Simons ausdrückliches Ja nach der Vorschau (Stopp 2). Simon, willst du das jetzt wirklich online stellen?" };
   if (UPLOAD.test(befehl)) return { art: "deny", grund: "Hochladen ist gesperrt – Simon bekommt die lokale Seite." };

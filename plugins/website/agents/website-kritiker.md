@@ -57,6 +57,7 @@ Je Kriterium eine Note 1–10 mit einem Satz Begründung und einem Bildbeleg. Ge
 3. Ist das Hauptmotiv echt (kein Platzhalter, kein im Browser berechneter Ersatz)?
 4. Ist jeder Text lesbar, auch über Bildern und unter der Kopfleiste?
 5. Gibt es genau einen Wow-Moment, und trägt er? (Muss zum Merk-Urteil passen.)
+5b. Fällt die Seite nach dem Moment ab? Scroll bis ganz unten und beleg es mit einem Bild der unteren Hälfte. Bewegt sich darunter nichts Eigenes mehr, oder sieht es dort wie eine Vorlage aus, ist das ⚠️ und kostet bei Gestaltung mindestens einen Punkt (Simon: „wird nach unten hin immer langweilig“).
 6. Steht irgendwo eine Aussage, die erfunden wirkt (Zahlen, Kunden, Versprechen, Lebenslauf)?
 7. Stimmen die Messwerte des Prüfskripts mit deinem Eindruck überein?
 8. Bei Verbesserung: Sind alle Inhalte und Funktionen aus der Inhaltsliste erhalten?
