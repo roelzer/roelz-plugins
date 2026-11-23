@@ -35,6 +35,7 @@ In der Probearbeit waren alle Seiten des Website-Bauers fehlerfrei und bestanden
   - Der letzte Abschnitt greift den Moment wieder auf, z. B. eine leere Nische mit „Ihr Maß?“.
 
   Machart: CSS oder SVG, nur beim Hineinscrollen (IntersectionObserver), keine zweite WebGL-Fläche, bei reduzierter Bewegung ohne. Nicht: jeden Absatz von unten einblenden lassen. Das ist Stangenware.
+  Stolperstein: Ein Element, das bis zum Start auf null zugeschnitten ist (`clip-path: inset(0 0 100% 0)`, `scale(0)`), meldet der IntersectionObserver nie als sichtbar, also startet es nie. Beobachte den umgebenden Rahmen und schalte das Kind über ihn (Schreinerei: Teamfoto-Platzhalter blieb leer).
 
 ## 2. Vorbilder wirklich ansehen (gegen W3)
 - Öffne **mindestens 3 Vorbilder** und fotografiere sie (Playwright, 1440 px und 390 px) nach `arbeit/vorbilder/`. Simons Vorbilder (Lando, Igloo) sind immer dabei. Dazu 1–2 aus der Branche, z. B. von Awwwards (Kategorie und Jury-Note ansehen).
@@ -123,6 +124,6 @@ Eine zweite Sitzung hat den Entwurf durchgesehen und zehn Fehler gefunden. Jeder
    - Wenn die Seite eingebettet ist (`window.top !== window.self`) oder nicht scrollen kann, spielt der Moment einmal von selbst ab. Ein Knopf startet ihn neu.
    - Bei „Bewegung reduzieren“ steht der End-Zustand, und derselbe Knopf spielt den Moment auf Wunsch ab.
    - Ereignis-Handler nie direkt als Startfunktion mit Parametern übergeben (`addEventListener("pointerdown", start)` gibt das Ereignis als ersten Parameter mit). Im Test hat genau das den Rückfall ausgehebelt.
-   - Prüfen: die Seite einmal in einem `<iframe>` normaler Höhe öffnen und nach einigen Sekunden fotografieren.
-   - Simon bekommt zum Ansehen eine einzelne HTML-Datei und den Hinweis, sie per Doppelklick im Browser zu öffnen.
+   - Prüfen und Liefern mit `scripts/vorschau.mjs --pruefen`: Es packt die Seite in eine einzelne HTML-Datei, die Simon per Doppelklick öffnet, und fotografiert sie eingebettet nach 3 und 12 s.
+12. **Der Kontakt bleibt immer erreichbar** (Schreinerei-Test). Die Kopfleiste war am Desktop während der 260vh langen Bühne ausgeblendet, damit nichts überlappt. Wer schon beim Schrank anrufen wollte, fand keinen Weg. Blendest du die Navigation aus, bleibt mindestens der Kontakt-Knopf sichtbar, oben rechts, klein, ohne den Moment zu überdecken.
 

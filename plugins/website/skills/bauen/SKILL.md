@@ -82,7 +82,7 @@ Im SFH-Test kam das erst am Ende auf: Domain und Mail bei IONOS, die Seite lief 
 
 ## 3b. Entwurf (Stopp 1b)
 - Baue **zuerst nur den Moment** als Durchstich in `site/`: Er läuft grob, mit einfachen Formen. Der Rest der Seite ist noch Platzhalter.
-- Bildserie mit `ablauf.mjs` (Laptop und Handy), dann Simon die Bilder schicken mit der Frage: „Trägt der Moment? Was soll anders?“
+- Bildserie mit `ablauf.mjs` (Laptop und Handy), dann Simon die Bilder und eine Vorschau-Datei aus `vorschau.mjs` (Abschnitt 6) schicken mit der Frage: „Trägt der Moment? Was soll anders?“
 - Der Moment muss auch in einer eingebetteten Vorschau laufen, in der die Seite nicht selbst scrollt (`handwerk.md` Abschnitt 11, Punkt 11). Simon schaut oft in der Claude-App.
 - **Erst nach seinem Ja** baust du den Rest. Seine Anmerkungen setzt du in kurzen Runden um: umbauen, Bildserie, schicken. So entstand die SFH-Seite („ja mach mal und zeig mir den Entwurf“).
 - Bei „mach einfach“: Statt Simon ruft du den `website-kritiker` für ein Merk-Urteil über den Durchstich. Sagt er „langweilig“, verbesserst du den Moment, bevor du weiterbaust.
@@ -124,10 +124,19 @@ Im SFH-Test kam das erst am Ende auf: Domain und Mail bei IONOS, die Seite lief 
 
   Er bekommt **nicht** deine Begründungen und **nicht** `hauptidee.md`. Er soll selbst sagen, ob er einen Moment sieht.
 - Der Kritiker schreibt als erste Zeile ein **Merk-Urteil**: „merkt man sich“ oder „langweilig“. Bei „langweilig“ arbeitest du in der nächsten Runde am Moment, nicht an Details. Die Abschluss-Sperre verlangt das Merk-Urteil bei jeder neuen Seite.
-- Korrigieren und neu prüfen, **höchstens 3 Runden**. Jede Runde sicherst du nach `arbeit/runden/<n>/`, die Antwort des Kritikers wörtlich als `arbeit/runden/<n>/kritik.md`. Die Abschluss-Sperre prüft das und die 3 Vorbild-Fotos. **Am Ende gilt die Fassung mit der besten Note**, nicht automatisch die letzte.
+- Korrigieren und neu prüfen, **höchstens 3 Runden**. Jede Runde sicherst du nach `arbeit/runden/<n>/`, die Antwort des Kritikers wörtlich als `arbeit/runden/<n>/kritik.md`. Die Abschluss-Sperre prüft das und die 3 Vorbild-Fotos. **Am Ende gilt die Fassung mit der besten Note**, nicht automatisch die letzte. Ausnahme: Liegen die Noten höchstens 0,4 auseinander (Streuung des Kritikers), nimmst du die spätere Fassung, wenn sie Fehler behebt, die der Kritiker selbst benannt hat. Die andere Fassung bleibt in `arbeit/runden/<n>/site`, und du sagst Simon beides.
+- **Nach der letzten Kritiker-Runde** nur noch kleine, benannte Korrekturen. Danach laufen `pruefen.mjs` und `vorschau.mjs --pruefen` erneut, und du sagst Simon, was der Kritiker nicht mehr gesehen hat. Im Schreinerei-Test hat genau so eine Korrektur den Team-Abschnitt leer gemacht.
 
 ## 6. Vorschau (Stopp 2)
-Simon öffnet die Seite **auf seinem Laptop**: `npx --yes serve website/<name>/site`, dann die angezeigte Adresse im Browser. Dazu kurz:
+Simon bekommt **eine einzelne HTML-Datei**, die er per Doppelklick im Browser oder direkt in der Claude-App öffnet. Bau sie nicht von Hand, sondern mit:
+
+`node ${CLAUDE_PLUGIN_ROOT}/scripts/vorschau.mjs website/<name>/site website/<name>/arbeit/<name>-vorschau.html --pruefen website/<name>/arbeit/vorschau`
+
+Das Werkzeug bettet alles ein, hängt Impressum und Datenschutz als aufklappbare Abschnitte an und prüft zwei Dinge:
+- ob der Moment eingebettet von selbst abspielt,
+- ob unten etwas leer bleibt oder sich nichts bewegt.
+
+Es braucht `esbuild` und `playwright` (`npm i -D esbuild playwright` in `arbeit/build`). Bei FEHLER erst beheben. Die Bilder `eingebettet-*` und `unten-*` siehst du dir selbst an, bevor Simon die Datei bekommt. Alternativ für den Laptop: `npx --yes serve website/<name>/site`. Dazu kurz:
 - was die Seite in einem Satz macht und woher die Idee kommt,
 - die wichtigsten Bildschirmfotos (Handy und Desktop),
 - was das Prüfskript und der Kritiker noch bemängeln,
