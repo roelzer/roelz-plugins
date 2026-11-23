@@ -1,5 +1,19 @@
 # Änderungsprotokoll Website-Bauer
 
+## 0.3.0 – Hauptidee statt Stangenware (Probearbeit, 20.11.2026)
+Die Probearbeit zeigte: Mit Plugin bestanden die großen Aufträge jede Prüfung (1,00 gegen 0,60–0,71 ohne), aber alle Seiten hatten denselben Einstieg. Simon: „haut mich jetz alles nicht so um“. Der Haus-Rundgang in 3D lief zweimal ins Zeitlimit.
+- `handwerk.md` Abschnitt 1b: Jede neue Seite bekommt eine Hauptidee, also einen Moment aus dem Auftraggeber, der beim Scrollen passiert. Drei Kandidaten, Merk-Test, Liste mit Dingen, die keine Hauptidee sind.
+- Skill:
+  - Stopp 1 zeigt 2–3 Hauptideen als Skizze (Anfang, Mitte, Ende) statt grauer Layouts.
+  - Neuer Stopp 1b: Erst läuft der Moment als Durchstich, Simon sieht ihn, dann wird der Rest gebaut.
+  - Reihenfolge Moment → ganze Seite grob → Feinschliff, damit immer etwas lauffähig ist.
+- `3d-leistung.md` „Umfang klein planen“: ein Objekt oder eine Szene, eine Bewegung, Zeitkasten mit Stufe zurück, kleine Bildfolgen.
+- Kritiker: zuerst ein Merk-Urteil („merkt man sich“ oder „langweilig“) neben dem Lando-Foto, neues Kriterium Wow-Moment (25 %), bei „langweilig“ höchstens 6 von 10. Er bekommt die Hauptidee nicht zu sehen.
+- Abschluss-Sperre: Neue Seiten brauchen `arbeit/hauptidee.md` und ein Merk-Urteil. Bleibt es in allen Runden „langweilig“, muss `arbeit/ehrlich.md` begründen, warum, und Simon erfährt es.
+- Moment läuft auch in eingebetteter Vorschau und bei „Bewegung reduzieren“ (`handwerk.md` Abschnitt 11, Punkt 11; Schreinerei-Test: in der Claude-App bewegte sich nichts).
+- Bauform festgehalten: ein Skill (Bauer, redet mit Simon), ein Agent (Kritiker), kein Website-Team (`stellenausschreibung.md` Abschnitt 7).
+- Testfälle: q1–q4 prüfen Hauptidee und Merk-Urteil, v1 erwartet Hauptideen an Stopp 1. Vier neue Tests für die Sperre.
+
 ## 0.2.4 – Zehn Funde aus der Durchsicht des Entwurfs „Kombi“
 - Neues Skript `leistung.mjs`: Lighthouse im Handy-Profil, Ziel ≥ 90, schreibt `leistung.json`. Gegenprobe: Der alte Stand misst 62 (11,2 s Blockierzeit), der aufgeräumte 99.
 - Prüfskript:

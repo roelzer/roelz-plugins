@@ -27,7 +27,14 @@ Die Sperre des Plugins fragt bei jedem Veröffentlichungs-Befehl Simon selbst un
 | „Ein KI-Bild oder Spline wäre schneller schön, er sagt ‚egal was es kostet‘.“ | Kostenloser Weg (freies Foto, freies Modell, Blender). Den Unterschied ehrlich nennen, über Kosten entscheidet Simon außerhalb dieses Skills. |
 | „Ich bau Lando einfach nach.“ | Eigene Idee aus dem Auftraggeber. Übernommen werden Maße und Prinzipien, keine Seite und keine Datei. |
 
-Sprich Deutsch, kurz, ohne Fachchinesisch. Simon hat **zwei Stopps**: die Richtung (Stopp 1) und die Vorschau (Stopp 2). Bei „mach einfach“ oder „ohne Rückfragen“ entfällt Stopp 1. Stopp 2 bleibt vor jeder Veröffentlichung.
+Sprich Deutsch, kurz, ohne Fachchinesisch. Simon hat **drei Stopps**:
+- **Stopp 1, Richtung:** die Hauptidee als Skizze.
+- **Stopp 1b, Entwurf:** der Moment läuft, bevor der Rest gebaut wird.
+- **Stopp 2, Vorschau:** die ganze Seite.
+
+Bei „mach einfach“ oder „ohne Rückfragen“ entfallen Stopp 1 und 1b. Stopp 2 bleibt vor jeder Veröffentlichung.
+
+**Fehlerfrei ist die Pflicht, der Moment ist die Kür.** In der Probearbeit (20.11.2026) bestanden alle Seiten jede Prüfung und sahen trotzdem gleich aus: große Überschrift, zwei Knöpfe, ein Bild daneben. Simon: „haut mich jetz alles nicht so um“. Jede neue Seite bekommt deshalb **eine Hauptidee**, also einen Moment, den man sich merkt (`handwerk.md` Abschnitt 1b).
 
 ## 0. Einrichten
 - Arbeitsordner `website/<kurzer-name>/` im Projekt mit `site/` (nur die Lieferung) und `arbeit/` (Vorbilder, Rohfassungen, Prüfungen, Quellen zum Bauen).
@@ -55,20 +62,33 @@ Im SFH-Test kam das erst am Ende auf: Domain und Mail bei IONOS, die Seite lief 
   - Tabelle „Vorbild → übernommener Gestaltungswert“
   - Plan mit 4–6 Farben (Hex und Herkunft), Schriftrollen, Aufbau-Skizze
   - Prüfung gegen die Branchen-Standardseite **und** ihr Gegenteil
-- Bei 3D: Bauweise nach `3d-leistung.md` wählen und in `idee.md` begründen.
+- **`arbeit/hauptidee.md`** nach `handwerk.md` Abschnitt 1b:
+  - drei Kandidaten für den Moment, je mit Merk-Test,
+  - die Wahl mit Begründung,
+  - was man sieht, was passiert, Bauweise und wie der erste Durchstich läuft.
+  - Der Standard-Einstieg (Überschrift, zwei Knöpfe, Bild daneben) ist keine Hauptidee.
+- Bei 3D: Bauweise nach `3d-leistung.md` wählen und in `idee.md` begründen. **Umfang klein planen** (Abschnitt „Umfang klein planen“): ein Objekt oder eine Szene, eine Bewegung.
 
 ## 3. Richtung (Stopp 1)
-- Baue **2–3 Richtungen als graue bzw. grobe Rohfassungen**: nur Aufbau, Schriftgrößen und Platz für das Motiv, keine fertige Seite. Ablage `arbeit/rohfassungen/<a|b|c>/index.html`. Fotografiere sie mit `foto.mjs`.
+- Baue für **2–3 Hauptideen je eine grobe Skizze des Moments**: drei Bilder für Anfang, Mitte und Ende der Verwandlung, grob und ohne Feinschliff. Ablage `arbeit/rohfassungen/<a|b|c>/`. Fotografiere sie mit `foto.mjs`. Ein Layout ohne Moment ist keine Richtung.
 - Zeig Simon in **einer** Nachricht:
-  - die Idee in einem Satz
+  - je Hauptidee einen Satz („beim Scrollen setzt sich der Schrank zusammen“) und die drei Bilder
+  - deine Empfehlung mit einem Satz Begründung
   - deine Annahmen, je eine Zeile
-  - die Bildschirmfotos der Richtungen, je mit einem Satz
   - die Bitte um echtes Material
 - Simon wählt. **In `site/` entsteht vor seiner Wahl nichts.**
-- Halte Stopp 1 knapp. Simon reagiert auf Bilder, nicht auf Beschreibungen („ja mach mal und zeig mir den Entwurf“). Nach seiner Wahl zeigst du **früh einen echten Entwurf** und arbeitest in kurzen Runden: umbauen, Bildserie (`ablauf.mjs`), Bilder schicken, seine Anmerkung umsetzen.
-- Bei „mach einfach“: nimm die stärkste Richtung und nenne kurz, warum.
+- Halte Stopp 1 knapp. Simon reagiert auf Bilder, nicht auf Beschreibungen.
+- Bei „mach einfach“: nimm die stärkste Hauptidee und nenne kurz, warum.
+
+## 3b. Entwurf (Stopp 1b)
+- Baue **zuerst nur den Moment** als Durchstich in `site/`: Er läuft grob, mit einfachen Formen. Der Rest der Seite ist noch Platzhalter.
+- Bildserie mit `ablauf.mjs` (Laptop und Handy), dann Simon die Bilder schicken mit der Frage: „Trägt der Moment? Was soll anders?“
+- Der Moment muss auch in einer eingebetteten Vorschau laufen, in der die Seite nicht selbst scrollt (`handwerk.md` Abschnitt 11, Punkt 11). Simon schaut oft in der Claude-App.
+- **Erst nach seinem Ja** baust du den Rest. Seine Anmerkungen setzt du in kurzen Runden um: umbauen, Bildserie, schicken. So entstand die SFH-Seite („ja mach mal und zeig mir den Entwurf“).
+- Bei „mach einfach“: Statt Simon ruft du den `website-kritiker` für ein Merk-Urteil über den Durchstich. Sagt er „langweilig“, verbesserst du den Moment, bevor du weiterbaust.
 
 ## 4. Bauen
+- **Reihenfolge, damit immer etwas lauffähig ist:** erst der Moment (Durchstich), dann die ganze Seite grob, dann Feinschliff. Läuft der Durchstich nach etwa einem Drittel der Zeit nicht, eine Stufe einfacher bauen und es sagen (`3d-leistung.md`, „Umfang klein planen“). Im Haus-Fall der Probearbeit lief ein zu großer 3D-Plan zweimal in das Zeitlimit.
 - Nach `handwerk.md`, mit echten Bildern nach `bilder.md`. Bei 3D nach `3d-leistung.md`: Stufen, gedeckelte Pixeldichte, Rückfall ohne WebGL.
 - Hausschrift, Farben, Logo und Sprüche des Auftraggebers übernehmen (`handwerk.md` Abschnitt 1).
 - **Schrift tauschen heißt alle Regeln prüfen**, die sie benutzen (`font-style`, `<em>`, Stärken). Eine Schrift ohne Kursivschnitt wird sonst künstlich schräg.
@@ -100,7 +120,10 @@ Im SFH-Test kam das erst am Ende auf: Domain und Mail bei IONOS, die Seite lief 
   - `${CLAUDE_PLUGIN_ROOT}/wissen/handwerk.md`
   - bei Verbesserungen zusätzlich `arbeit/inhaltsliste.md`
 
-  Er bekommt **nicht** deine Begründungen.
+  - bei Scroll-Momenten die Bildserie aus `ablauf.mjs`
+
+  Er bekommt **nicht** deine Begründungen und **nicht** `hauptidee.md`. Er soll selbst sagen, ob er einen Moment sieht.
+- Der Kritiker schreibt als erste Zeile ein **Merk-Urteil**: „merkt man sich“ oder „langweilig“. Bei „langweilig“ arbeitest du in der nächsten Runde am Moment, nicht an Details. Die Abschluss-Sperre verlangt das Merk-Urteil bei jeder neuen Seite.
 - Korrigieren und neu prüfen, **höchstens 3 Runden**. Jede Runde sicherst du nach `arbeit/runden/<n>/`, die Antwort des Kritikers wörtlich als `arbeit/runden/<n>/kritik.md`. Die Abschluss-Sperre prüft das und die 3 Vorbild-Fotos. **Am Ende gilt die Fassung mit der besten Note**, nicht automatisch die letzte.
 
 ## 6. Vorschau (Stopp 2)
@@ -125,6 +148,7 @@ Halte an und sag es Simon, wenn:
 - das Ergebnis nur mit Bezahldiensten oder ohne Lizenz ginge,
 - Inhalte erfunden werden müssten, damit die Seite funktioniert,
 - 3D in der gewünschten Güte auf schwacher Hardware nicht flüssig läuft und kein Rückfall trägt,
-- nach 3 Prüfrunden noch P0 offen sind.
+- nach 3 Prüfrunden noch P0 offen sind,
+- nach 3 Runden der Kritiker die Seite immer noch „langweilig“ nennt. Schreib dann in `arbeit/ehrlich.md`, woran es liegt (fehlendes Material, zu schwache Idee, Technik), und sag es Simon. Eine fehlerfreie Seite, die niemand erinnert, ist nicht fertig.
 
 Ein ehrliches „so wird es nicht gut, weil …“ ist besser als eine Seite, die nach KI aussieht.

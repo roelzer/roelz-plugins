@@ -70,13 +70,26 @@ export function pruefe(eingabe, jetzt = Date.now()) {
     // Umbau: Wünsche aus dem bisherigen Stand müssen erfasst sein, sonst gehen sie verloren (SFH: die „50“ mit Foto fehlte)
     const umbau = existsSync(join(wurzel, name, "arbeit", "inhaltsliste.md")) || existsSync(join(wurzel, name, "arbeit", "original"));
     if (umbau && !existsSync(join(wurzel, name, "arbeit", "wuensche.md"))) offen.push(`${relative(cwd, site)} (Umbau ohne arbeit/wuensche.md – frühere Wünsche des Auftraggebers erfassen und mitnehmen)`);
+    // Probearbeit 20.11.2026: alle Seiten fehlerfrei, aber ohne Moment („haut mich jetz alles nicht so um“).
+    // Neue Seiten brauchen eine Hauptidee und ein Merk-Urteil des Kritikers; bleibt es in allen Runden „langweilig“, ehrlich sagen.
+    if (!umbau) {
+      const arbeit = join(wurzel, name, "arbeit");
+      if (!existsSync(join(arbeit, "hauptidee.md"))) offen.push(`${relative(cwd, site)} (keine arbeit/hauptidee.md – den einen Moment festlegen, den man sich merkt, handwerk.md Abschnitt 1b)`);
+      if (kritik) {
+        const urteile = readdirSync(runden).map((r) => join(runden, r, "kritik.md")).filter((k) => existsSync(k))
+          .map((k) => (readFileSync(k, "utf8").match(/Merk-Urteil:\s*\**\s*(merkt man sich|langweilig)/i) || [])[1]?.toLowerCase()).filter(Boolean);
+        if (!urteile.length) offen.push(`${relative(cwd, site)} (Kritik ohne Merk-Urteil – website-kritiker muss mit „Merk-Urteil: merkt man sich“ oder „Merk-Urteil: langweilig“ beginnen)`);
+        else if (!urteile.includes("merkt man sich") && !existsSync(join(arbeit, "ehrlich.md")))
+          offen.push(`${relative(cwd, site)} (der Kritiker nennt jede Runde „langweilig“ – am Moment arbeiten, nicht an Details; nach 3 Runden in arbeit/ehrlich.md begründen und Simon ehrlich sagen)`);
+      }
+    }
     // Müll im Projekt (SFH: eingecheckte __pycache__-Datei)
     const muell = finde(join(wurzel, name), (n) => n === "__pycache__" || n === ".DS_Store" || /\.pyc$/.test(n));
     if (muell.length) offen.push(`${relative(cwd, join(wurzel, name))} (Müll im Projekt: ${muell.slice(0, 2).map((m) => relative(cwd, m)).join(", ")} – löschen und in .gitignore aufnehmen)`);
   }
   if (!offen.length) return null;
   return `Website-Abschluss: ${offen.slice(0, 4).join("; ")}. Vor „fertig“: ` +
-    "mindestens 3 Vorbilder fotografieren, node <Plugin>/scripts/pruefen.mjs website/<name>/site, P0 beheben, Bildschirmfotos ansehen, node <Plugin>/scripts/leistung.mjs (Handy ≥ 90), den Agenten website-kritiker rufen und seine Antwort als arbeit/runden/<n>/kritik.md sichern, Unterlagen (QUELLEN.md, Design-Notizen) mit anpassen. " +
+    "mindestens 3 Vorbilder fotografieren, node <Plugin>/scripts/pruefen.mjs website/<name>/site, P0 beheben, Bildschirmfotos ansehen, node <Plugin>/scripts/leistung.mjs (Handy ≥ 90), bei neuen Seiten arbeit/hauptidee.md schreiben, den Agenten website-kritiker rufen und seine Antwort (mit Merk-Urteil) als arbeit/runden/<n>/kritik.md sichern, Unterlagen (QUELLEN.md, Design-Notizen) mit anpassen. " +
     "Kann etwas davon nicht laufen, sag ehrlich, was und warum.";
 }
 

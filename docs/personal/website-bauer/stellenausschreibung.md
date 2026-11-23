@@ -91,10 +91,25 @@ Er baut für Simon Websites auf Spitzenniveau, also Vereinsseiten, die eigene Fi
 
 Grund: Ein Ablauf mit Freigaben braucht einen Skill. Der unabhängige Blick braucht einen eigenen Agenten (Selbstbewertung ist nachweislich zu positiv). Was immer gelten muss, wird Skript oder Sperre.
 
-**Ablauf mit zwei Stopps:**
+**Festgelegt am 23.11.2026** (Simon: „wir müssen das halt genau festhalten, also was genau wird der website bauer, ein agent oder ein skill? und nur ein agent? oder ein website team?“):
+
+| Teil | Art | Warum so |
+|---|---|---|
+| **Website-Bauer** | **Skill** `/website:bauen`, läuft im Hauptgespräch | Er muss an den Stopps mit Simon reden und auf sein Ja warten. Ein Agent arbeitet im Hintergrund und kann das nicht. |
+| **Kritiker** | **ein Agent** `website-kritiker` | Wer gebaut hat, bewertet sich zu gut. Der Kritiker sieht nur die Seite und die Vorbilder, nicht die Begründungen und nicht die Hauptidee. |
+| Prüfskripte und Sperren | Skripte und Hooks | Was immer gelten muss, darf nicht vom Gedächtnis eines Modells abhängen. |
+
+**Kein Website-Team** (mehrere Rollen wie Designer, Entwickler, Texter):
+- Gut wurde es immer dann, wenn **einer** gebaut hat und Simon an den Haltepunkten draufschaute (SFH-Seite, Schrank-Moment der Schreinerei). Bei jeder Übergabe zwischen Rollen geht ein Stück Geschmack verloren.
+- Das Dev-Team ist für Programme mit Logik gebaut. Sein Maßstab ist „funktioniert und ist sauber“, die Probearbeit hat gezeigt, dass das für eine Website nicht reicht.
+- **Zusammenarbeit mit dem Dev-Team nur für echte Programmlogik in einer Website** (Terminbuchung mit Kalender, Mitgliederbereich mit Login): Der Website-Bauer baut die Seite, das Dev-Team nur dieses Stück.
+- Ein weiterer Agent kommt erst dazu, wenn ein Testfall zeigt, dass Skill plus Kritiker etwas nicht schaffen. Kein Agent auf Vorrat.
+
+**Ablauf (seit 0.3.0 mit drei Stopps, siehe `skills/bauen/SKILL.md`; ursprünglich zwei):**
 1. Briefing: Annahmen statt Fragerunde, echte Inhalte und Bilder von Simon erfragen.
 2. Vorbilder öffnen und fotografieren, Tabelle der Gestaltungswerte, Idee in einem Satz, Markentausch-Test.
-3. **Stopp 1:** Idee plus 2–3 Richtungen als **Bildschirmfotos grauer bzw. grober Rohfassungen**, keine fertige Seite. Simon wählt.
+3. **Stopp 1:** 2–3 Hauptideen (je ein Moment) als grobe Skizze in drei Bildern, keine fertige Seite. Simon wählt.
+3b. **Stopp 1b:** Erst der Moment als Durchstich, Simon sieht ihn, dann der Rest.
 4. Bauen. Dann Prüfskript, `website-kritiker` und Korrektur, höchstens 3 Runden, die beste Fassung behalten.
 5. **Stopp 2:** Simon öffnet die Seite **auf seinem Laptop** (lokal, Anleitung mit einem Befehl), dazu Bildschirmfotos.
 6. Lieferordner `site/`, `QUELLEN.md`, Austauschliste, Anleitung zum kostenlosen Hochladen.
