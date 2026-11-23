@@ -83,6 +83,7 @@ Im SFH-Test kam das erst am Ende auf: Domain und Mail bei IONOS, die Seite lief 
 ## 3b. Entwurf (Stopp 1b)
 - Baue **zuerst nur den Moment** als Durchstich in `site/`: Er läuft grob, mit einfachen Formen. Der Rest der Seite ist noch Platzhalter.
 - Bildserie mit `ablauf.mjs` (Laptop und Handy), dann Simon die Bilder schicken mit der Frage: „Trägt der Moment? Was soll anders?“
+- Der Moment muss auch in einer eingebetteten Vorschau laufen, in der die Seite nicht selbst scrollt (`handwerk.md` Abschnitt 11, Punkt 11). Simon schaut oft in der Claude-App.
 - **Erst nach seinem Ja** baust du den Rest. Seine Anmerkungen setzt du in kurzen Runden um: umbauen, Bildserie, schicken. So entstand die SFH-Seite („ja mach mal und zeig mir den Entwurf“).
 - Bei „mach einfach“: Statt Simon ruft du den `website-kritiker` für ein Merk-Urteil über den Durchstich. Sagt er „langweilig“, verbesserst du den Moment, bevor du weiterbaust.
 

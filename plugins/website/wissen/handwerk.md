@@ -112,3 +112,10 @@ Eine zweite Sitzung hat den Entwurf durchgesehen und zehn Fehler gefunden. Jeder
 8. **Toten Code beim Umbau mitnehmen:** Komponenten, die niemand mehr benutzt, und ihr Code in Skripten und Stilen kommen raus, ebenso unbenutzte Bilder. Das Prüfskript meldet mitgelieferte Dateien, auf die nichts verweist (Ballast).
 9. **Kein Müll im Repository:** `__pycache__`, `.pyc`, `.DS_Store` gehören in `.gitignore`. Die Abschluss-Sperre meldet sie.
 10. **Unterlagen im selben Schritt wie die Änderung anpassen:** `QUELLEN.md` (jede Bibliothek, jede Schrift mit Lizenz), Design-Notizen, Pflege-Anleitung, offene Fragen. Das Prüfskript meldet Bibliotheken und Schriften, die in `QUELLEN.md` fehlen.
+11. **Der Moment muss auch ohne eigenes Scrollen laufen** (Schreinerei-Test, 23.11.2026). Simon öffnete die Seite in der Vorschau der Claude-App, am Handy und am Laptop: „bei mir bewegt isch da garnix“. In eingebetteten Vorschauen scrollt die App, nicht die Seite, und der scrollgesteuerte Moment stand still.
+   - Wenn die Seite eingebettet ist (`window.top !== window.self`) oder nicht scrollen kann, spielt der Moment einmal von selbst ab. Ein Knopf startet ihn neu.
+   - Bei „Bewegung reduzieren“ steht der End-Zustand, und derselbe Knopf spielt den Moment auf Wunsch ab.
+   - Ereignis-Handler nie direkt als Startfunktion mit Parametern übergeben (`addEventListener("pointerdown", start)` gibt das Ereignis als ersten Parameter mit). Im Test hat genau das den Rückfall ausgehebelt.
+   - Prüfen: die Seite einmal in einem `<iframe>` normaler Höhe öffnen und nach einigen Sekunden fotografieren.
+   - Simon bekommt zum Ansehen eine einzelne HTML-Datei und den Hinweis, sie per Doppelklick im Browser zu öffnen.
+
