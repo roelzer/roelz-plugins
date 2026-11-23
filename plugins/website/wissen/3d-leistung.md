@@ -38,6 +38,17 @@ Simon zum Vereinswappen: „ein geiles 3D-Modell vom Logo, in so ner Metall-Opti
    - Gesamt etwa 80.000 Dreiecke.
 7. **Einstieg mit Geschichte statt Effekt:** Das Wappen dreht sich beim Scrollen aus dem Dunkel nach vorn, während eine wahre Geschichte des Auftraggebers passiert. Beim Verein: das Flutlicht geht an, „Es werde Licht“ von 2020. Die Umgebung (Platz, Masten, Lichtkegel) ist ebenfalls 3D, sonst beißt sich eine flache Zeichnung mit dem echten Objekt. Umgebung und Objekt auf zwei Zeichenflächen, damit eine helle Fläche dazwischen den Übergang machen kann.
 
+## Umfang klein planen (Probearbeit, 20.11.2026)
+Der Haus-Rundgang in 3D lief in beiden Läufen in das Zeitlimit von 60 Minuten: einmal ganz ohne Seite, einmal mit halber Bildfolge. Ein großer Plan, der nicht fertig wird, ist schlechter als ein kleiner, der sitzt.
+- **Ein Objekt oder eine Szene, eine Bewegung.** Eine Kamerafahrt oder eine Verwandlung, nicht beides und nicht mehrere Räume.
+- **Reihenfolge, damit immer etwas lauffähig ist:**
+  1. Durchstich: Der Moment läuft grob in `site/` (einfache Formen, ohne Feinschliff). Spätestens nach etwa einem Drittel der Zeit.
+  2. Die ganze Seite grob: alle Abschnitte mit echtem Inhalt, Impressum, Datenschutz.
+  3. Erst dann verfeinern: Material, Licht, Kanten, Übergänge.
+- **Läuft der Durchstich nach einem Drittel der Zeit nicht,** wechselst du eine Stufe herunter und sagst es: von Echtzeit-3D auf eine kurze Bildfolge, von der Bildfolge auf Ebenen in 2,5D, im Notfall auf ein Standbild mit einer Bewegung. Nicht kurz vor Schluss neu anfangen.
+- **Modelle aus einfachen Formen** in three.js bauen (Quader, Extrusion aus SVG, gefaste Kanten) statt große Fremdmodelle. Ein Schrank aus 12 Quadern mit Holz-Material wirkt, wenn Licht und Kanten stimmen.
+- **Bildfolgen klein:** höchstens etwa 60 Bilder in 720p für den ersten Stand. Mehr nur auf Simons Wunsch.
+
 ## Pflicht bei jedem Echtzeit-3D
 - **Erst bei der ersten Bewegung laden** (erstes Scrollen, Tippen oder Tastendruck), nicht beim `load`. Bis dahin steht ein Standbild bzw. die Vektorgrafik.
   - SFH-Test: beim `load` geladen gab es Handy-Leistung 62 und 12 s Blockierzeit. Nach der Umstellung waren es 100.

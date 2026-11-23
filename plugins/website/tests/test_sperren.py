@@ -104,12 +104,14 @@ class Abschluss(unittest.TestCase):
         os.makedirs(os.path.join(arbeit, "vorbilder")); os.makedirs(os.path.join(arbeit, "runden", "1"))
         for i in range(3):
             open(os.path.join(arbeit, "vorbilder", "v%d.png" % i), "w").close()
-        open(os.path.join(arbeit, "runden", "1", "kritik.md"), "w").close()
+        with open(os.path.join(arbeit, "runden", "1", "kritik.md"), "w") as d:
+            d.write("Merk-Urteil: merkt man sich – beim Scrollen geht das Flutlicht an.\n")
+        open(os.path.join(arbeit, "hauptidee.md"), "w").close()
         with open(os.path.join(arbeit, "pruefung", "leistung.json"), "w") as d:
             d.write('{"ok": true}')
         self.assertIsNone(hook("abschluss.mjs", {"cwd": self.ws}))
 
-    def _fast_fertig(self, leistung='{"ok": true}'):
+    def _fast_fertig(self, leistung='{"ok": true}', kritik="Merk-Urteil: merkt man sich\n", hauptidee=True):
         open(os.path.join(self.ws, "website", "x", "site", "index.html"), "w").close()
         time.sleep(1.2)
         arbeit = os.path.join(self.ws, "website", "x", "arbeit")
@@ -117,7 +119,10 @@ class Abschluss(unittest.TestCase):
         os.makedirs(os.path.join(arbeit, "vorbilder")); os.makedirs(os.path.join(arbeit, "runden", "1"))
         for i in range(3):
             open(os.path.join(arbeit, "vorbilder", "v%d.png" % i), "w").close()
-        open(os.path.join(arbeit, "runden", "1", "kritik.md"), "w").close()
+        with open(os.path.join(arbeit, "runden", "1", "kritik.md"), "w") as d:
+            d.write(kritik)
+        if hauptidee:
+            open(os.path.join(arbeit, "hauptidee.md"), "w").close()
         if leistung is not None:
             with open(os.path.join(arbeit, "pruefung", "leistung.json"), "w") as d:
                 d.write(leistung)
@@ -151,6 +156,26 @@ class Abschluss(unittest.TestCase):
         r = hook("abschluss.mjs", {"cwd": self.ws})
         self.assertEqual(r["decision"], "block")
         self.assertIn("Vorbild", r["reason"]); self.assertIn("kritik.md", r["reason"])
+
+    def test_neue_seite_ohne_hauptidee_blockt(self):
+        self._fast_fertig(hauptidee=False)
+        self.assertIn("hauptidee.md", hook("abschluss.mjs", {"cwd": self.ws})["reason"])
+
+    def test_kritik_ohne_merk_urteil_blockt(self):
+        self._fast_fertig(kritik="Ampel gelb, Note 7\n")
+        self.assertIn("Merk-Urteil", hook("abschluss.mjs", {"cwd": self.ws})["reason"])
+
+    def test_nur_langweilig_blockt_bis_ehrlich(self):
+        arbeit = self._fast_fertig(kritik="**Merk-Urteil: langweilig** – Überschrift, zwei Knöpfe, Bild daneben.\n")
+        self.assertIn("langweilig", hook("abschluss.mjs", {"cwd": self.ws})["reason"])
+        open(os.path.join(arbeit, "ehrlich.md"), "w").close()
+        self.assertIsNone(hook("abschluss.mjs", {"cwd": self.ws}))
+
+    def test_umbau_braucht_keine_hauptidee(self):
+        arbeit = self._fast_fertig(kritik="", hauptidee=False)
+        open(os.path.join(arbeit, "inhaltsliste.md"), "w").close()
+        open(os.path.join(arbeit, "wuensche.md"), "w").close()
+        self.assertIsNone(hook("abschluss.mjs", {"cwd": self.ws}))
 
     def test_nur_einmal_je_stopp(self):
         open(os.path.join(self.ws, "website", "x", "site", "index.html"), "w").close()

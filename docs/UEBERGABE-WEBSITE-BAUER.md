@@ -1,4 +1,4 @@
-# Übergabe: Website-Bauer weiterentwickeln (Stand 19.11.2026, Abend)
+# Übergabe: Website-Bauer weiterentwickeln (Stand 23.11.2026)
 
 Für die nächste Sitzung mit Simon. Erst ganz lesen, dann `plugins/personal/wissen/handwerk.md` (Abschnitt 9) und `plugins/website/skills/bauen/SKILL.md`.
 
@@ -11,8 +11,8 @@ Für die nächste Sitzung mit Simon. Erst ganz lesen, dann `plugins/personal/wis
 - Laptop: 8 GB RAM, keine eigene Grafikkarte.
 
 ## Stand
-- **Website-Bauer** (`plugins/website`, **0.2.4, in Probearbeit, nicht eingestellt**). Alle Unterlagen in `docs/personal/website-bauer/`.
-- **Tests:** `python3 -m pytest plugins/website/tests`: 36 grün (19.11.2026, Dauer etwa 7 Minuten).
+- **Website-Bauer** (`plugins/website`, **0.3.0, nach der Probearbeit umgebaut, nicht eingestellt**). Alle Unterlagen in `docs/personal/website-bauer/`.
+- **Tests:** `python3 -m pytest plugins/website/tests`: 40 grün (23.11.2026, Dauer etwa 7 Minuten).
 - **Testfälle (Evals):** 17, neu sind `k2-altbestand` und `k3-wunsch-erhalten`. Läufer: `tests/werkzeug/probearbeit.py`.
 
 ## Was am 19.11. im Test mit der Vereinsseite (SFH) entstand
@@ -46,9 +46,17 @@ Simon hat den Test für beendet erklärt. Die SFH-Seite selbst arbeitet er im Ch
   - Regeln in `handwerk.md` Abschnitt 11.
   - Gegenprobe am alten und am aufgeräumten SFH-Stand: alt schlägt überall an, aufgeräumt null harte Befunde.
 
+## Probearbeit (20.11.2026) und Umbau auf 0.3.0
+- **Ergebnis automatisch:** Große Aufträge mit Plugin 1,00 und null harte Befunde (Firma, Verein, Schreinerei), ohne Plugin 0,60–0,71. Haus in 3D beide Arme 0,25, mit Plugin zweimal ins Zeitlimit von 60 Minuten. Kosten der großen Läufe etwa 34 $.
+- **Simons Urteil:** „haut mich jetz alles nicht so um“. Meins: 2 bis 3 von 5 gegen Lando, alle mit demselben Einstieg (Überschrift, zwei Knöpfe, Bild).
+- **Ursache:** Die Prüfungen zählten Fehler, nicht das Besondere, und ohne Simon an den Haltepunkten fehlte das Nachsteuern.
+- **Umbau 0.3.0 (Simon: „ja passt dann so umbauen“):** Hauptidee als Pflicht, Stopp 1b Entwurf, Kritiker mit Merk-Urteil, 3D klein planen, Sperre und Testfälle. Einzelheiten im CHANGELOG.
+- **Nächster Schritt:** Die Schreinerei (q3) neu bauen lassen, mit Simon an Stopp 1 und 1b. Erst wenn er dort „wow“ sagt, wieder eine Probearbeit.
+- Alle Seiten der Probearbeit als einzelne HTML-Dateien hat Simon bekommen (Packer im Scratchpad der Sitzung, nicht im Repo).
+
 ## Ehrlich offen
 1. **Der formale Ablauf lief im Test nicht vollständig:** kein Kritiker-Agent, keine drei Vorbild-Fotos, kein blinder Vergleich. Für die Probearbeit zählt der Lauf nur halb.
-2. **Probearbeit** in der Sparvariante, 2 Läufe, etwa 3,5 bis 5 Mio. Tokens. Danach Stopp 2 mit Simons blinder Note, erst dann einstellen. Den Konto-Skill `website-bauen` abschalten (Simon hat zugestimmt).
+2. **Konto-Skill `website-bauen` abschalten** (Simon hat zugestimmt): Er lief in der Probearbeit auch im Arm ohne Plugin mit und verfälscht den Vergleich.
 3. **Veröffentlichen ohne Wrangler-Anmeldung** ging nur mit viel Handarbeit über die Cloudflare-Schnittstelle (Manifest, Upload-Sitzung, Worker hochladen). Ein Skript, das das in einem Schritt mit einem API-Token erledigt, fehlt. Ungetestet nicht einbauen.
 4. **Prüfskript:** Abgeschnittene Inhalte (overflow) und ein fehlendes Handy-Menü erkennt es weiterhin nicht.
 5. **Leistung:** Ohne Grafikkarte nicht messbar. Simons Laptop entscheidet.
