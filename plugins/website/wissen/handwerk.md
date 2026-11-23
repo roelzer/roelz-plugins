@@ -28,6 +28,13 @@ In der Probearbeit waren alle Seiten des Website-Bauers fehlerfrei und bestanden
   - Haus: Über dem Haus wird es Abend, und die Fenster gehen an.
 - **Der Rest der Seite dient dem Moment** und bleibt ruhig (Simon: nicht laut). Ein Moment, der trägt, ist besser als fünf kleine Effekte.
 - **Der Moment steht ganz oben** oder spätestens nach dem ersten Scrollen. Wer ihn suchen muss, erlebt ihn nicht.
+- **Danach nicht abfallen** (Schreinerei-Test, 23.11.2026). Simon: „find ich cool, wird nach unten hin immer langweilig“. Ruhig heißt nicht leblos. Jeder Abschnitt darunter bekommt eine kleine eigene Bewegung aus derselben Bildsprache wie der Moment, z. B.:
+  - Skizzen zeichnen sich Strich für Strich, wenn man hinscrollt.
+  - Ein Zollstock klappt sich Glied für Glied auf, und die Schritte rasten ein.
+  - Maßlinien laufen an Überschriften entlang.
+  - Der letzte Abschnitt greift den Moment wieder auf, z. B. eine leere Nische mit „Ihr Maß?“.
+
+  Machart: CSS oder SVG, nur beim Hineinscrollen (IntersectionObserver), keine zweite WebGL-Fläche, bei reduzierter Bewegung ohne. Nicht: jeden Absatz von unten einblenden lassen. Das ist Stangenware.
 
 ## 2. Vorbilder wirklich ansehen (gegen W3)
 - Öffne **mindestens 3 Vorbilder** und fotografiere sie (Playwright, 1440 px und 390 px) nach `arbeit/vorbilder/`. Simons Vorbilder (Lando, Igloo) sind immer dabei. Dazu 1–2 aus der Branche, z. B. von Awwwards (Kategorie und Jury-Note ansehen).

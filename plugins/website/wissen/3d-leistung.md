@@ -57,7 +57,9 @@ Der Haus-Rundgang in 3D lief in beiden Läufen in das Zeitlimit von 60 Minuten: 
 - **Layout und Kamera nach derselben Regel umschalten** (Seitenverhältnis in JS und `@media (min-aspect-ratio: …)` im CSS).
 - **`<noscript>` zeigt den End-Zustand** der Szene, damit die Seite ohne JavaScript nicht stillsteht.
 - **Stufen:** Ohne WebGL oder bei sehr schwacher Grafik ein Standbild (gleiche Szene, vorab gerendert oder als Bildschirmfoto). Mit `prefers-reduced-motion` keine Kamerafahrt.
-- **Pixeldichte deckeln:** am Desktop höchstens 1,25, am Handy höchstens 2 (`Math.min(devicePixelRatio, innerWidth > 768 ? 1.25 : 2)`, so macht es die Site of the Year 2025). Die Größe der Zeichenfläche ist der wirksamste Hebel (web.dev, The Hobbit: 50 % Fläche brachte 16 → 33 fps).
+- **Pixeldichte deckeln:** am Desktop höchstens 1, am Handy höchstens 1,5 (`Math.min(devicePixelRatio, innerWidth > 768 ? 1 : 1.5)`). Die Site of the Year 2025 nimmt 1,25 und 2, aber auf Simons Laptop ohne Grafikkarte ruckelte die Schreinerei damit (23.11.2026).
+- **Ruckel-Bremse einbauen:** Laufen etwa 12 Bilder hintereinander langsamer als 45 fps, die Auflösung um eine Stufe senken (höchstens zweimal, z. B. ×0,8 und ×0,6), dabei auch die Schattenkarte verkleinern.
+- **Teure Bausteine meiden:** keine `VSMShadowMap` mit großem Weichzeichner (stattdessen `PCFSoftShadowMap`, Karte 1024²), kein `MeshPhysicalMaterial` mit Klarlack (stattdessen `MeshStandardMaterial`), Zeichenfläche nicht größer als die Bühne. Schatten, die sich nicht bewegen, als Bild unterlegen. Die Größe der Zeichenfläche ist der wirksamste Hebel (web.dev, The Hobbit: 50 % Fläche brachte 16 → 33 fps).
 - **Nur zeichnen, wenn sich etwas bewegt** (beim Scrollen bzw. während einer Animation), nicht dauernd.
 - **Budget:** höchstens 100.000 Dreiecke (gut 30–50k), Texturen höchstens 2048², höchstens 10 Materialien, Modell höchstens 10 MB. Komprimieren mit `npx @gltf-transform/cli optimize in.glb out.glb` (Meshopt) bzw. Texturen verkleinern. Kontrolle mit `renderer.info`.
 - **Keine Post-Effekte** (Bloom, Tiefenunschärfe) und keine Kantenglättung auf schwachen Geräten.

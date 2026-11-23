@@ -1,5 +1,14 @@
 # Änderungsprotokoll Website-Bauer
 
+## 0.3.1 – Nicht abfallen, nicht ruckeln (Schreinerei-Test, 23.11.2026)
+Simon zur fertigen Schreinerei: „find ich cool, wird nach unten hin immer langweilig und ruckelt bisschen“.
+- `handwerk.md` 1b: Nach dem Moment nicht abfallen. Jeder Abschnitt darunter bekommt eine kleine eigene Bewegung aus derselben Bildsprache (CSS/SVG beim Hineinscrollen), und der Schluss greift den Moment wieder auf.
+- Kritiker: neue Pflichtfrage 5b „Fällt die Seite nach dem Moment ab?“ mit Bild der unteren Hälfte.
+- `3d-leistung.md`:
+  - Pixeldichte am Desktop höchstens 1, am Handy höchstens 1,5.
+  - Ruckel-Bremse, die die Auflösung selbst senkt.
+  - Keine VSM-Schatten und kein Klarlack-Material.
+
 ## 0.3.0 – Hauptidee statt Stangenware (Probearbeit, 20.11.2026)
 Die Probearbeit zeigte: Mit Plugin bestanden die großen Aufträge jede Prüfung (1,00 gegen 0,60–0,71 ohne), aber alle Seiten hatten denselben Einstieg. Simon: „haut mich jetz alles nicht so um“. Der Haus-Rundgang in 3D lief zweimal ins Zeitlimit.
 - `handwerk.md` Abschnitt 1b: Jede neue Seite bekommt eine Hauptidee, also einen Moment aus dem Auftraggeber, der beim Scrollen passiert. Drei Kandidaten, Merk-Test, Liste mit Dingen, die keine Hauptidee sind.
