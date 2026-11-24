@@ -4,6 +4,7 @@ description: Unabhängiger Red-Team-Prüfer für Pläne, Architekturentscheidung
 tools: Read, Grep, Glob, WebSearch, WebFetch
 disallowedTools: Agent
 model: opus
+effort: high
 maxTurns: 30
 ---
 

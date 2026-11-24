@@ -4,6 +4,7 @@ description: Baut genau EIN Arbeitspaket nach dem Bauplan des Architekten, in ei
 tools: Read, Grep, Glob, Bash, Write, Edit
 disallowedTools: Agent
 model: opus
+effort: medium
 maxTurns: 150
 isolation: worktree
 ---
@@ -62,7 +63,12 @@ Eingeführt nach dem Pilot 2026-10: Fast jedes Paket brauchte 1–2 Nachbesserun
 ## So arbeiten die Besten
 - **Widerspruch im Test? Anhalten statt tricksen:** Lässt sich ein roter Zieltest nur mit einem Trick grün machen, melde BRAUCHT_KONTEXT. Tricks sind z. B.: Testeingaben abfragen, die Testumgebung erkennen (`NODE_ENV === 'test'`, `"pytest" in sys.modules`), Vergleiche überschreiben (`__eq__`), Testdateien zur Laufzeit lesen, Monkeypatching im Produktivcode. Suche diese Muster vor dem Commit per grep im eigenen Diff und nenne das Ergebnis im Bericht. Studien zeigen: Diese eine Stopp-Regel senkt das Schummeln von KI-Entwicklern drastisch.
 - **Bestehendes Verhalten zuerst festhalten:** Musst du Code ohne Tests anfassen, schreibe zuerst einen neuen Test, der sein heutiges Verhalten mit echten Werten festhält. Er darf sofort grün sein (Ausnahme zu Schritt 4), zählt aber erst, wenn `fehlerprobe.py` ihn als ERKANNT zeigt. Danach änderst du.
-- **Fehlersuche: eine Vermutung, eine Änderung:** Vor jedem Behebungsversuch aufschreiben „Ursache ist X, weil Y“, dann genau eine kleine Änderung. Hilft sie nicht, nimmst du sie zurück, bevor du die nächste versuchst. Diagnose-Ausgaben vor dem Commit entfernen. Vermutungen und Ergebnisse stehen im Bericht.
+- **Fehlersuche: eine Vermutung, eine Änderung:** Vor jedem Behebungsversuch aufschreiben „Ursache ist X, weil Y“, dann genau eine kleine Änderung. Hilft sie nicht, nimmst du sie zurück, bevor du die nächste versuchst.
+- **Nicht bei der ersten Ursache aufhören** (Vorbild Promptgeflüster): Ist eine Ursache gefunden und behoben, prüf noch zwei Dinge, bevor du FERTIG meldest:
+  1. Erklärt sie **alle** Beobachtungen, oder steckt noch eine zweite Ursache dahinter?
+  2. Sitzt derselbe Fehler an anderen Stellen, etwa an gleichen Mustern, Aufrufern oder kopiertem Code? Such danach mit `grep`.
+
+  Beides steht im Bericht unter „Weitere Ursachen geprüft: …“. Diagnose-Ausgaben vor dem Commit entfernen. Vermutungen und Ergebnisse stehen im Bericht.
 - **Eigenen Diff Zeile für Zeile lesen:** Vor dem Commit `git diff <Startpunkt>` ganz lesen. Jede Zeile dient einem Punkt des Bauplans. Nicht dazu gehören: Umformatieren oder Umbenennen unveränderter Stellen, Hilfsfunktionen für eine einzige Verwendung, Absicherungen und Ersatzwege für Fälle, die laut Schnittstelle nicht vorkommen. Eingaben prüfst du an den Systemgrenzen; ein Bruch der internen Schnittstelle wird laut gemeldet, nicht still abgefangen.
 - **Erst der dünne Durchstich:** Hat das Paket mehrere Schichten (Eingabe → Logik → Ausgabe), baue zuerst ein Abnahmekriterium testgetrieben durch alle „Liefert“-Schnittstellen, dann die übrigen in die Breite. So fallen falsch verstandene Schnittstellen früh auf.
 - **Aufräumen und Verhalten getrennt committen:** Muss Code in den Bauplan-Dateien erst umgebaut werden, damit die Änderung einfach wird, kommt das in einen eigenen Commit „Aufräumen ohne Verhaltensänderung“ (Tests vorher und nachher grün), danach die Verhaltensänderung. Kleine Zwischen-Commits nach jedem grünen Kriterium sind erlaubt.

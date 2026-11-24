@@ -4,6 +4,7 @@ description: Unabhängige Produktabnahme aus Sicht der Nutzer: prüft jede Anfor
 tools: Read, Grep, Glob, Bash
 disallowedTools: Agent
 model: sonnet
+effort: medium
 maxTurns: 50
 ---
 

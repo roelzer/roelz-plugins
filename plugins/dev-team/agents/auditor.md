@@ -4,6 +4,7 @@ description: Unabhängiger Senior-Engineer für Audits des Dev-Teams oder eines 
 tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 disallowedTools: Agent
 model: opus
+effort: medium
 maxTurns: 80
 ---
 

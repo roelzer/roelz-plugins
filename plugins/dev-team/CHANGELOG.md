@@ -1,5 +1,17 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.24.0 – Nach dem Vorbild Promptgeflüster: Denkaufwand, Review-Schwelle, Fehlersuche
+Anlass: Simon nach drei weiteren Promptgeflüster-Videos (Befehle, Code Guardian, „Erst planen“): „bau sonst alles nach seinem Vorbild um“.
+- **Denkaufwand je Rolle** (`effort` im Steckbrief):
+  - **Mittel** für alle Rollen. Laut seiner Messung finden Prüfer auf „mittel“ 99 % der Fehler, „hoch“ und „sehr hoch“ kosten dort nur mehr.
+  - **Hoch** nur für den Kritiker bei der Planprüfung.
+  - **Sehr hoch** beim Aufruf nur für den frischen Entwickler ab Fix-Runde 3 und für hartnäckige Fehlersuche in bestehendem Code.
+- **Review-Schwelle:** Ein Paket-Review gibt es nur ab 300 Code-Zeilen, bei Risiko-Auslöser, Datenmodell- oder Schnittstellenänderung oder Stufe Groß. Stufe Klein läuft ohne Rückfrage und ohne Review, wenn sie klein und risikofrei ist. Die Schranke verlangt das Review nur noch dann. Das Gesamt-Review am Meilenstein bleibt.
+- **Fix-Schleife:** Nach zwei erfolglosen Runden übernimmt ein frischer Entwickler, laut Empfehlung von Anthropic. Vorher war es nach drei.
+- **Fehlersuche:** Der Entwickler hört nicht bei der ersten Ursache auf. Er prüft, ob sie alle Beobachtungen erklärt und ob derselbe Fehler noch an anderen Stellen sitzt.
+- Offene Befunde nach Runde 5 gehen an den Entscheidungsrat statt an Simon.
+- Tests: kleine Änderung ohne Review, Risiko-Auslöser mit Review. Alle 206 grün.
+
 ## 3.23.0 – Autopilot für alle Projekte mit Entscheidungsrat, doppelte Planprüfung, statische Analyse
 Anlass:
 - Simon: „ich will auch dass alles autonom läuft“, für alle Projekte.

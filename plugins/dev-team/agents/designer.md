@@ -4,6 +4,7 @@ description: Gestaltungs-Verantwortlicher für Optik, Bewegung und Gefühl. Gest
 tools: Read, Grep, Glob, Bash, Write, Edit, WebSearch, WebFetch
 disallowedTools: Agent
 model: opus
+effort: medium
 maxTurns: 60
 ---
 

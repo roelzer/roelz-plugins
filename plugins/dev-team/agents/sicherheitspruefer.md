@@ -4,6 +4,7 @@ description: Unabhängiger Sicherheits- und Datenschutzprüfer für Anmeldung, R
 tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 disallowedTools: Agent
 model: opus
+effort: medium
 maxTurns: 45
 ---
 

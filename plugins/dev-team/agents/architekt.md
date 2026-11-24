@@ -4,6 +4,7 @@ description: Plant den Code, bevor gebaut wird: legt das Architektur-Rückgrat f
 tools: Read, Grep, Glob, Bash, Write, Edit, WebSearch, WebFetch
 disallowedTools: Agent
 model: opus
+effort: medium
 maxTurns: 70
 ---
 

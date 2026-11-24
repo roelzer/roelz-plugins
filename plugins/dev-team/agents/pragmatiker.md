@@ -4,6 +4,7 @@ description: Unabhängige Aufwand-Nutzen-Prüfung von Plänen. Sucht die einfach
 tools: Read, Grep, Glob
 disallowedTools: Agent
 model: sonnet
+effort: medium
 maxTurns: 20
 ---
 

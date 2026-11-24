@@ -4,6 +4,7 @@ description: Recherchiert fachliche oder technische Wissenslücken mit nachvollz
 tools: Read, Grep, Glob, WebSearch, WebFetch, Write, Edit
 disallowedTools: Agent
 model: sonnet
+effort: medium
 maxTurns: 45
 ---
 

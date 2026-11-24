@@ -85,7 +85,7 @@ Bestehende Referenzwerte ändert nur Simon. Erwartete fachliche Rechenwerte, die
 Die Stufen gelten mit dem Kurzwort **`voll`**. Sonst bestimmt der Teamplan den Ablauf; Risiko-Auslöser holen gezielt den Sicherheitsprüfer (Untergrenzen). Sag Simon vor dem Start, welche Stufe du wählst. Er kann hochstufen.
 | Stufe | Wann | Ablauf |
 |---|---|---|
-| **Klein** | eine Datei, klarer Fehler, Text/Farbe, **ohne** Risiko-Auslöser | ohne Rückfrage → `entwickler` (mit Test, der den Fehler zeigt) → `reviewer` → Merge → Test-Schranke → kurzer Bericht |
+| **Klein** | eine Datei, klarer Fehler, Text/Farbe, **ohne** Risiko-Auslöser | ohne Rückfrage → `entwickler` (mit Test, der den Fehler zeigt) → `reviewer` nur ab 300 Code-Zeilen oder mit Risiko-Auslöser → Merge → Test-Schranke → kurzer Bericht |
 | **Normal** | Feature über mehrere Dateien, begrenzter Umbau | voller Ablauf (`/dev-team:auftrag`) inklusive Abwägungsrunde |
 | **Groß** | Berechnung, Datenmodell, neues Modul, fachliche Folgen, Mehrbenutzer, Schnittstellen | voller Ablauf mit allen Instanzen, Abwägungsrunde immer, Meilensteine |
 

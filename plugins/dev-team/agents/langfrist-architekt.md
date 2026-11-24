@@ -4,6 +4,7 @@ description: Unabhängige Architekturprüfung des Plans mit Blick auf Änderbark
 tools: Read, Grep, Glob
 disallowedTools: Agent
 model: opus
+effort: medium
 maxTurns: 25
 ---
 

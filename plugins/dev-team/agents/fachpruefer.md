@@ -4,6 +4,7 @@ description: Prüft fachliche Korrektheit: bestätigte Fachregeln, Referenzfäll
 tools: Read, Grep, Glob, Bash
 disallowedTools: Agent
 model: opus
+effort: medium
 maxTurns: 40
 ---
 

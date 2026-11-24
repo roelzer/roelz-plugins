@@ -4,6 +4,7 @@ description: Unabhängiger Testingenieur. Schreibt vor dem Bauen verdeckte Abnah
 tools: Read, Grep, Glob, Bash, Write, Edit
 disallowedTools: Agent
 model: opus
+effort: medium
 maxTurns: 80
 ---
 

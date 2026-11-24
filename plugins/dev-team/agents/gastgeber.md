@@ -4,6 +4,7 @@ description: Denkt an das, woran niemand gedacht hat – für den Wow-Effekt nac
 tools: Read, Grep, Glob, WebSearch, WebFetch
 disallowedTools: Agent
 model: opus
+effort: medium
 maxTurns: 30
 ---
 

@@ -4,6 +4,7 @@ description: Unabhängiger Senior-Code-Reviewer und Qualitätsgate. Modus paket 
 tools: Read, Grep, Glob, Bash
 disallowedTools: Agent
 model: opus
+effort: medium
 maxTurns: 50
 ---
 
