@@ -1,7 +1,7 @@
 {
   "name": "spiele",
   "displayName": "Spiele-Bauer",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Spiele-Bauer: eigene kleine Browserspiele für Handy und Laptop – Spaßprojekte und Mini-Spiele für Vereins- und Firmenseiten, 2D oder 3D, die sich gut anfühlen und bei denen man gleich nochmal will. Eigene Idee mit erster Minute, Stellschrauben mit ?tune, Prüfskript ohne KI (Bot, Hochkant, Bildzeit, iframe, fremde Server), unabhängiger Prüfer, Sperren gegen Veröffentlichen ohne Ja und fremde Server.",
   "author": {
     "name": "Simon Rölz"

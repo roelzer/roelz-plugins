@@ -33,6 +33,19 @@ Mit dem Spiele-Bauer in 13 von 17 Fällen voll erfüllt, ohne ihn in 6 (und davo
 - **Prüfpunkt cooles-spiel** erkennt jetzt auch „A)“/„B)“-Listen.
 - **Skill wurde bei vorhandenen Spielen nie geladen** (Kontrolllauf 1: ruckelt 0,33, gleich-online 0,33, ohne einen einzigen Skill-Aufruf). Neuer Hook `hinweis.mjs` erinnert daran, wenn ein Ordner `spiele/` im Projekt liegt. Kontrolllauf 2: beide 1,00, cooles-spiel 1,00.
 
+## Blindvergleich durch Simon (24.11.2026)
+| Paar | Simons Wahl | Spiele-Bauer war |
+|---|---|---|
+| Elfmeter | B | B → gewonnen |
+| Familienrätsel | beide gleich | B → unentschieden |
+| Lehrling | A | B → verloren |
+| 3D-Kegeln | grafisch B, Bedienung A | B → Grafik gewonnen, Bedienung verloren |
+
+Zufall: Bei allen vier Paaren lag der Spiele-Bauer auf B (Chance 1 zu 16). Der Vergleich bleibt verwertbar, weil Simon die Zuordnung nicht kannte, ist aber schwächer als geplant. Künftig je Paar losen **und** prüfen, dass nicht alle auf derselben Seite liegen.
+
+Daraus gelernt (`wissen/handwerk.md` Regeln 18 und 19):
+- **Kegeln, Bedienung:** Die Spiele-Bauer-Fassung verlangte, die Geste genau am Ball zu beginnen. Die Gegenseite ließ überall wischen, trennte Zielen und Werfen, meldete „Schneller wischen“ und ging auch mit Tasten. Dazu lief der Spiele-Bauer-Lauf ins Nutzungslimit und wurde nicht fertig poliert.
+- **Lehrling:** Gleiche Kern-Idee (Stapel schwankt, abliefern), aber die Gegenseite hatte mehr Welt: Holzarten, Meister mit trockenen Sprüchen, angekündigte Gefahr, Aufträge.
+
 ## Offen
-- Blindvergleich durch Simon (4 Paare): https://claude.ai/artifact/Y4RVSCoZowviKmbgsypjkc. Schlüssel liegt außerhalb des Repos.
 - Noch kein Spiel von einem Menschen gespielt.
