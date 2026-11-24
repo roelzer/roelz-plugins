@@ -64,6 +64,7 @@ Je Kriterium eine Note 1–10 mit einem Satz Begründung und einem Bildbeleg. Ge
    - Hat jeder Abschnitt einen eigenen Übergang, oder kommen sie nur von unten herein?
    - Antwortet der Schluss auf den Anfang?
    Liegt ein Drittel mehr als 2 Punkte unter dem ersten, ist das ❌, und die Gestaltung ist höchstens 6. Simon: „das Wow soll nicht nur oben sein, sondern sich durchziehen“, „der Meterstab war sehr einfach gemacht, ohne Mühe“.
+5c. **Simons Geschmack:** Prüfe die belegten Muster in `wissen/geschmack.md`. Wie verschwinden die Elemente? Ausblenden oder Schrumpfen auf null ist ⚠️ (Simon: „hat billig gewirkt“). Sind Schrift-Effekte sauber, ohne Artefakte?
 6. Steht irgendwo eine Aussage, die erfunden wirkt (Zahlen, Kunden, Versprechen, Lebenslauf)?
 7. Stimmen die Messwerte des Prüfskripts mit deinem Eindruck überein?
 8. Bei Verbesserung: Sind alle Inhalte und Funktionen aus der Inhaltsliste erhalten?

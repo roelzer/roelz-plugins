@@ -1,5 +1,12 @@
 # Änderungsprotokoll Website-Bauer
 
+## 0.4.2 – Lernt aus Simons Wahl
+Simon, 24.11.2026: „dass es sich immer anhand meiner Wahl dann selber verbessert“, dazu: „wie das dann verschwindet … bisschen unspektakulär, hat irgendwie billig auf mich gewirkt“.
+- **`wissen/geschmack.md`:** Protokoll jeder Wahl (empfohlen, gewählt, Abweichungen, seine Worte) mit Mustern. Ein Muster ist **belegt** ab drei Einträgen aus zwei Aufträgen oder durch eine ausdrückliche Aussage, vorher ist es eine **Vermutung**, die nur die Reihenfolge im Katalog bestimmt. Der Skill liest das Protokoll vor dem Katalog und schreibt nach jeder Wahl einen Eintrag (ins Plugin, wenn das Repo erreichbar ist, sonst über `/personal:nachschulen`).
+- **Neue Regel `handwerk.md` 1c, Punkt 9 „Auch das Verschwinden ist ein Moment“.** Im Drehbuch gibt es eine neue Spalte „Abgang“, W20 meldet Abschnitte, die nur ausgeblendet werden.
+- **Kritiker:** Frage 5c zu Simons Geschmack (Abgänge, saubere Schrift-Effekte).
+- Katalog und Vorschau gehen am Handy als privates Artifact raus (die App zeigt HTML-Dateien als Code).
+
 ## 0.4.1 – Katalog stürzte am iPhone ab, Baustein-Bibliothek
 Simon, 24.11.2026: „Die Seite stürzt immer wieder ab“ (Honig-Bausteinkatalog in der Claude-App).
 - **Ursache:** Eingebettet liefen alle 17 Bausteine pausenlos, dazu ein Schmuckband mit 865 Wabenzellen. Gemessen wurden 76–86 % Rechenzeit im Leerlauf. Vier Fotos waren 13-mal eingebettet (2,5 MB).

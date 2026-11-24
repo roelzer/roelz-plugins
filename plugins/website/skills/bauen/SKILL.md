@@ -71,6 +71,7 @@ Im SFH-Test kam das erst am Ende auf: Domain und Mail bei IONOS, die Seite lief 
 
 ## 3. Bausteine zur Auswahl (Stopp 1)
 Simon, 24.11.2026: „Vorschläge für Bausteine liefern, ich wähl aus und dann zusammenbauen.“
+- **Zuerst `wissen/geschmack.md` lesen.** Belegte Muster sind Regeln für Katalog und Empfehlung. Vermutungen bestimmen nur die Reihenfolge, z. B. was er öfter gewählt hat, kommt zuerst. Nichts wird deshalb weggelassen.
 - **Katalog bauen:** `arbeit/bausteine/katalog.html`, je Abschnitt (Einstieg, Leistungen, Ablauf, Referenzen, Text-Moment, Schluss) **2–3 Bausteine** aus `wissen/bausteine.md`, schon mit dem Motiv und dem Gewerk-Zeichen des Auftraggebers gefüllt. Jeder Baustein ist eine kleine **laufende** Szene, grob und ohne Feinschliff, mit eigener Scrollstrecke. Darüber stehen Kennung („Einstieg B“), ein Satz, was passiert, und laut oder leise. Die Einstieg-Bausteine sind die 2–3 Hauptideen aus `hauptidee.md`.
 - **Am Handy zeigt die Claude-App HTML-Dateien als Code** (Simon, 24.11.2026). Gibt es das Artifact-Werkzeug, veröffentlichst du Katalog und Vorschau als **privates Artifact** aus dem Quellordner (Seite plus CSS, JS, Bilder, Schriften als Dateien) und schickst Simon den Link. Die HTML-Datei aus `vorschau.mjs` bleibt für den Laptop.
 - **Der Katalog muss am iPhone laufen** (Honig, 24.11.2026: stürzte in der Claude-App ab). Nur sichtbare Bausteine bewegen sich, keine Endlosschleifen, viele Einzelteile auf ein Canvas (`wissen/bausteine.md`, Leistung). `vorschau.mjs … --pruefen` muss ohne FEHLER durchlaufen, bevor Simon die Datei bekommt. Packe aus einem eigenen Quellordner, nicht aus dem Ordner mit den Fotos.
@@ -80,6 +81,7 @@ Simon, 24.11.2026: „Vorschläge für Bausteine liefern, ich wähl aus und dann
   - deine Empfehlung als fertige Auswahl („Einstieg B, Leistungen A, Ablauf A, Referenzen C, Text B, Schluss A“) mit einem Satz, warum sie zusammen durchzieht,
   - deine Annahmen, je eine Zeile, und die Bitte um echtes Material.
 - Simon antwortet mit seiner Auswahl, auch gemischt oder mit Änderungswünschen. **In `site/` entsteht vor seiner Wahl nichts.**
+- **Wahl festhalten, damit das Plugin lernt:** Sofort nach Simons Antwort schreibst du einen Eintrag nach dem Muster in `wissen/geschmack.md` (Empfohlen, Gewählt, Abweichungen, Wörtlich) nach `arbeit/auswahl.md`. Ist das Plugin-Repo `roelz-plugins` erreichbar, trägst du ihn auch dort in `plugins/website/wissen/geschmack.md` ein und prüfst die Muster: neue Vermutung, Vermutung wird belegt, oder Widerspruch. Sonst steht im Bericht: „Geschmack-Eintrag in arbeit/auswahl.md, bitte mit /personal:nachschulen übernehmen.“ Dasselbe gilt für seine Rückmeldungen an Stopp 2.
 - **Aus der Auswahl wird das Drehbuch** `arbeit/drehbuch.md` (`handwerk.md` 1c): jede Zeile mit laut/leise, Baustein, Übergang, Rolle des Motivs, Farbe und Text-Bewegung. Passt die Auswahl nicht zu den Regeln (z. B. ein Drittel ohne lauten Moment), sag es mit einem Gegenvorschlag, statt still umzubauen.
 - Bei „mach einfach“: Du wählst selbst nach dem Drehbuch und nennst die Auswahl im Bericht.
 
