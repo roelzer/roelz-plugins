@@ -1,10 +1,14 @@
 {
   "name": "recherche",
   "displayName": "Recherche",
-  "version": "0.1.0",
-  "description": "YouTube-Recherche über die offizielle YouTube Data API: Kanäle und Themen durchsuchen, Beschreibungen, Kapitel, Links und Kommentare lesen, Begleit-Blogs finden. Kein Herunterladen, kostenlos.",
+  "version": "0.2.0",
+  "description": "Recherche wie die Profis: wie die besten Fachleute arbeiten, was es schon gibt (vor allem auf GitHub) und was davon nutzbar ist; dazu YouTube-Recherche über die offizielle Data API. Nur lesen, kostenlos.",
   "author": {
     "name": "Simon Rölz"
   },
-  "keywords": ["youtube", "recherche", "research"]
+  "keywords": [
+    "youtube",
+    "recherche",
+    "research"
+  ]
 }
