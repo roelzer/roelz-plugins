@@ -81,3 +81,8 @@ Motiv: eine Musterfliese. Gewerk-Zeichen: das Fugenkreuz. Farben aus dem Materia
 - **Viele Einzelteile auf ein Canvas** (Honig-Katalog, 24.11.2026): Eine Wabe aus über 800 SVG-Zellen, die je per CSS-Variable rechnen, kostet bei jedem Bild alle Zellen neu. Ab etwa 200 bewegten Teilen in einer Szene: auf ein `<canvas>` zeichnen oder ein Muster (SVG-`<pattern>`, Maske) mit einer einzigen bewegten Ebene.
 - **Keine Endlosschleifen, nur Sichtbares animieren:** Selbstlauf und Schmuckbänder laufen nur, solange sie im Bild sind (IntersectionObserver), ein Selbstlauf mit 30 Bildern/s reicht, Bereiche außerhalb mit `content-visibility: auto`. Der Honig-Katalog animierte eingebettet alle 17 Bausteine pausenlos und stürzte am iPhone ab. `vorschau.mjs --pruefen` misst das jetzt (FEHLER ab 40 % Leerlauf-Rechenzeit).
 
+## Material echt darstellen (Rezepte)
+Wenn das Material selbst die Bewegung macht, wird es nicht als Symbol gezeichnet (Simon, Honig 24.11.2026). Kleine Fläche, ein Canvas, nur solange sichtbar.
+- **Honig, der läuft:** ein dünner Strahl, der unten in Schlaufen aufläuft und sich legt („Seilwurf“, wie echter Honig vom Löffel). Gezeichnet als Kette aus Punkten mit Trägheit (Verlet), langsam, weil zähflüssig. Darstellung: durchscheinender Bernstein-Verlauf quer zum Strahl (Rand dunkler, Mitte heller), ein schmaler weißer Glanzstreifen auf einer Seite, unten ein Glanzpunkt im See. Dazu leichte Verdickung, wo der Strahl auftrifft. Mit WebGL nur, wenn die Fläche klein bleibt (Brechung, Glanz), sonst Canvas 2D mit Verläufen.
+- **Allgemein:** Durchscheinen (Verlauf und Transparenz), Glanzlicht (eine helle Kante), Trägheit in der Bewegung (Material hat Gewicht) und Kontakt (es staut, spritzt, legt sich). Fehlt eins davon, wirkt es wie Clipart.
+

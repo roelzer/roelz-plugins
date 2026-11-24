@@ -13,6 +13,7 @@ Der feste Teil aus dem SFH-Test steht in `handwerk.md` Abschnitt 10.
 | **Mühe auch unten.** Untere Abschnitte mit derselben Sorgfalt wie oben. | belegt, Regel (`handwerk.md` 1c) | Schreinerei: „Meterstab … sehr einfach gemacht, ohne Mühe“; „das Wow soll sich durchziehen“ |
 | **Saubere Typografie-Effekte.** Effekte an Buchstaben (Umriss, Füllung) müssen sauber gesetzt sein. `-webkit-text-stroke` mit Artefakten an den Kreuzungen fällt ihm auf. | Vermutung (1) | Honig, Schluss C: „die Leerbuchstaben … sehen schon irgendwie komisch aus“ |
 | **Das Motiv nicht überstrapazieren?** Er wählte in Referenzen und Schluss die Fassung *ohne* das Leitmotiv (schwebende Fotos statt Wabe über Foto, Name läuft voll statt Fahrt in die leere Zelle), obwohl beide empfohlen waren. | Vermutung (1) | Honig: Referenzen C statt A, Schluss C statt A |
+| **Material echt aussehen lassen.** Wo das Material des Auftraggebers selbst die Bewegung macht (Honig läuft, Holz wird gehobelt, Wasser fließt), soll es realistisch wirken, nicht wie ein Symbol (ein gelber Strich als Honigfaden). | Vermutung (1) | Honig, Text C: „den langsam laufenden Honig vielleicht auch noch optisch viel realistischer darstellen“ |
 | **Grafisch vor Foto im Einstieg, solange kein echtes Material da ist.** | Vermutung (1) | Honig: Einstieg A (Wabe) statt B (Rähmchen-Foto) |
 
 ## Einträge
@@ -22,6 +23,9 @@ Der feste Teil aus dem SFH-Test steht in `handwerk.md` Abschnitt 10.
 - **Gewählt:** Einstieg A · Leistungen A · Text C · Ablauf A · Referenzen C · Schluss C („AACACC“)
 - **Abweichungen von der Empfehlung:** Text A (Wort für Wort) weggelassen, Referenzen C statt A, Schluss C statt A.
 - **Wörtlich:** „beim letzten C bitte die Leerbuchstaben noch mal überarbeiten, die sehen schon irgendwie komisch aus.“ – „die anderen Vorschläge größtenteils auch echt cool … mit den Waben an sich cool, aber wie das dann verschwindet und so ist bisschen unspektakulär. Hat irgendwie billig auf mich gewirkt.“
+
+### 24.11.2026 – Benedikts Honig, nach der Wahl
+- **Wörtlich:** „Zum langsam laufenden Honig: vielleicht kann man den auch noch optisch viel realistischer darstellen.“
 
 ### 23.11.2026 – Schreinerei, Stopp 2
 - **Wörtlich:** „das obere ist immer noch am coolsten, nach unten hin z. B. der Meterstab war halt sehr einfach wieder gemacht, ohne Mühe. Das Wow soll nicht nur oben sein, sondern sich durchziehen.“ – „ruckeln ein bisschen“
