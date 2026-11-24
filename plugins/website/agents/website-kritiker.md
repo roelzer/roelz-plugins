@@ -57,8 +57,13 @@ Je Kriterium eine Note 1–10 mit einem Satz Begründung und einem Bildbeleg. Ge
 2. Kommt mindestens ein KI-Merkmal aus `handwerk.md` Abschnitt 3 vor?
 3. Ist das Hauptmotiv echt (kein Platzhalter, kein im Browser berechneter Ersatz)?
 4. Ist jeder Text lesbar, auch über Bildern und unter der Kopfleiste?
-5. Gibt es genau einen Wow-Moment, und trägt er? (Muss zum Merk-Urteil passen.)
-5b. Fällt die Seite nach dem Moment ab? Scroll bis ganz unten und beleg es mit einem Bild der unteren Hälfte. Bewegt sich darunter nichts Eigenes mehr, oder sieht es dort wie eine Vorlage aus, ist das ⚠️ und kostet bei Gestaltung mindestens einen Punkt (Simon: „wird nach unten hin immer langweilig“).
+5. Trägt der Einstiegs-Moment? (Muss zum Merk-Urteil passen.)
+5b. **Zieht sich das Wow durch?** Teil die Seite in Drittel, mach je Drittel ein Bild vom stärksten Moment und gib je Drittel eine Note 1–10. Prüf gegen `handwerk.md` 1c:
+   - Hat jedes Drittel einen lauten Moment (mindestens zwei Ebenen, über eine Bildschirmhöhe Scrollweg, Bezug zum Motiv)? Eine einzelne Bewegung an einem Element (Zollstock klappt auf, Linie zeichnet sich) zählt als leise.
+   - Kommt das Motiv vom Einstieg mindestens dreimal in neuer Rolle wieder?
+   - Hat jeder Abschnitt einen eigenen Übergang, oder kommen sie nur von unten herein?
+   - Antwortet der Schluss auf den Anfang?
+   Liegt ein Drittel mehr als 2 Punkte unter dem ersten, ist das ❌, und die Gestaltung ist höchstens 6. Simon: „das Wow soll nicht nur oben sein, sondern sich durchziehen“, „der Meterstab war sehr einfach gemacht, ohne Mühe“.
 6. Steht irgendwo eine Aussage, die erfunden wirkt (Zahlen, Kunden, Versprechen, Lebenslauf)?
 7. Stimmen die Messwerte des Prüfskripts mit deinem Eindruck überein?
 8. Bei Verbesserung: Sind alle Inhalte und Funktionen aus der Inhaltsliste erhalten?

@@ -1,18 +1,37 @@
 {
-  "description": "Spiele-Sperre: Veröffentlichen nur nach Simons Ja (Rückfrage), keine Ladeverweise auf fremde Server im Spiel, keine Grafik oder Musik ohne Lizenz. Abschluss-Sperre: kein „fertig“, solange das Spiel ungeprüft ist.",
+  "description": "Spiele-Sperre: Veröffentlichen nur nach Simons Ja (Rückfrage), keine Ladeverweise auf fremde Server im Spiel, keine Grafik oder Musik ohne Lizenz. Abschluss-Sperre: kein „fertig“, solange das Spiel ungeprüft ist. Hinweis: Liegt ein Ordner spiele/ im Projekt, erinnert er bei Spiel-Aufträgen an den Skill.",
   "hooks": {
     "PreToolUse": [
       {
         "matcher": "Bash|PowerShell|Write|Edit|MultiEdit",
         "hooks": [
-          { "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/sperre.mjs\"", "timeout": 10 }
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/sperre.mjs\"",
+            "timeout": 10
+          }
         ]
       }
     ],
     "Stop": [
       {
         "hooks": [
-          { "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/abschluss.mjs\"", "timeout": 10 }
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/abschluss.mjs\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/hinweis.mjs\"",
+            "timeout": 5
+          }
         ]
       }
     ]

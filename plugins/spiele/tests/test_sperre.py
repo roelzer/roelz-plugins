@@ -66,6 +66,28 @@ class Sperre(unittest.TestCase):
         open(os.path.join(arbeit, "pruefung.json"), "w").write('{"befunde": [{"schwere": "Hinweis", "fehler": "S6", "text": "x"}]}')
         self.assertEqual(entscheidung(bash("npx wrangler deploy", cwd=d)), "allow")
 
+    def test_arbeit_ordner_nie_mitveroeffentlicht(self):
+        d = tempfile.mkdtemp()
+        spiel = os.path.join(d, "spiele", "fangen"); arbeit = os.path.join(spiel, "arbeit")
+        os.makedirs(arbeit)
+        open(os.path.join(spiel, "index.html"), "w").write("<canvas></canvas>")
+        open(os.path.join(d, "wrangler.jsonc"), "w").write('{ "name": "fangen", "assets": { "directory": "./spiele/fangen" } }')
+        open(os.path.join(arbeit, "veroeffentlichen.md"), "w").write("Simon: „stell's gleich online“\n")
+        time.sleep(0.05)
+        open(os.path.join(arbeit, "pruefung.json"), "w").write('{"befunde": []}')
+        r = bash("npx wrangler deploy", cwd=d)
+        self.assertEqual(entscheidung(r), "ask")
+        self.assertIn(".assetsignore", r["hookSpecificOutput"]["permissionDecisionReason"])
+        open(os.path.join(spiel, ".assetsignore"), "w").write("arbeit\ndienst\n")
+        self.assertEqual(entscheidung(bash("npx wrangler deploy", cwd=d)), "allow")
+
+    def test_hinweis_auf_skill_bei_vorhandenem_spiel(self):
+        d = tempfile.mkdtemp(); os.makedirs(os.path.join(d, "spiele", "funken"))
+        r = hook("hinweis.mjs", {"prompt": "Das Spiel in spiele/funken ruckelt auf meinem Handy", "cwd": d})
+        self.assertIn("spiele:bauen", r["hookSpecificOutput"]["additionalContext"])
+        self.assertIsNone(hook("hinweis.mjs", {"prompt": "Mach die Vereinsseite fertig", "cwd": d}))
+        self.assertIsNone(hook("hinweis.mjs", {"prompt": "Das Spiel ruckelt", "cwd": tempfile.mkdtemp()}))
+
     def test_andere_projekte_unberuehrt(self):
         self.assertIsNone(bash("git push origin main", cwd=tempfile.mkdtemp()))
 

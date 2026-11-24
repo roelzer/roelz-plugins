@@ -45,10 +45,29 @@ function freigegebeneHosts(ordner) {
 // und neuer ist als jede Spieldatei. Sonst fragt Claude Code Simon.
 function juengste(ordner) {
   let t = 0;
-  const geh = (d) => { for (const n of readdirSync(d, { withFileTypes: true })) { const p = path.join(d, n.name); if (n.isDirectory()) { if (!["node_modules", "arbeit"].includes(n.name)) geh(p); } else t = Math.max(t, statSync(p).mtimeMs); } };
+  const geh = (d) => { for (const n of readdirSync(d, { withFileTypes: true })) { const p = path.join(d, n.name); if (n.isDirectory()) { if (!["node_modules", "arbeit"].includes(n.name)) geh(p); } else if (n.name !== ".assetsignore") t = Math.max(t, statSync(p).mtimeMs); } };
   try { geh(ordner); } catch {}
   return t;
 }
+// Probearbeit 24.11.2026: Zeigt wrangler.jsonc auf spiele/<name>, würde arbeit/ (Fotos, Prüfberichte) mit online gehen.
+export function arbeitWirdMitveroeffentlicht(w, n) {
+  const spiel = path.join(w, "spiele", n);
+  for (const datei of [path.join(w, "wrangler.jsonc"), path.join(w, "wrangler.json"), path.join(spiel, "wrangler.jsonc"), path.join(spiel, "wrangler.json")]) {
+    if (!existsSync(datei)) continue;
+    const m = readFileSync(datei, "utf8").match(/"directory"\s*:\s*"([^"]+)"/);
+    if (!m) continue;
+    const ziel = path.resolve(path.dirname(datei), m[1]);
+    const rel = path.relative(ziel, path.join(spiel, "arbeit"));
+    if (rel.startsWith("..") || path.isAbsolute(rel)) continue;
+    let ignor = "";
+    try { ignor = readFileSync(path.join(ziel, ".assetsignore"), "utf8"); } catch {}
+    const muster = rel.split(path.sep).join("/");
+    if (!ignor.split("\n").some((z) => { const t = z.trim().replace(/^\/+|\/+$/g, ""); return t === "arbeit" || t === muster || t === "**/arbeit"; }))
+      return `Der Upload-Ordner ${path.relative(w, ziel) || "."} enthält ${path.relative(w, path.join(spiel, "arbeit"))}/ (Fotos, Prüfberichte). Erst eine .assetsignore mit der Zeile „${muster}“ in den Upload-Ordner legen.`;
+  }
+  return null;
+}
+
 export function auftragsFreigabe(cwd) {
   let d = path.resolve(cwd || process.cwd()), w = null;
   for (let i = 0; i < 10; i++) { if (existsSync(path.join(d, "spiele"))) { w = d; break; } const o = path.dirname(d); if (o === d) break; d = o; }
@@ -65,6 +84,8 @@ export function auftragsFreigabe(cwd) {
     try { fehler = (JSON.parse(readFileSync(pj, "utf8")).befunde || []).filter((b) => b.schwere === "FEHLER").length; } catch {}
     if (fehler) return { ok: false, grund: `Auftrag sagt veröffentlichen, aber die Prüfung hat ${fehler} FEHLER.` };
     if (statSync(pj).mtimeMs < juengste(path.join(w, "spiele", n))) return { ok: false, grund: "Auftrag sagt veröffentlichen, aber das Spiel wurde nach der letzten Prüfung geändert." };
+    const leck = arbeitWirdMitveroeffentlicht(w, n);
+    if (leck) return { ok: false, grund: leck };
     return { ok: true, grund: `Veröffentlichen laut Auftrag (spiele/${n}/arbeit/veroeffentlichen.md), Prüfung ohne FEHLER.` };
   }
   return null;
@@ -109,7 +130,7 @@ export function pruefe(eingabe) {
   if (VEROEFFENTLICHEN.test(befehl)) {
     const f = auftragsFreigabe(eingabe.cwd);
     if (f && f.ok) return { art: "allow", grund: f.grund };
-    return { art: "ask", grund: (f ? f.grund + " " : "") + "Veröffentlichen nur, wenn der Auftrag es verlangt oder auf Simons ausdrückliches Ja zu genau dieser Fassung. Simon, willst du das jetzt wirklich online stellen?" };
+    return { art: "ask", grund: (f ? f.grund + " " : "") + "Veröffentlichen nur, wenn der Auftrag es verlangt oder auf Simons ausdrückliches Ja zu genau dieser Fassung. Verlangt es der Auftrag: Simons Satz nach spiele/<name>/arbeit/veroeffentlichen.md (Zeile „Simon: …“), .assetsignore mit „arbeit“ in den Upload-Ordner, spielpruefen.mjs laufen lassen, dann erneut deployen (Skill spiele:bauen). Simon, willst du das jetzt wirklich online stellen?" };
   }
   if (UPLOAD.test(befehl)) return { art: "deny", grund: "Hochladen ist gesperrt – Simon bekommt das Spiel als Datei." };
   if (VIDEO_LADEN.test(befehl)) return { art: "deny", grund: "Musik oder Videos von YouTube haben keine klare Lizenz. Ton im Code erzeugen (ZzFX, jsfxr) oder CC0-Klänge nehmen." };

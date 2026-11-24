@@ -1,6 +1,6 @@
 ---
 name: bauen
-description: Spiele-Bauer. Baut eigene kleine Browserspiele für Handy und Laptop, 2D oder 3D, ohne Installation – Spaßprojekte und Mini-Spiele für Vereins- und Firmenseiten, die sich gut anfühlen und bei denen man gleich nochmal will. Nutzen bei „Bau mir ein kleines Elfmeterschießen für die Vereinsseite“, „Kannst du was zum Zocken für den Kindergeburtstag machen?“, „Ich hätte gern ein eigenes kleines Spiel, so was wie: Lehrling fängt Bretter in der Werkstatt“, „Mach mir ein Knobelspiel für die Familie, jeden Tag ein neues“. Nicht für Websites ohne Spiel (website:bauen), nicht für Apps mit Login, Datenbank oder Geschäftslogik (Dev-Team), nicht für Videos, auch nicht von Spielen (video), und nicht für Nachbauten bestehender Spiele mit Name, Figuren, Grafik oder Musik.
+description: Spiele-Bauer. Baut eigene kleine Browserspiele für Handy und Laptop, 2D oder 3D, ohne Installation – Spaßprojekte und Mini-Spiele für Vereins- und Firmenseiten, die sich gut anfühlen und bei denen man gleich nochmal will. Nutzen bei „Bau mir ein kleines Elfmeterschießen für die Vereinsseite“, „Kannst du was zum Zocken für den Kindergeburtstag machen?“, „Ich hätte gern ein eigenes kleines Spiel, so was wie: Lehrling fängt Bretter in der Werkstatt“, „Mach mir ein Knobelspiel für die Familie, jeden Tag ein neues“. Auch zum Ändern, Reparieren und Veröffentlichen eines bestehenden Browserspiels (z. B. unter `spiele/`): „Das Spiel ruckelt auf meinem Handy“, „der Neustart geht nicht“, „stell das Spiel online“. Nicht für Websites ohne Spiel (website:bauen), nicht für Apps mit Login, Datenbank oder Geschäftslogik (Dev-Team), nicht für Videos, auch nicht von Spielen (video), und nicht für Nachbauten bestehender Spiele mit Name, Figuren, Grafik oder Musik.
 argument-hint: "[Was für ein Spiel, für wen? | mach einfach …]"
 ---
 
@@ -14,7 +14,7 @@ Im Probelauf (24.11.2026) liefen alle drei Spiele ohne Plugin fehlerfrei und war
 
 **Grenzen, die nicht verhandelbar sind:**
 - **Kein Nachbau:** keine Namen, Figuren, Grafiken, Musik oder Level bestehender Spiele, auch nicht umbenannt. Ein eigenes Spiel im Stil eines Genres ist erlaubt.
-- **Veröffentlichen** (Website, Hosting, Dienst) nur auf Simons ausdrückliches Ja zu dieser Fassung, **oder sofort, wenn der Auftrag es schon verlangt** („… und stell es online“). Dann schreibst du gleich zu Beginn `spiele/<name>/arbeit/veroeffentlichen.md` mit `Simon: „<sein Satz wörtlich>“`. Ist `arbeit/pruefung.json` ohne FEHLER und frisch, veröffentlicht die Sperre ohne Rückfrage. Stores (App Store, Play Store) gibt es nie ohne Simon, dafür braucht es seine Konten.
+- **Veröffentlichen** (Website, Hosting, Dienst) nur auf Simons ausdrückliches Ja zu dieser Fassung, **oder sofort, wenn der Auftrag es schon verlangt** („… und stell es online“). Dann schreibst du gleich zu Beginn `spiele/<name>/arbeit/veroeffentlichen.md` mit `Simon: „<sein Satz wörtlich>“`. Ist `arbeit/pruefung.json` ohne FEHLER und frisch, veröffentlicht die Sperre ohne Rückfrage. **Erst prüfen, dann hochladen**, auch bei „testen brauch ich nicht“: Der Deploy ist nie der erste Schritt. Der Upload-Ordner bekommt eine `.assetsignore` mit `arbeit` und `dienst`, sonst gehen Fotos und Prüfberichte mit online. Die Sperre hält den Deploy sonst an. Stores (App Store, Play Store) gibt es nie ohne Simon, dafür braucht es seine Konten.
 - **Nichts Bezahltes:** keine bezahlten Grafik- oder Ton-Generatoren, keine Konten.
 - **Keine fremden Server zur Laufzeit:** Schriften, Skripte, Klänge liegen im Spielordner, kein Tracking.
 - **Lizenzen:** Grafik und Ton nur CC0 oder selbst erzeugt, Schriften OFL mit Lizenztext. Alles steht in `CREDITS.md`.
@@ -91,6 +91,7 @@ Dann `node ${CLAUDE_PLUGIN_ROOT}/scripts/spielpruefen.mjs spiele/<name> spiele/<
   - ob ein Wisch im iframe die Seite scrollt,
   - Regelkarte vor dem Start, `touch-action` auf `html`/`body`,
   - mit `--bot`: punkten, Spielende und Neustart unter 1 s.
+- **„Ruckelt“ oder „langsam“:** Erst messen, dann ändern. Vorher läuft `spielpruefen.mjs` und du notierst die fps unter 4× Drosselung aus `arbeit/leistung.json`. Dann suchst du die Ursache und behebst sie, dann misst du nachher genauso. In der Antwort stehen beide Zahlen („vorher 18 fps, nachher 52 fps bei 4× Drosselung“). Ohne Messung meldest du nicht „behoben“, sondern „vermutlich behoben, nicht gemessen“.
 - Jeden FEHLER beheben. Hinweise abwägen und begründen. Bei SwiftShader sind die fps nur ein Vergleich zwischen Fassungen, kein echtes Gerät: so in die Übergabe schreiben.
 - Dann den Agenten **`spiele-pruefer`** rufen, bei 3D-Spielen oder schwierigen Fällen mit `model: "opus"`, sonst mit seinem Standard (Sonnet). Er bekommt nur:
   - den Pfad zum Spiel,

@@ -17,6 +17,7 @@ import { createRequire } from "node:module";
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
+import { drehbuchBefunde } from "./drehbuch.mjs";
 
 const require = createRequire(import.meta.url);
 function playwrightLaden() {
@@ -182,6 +183,13 @@ else {
   if (bewegung.length) befund("Hinweis", "W18", "Animiert wird nur transform und opacity", bewegung.join(" · ") + " · Vercel, Hallmark");
   // W19 GSAP-Markierungen im eigenen Code (gsap-skills): Prüfhilfe, die sichtbar mit ausgeliefert würde
   if (/\bmarkers\s*:\s*(true|\{)/.test(eigenJs)) befund("P0", "W19", "GSAP ScrollTrigger mit markers: true im eigenen Code – Prüfhilfe vor der Lieferung entfernen", "gsap-skills");
+}
+
+// ---------- W20 Drehbuch: das Wow zieht sich durch (handwerk.md 1c, Simon 24.11.2026) ----------
+{
+  let dt = null;
+  try { dt = fs.readFileSync(path.join(site, "..", "arbeit", "drehbuch.md"), "utf8"); } catch {}
+  for (const b of drehbuchBefunde(dt)) befund(...b);
 }
 
 // ---------- lokaler Server ----------

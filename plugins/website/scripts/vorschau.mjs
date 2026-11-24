@@ -8,7 +8,7 @@
 //   --pruefen  öffnet die Datei eingebettet in einem <iframe> (Laptop und Handy) und fotografiert nach 3 und 12 s.
 //              Sind beide Bilder gleich, spielt der Moment eingebettet nicht von selbst ab (Fehler, handwerk.md §11).
 //              Dazu je Abschnitt (section[id]) zwei Bilder kurz nach dem Hineinscrollen und 3 s später: zeigt, ob
-//              sich unten etwas bewegt (handwerk.md 1b „Danach nicht abfallen“) und ob etwas leer bleibt.
+//              sich unten etwas bewegt (handwerk.md 1c „Das Wow zieht sich durch“) und ob etwas leer bleibt.
 // Braucht esbuild (Bündeln von Modulen) und für --pruefen Playwright: npm i -D esbuild playwright
 import { createRequire } from "node:module";
 import fs from "node:fs";
@@ -139,8 +139,8 @@ if (bilder) {
       const r = e.getBoundingClientRect(); if (r.width < 40 || r.height < 40 || r.bottom < 0 || r.top > innerHeight) return false;
       const s = getComputedStyle(e); return /inset\(0px 0px 100%|inset\(100%/.test(s.clipPath) || (s.opacity === "0" && !e.closest("[aria-hidden=true]"));
     }).map((e) => e.tagName.toLowerCase() + (e.className && typeof e.className === "string" ? "." + e.className.split(" ")[0] : "")), id);
-    if (leer.length) befunde.push(`FEHLER #${id}: ${[...new Set(leer)].slice(0, 4).join(", ")} bleibt nach 3,5 s unsichtbar – Animation startet nicht (handwerk.md 1b, Stolperstein IntersectionObserver)`);
-    if (gleich(path.join(bilder, `unten-${id}-a.png`), path.join(bilder, `unten-${id}-b.png`))) befunde.push(`Hinweis #${id}: keine Bewegung beim Hineinscrollen (ok, wenn gewollt – sonst handwerk.md 1b)`);
+    if (leer.length) befunde.push(`FEHLER #${id}: ${[...new Set(leer)].slice(0, 4).join(", ")} bleibt nach 3,5 s unsichtbar – Animation startet nicht (handwerk.md 1c, Stolperstein IntersectionObserver)`);
+    if (gleich(path.join(bilder, `unten-${id}-a.png`), path.join(bilder, `unten-${id}-b.png`))) befunde.push(`Hinweis #${id}: keine Bewegung beim Hineinscrollen (ok, wenn gewollt – sonst handwerk.md 1c)`);
   }
   await b.close();
   if (fremd.length) befunde.push(`Hinweis: ${fremd.length} Verweis(e) auf fremde Server bleiben drin (${fremd.slice(0, 2).join(", ")})`);

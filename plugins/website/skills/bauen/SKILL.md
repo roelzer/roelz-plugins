@@ -28,13 +28,13 @@ Die Sperre des Plugins fragt bei jedem Veröffentlichungs-Befehl Simon selbst un
 | „Ich bau Lando einfach nach.“ | Eigene Idee aus dem Auftraggeber. Übernommen werden Maße und Prinzipien, keine Seite und keine Datei. |
 
 Sprich Deutsch, kurz, ohne Fachchinesisch. Simon hat **drei Stopps**:
-- **Stopp 1, Richtung:** die Hauptidee als Skizze.
+- **Stopp 1, Bausteine:** je Abschnitt 2–3 laufende Bausteine zur Auswahl, Simon wählt (Abschnitt 3).
 - **Stopp 1b, Entwurf:** der Moment läuft, bevor der Rest gebaut wird.
 - **Stopp 2, Vorschau:** die ganze Seite.
 
 Bei „mach einfach“ oder „ohne Rückfragen“ entfallen Stopp 1 und 1b. Stopp 2 bleibt vor jeder Veröffentlichung.
 
-**Fehlerfrei ist die Pflicht, der Moment ist die Kür.** In der Probearbeit (20.11.2026) bestanden alle Seiten jede Prüfung und sahen trotzdem gleich aus: große Überschrift, zwei Knöpfe, ein Bild daneben. Simon: „haut mich jetz alles nicht so um“. Jede neue Seite bekommt deshalb **eine Hauptidee**, also einen Moment, den man sich merkt (`handwerk.md` Abschnitt 1b).
+**Fehlerfrei ist die Pflicht, der Moment ist die Kür.** In der Probearbeit (20.11.2026) bestanden alle Seiten jede Prüfung und sahen trotzdem gleich aus: große Überschrift, zwei Knöpfe, ein Bild daneben. Simon: „haut mich jetz alles nicht so um“. Jede neue Seite bekommt deshalb **eine Hauptidee**, also einen Moment, den man sich merkt (`handwerk.md` Abschnitt 1b), und das Wow zieht sich bis zum Schluss durch (Abschnitt 1c).
 
 ## 0. Einrichten
 - Arbeitsordner `website/<kurzer-name>/` im Projekt mit `site/` (nur die Lieferung) und `arbeit/` (Vorbilder, Rohfassungen, Prüfungen, Quellen zum Bauen).
@@ -69,16 +69,17 @@ Im SFH-Test kam das erst am Ende auf: Domain und Mail bei IONOS, die Seite lief 
   - Der Standard-Einstieg (Überschrift, zwei Knöpfe, Bild daneben) ist keine Hauptidee.
 - Bei 3D: Bauweise nach `3d-leistung.md` wählen und in `idee.md` begründen. **Umfang klein planen** (Abschnitt „Umfang klein planen“): ein Objekt oder eine Szene, eine Bewegung.
 
-## 3. Richtung (Stopp 1)
-- Baue für **2–3 Hauptideen je eine grobe Skizze des Moments**: drei Bilder für Anfang, Mitte und Ende der Verwandlung, grob und ohne Feinschliff. Ablage `arbeit/rohfassungen/<a|b|c>/`. Fotografiere sie mit `foto.mjs`. Ein Layout ohne Moment ist keine Richtung.
-- Zeig Simon in **einer** Nachricht:
-  - je Hauptidee einen Satz („beim Scrollen setzt sich der Schrank zusammen“) und die drei Bilder
-  - deine Empfehlung mit einem Satz Begründung
-  - deine Annahmen, je eine Zeile
-  - die Bitte um echtes Material
-- Simon wählt. **In `site/` entsteht vor seiner Wahl nichts.**
-- Halte Stopp 1 knapp. Simon reagiert auf Bilder, nicht auf Beschreibungen.
-- Bei „mach einfach“: nimm die stärkste Hauptidee und nenne kurz, warum.
+## 3. Bausteine zur Auswahl (Stopp 1)
+Simon, 24.11.2026: „Vorschläge für Bausteine liefern, ich wähl aus und dann zusammenbauen.“
+- **Katalog bauen:** `arbeit/bausteine/katalog.html`, je Abschnitt (Einstieg, Leistungen, Ablauf, Referenzen, Text-Moment, Schluss) **2–3 Bausteine** aus `wissen/bausteine.md`, schon mit dem Motiv und dem Gewerk-Zeichen des Auftraggebers gefüllt. Jeder Baustein ist eine kleine **laufende** Szene, grob und ohne Feinschliff, mit eigener Scrollstrecke. Darüber stehen Kennung („Einstieg B“), ein Satz, was passiert, und laut oder leise. Die Einstieg-Bausteine sind die 2–3 Hauptideen aus `hauptidee.md`.
+- **Bilder dazu:** Je Baustein drei Bilder für Anfang, Mitte und Ende mit `ablauf.mjs` nach `arbeit/bausteine/fotos/`. Den Katalog mit `vorschau.mjs arbeit/bausteine <ziel>.html` in eine Datei packen, damit Simon ihn am Handy und in der Claude-App durchscrollen kann.
+- **Zeig Simon in einer Nachricht:**
+  - die Katalog-Datei und je Abschnitt ein Bilderblatt,
+  - deine Empfehlung als fertige Auswahl („Einstieg B, Leistungen A, Ablauf A, Referenzen C, Text B, Schluss A“) mit einem Satz, warum sie zusammen durchzieht,
+  - deine Annahmen, je eine Zeile, und die Bitte um echtes Material.
+- Simon antwortet mit seiner Auswahl, auch gemischt oder mit Änderungswünschen. **In `site/` entsteht vor seiner Wahl nichts.**
+- **Aus der Auswahl wird das Drehbuch** `arbeit/drehbuch.md` (`handwerk.md` 1c): jede Zeile mit laut/leise, Baustein, Übergang, Rolle des Motivs, Farbe und Text-Bewegung. Passt die Auswahl nicht zu den Regeln (z. B. ein Drittel ohne lauten Moment), sag es mit einem Gegenvorschlag, statt still umzubauen.
+- Bei „mach einfach“: Du wählst selbst nach dem Drehbuch und nennst die Auswahl im Bericht.
 
 ## 3b. Entwurf (Stopp 1b)
 - Baue **zuerst nur den Moment** als Durchstich in `site/`: Er läuft grob, mit einfachen Formen. Der Rest der Seite ist noch Platzhalter.
@@ -88,7 +89,7 @@ Im SFH-Test kam das erst am Ende auf: Domain und Mail bei IONOS, die Seite lief 
 - Bei „mach einfach“: Statt Simon ruft du den `website-kritiker` für ein Merk-Urteil über den Durchstich. Sagt er „langweilig“, verbesserst du den Moment, bevor du weiterbaust.
 
 ## 4. Bauen
-- **Reihenfolge, damit immer etwas lauffähig ist:** erst der Moment (Durchstich), dann die ganze Seite grob, dann Feinschliff. Läuft der Durchstich nach etwa einem Drittel der Zeit nicht, eine Stufe einfacher bauen und es sagen (`3d-leistung.md`, „Umfang klein planen“). Im Haus-Fall der Probearbeit lief ein zu großer 3D-Plan zweimal in das Zeitlimit.
+- **Reihenfolge, damit immer etwas lauffähig ist:** erst der Moment (Durchstich), dann die ganze Seite grob nach dem Drehbuch, dann Feinschliff. **Jeder laute Baustein bekommt denselben Feinschliff wie der Einstieg.** Der Meterstab der Schreinerei war „sehr einfach gemacht, ohne Mühe“ (Simon), das darf unten nicht wieder passieren. Plane die Zeit so, dass der Feinschliff für alle lauten Bausteine reicht. Läuft der Durchstich nach etwa einem Drittel der Zeit nicht, eine Stufe einfacher bauen und es sagen (`3d-leistung.md`, „Umfang klein planen“). Im Haus-Fall der Probearbeit lief ein zu großer 3D-Plan zweimal in das Zeitlimit.
 - Nach `handwerk.md`, mit echten Bildern nach `bilder.md`. Bei 3D nach `3d-leistung.md`: Stufen, gedeckelte Pixeldichte, Rückfall ohne WebGL.
 - Hausschrift, Farben, Logo und Sprüche des Auftraggebers übernehmen (`handwerk.md` Abschnitt 1).
 - **Schrift tauschen heißt alle Regeln prüfen**, die sie benutzen (`font-style`, `<em>`, Stärken). Eine Schrift ohne Kursivschnitt wird sonst künstlich schräg.
@@ -146,7 +147,15 @@ Es braucht `esbuild` und `playwright` (`npm i -D esbuild playwright` in `arbeit/
 Seine Rückmeldung setzt du um und prüfst neu (Schritt 5).
 
 ## 7. Abgabe und Veröffentlichen
-- Simon bekommt `site/`, `QUELLEN.md`, die Austauschliste und eine kurze **Pflege-Anleitung** (Inhalte als Dateien, Ändern im Browser auf GitHub).
+- Simon bekommt `site/`, `QUELLEN.md`, die Austauschliste und eine kurze **Pflege-Anleitung**.
+- **Kunden pflegen selbst** (Simon, 24.11.2026). Standard ist **Sveltia CMS** unter `/admin/` mit **Sveltia CMS Additions** als Worker im Cloudflare-Konto des Kunden. Damit melden sich Kunden mit Benutzername und Passwort an, ein GitHub-Konto brauchen sie nicht. Beides ist kostenlos und MIT-lizenziert, Recherche: `docs/recherche/2026-11-24-kunden-pflege.md`.
+  - **Inhalt getrennt vom Design:** Alles, was der Kunde ändert, liegt in `content/` als JSON (Texte, Leistungen, Kontakt, Termine) oder Markdown (Neuigkeiten, Referenzen). In HTML, CSS und JS stehen keine Kundentexte.
+  - **Feste Felder:** Im CMS gibt es nur Sammlungen mit festen Feldern. Jedes Feld bekommt einen deutschen Namen und einen Hilfetext, dazu nach Bedarf Pflicht, Zeichenlimit (Überschrift höchstens 60) und Datum. Bilder brauchen einen Alt-Text. Freies HTML und Farben im Text gibt es nicht. Layout, 3D, Scroll und Styles sind nie als Feld erreichbar.
+  - **Design hält aus:** Die Seite wird mit doppelt so langen, mit fehlenden und mit hochkant fotografierten Inhalten geprüft. Bilder stehen in festen Seitenverhältnissen (`object-fit`). Im CMS ist die Umwandlung nach WebP an, höchstens etwa 2000 px.
+  - **Oberfläche auf Deutsch.** Die Anleitung passt auf eine Seite, mit Bildschirmfotos für Anmelden, Neuigkeit anlegen, Bild tauschen und Termin eintragen.
+  - **Ein Speichern ist ein Commit auf `main`.** Danach baut und veröffentlicht Cloudflare automatisch. Zurückrollen geht über den Git-Verlauf. Repo und Cloudflare-Konto gehören dem Kunden, Simon hat Admin-Zugang.
+  - **Datenschutzerklärung:** GitHub und Cloudflare werden genannt. Das CMS darf keine fremden Schriften und keine Tracker nachladen, das wird geprüft.
+  - **Vorsicht:** Additions ist erst wenige Wochen alt. Hakt es, melden sich Kunden über `sveltia-cms-auth` mit einem GitHub-Konto an. Für Webspace (IONOS) gilt dasselbe CMS, der Login läuft trotzdem über einen Cloudflare-Worker, und eine GitHub-Action lädt per SFTP hoch.
 - **Selbst pflegen geht nur mit automatischem Veröffentlichen.** Gehört zur Abgabe, nicht als Nachtrag: Cloudflare Builds (Repo verbinden) oder eine GitHub-Action, die bei jeder Änderung auf `main` hochlädt. Zugangsdaten trägt der Auftraggeber selbst als GitHub-Secret ein, nie im Chat.
 - **Webspace statt Cloudflare** (z. B. IONOS): Die fertigen Dateien laufen auf jedem Webspace mit SFTP. Sicherheits-Header kommen in `.htaccess` statt `_headers`. Eine Server-Funktion (z. B. Live-Daten über `/api/…`) braucht dort ein kleines PHP-Skript. Die Datenschutzerklärung nennt den richtigen Anbieter.
 - **Veröffentlichen, wenn der Auftrag es verlangt** (`arbeit/veroeffentlichen.md`, Prüfung ohne P0 und frisch), **oder wenn Simon nach der Vorschau ausdrücklich Ja zu dieser Fassung sagt.** Danach nennst du die Adresse und wie man zurückrollt (`npx wrangler rollback`). Dann kostenlos über Cloudflare: Projekt mit `wrangler.jsonc` (statische Dateien aus `site/`), `npx wrangler deploy`. Mit Auftrag und grüner Prüfung lässt die Sperre das ohne Rückfrage durch, sonst fragt sie Simon. Ohne Auftrag und ohne Ja beschreibst du nur, wie er es selbst machen kann.

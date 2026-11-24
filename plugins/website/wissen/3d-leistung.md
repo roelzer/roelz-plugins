@@ -5,6 +5,8 @@ Stand 18.11.2026. Quellen in `docs/personal/website-bauer/recherche.md`.
 ## Was Simons Laptop schafft
 Simon (8 GB RAM, keine eigene Grafikkarte) über landonorris.com: „geht bei mir gut durch, aber beim Scrollen durch die Seite könnte es flüssiger sein“. Also: **ein** 3D-Objekt auf echtem Motiv ja, schwere Effekte über die ganze Fläche beim Scrollen nein. Ohne Grafikkarte im Testrechner (Software-Rendering) liefen WebGL-Seiten über die ganze Fläche mit 1–4 fps (Lando, SANTAL, JJ, Colombel). Foto, Video und 3D zum Zuschalten liefen mit 60 fps.
 
+**Gegenprobe an Vorbildern (24.11.2026, ohne Grafikkarte gemessen, normal / 4× gedrosselt):** Zoox 59/36 fps und AirPods 52/47 fps kommen ganz ohne WebGL aus, mit Video, Bildfolge auf 2D-Canvas und transform. Scale (WebGL nur im Einstieg) 23 fps, ikilledacactus (Bildfolgen als Lottie, 35 MB) 25 fps, Stripe Press (WebGL über die ganze Fläche) 2 fps. Simon fand auch den Einstieg der Schreinerei noch „ein bisschen ruckelig“. Folgerung: **Das Wow kommt aus Verwandlung, Übergängen und Rhythmus, nicht aus WebGL.** WebGL nur für ein Objekt auf kleiner Fläche oder auf Knopfdruck.
+
 ## Wahl der Bauweise
 | Ziel | Bauweise |
 |---|---|
@@ -60,6 +62,9 @@ Der Haus-Rundgang in 3D lief in beiden Läufen in das Zeitlimit von 60 Minuten: 
 - **Pixeldichte deckeln:** am Desktop höchstens 1, am Handy höchstens 1,5 (`Math.min(devicePixelRatio, innerWidth > 768 ? 1 : 1.5)`). Die Site of the Year 2025 nimmt 1,25 und 2, aber auf Simons Laptop ohne Grafikkarte ruckelte die Schreinerei damit (23.11.2026).
 - **Ruckel-Bremse einbauen:** Laufen etwa 12 Bilder hintereinander langsamer als 45 fps, die Auflösung um eine Stufe senken (höchstens zweimal, z. B. ×0,8 und ×0,6), dabei auch die Schattenkarte verkleinern.
 - **Teure Bausteine meiden:** keine `VSMShadowMap` mit großem Weichzeichner (stattdessen `PCFSoftShadowMap`, Karte 1024²), kein `MeshPhysicalMaterial` mit Klarlack (stattdessen `MeshStandardMaterial`), Zeichenfläche nicht größer als die Bühne. Schatten, die sich nicht bewegen, als Bild unterlegen. Die Größe der Zeichenfläche ist der wirksamste Hebel (web.dev, The Hobbit: 50 % Fläche brachte 16 → 33 fps).
+- **Videos erst bei Sicht starten**, vorher ein Standbild als `poster` (AirPods: `autoplay` aus, Abspielen per Skript beim Hineinscrollen, Startbilder). Mehrere Szenen lieber in ein kurzes Video als viele Dateien (Scale: ein `Packed.mp4`).
+- **Bildfolgen auf ein 2D-Canvas**, als WebP, kleine Fläche, unter etwa 2 MB je Folge. **Nie als Lottie mit eingebetteten Bildern** (ikilledacactus: 25 fps ohne WebGL).
+- **Ein Modell, viele Texturen:** Gibt es mehrere gleichartige Objekte, ein Modell laden und nur die Texturen tauschen (Stripe Press: ein Buch mit 84 KB für alle Bücher).
 - **Nur zeichnen, wenn sich etwas bewegt** (beim Scrollen bzw. während einer Animation), nicht dauernd.
 - **Pro Bild kein Layout lesen:** Scroll-Ereignisse nur merken und höchstens einmal pro Bild in `requestAnimationFrame` auswerten. Größen (`getBoundingClientRect`, `offsetHeight`) nur beim Ändern der Fenstergröße messen, nicht in der Zeichenschleife. Im Schreinerei-Test las die Szene die Größe der Zeichenfläche bei jedem Bild.
 - **Budget:** höchstens 100.000 Dreiecke (gut 30–50k), Texturen höchstens 2048², höchstens 10 Materialien, Modell höchstens 10 MB. Komprimieren mit `npx @gltf-transform/cli optimize in.glb out.glb` (Meshopt) bzw. Texturen verkleinern. Kontrolle mit `renderer.info`.

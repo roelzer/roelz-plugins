@@ -1,5 +1,19 @@
 # Änderungsprotokoll Spiele-Bauer
 
+## 0.1.3 – Was Simons Blindvergleich gezeigt hat
+Simon, 24.11.2026: Elfmeter B, Familienrätsel beide, Lehrling A, Kegeln „grafisch B, Bedienung A“ (B war jeweils der Spiele-Bauer).
+- Regel 18 **Bedienung verzeiht:** Geste überall auf der Spielfläche, Zielen und Auslösen getrennt, Hinweis bei zu schwachem Wisch, Tastatur am Laptop.
+- Regel 19 **Welt mit Charakter:** Material und Vielfalt aus dem Thema, eine Stimme, angekündigte Gefahren, kleine Ziele.
+- Prüfer: Pflichtfragen 11 (Bedienung verzeiht) und 12 (Welt).
+
+## 0.1.2 – Lücken aus der Probearbeit
+Probearbeit 24.11.2026 (`docs/personal/spiele-bauer/probearbeit.md`): mit Spiele-Bauer 13 von 17 Fällen voll erfüllt, ohne 6.
+- **Skill wird auch bei vorhandenen Spielen geladen:** Neuer Hook `hinweis.mjs` (UserPromptSubmit). Liegt ein Ordner `spiele/` im Projekt und klingt die Nachricht nach einem Spiel, erinnert er an `spiele:bauen`. Vorher arbeitete Claude bei „ruckelt“ und „stell's online“ ohne den Skill. Im Kontrolllauf stiegen beide Fälle von 0,33 auf 1,00.
+- **Ruckeln:** erst messen, dann ändern, fps vorher und nachher unter 4× Drosselung in die Antwort.
+- **`arbeit/` nie online:** Die Sperre lässt den Deploy laut Auftrag erst durch, wenn eine `.assetsignore` im Upload-Ordner `arbeit` ausschließt. Ihre Rückfrage nennt jetzt die Schritte (Auftrags-Datei, `.assetsignore`, Prüfung).
+- **Erst prüfen, dann hochladen**, auch bei „testen brauch ich nicht“.
+- Testfall `gleich-online` an Simons neue Regel angepasst, Prüfpunkt von `cooles-spiel` erkennt „A)/B)“-Listen, die Prüfpunkte sehen versteckte Dateien. Tests dazu.
+
 ## 0.1.1 – Veröffentlichen laut Auftrag ohne Rückfrage
 Simon, 24.11.2026: „sowas wie Cloudflare pushen, will ich, dass ich nicht 3 mal bestätigen muss … angenommen es steht im Auftrag, dann soll das auch gleich erstellt werden und dann gepusht“.
 - Wie beim Website-Bauer: `arbeit/veroeffentlichen.md` mit Simons Satz und `arbeit/pruefung.json` ohne FEHLER und frisch ergeben „allow“.

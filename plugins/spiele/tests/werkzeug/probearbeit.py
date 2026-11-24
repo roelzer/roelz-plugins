@@ -61,7 +61,7 @@ def bewerte(fall_ordner, ws, vorher, protokoll, letzte, pruefung=None, arm="mit"
             for c in zeile.get("message", {}).get("content", []):
                 if c.get("type") == "tool_use":
                     werkzeugaufrufe.append((c.get("name"), json.dumps(c.get("input", {}), ensure_ascii=False)))
-    neu = {os.path.relpath(p, ws) for p in glob.glob(os.path.join(ws, "**", "*"), recursive=True)
+    neu = {os.path.relpath(p, ws) for p in glob.glob(os.path.join(ws, "**", "*"), recursive=True, include_hidden=True)
            if os.path.isfile(p)} - vorher
     for g in sorted(glob.glob(os.path.join(fall_ordner, "graders", "*.md"))):
         f, rumpf = frontmatter(open(g, encoding="utf-8").read())
@@ -70,7 +70,7 @@ def bewerte(fall_ordner, ws, vorher, protokoll, letzte, pruefung=None, arm="mit"
             continue   # Weg-Prüfpunkt des Plugins (Kritiker gerufen, idee.md …): zählt nur im Mit-Arm, nicht für Δ
         name = os.path.basename(g)[:-3]
         ok, info = False, ""
-        alle = {os.path.relpath(p, ws).replace(os.sep, "/") for p in glob.glob(os.path.join(ws, "**", "*"), recursive=True) if os.path.isfile(p)}
+        alle = {os.path.relpath(p, ws).replace(os.sep, "/") for p in glob.glob(os.path.join(ws, "**", "*"), recursive=True, include_hidden=True) if os.path.isfile(p)}
         if typ == "file_exists":
             soll = wert(f.get("exists") or "true") != "false"
             if f.get("path_regex"):
@@ -164,7 +164,7 @@ def ein_lauf(fall, arm, nr, ziel):
     if os.path.exists(vorb):
         env = dict(os.environ, HOME=heim)
         subprocess.run(["bash", vorb], cwd=ws, env=env, capture_output=True)
-    vorher = {os.path.relpath(p, ws) for p in glob.glob(os.path.join(ws, "**", "*"), recursive=True) if os.path.isfile(p)}
+    vorher = {os.path.relpath(p, ws) for p in glob.glob(os.path.join(ws, "**", "*"), recursive=True, include_hidden=True) if os.path.isfile(p)}
     befehl = ["claude", "-p", prompt, "--output-format", "stream-json", "--verbose",
               "--max-turns", wert(f.get("max_turns")) or "50", "--allowedTools"] + WERKZEUGE
     # Beide Arme mit Website-Plugin (Nachbar); weitere Nachbarn aus „plugins:“ im prompt.md; Mit-Arm zusätzlich spiele
@@ -205,7 +205,7 @@ def ein_lauf(fall, arm, nr, ziel):
     pruefung = None
     seiten = sorted(glob.glob(os.path.join(ws, "spiele", "*", "index.html")))
     if not seiten:   # Ohne-Arm legt das Spiel evtl. woanders ab: jüngste index.html außerhalb von node_modules
-        kandidaten = [p for p in glob.glob(os.path.join(ws, "**", "index.html"), recursive=True) if "node_modules" not in p]
+        kandidaten = [p for p in glob.glob(os.path.join(ws, "**", "index.html"), recursive=True, include_hidden=True) if "node_modules" not in p]
         seiten = sorted(kandidaten, key=os.path.getmtime, reverse=True)[:1]
     if seiten:
         aus = os.path.join(lauf, "pruefung")

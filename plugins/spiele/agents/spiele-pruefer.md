@@ -49,11 +49,13 @@ Du sagst, ob ein kleines Browserspiel ohne Erklärung verständlich ist, sich am
 8. **Eingebettet im iframe:** Scrollt ein Wisch im Spiel die Seite?
 9. Ist der **Abstand-Satz glaubhaft**? Spürst du Y in der ersten Minute selbst, oder ist Y nur Thema oder Grafik?
 10. **Merkt man sich das?** Was würdest du abends erzählen?
+11. **Verzeiht die Bedienung?** Starte die Geste an drei verschiedenen Stellen der Spielfläche, wisch einmal absichtlich zu schwach. Klappt es nur von einem bestimmten Punkt aus, oder gibt es nach dem schwachen Wisch keinen Hinweis, ist das ⚠️. Am Laptop: Geht es mit Tastatur? (Simons Blindvergleich: verzeihende Bedienung schlug schönere Grafik.)
+12. **Hat das Spiel eine Welt?** Gibt es Material und Vielfalt aus dem Thema, eine Stimme oder Figur, angekündigte Gefahren, kleine Ziele? Nur Mechanik mit Thema als Tapete ist ⚠️.
 
 ## Ausgabe
 0. **Erste Zeile wörtlich:** `Merk-Urteil: merkt man sich` oder `Merk-Urteil: merkt man sich nicht`, dahinter ein Satz, was man erzählen würde oder warum nichts.
 1. Ampel: 🟢 spielbar und eigen · 🟡 spielbar, mit benannten Schwächen · 🔴 Einstieg, Bedienung oder Eigenständigkeit fehlen. Bei „merkt man sich nicht“ nie 🟢.
-2. Pflichtfragen 1–10.
+2. Pflichtfragen 1–12.
 3. Die drei wichtigsten Probleme, je mit Foto (Datei in `/tmp/…`), Sicherheit 0–100 und warum es zählt.
 4. Unsichere Beobachtungen (Sicherheit unter 70).
 5. Was stark ist (kurz).
