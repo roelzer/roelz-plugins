@@ -1,5 +1,28 @@
 # Änderungsprotokoll Website-Bauer
 
+## 0.3.3 – Mehr Prüfregeln aus dem GitHub-Abgleich (24.11.2026)
+Anlass: GitHub-Abgleich 24.11.2026. Quellen: impeccable, Hallmark, Vercel Web Interface Guidelines, gsap-skills, Anthropic `frontend-design`. Übernommen sind nur Ideen und Schwellen, die Umsetzung ist eigen, kein fremder Code.
+- Prüfskript, KI-Look (W1):
+  - P0: Verlaufstext, Neon-Leuchtrand, Creme-Grund mit Serifen-Überschrift und Terrakotta.
+  - Hinweis: Creme-Grund allein, federnde Bewegung (`cubic-bezier` über 0…1).
+  - Zählt zum Beiwerk: pulsierender Punkt, Icon-Kachel über Überschrift, Meta-Zeilen „A · B · C“, Seitenstreifen an runder Karte.
+- Prüfskript, Technik und Zugang:
+  - W13 (P0): Inhalt bleibt unsichtbar. Die Seite wird bis unten und zurück gescrollt, auch mit „Bewegung reduzieren“. Erfasst auch auf null zugeschnittene Flächen (der leere Team-Rahmen aus dem Schreinerei-Test).
+  - W14 (P0): Fokus sichtbar, gemessen mit bis zu 16× Tab. Dazu `outline: none` ohne `:focus-visible` im CSS.
+  - W15 (P0): Zoom gesperrt.
+  - W16: 320 px seitlich (P0), Fließtext über 1600 px bei 1920 px (Hinweis).
+  - W17 (Hinweis): Text fehlt am Handy.
+  - W18 (Hinweis): `transition: all` bzw. animierte Breite, Höhe, top oder left.
+  - W19 (P0): GSAP `markers: true` im eigenen Code.
+- `leistung.mjs`: Misst auch die Barrierefreiheit. Unter 90 gibt es einen Hinweis in Ausgabe und JSON. Der Exit-Code hängt weiter nur an der Leistung.
+- `handwerk.md`:
+  - §3: weitere Vorlagen-Merkmale.
+  - §4: nur `transform` und `opacity` animieren, Breiten von 320 bis 1920 px.
+  - §8: sichtbarer Fokus, Zoom nie sperren.
+  - §9: Prüfhilfen raus.
+- Kritiker: Pflichtfrage 11 (Tab bis zum Kontakt-Knopf, Fokus sichtbar). Vor dem Urteil nennt er ein Element, das man streichen sollte.
+- Eichung: zehn neue Testseiten: neun mit Fehler und `gut-zugang` als Gegenprobe ohne Fehlalarm.
+
 ## 0.3.2 – Alles aus dem Schreinerei-Test im Skill (23.11.2026)
 Simon zur Schreinerei v2: „Ja is cool so, Bau alles in den skill ein.“
 - Neues Werkzeug `scripts/vorschau.mjs`:
