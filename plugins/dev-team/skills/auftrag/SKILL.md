@@ -28,7 +28,7 @@ Für jeden Teamplan gelten: Startfreigabe bzw. Autopilot, stiller Durchlauf, Kon
 
 ### Ablauf: Aufbau → Fertigstellung (Grundlage für jeden Teamplan)
 Der Bau läuft in **zwei Phasen** (Simons Vorgabe: erst schnell das Grundgerüst, robust gebaut wird, wenn das Produkt fertiggestellt wird). Auch Solo endet erst, wenn **alle** Anforderungen fertig sind (Grundgesetz „Eigenständig bauen“) – nach einem ersten lauffähigen Stand geht es mit der nächsten Anforderung weiter, ohne zu fragen. Naheliegende Pflichtpunkte aus den Projektregeln (z. B. Tokens verschlüsseln) machst du einfach.
-1. Anforderungen kurz in `docs/lastenheft.md` (A1 …, je ein prüfbarer Satz). Startfreigabe kurz: Anforderungen, Vorgehen in 3–5 Punkten, offene Fragen mit Empfehlung (Autopilot: entfällt). Danach Durchlauf einschalten.
+1. Anforderungen kurz in `docs/lastenheft.md` (A1 …, je ein prüfbarer Satz). Startfreigabe kurz: Anforderungen, Vorgehen in 3–5 Punkten, offene Fragen mit Empfehlung. Im Standard-Autopilot entfällt sie: Kleine Fragen entscheidest du nach Empfehlung, tragende gehen an den Entscheidungsrat (`wissen/rat.md`). Danach Durchlauf einschalten.
    **Oberfläche?** Dann vor dem ersten Feature einmal `designer` Modus `entwurf` (Grundlage: `${CLAUDE_PLUGIN_ROOT}/wissen/oberflaeche.md`; Ergebnis `docs/DESIGN.md` mit Vorbildern und Bewegungssprache, `design/tokens.json`, die Kernbildschirme mit allen Zuständen).
 
 **Phase A – Aufbau (schnell).** Ziel: Simon kann so früh wie möglich ausprobieren.
@@ -79,14 +79,17 @@ Nach der Tabelle und den Risiko-Auslösern im Grundgesetz, nach Risiko, nicht na
 5. **Kein einzelnes Vorab-Paket** (z. B. P1 „Grundgerüst“ allein vor allen anderen), außer wirklich alle anderen Pakete hängen davon ab – dann so klein wie möglich (Ziel: unter 30 Minuten). Gemeinsame Grundlagen lieber in das erste Paket jeder parallelen Gruppe legen.
 6. **Bestehende Tests und Testkonfiguration** (`vitest.config.*`, `conftest.py` …) ändert nur der `tester`. Verlangt ein Bauplan eine Änderung daran (auch „(+Test)“ an einer bestehenden Testdatei, umgestellte Bedienregel, die ein alter Test festschreibt), ist das **Tester-Vorarbeit** auf dem Paketzweig (Ablauf in Phase 7, Schritt 2); dasselbe gilt für Architekturtests (Architekt-Vorarbeit) und für neue Referenzdateien, die ein Paket braucht (legt der Tester an). Der Bauplan nennt das ausdrücklich, damit kein Entwickler daran scheitert. Neue Testfälle sieht der Bauplan als neue Testdatei vor. Anleitungen und Hilfetexte unter `docs/` (Markdown), die der Bauplan nennt, darf der Entwickler selbst schreiben; Testkonfiguration legt immer der Tester an.
 
-## Phase 3 – Unabhängige Planprüfung (parallel, höchstens 3)
-- `kritiker`: immer.
+## Phase 3 – Unabhängige Planprüfung (parallel, höchstens 4)
+- `kritiker`: immer, **in zwei Armen**: einmal mit `model: "opus"`, einmal mit `model: "sonnet"`, gleichzeitig gestartet, jeder ohne den anderen und mit demselben Auftrag. Laut Promptgeflüster findet jedes Modell Fehler, die das andere übersieht. Zusammenführen:
+  - **bestätigt** ist ein Befund, den beide melden oder den du am Plan selbst nachvollziehst,
+  - **Verdacht** ist ein Befund, den nur einer meldet. Den prüfst du am Plan, dann wird er bestätigt oder verworfen, mit einem Satz Begründung.
+  - Die Rückfragen der Bauplan-Probe aus beiden Armen werden vereinigt.
 - `fachpruefer` Modus `plan`: bei fachlichen Folgen; im Profil `fachsoftware` bei jeder Berechnung.
 - `sicherheitspruefer`: **bei Stufe Normal und Groß immer** (Sicherheit ist nie optional); bei Klein nur mit Risiko-Auslöser. Im Profil `web` gilt das ohnehin.
 - **Auslöser-Checkliste (Pflicht):** Vor der Planprüfung schreibst du in `docs/plan.md` für **jeden** Risiko-Auslöser aus dem Grundgesetz eine Zeile `ja/nein – Begründung`. Der Kritiker prüft diese Liste gegen Plan und Lastenheft; ein falsches „nein“ ist ein Befund.
 - **Fachwissen-Inventur (Profil `fachsoftware`, Pflicht):** Vergleiche die Fachwissen-Bibliothek mit dem, was die Anforderungen berechnen: Welche Regeln sind nur „offen“ oder „vorgeschlagen", welche Grenzwerte fehlen, welche Rechenschritte haben gar keine Regel? Das Ergebnis geht als Liste „Fachwissen-Lücken“ an Simon (Startfreigabe); Jede Lücke geht **automatisch** an den `rechercheur` (Recherche + frische Gegenprüfung, Skill `recherche`); du wartest nicht auf Simon. Die Ergebnisse schreibst du sofort als **„Vorgeschlagen“** (mit Quelle und Sicherheit) ins Gehirn (`gehirn.py wissen`). Simon bekommt nur eine Bestätigungsliste; erst bestätigte Regeln zählen für Tests und Berechnung. Was Recherche nicht klärt (z. B. interne Grenzwerte), bleibt als Frage an Simon.
 - Wissenslücke: `rechercheur` Modus `recherche`, danach ein **frischer** `rechercheur` Modus `gegenpruefung` nur mit der Recherche-Datei (Skill `recherche`). Ergebnisse bleiben Vorschläge.
-- Punkte einarbeiten oder begründen, warum nicht (höchstens 2 Überarbeitungen, dann Frage an Simon). Strukturänderung → `architekt` erneut.
+- Punkte einarbeiten oder begründen, warum nicht (höchstens 2 Überarbeitungen, dann an den Entscheidungsrat bzw. bei „mit Freigabe“ an Simon). Strukturänderung → `architekt` erneut.
 - **Bauplan-Probe:** Die Rückfragen des Kritikers je Paket (Pflichtfrage 9) gehen **gesammelt in einem Auftrag** an den `architekt`, der sie in den Bauplänen beantwortet – vor der Startfreigabe, nicht mitten im Bau. Ebenso ein Vorschlag „Schnittstelle zuerst“ (Pflichtfrage 10). Mitten im Bau gilt dann: eine neue Rückfrage eines Entwicklers ist ein Befund gegen den Bauplan und kommt in die Lektionen.
 - **Freigabe-Bedarf sammeln:** Prüfe mit Kritiker und Tester, welche **bestehenden** Abnahmetests, Referenzwerte oder Einstellungen der Plan verändert (alte Bedienregel, alter Fehlertext, geändertes Format). Für jede schreibst du die Freigabe-Zeile (`Datum | Stichwort | Geltung | Grund`) in `docs/plan.md`, Abschnitt „Freigaben“; ein frischer `kritiker` Modus `freigabe` prüft sie alle in **einem** Auftrag, 🟢-Zeilen trägst du in `.claude/freigaben.md` ein, bevor gebaut wird. Neue Abnahmetests und neue Referenzdateien brauchen keine Freigabe.
 
@@ -96,7 +99,9 @@ Nach der Tabelle und den Risiko-Auslösern im Grundgesetz, nach Risiko, nicht na
 - Zusammenfassen: Einigkeit, Widersprüche, deine begründete Empfehlung. Gesamtampel: 🔴 sobald einer 🔴; 🟢 nur wenn alle 🟢; sonst 🟡. Kritische Sicherheits-, Datenintegritäts- oder Fachregel-Befunde werden nicht überstimmt.
 
 ## Phase 5 – Freigabe
-**Startfreigabe – der einzige Stopp** (entfällt im Autopilot, siehe unten). Simon in **einer** Nachricht vorlegen:
+**Standard ist der Autopilot** (seit 3.23, Simon: „ich will, dass alles autonom läuft“, für alle Projekte): Die Startfreigabe entfällt, und offene Produkt- und Architekturfragen entscheidet der **Entscheidungsrat** (`wissen/rat.md`). Die Startfreigabe unten gilt nur, wenn Simon beim Auftrag „mit Freigabe“ schreibt oder `"autopilot": false` in `.claude/dev-team.json` steht.
+
+**Startfreigabe** (nur bei „mit Freigabe“). Simon in **einer** Nachricht vorlegen:
 0. Anforderungen A1 … in seinen Worten, Stufe, Profil, Einsatz (intern/öffentlich) und alle Verständnisfragen mit deiner Empfehlung – „Fehlt etwas, ist etwas falsch verstanden?“
 1. Gesamtampel und wichtigste Punkte in einfacher Sprache.
 2. **Tragende Architekturentscheidungen** mit Alternativen und Empfehlung – Simon entscheidet sie.
@@ -110,9 +115,11 @@ Frage: „Freigabe zum eigenständigen Bauen?“
 
 Entscheidungen in `docs/risiko-log.md`, bestätigte Regeln in `fachwissen/regeln.md`. Bei jeder neuen Regel fragen, ob sie fürs ganze Fachgebiet gilt. **Ohne ausdrückliche Freigabe wird nicht gebaut.**
 
-**Autopilot (ganz ohne Stopp):** Schreibt Simon beim Auftrag „Autopilot“ (oder steht `"autopilot": true` in `.claude/dev-team.json`), entfällt die Startfreigabe:
-- Alle Entscheidungen triffst du nach der Empfehlung der zuständigen Agenten und schreibst sie nach `docs/ENTSCHEIDUNGEN.md`; im Abschlussbericht stehen sie als Liste „Von mir entschieden – bitte prüfen“.
-- Wow-Vorschläge werden nicht gebaut, nur aufgelistet. Neue Fachregeln bleiben „vorgeschlagen“; Berechnungen, die eine unbestätigte Regel brauchen, werden gebaut und als **vorläufig** gekennzeichnet, mit Eintrag unter „Nur Simon“ (bestätigen).
+**Autopilot (Standard, ganz ohne Stopp):**
+- **Entscheidungsrat statt Simon:** Alles, was in der Startfreigabe stünde, geht gesammelt in **einen** Rat nach `wissen/rat.md`: Verständnisfragen, tragende Architekturentscheidungen, Prüferpunkte mit Empfehlung, Wow-Auswahl. Fünf Berater, blinde Bewertung, du entscheidest als Vorsitz. Technische Fragen ohne Produktfolge entscheidest du wie bisher nach Empfehlung des zuständigen Agenten. Alles steht in `docs/ENTSCHEIDUNGEN.md`. Im Abschlussbericht stehen die Beschlüsse als Liste „Vom Rat entschieden – bitte prüfen“, die knappen zuerst.
+- **Wow:** Der Rat wählt höchstens **einen** Wow-Vorschlag mit kleinem Aufwand. Er wird eine Anforderung wie jede andere. Der Rest kommt nach `docs/wow-ideen.md`.
+- **Ausliefern:** nur, wenn Simon beim Auftrag ausdrücklich „ausliefern“ geschrieben hat. Sonst bleibt der Pull Request offen und steht unter „Nur Simon“.
+- Mitten im Lauf neu entstehende tragende Fragen gehen gesammelt in einen weiteren Rat, höchstens einmal je Meilenstein. Bis dahin baust du Unabhängiges weiter. Neue Fachregeln bleiben „vorgeschlagen“; Berechnungen, die eine unbestätigte Regel brauchen, werden gebaut und als **vorläufig** gekennzeichnet, mit Eintrag unter „Nur Simon“ (bestätigen).
 - Was nur Simon darf (bestehende Abnahmetests/Referenzwerte ändern, veröffentlichen, Geld, Daten löschen, Konten): Das Paket wird gebaut, geprüft und **geparkt** (Zwischenstand), die fertige Freigabe-Zeile bzw. der Schritt steht in `docs/OFFENE_FRAGEN.md`. Alles andere wird fertig.
 - Nach der Planprüfung (Phase 3/4) schaltest du sofort den Durchlauf ein. Stufe Klein läuft immer ohne Rückfrage.
 
