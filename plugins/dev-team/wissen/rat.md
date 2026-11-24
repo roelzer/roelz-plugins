@@ -5,6 +5,8 @@ Ab 3.23 laufen alle Aufträge im Autopilot. Fragen, die früher bei Simon lagen 
 Anlass: Simon: „ich will, dass alles autonom läuft“, für alle Projekte (24.11.2026). Vorbild ist das „LLM Council“ von Promptgeflüster: fünf Berater antworten unabhängig, bewerten sich anonym, ein Vorsitz entscheidet.
 
 ## Wann
+- **Nie bei Werkstatt- und Klein-Aufträgen.** Die laufen wie bisher ohne Plan und ohne Rat. Simon: „gerade kleine Änderungen können dadurch unnötig lang werden“.
+- **Nur, wenn es eine tragende offene Frage gibt.** Hat die Planprüfung keine, entfällt der Rat ganz. Das ist bei den meisten Normal-Aufträgen so.
 - **Gesammelt, nicht einzeln:** Alle offenen Fragen einer Phase gehen in **einen** Rat, nach der Planprüfung (Phase 3/4) und bei Bedarf noch einmal je Meilenstein. Kostet etwa 10 Agentenläufe, deshalb nie für eine einzelne Kleinigkeit.
 - **Nicht vor den Rat** gehören technische Fragen ohne Produktfolge. Die entscheidest du wie bisher nach der Empfehlung des zuständigen Agenten, mit einer Zeile in `docs/ENTSCHEIDUNGEN.md`.
 

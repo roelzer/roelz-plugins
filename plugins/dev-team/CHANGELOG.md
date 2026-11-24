@@ -10,7 +10,7 @@ Anlass:
 - **Entscheidungsrat** (`wissen/rat.md`) statt Fragen an Simon:
   - Fünf Berater (`fachexperte`, `pragmatiker`, `langfrist-architekt`, `produktpruefer`, `sicherheitspruefer`, je mit neuem Modus `rat`) antworten unabhängig, bewerten sich danach blind (A–E), und der Projektleiter entscheidet als Vorsitz.
   - Risiko-Befunde und Simons ausdrückliche Anforderungen werden nie überstimmt. Bei knapper Mehrheit in tragenden Fragen gilt die leichter umkehrbare Option.
-  - Gesammelt einmal nach der Planprüfung und höchstens einmal je Meilenstein.
+  - Gesammelt einmal nach der Planprüfung und höchstens einmal je Meilenstein. Nie bei Werkstatt- und Klein-Aufträgen, und ohne tragende offene Frage entfällt er.
   - Beschlüsse stehen in `docs/rat/` und `docs/ENTSCHEIDUNGEN.md`, im Abschlussbericht als „Vom Rat entschieden – bitte prüfen“.
 - **Bei Simon bleiben nur Grenzen**, und sie halten den Lauf nie an:
   - Konten, Zahlungen, Geräte,
