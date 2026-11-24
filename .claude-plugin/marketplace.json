@@ -1,6 +1,6 @@
 {
   "name": "roelz-plugins",
-  "description": "Simons Claude-Code-Plugins: Dev-Team, Team-Tafel, Tool-Scout, Personaler, Video-Editor und Website-Bauer. Ohne Firmen- oder Kundenwissen, auch auf Arbeitsrechnern nutzbar.",
+  "description": "Simons Claude-Code-Plugins: Dev-Team, Team-Tafel, Tool-Scout, Personaler, Video-Editor, Website-Bauer und Recherche. Ohne Firmen- oder Kundenwissen, auch auf Arbeitsrechnern nutzbar.",
   "owner": {
     "name": "Simon Rölz"
   },
@@ -39,6 +39,12 @@
       "name": "website",
       "source": "./plugins/website",
       "description": "Website-Bauer: Vereins-, Firmen-, Muster- und Projektseiten mit 3D auf Spitzenniveau – nur kostenlose Werkzeuge, kein KI-Look. Vorbilder und Idee zuerst, echte Bilder, Prüfskript ohne KI, unabhängiger Kritiker, Veröffentlichen nur auf Simons Ja.",
+      "category": "productivity"
+    },
+    {
+      "name": "recherche",
+      "source": "./plugins/recherche",
+      "description": "YouTube-Recherche über die offizielle YouTube Data API: Kanäle und Themen durchsuchen, Beschreibungen, Kapitel, Links und Kommentare lesen, Begleit-Blogs finden, gezielt Transkripte erbitten. Kein Herunterladen, kostenlos (10.000 Einheiten/Tag).",
       "category": "productivity"
     }
   ]
