@@ -657,6 +657,26 @@ ROLLEN = {"reviewer", "kritiker", "architekt", "tester", "designer", "fachpruefe
           "general-purpose"}
 
 
+ANALYSE_JE_SPRACHE = (
+    # (Erkennungsdateien, Werkzeuge, von denen mindestens eins in zusatzbefehle/meilensteinbefehle stehen soll)
+    (("tsconfig.json", "package.json"), ("tsc", "eslint", "biome", "oxlint", "vue-tsc", "svelte-check")),
+    (("pyproject.toml", "requirements.txt", "setup.py"), ("ruff", "mypy", "pyright", "flake8", "pylint")),
+    (("composer.json",), ("phpstan", "psalm")),
+    (("go.mod",), ("go vet", "golangci", "staticcheck")),
+    (("Cargo.toml",), ("clippy",)),
+)
+
+
+def analyse_pruefen(e, wurzel, konfig):
+    """Statische Analyse ohne KI ist Pflicht (Architekt, seit 3.23). Fehlt sie für eine erkannte Sprache: Warnung."""
+    befehle = " ".join(str(b) for b in list((konfig or {}).get("zusatzbefehle") or [])
+                       + list((konfig or {}).get("meilensteinbefehle") or [])).lower()
+    for dateien, werkzeuge in ANALYSE_JE_SPRACHE:
+        if any(os.path.isfile(os.path.join(wurzel, d)) for d in dateien) and not any(w in befehle for w in werkzeuge):
+            e.w("Keine statische Analyse in zusatzbefehle (erwartet z. B. %s, Erkennung über %s). Der Projektleiter "
+                "darf sie selbst ergänzen, das ist eine Verschärfung." % (" / ".join(werkzeuge[:3]), dateien[0]))
+
+
 def teamplan_pruefen(e, wurzel, hauptordner, basis, konfig, fg):
     """Besetzung nach Bedarf, mechanisch abgesichert: Teamplan vorhanden, Untergrenzen tatsächlich gelaufen.
     Aktiv nur in einem laufenden Auftrag (.dev-team/plugin-version vorhanden)."""
@@ -906,6 +926,8 @@ def main():
     if arg.rolle == "projektleiter":
         abdeckung_pruefen(e, wurzel, hauptordner, konfig, fg)
         teamplan_pruefen(e, wurzel, hauptordner, basis, konfig, fg)
+        if os.path.isfile(os.path.join(hauptordner, ".dev-team", "plugin-version")):
+            analyse_pruefen(e, wurzel, konfig)
     wt_ordner = os.path.join(wurzel, ".claude", "worktrees")
     if not ist_worktree and os.path.isdir(wt_ordner) and os.listdir(wt_ordner):
         e.w("Im Hauptordner liegen Entwickler-Worktrees (.claude/worktrees/). Der Testbefehl darf sie "

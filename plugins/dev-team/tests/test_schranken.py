@@ -710,6 +710,18 @@ class TestSchranke(unittest.TestCase):
         self.assertNotIn("langfrist", gelaufen)
         self.assertNotIn("tester", gelaufen)
 
+    def test_statische_analyse_warnung(self):
+        self.schreibe(".dev-team/plugin-version", "3.23.0\n")
+        self.schreibe("pyproject.toml", "[project]\nname='x'\n")
+        code, aus = self.lauf("--rolle", "projektleiter", "--ohne-lauf")
+        self.assertIn("Keine statische Analyse", aus)
+        k = json.loads(open(os.path.join(self.p, ".claude", "dev-team.json")).read()) if os.path.isfile(
+            os.path.join(self.p, ".claude", "dev-team.json")) else {}
+        k["zusatzbefehle"] = list(k.get("zusatzbefehle", [])) + ["ruff check ."]
+        self.schreibe(".claude/dev-team.json", json.dumps(k))
+        code, aus = self.lauf("--rolle", "projektleiter", "--ohne-lauf")
+        self.assertNotIn("Keine statische Analyse", aus)
+
     def test_verdeckt_ohne_liste_rot_beim_merge(self):
         self.schreibe(".dev-team/verdeckt/test_abn_a1.py", "def test_a1():\n    assert 1 + 1 == 2\n")
         code, aus = self.lauf("--rolle", "projektleiter", "--ohne-lauf")

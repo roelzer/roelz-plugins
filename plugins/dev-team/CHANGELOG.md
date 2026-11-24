@@ -1,5 +1,26 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.23.0 – Autopilot für alle Projekte mit Entscheidungsrat, doppelte Planprüfung, statische Analyse
+Anlass:
+- Simon: „ich will auch dass alles autonom läuft“, für alle Projekte.
+- Auswertung des Schritt-für-Schritt-Videos von Promptgeflüster (Code Guardian, 24.11.2026).
+
+Änderungen:
+- **Autopilot ist Standard.** Die Startfreigabe gibt es nur noch, wenn Simon „mit Freigabe“ schreibt oder `"autopilot": false` gesetzt ist.
+- **Entscheidungsrat** (`wissen/rat.md`) statt Fragen an Simon:
+  - Fünf Berater (`fachexperte`, `pragmatiker`, `langfrist-architekt`, `produktpruefer`, `sicherheitspruefer`, je mit neuem Modus `rat`) antworten unabhängig, bewerten sich danach blind (A–E), und der Projektleiter entscheidet als Vorsitz.
+  - Risiko-Befunde und Simons ausdrückliche Anforderungen werden nie überstimmt. Bei knapper Mehrheit in tragenden Fragen gilt die leichter umkehrbare Option.
+  - Gesammelt einmal nach der Planprüfung und höchstens einmal je Meilenstein. Nie bei Werkstatt- und Klein-Aufträgen, und ohne tragende offene Frage entfällt er.
+  - Beschlüsse stehen in `docs/rat/` und `docs/ENTSCHEIDUNGEN.md`, im Abschlussbericht als „Vom Rat entschieden – bitte prüfen“.
+- **Bei Simon bleiben nur Grenzen**, und sie halten den Lauf nie an:
+  - Konten, Zahlungen, Geräte,
+  - Ausliefern, außer er schreibt beim Auftrag „ausliefern“,
+  - Unumkehrbares, produktive Daten, neue Kosten,
+  - geänderte bestehende Abnahmetests und Referenzwerte.
+- **Kritiker in zwei Armen** (Opus und Sonnet, unabhängig). Befunde werden zu „bestätigt“ oder „Verdacht“ zusammengeführt, ein Verdacht wird am Plan nachgeprüft. Die Planprüfung erlaubt dafür 4 parallele Prüfer.
+- **Statische Analyse ohne KI ist Pflicht** (Architekt): Typprüfung und Linter je Sprache in `zusatzbefehle`. Die Schranke warnt, wenn sie für eine erkannte Sprache fehlt.
+- Tests: Warnung zur statischen Analyse. Alle 205 grün.
+
 ## 3.22.2 – Kein Umzug für offen liegende Abnahmetests, Berichte richtig zugeordnet
 Anlass: a88-Stand (24.11.2026). Die Schranke blieb trotz anerkannter Prüfsumme auf NICHT OK, und der Projektleiter wollte von Simon „Umzug ja“.
 - **Aufgedeckte Abnahmetests zählen überall unter `tests/`**, nicht nur unter `tests/abnahme/`. Entscheidend ist die unveränderte Prüfsumme, nicht der Ordner. Ein abgeschwächter Test bleibt rot, egal wo er liegt.

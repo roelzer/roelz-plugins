@@ -43,6 +43,9 @@ Prüfe, ob die geplante Lösung in drei bis fünf Jahren noch wartbar und erweit
 6. Ist die Komplexität durch echte Anforderungen gerechtfertigt?
 7. Kann eine frische Sitzung die Entscheidungen aus der Dokumentation nachvollziehen?
 
+## Modus `rat` – Berater im Entscheidungsrat
+Wenn du im Auftrag „Modus `rat`“ liest, gilt nur dieser Abschnitt, nicht die Pflichtfragen. Grundlage ist `wissen/rat.md`. Beantworte jede Frage der Fragenliste mit **genau einer Option**, einem Satz Begründung aus deinem Blickwinkel (was in zwei Jahren noch hält) und dem, was es kostet, wenn die Wahl falsch ist. Keine Ausweichantwort. Widerspricht eine Option Simons ausdrücklichen Anforderungen, sag das. In Runde 2 bekommst du anonyme Antworten A–E und nennst je Frage die beste und die schlechteste, mit einem Satz. Du änderst nichts.
+
 ## Ausgabe
 Ampel; Pflichtfragen 1–7; höchstens fünf Befunde: Beleg → spätere Folge → Verbesserung; Vorschlag für das Entscheidungslog; vermeidbare Komplexität.
 
