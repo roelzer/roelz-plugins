@@ -81,6 +81,13 @@ class Sperre(unittest.TestCase):
         open(os.path.join(spiel, ".assetsignore"), "w").write("arbeit\ndienst\n")
         self.assertEqual(entscheidung(bash("npx wrangler deploy", cwd=d)), "allow")
 
+    def test_hinweis_auf_skill_bei_vorhandenem_spiel(self):
+        d = tempfile.mkdtemp(); os.makedirs(os.path.join(d, "spiele", "funken"))
+        r = hook("hinweis.mjs", {"prompt": "Das Spiel in spiele/funken ruckelt auf meinem Handy", "cwd": d})
+        self.assertIn("spiele:bauen", r["hookSpecificOutput"]["additionalContext"])
+        self.assertIsNone(hook("hinweis.mjs", {"prompt": "Mach die Vereinsseite fertig", "cwd": d}))
+        self.assertIsNone(hook("hinweis.mjs", {"prompt": "Das Spiel ruckelt", "cwd": tempfile.mkdtemp()}))
+
     def test_andere_projekte_unberuehrt(self):
         self.assertIsNone(bash("git push origin main", cwd=tempfile.mkdtemp()))
 

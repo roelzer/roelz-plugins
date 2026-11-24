@@ -130,7 +130,7 @@ export function pruefe(eingabe) {
   if (VEROEFFENTLICHEN.test(befehl)) {
     const f = auftragsFreigabe(eingabe.cwd);
     if (f && f.ok) return { art: "allow", grund: f.grund };
-    return { art: "ask", grund: (f ? f.grund + " " : "") + "Veröffentlichen nur, wenn der Auftrag es verlangt oder auf Simons ausdrückliches Ja zu genau dieser Fassung. Simon, willst du das jetzt wirklich online stellen?" };
+    return { art: "ask", grund: (f ? f.grund + " " : "") + "Veröffentlichen nur, wenn der Auftrag es verlangt oder auf Simons ausdrückliches Ja zu genau dieser Fassung. Verlangt es der Auftrag: Simons Satz nach spiele/<name>/arbeit/veroeffentlichen.md (Zeile „Simon: …“), .assetsignore mit „arbeit“ in den Upload-Ordner, spielpruefen.mjs laufen lassen, dann erneut deployen (Skill spiele:bauen). Simon, willst du das jetzt wirklich online stellen?" };
   }
   if (UPLOAD.test(befehl)) return { art: "deny", grund: "Hochladen ist gesperrt – Simon bekommt das Spiel als Datei." };
   if (VIDEO_LADEN.test(befehl)) return { art: "deny", grund: "Musik oder Videos von YouTube haben keine klare Lizenz. Ton im Code erzeugen (ZzFX, jsfxr) oder CC0-Klänge nehmen." };

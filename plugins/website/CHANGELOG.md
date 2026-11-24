@@ -1,5 +1,14 @@
 # Änderungsprotokoll Website-Bauer
 
+## 0.4.0 – Das Wow zieht sich durch, Bausteine zur Auswahl, Kunden pflegen selbst
+Simon, 24.11.2026: „das obere ist immer noch am coolsten, nach unten hin z. B. der Meterstab war halt sehr einfach wieder gemacht, ohne Mühe, das Wow soll nicht nur oben sein, sondern sich durchziehen“, „Vorschläge für Bausteine liefern, ich wähl aus und dann zusammenbauen“, Kunden pflegen die Seite selbst. Neue Vorbilder: Zoox, AirPods 5, Scale („vor allem Scale ist echt krass“), Stripe Press, ikilledacactus, ausgewertet mit Bildserien, Technik und fps-Messung.
+- **`handwerk.md` 1c „Das Wow zieht sich durch“:** acht Prinzipien aus den Vorbildern (Motiv verwandelt sich mindestens dreimal, eigener Übergang je Abschnitt, laut/leise im Wechsel mit einem lauten Moment je Drittel, Farbe trägt das Kapitel, Typografie bewegt sich, Schluss antwortet auf den Anfang, Zeichen des Gewerks, Bewegung am Scrollen). Klar definiert, was „mit Mühe“ heißt. Ersetzt „Danach nicht abfallen“ (eine kleine Bewegung je Abschnitt reichte Simon nicht).
+- **Drehbuch** `arbeit/drehbuch.md` je Abschnitt; das Prüfskript liest es (**W20**): kein lauter Moment in einem Drittel ist P0, zu wenig Motiv-Auftritte und bloßes Einblenden sind Hinweise. Tests dazu.
+- **Stopp 1 ist jetzt ein Bausteinkatalog:** je Abschnitt 2–3 laufende Bausteine mit dem Motiv des Auftraggebers, als eine Datei zum Durchscrollen plus Bilderblätter. Simon wählt, daraus wird das Drehbuch. Neue Datei `wissen/bausteine.md` mit über 20 Bauformen (Technik, Aufwand, Risiko, Vorbild) und einem Beispiel für einen Fliesenleger.
+- **Kritiker:** bewertet jedes Drittel einzeln mit Bild. Liegt eins mehr als 2 Punkte unter dem ersten, ist das ❌.
+- **Ruckeln:** belegte Leistungsregeln aus den Vorbildern (kein bildfüllendes WebGL, Videos erst bei Sicht mit Standbild, Bildfolgen auf 2D-Canvas statt Lottie, ein Modell mit vielen Texturen). Folgerung: Das Wow kommt aus Verwandlung, Übergängen und Rhythmus, nicht aus WebGL.
+- **Kunden pflegen selbst:** Sveltia CMS unter `/admin/` mit Login ohne GitHub-Konto (Sveltia CMS Additions auf Cloudflare Free), Inhalte nur in `content/`, feste Felder, Design nie erreichbar, deutsche Oberfläche, Anleitung auf einer Seite. Recherche in `docs/recherche/2026-11-24-kunden-pflege.md`.
+
 ## 0.3.4 – Veröffentlichen laut Auftrag ohne Rückfrage
 Simon, 24.11.2026: „sowas wie Cloudflare pushen, will ich, dass ich nicht 3 mal bestätigen muss … angenommen es steht im Auftrag, dann soll das auch gleich erstellt werden und dann gepusht“.
 - Steht das Veröffentlichen im Auftrag, schreibt der Skill zu Beginn `arbeit/veroeffentlichen.md` mit Simons Satz wörtlich.

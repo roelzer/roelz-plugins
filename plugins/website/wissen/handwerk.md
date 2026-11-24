@@ -26,19 +26,32 @@ In der Probearbeit waren alle Seiten des Website-Bauers fehlerfrei und bestanden
   - Fotograf: Die Blende öffnet sich und gibt das erste Bild frei.
   - Software für Betriebe: Zwei Tabellen, die nicht zusammenpassen, verbinden sich beim Scrollen Zeile für Zeile.
   - Haus: Über dem Haus wird es Abend, und die Fenster gehen an.
-- **Der Rest der Seite dient dem Moment** und bleibt ruhig (Simon: nicht laut). Ein Moment, der trägt, ist besser als fünf kleine Effekte.
 - **Der Moment steht ganz oben** oder spätestens nach dem ersten Scrollen. Wer ihn suchen muss, erlebt ihn nicht.
-- **Danach nicht abfallen** (Schreinerei-Test, 23.11.2026). Simon: „find ich cool, wird nach unten hin immer langweilig“. Ruhig heißt nicht leblos. Jeder Abschnitt darunter bekommt eine kleine eigene Bewegung aus derselben Bildsprache wie der Moment, z. B.:
-  - Skizzen zeichnen sich Strich für Strich, wenn man hinscrollt.
-  - Ein Zollstock klappt sich Glied für Glied auf, und die Schritte rasten ein.
-  - Maßlinien laufen an Überschriften entlang.
-  - Der letzte Abschnitt greift den Moment wieder auf, z. B. eine leere Nische mit „Ihr Maß?“.
 
-  Machart: CSS oder SVG, nur beim Hineinscrollen (IntersectionObserver), keine zweite WebGL-Fläche, bei reduzierter Bewegung ohne. Nicht: jeden Absatz von unten einblenden lassen. Das ist Stangenware.
+## 1c. Das Wow zieht sich durch (Simon, 24.11.2026)
+Simon nach der Schreinerei: „das obere ist immer noch am coolsten, nach unten hin z. B. der Meterstab war halt sehr einfach wieder gemacht, ohne Mühe. Das Wow soll nicht nur oben sein, sondern sich durchziehen.“ Eine kleine Bewegung je Abschnitt reicht also nicht. Die Vorbilder (Scale, Zoox, AirPods, Stripe Press, ikilledacactus, ausgewertet am 24.11.2026) machen es so:
+
+1. **Das Motiv verwandelt sich, statt ausgetauscht zu werden.** Das Objekt oder Bild aus dem Einstieg kommt in **mindestens drei** weiteren Abschnitten in neuer Rolle wieder. Bei Scale wird das Einstiegsvideo zur schwebenden 3D-Ebene. Beim Kaktus steht dieselbe Pflanze auf dem Podest, wird von oben gezeigt und liegt im Nebel. Bei Stripe fliegt das Buch erst und steht dann im Regal.
+2. **Jeder Abschnitt hat einen eigenen Übergang.** Kein Abschnitt kommt einfach von unten herein. Er schiebt sich als Karte darüber, zieht auf, deckt auf oder färbt um. Scale stapelt Karten und deckt die Fußzeile auf, bei Zoox zieht das Video zur vollen Breite auf.
+3. **Laut und leise wechseln sich ab.** Auf einen großen Moment folgt höchstens ein ruhiger Abschnitt, dann kommt der nächste Moment. **In jedem Drittel der Seite steht mindestens ein lauter Moment mit dem Aufwand des Einstiegs.** AirPods: Farbkapitel, dann weiße Erklärung, dann das nächste Farbkapitel.
+4. **Farbe trägt das Kapitel.** Jedes Kapitel hat eine Grundfarbe aus dem Material des Auftraggebers, und der Farbwechsel ist selbst der Übergang (Scale: Schwarz, Grün, Hell, Braun).
+5. **Typografie bewegt sich.** In jedem Drittel macht mindestens einmal nur der Text die Bewegung: Wort für Wort aufhellen, ein wechselndes Wort, ein Echo („for hours / for hours“).
+6. **Der Schluss antwortet auf den Anfang.** Fußzeile oder letzter Abschnitt greifen Motiv oder Kernsatz vom Einstieg wieder auf (Scale: Kernsatz riesig in der Fußzeile, Zoox: das Fahrzeug fährt in der Fußzeile vor).
+7. **Ein Zeichen des Gewerks taucht immer wieder auf.** Ein kleines grafisches Zeichen aus dem Handwerk zieht sich als Faden durch, z. B. die Beschriftungs-Dreiecke bei Scale, eine Fuge beim Fliesenleger, eine Maßlinie beim Schreiner.
+8. **Die Bewegung hängt am Scrollen und läuft rückwärts mit** (ScrollTrigger mit `scrub`). Einmal abspielen und fertig wirkt billig.
+
+**„Mit Mühe“ heißt:** Ein lauter Moment hat mindestens zwei zusammenspielende Ebenen (z. B. Objekt und Hintergrundfarbe, oder Bild und Text), dauert über mehr als eine Bildschirmhöhe Scrollweg und hat Bezug zum Motiv. Eine einzelne Eigenschaft an einem Element (ein Zollstock klappt auf, eine Linie zeichnet sich) zählt als **leise**, egal wie hübsch sie ist.
+
+**Das Drehbuch** `arbeit/drehbuch.md` legt das vor dem Bauen fest, eine Zeile je Abschnitt:
+`Abschnitt | laut/leise | Baustein (aus wissen/bausteine.md) | Übergang hinein | Rolle des Motivs | Grundfarbe | Text-Bewegung`
+Die Prüfung dazu: Jedes Drittel hat ein „laut“, das Motiv kommt mindestens dreimal vor, jeder Übergang ist verschieden von „von unten einblenden“, und die letzte Zeile greift die erste auf.
+
+Machart der kleinen Bewegungen: CSS oder SVG, keine zweite WebGL-Fläche, bei reduzierter Bewegung ohne. Nicht jeden Absatz von unten einblenden lassen, das ist Stangenware.
   Stolperstein: Ein Element, das bis zum Start auf null zugeschnitten ist (`clip-path: inset(0 0 100% 0)`, `scale(0)`), meldet der IntersectionObserver nie als sichtbar, also startet es nie. Beobachte den umgebenden Rahmen und schalte das Kind über ihn (Schreinerei: Teamfoto-Platzhalter blieb leer).
 
 ## 2. Vorbilder wirklich ansehen (gegen W3)
 - Öffne **mindestens 3 Vorbilder** und fotografiere sie (Playwright, 1440 px und 390 px) nach `arbeit/vorbilder/`. Simons Vorbilder (Lando, Igloo) sind immer dabei. Dazu 1–2 aus der Branche, z. B. von Awwwards (Kategorie und Jury-Note ansehen).
+- **Simons Vorbilder, wofür (24.11.2026, ausgewertet):** Lando und Igloo (Gesamteindruck), **Scale** (Simon: „echt krass“: das Einstiegsvideo verwandelt sich in eine 3D-Ebene, Kapitel mit eigener Farbe, Kartenstapel, Fußzeile wiederholt den Kernsatz), **Zoox** (Video zieht auf, Wortliste, das Fahrzeug fährt in der Fußzeile vor, flüssig ohne WebGL), **AirPods 5** (laut und leise im Wechsel, Farbkapitel, Videos erst bei Sicht), **Stripe Press** (ein Objekt trägt die Seite, fliegt und landet im Regal; aber 2 fps ohne Grafikkarte), **ikilledacactus** (eine Pflanze in vielen Rollen; aber 38 MB, nicht nachmachen). Je Auftrag mindestens zwei davon fotografieren, dazu 1–2 aus der Branche.
 - Leite daraus eine Tabelle in `arbeit/idee.md` ab: **Vorbild → übernommener Gestaltungswert** (Schriftgrößen-Verhältnis, Laufweite, Farbanzahl, Art und Dauer der Bewegung, wie Text auf Bild steht). Jeder Wert der Seite stammt aus dieser Tabelle oder aus dem Auftraggeber.
 - Nachgebaut wird nichts. Übernommen werden Maße und Prinzipien, keine Dateien (die Sperre blockt Downloads von Vorbild-Seiten).
 

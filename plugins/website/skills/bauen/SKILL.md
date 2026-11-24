@@ -28,13 +28,13 @@ Die Sperre des Plugins fragt bei jedem Veröffentlichungs-Befehl Simon selbst un
 | „Ich bau Lando einfach nach.“ | Eigene Idee aus dem Auftraggeber. Übernommen werden Maße und Prinzipien, keine Seite und keine Datei. |
 
 Sprich Deutsch, kurz, ohne Fachchinesisch. Simon hat **drei Stopps**:
-- **Stopp 1, Richtung:** die Hauptidee als Skizze.
+- **Stopp 1, Bausteine:** je Abschnitt 2–3 laufende Bausteine zur Auswahl, Simon wählt (Abschnitt 3).
 - **Stopp 1b, Entwurf:** der Moment läuft, bevor der Rest gebaut wird.
 - **Stopp 2, Vorschau:** die ganze Seite.
 
 Bei „mach einfach“ oder „ohne Rückfragen“ entfallen Stopp 1 und 1b. Stopp 2 bleibt vor jeder Veröffentlichung.
 
-**Fehlerfrei ist die Pflicht, der Moment ist die Kür.** In der Probearbeit (20.11.2026) bestanden alle Seiten jede Prüfung und sahen trotzdem gleich aus: große Überschrift, zwei Knöpfe, ein Bild daneben. Simon: „haut mich jetz alles nicht so um“. Jede neue Seite bekommt deshalb **eine Hauptidee**, also einen Moment, den man sich merkt (`handwerk.md` Abschnitt 1b).
+**Fehlerfrei ist die Pflicht, der Moment ist die Kür.** In der Probearbeit (20.11.2026) bestanden alle Seiten jede Prüfung und sahen trotzdem gleich aus: große Überschrift, zwei Knöpfe, ein Bild daneben. Simon: „haut mich jetz alles nicht so um“. Jede neue Seite bekommt deshalb **eine Hauptidee**, also einen Moment, den man sich merkt (`handwerk.md` Abschnitt 1b), und das Wow zieht sich bis zum Schluss durch (Abschnitt 1c).
 
 ## 0. Einrichten
 - Arbeitsordner `website/<kurzer-name>/` im Projekt mit `site/` (nur die Lieferung) und `arbeit/` (Vorbilder, Rohfassungen, Prüfungen, Quellen zum Bauen).
@@ -69,16 +69,17 @@ Im SFH-Test kam das erst am Ende auf: Domain und Mail bei IONOS, die Seite lief 
   - Der Standard-Einstieg (Überschrift, zwei Knöpfe, Bild daneben) ist keine Hauptidee.
 - Bei 3D: Bauweise nach `3d-leistung.md` wählen und in `idee.md` begründen. **Umfang klein planen** (Abschnitt „Umfang klein planen“): ein Objekt oder eine Szene, eine Bewegung.
 
-## 3. Richtung (Stopp 1)
-- Baue für **2–3 Hauptideen je eine grobe Skizze des Moments**: drei Bilder für Anfang, Mitte und Ende der Verwandlung, grob und ohne Feinschliff. Ablage `arbeit/rohfassungen/<a|b|c>/`. Fotografiere sie mit `foto.mjs`. Ein Layout ohne Moment ist keine Richtung.
-- Zeig Simon in **einer** Nachricht:
-  - je Hauptidee einen Satz („beim Scrollen setzt sich der Schrank zusammen“) und die drei Bilder
-  - deine Empfehlung mit einem Satz Begründung
-  - deine Annahmen, je eine Zeile
-  - die Bitte um echtes Material
-- Simon wählt. **In `site/` entsteht vor seiner Wahl nichts.**
-- Halte Stopp 1 knapp. Simon reagiert auf Bilder, nicht auf Beschreibungen.
-- Bei „mach einfach“: nimm die stärkste Hauptidee und nenne kurz, warum.
+## 3. Bausteine zur Auswahl (Stopp 1)
+Simon, 24.11.2026: „Vorschläge für Bausteine liefern, ich wähl aus und dann zusammenbauen.“
+- **Katalog bauen:** `arbeit/bausteine/katalog.html`, je Abschnitt (Einstieg, Leistungen, Ablauf, Referenzen, Text-Moment, Schluss) **2–3 Bausteine** aus `wissen/bausteine.md`, schon mit dem Motiv und dem Gewerk-Zeichen des Auftraggebers gefüllt. Jeder Baustein ist eine kleine **laufende** Szene, grob und ohne Feinschliff, mit eigener Scrollstrecke. Darüber stehen Kennung („Einstieg B“), ein Satz, was passiert, und laut oder leise. Die Einstieg-Bausteine sind die 2–3 Hauptideen aus `hauptidee.md`.
+- **Bilder dazu:** Je Baustein drei Bilder für Anfang, Mitte und Ende mit `ablauf.mjs` nach `arbeit/bausteine/fotos/`. Den Katalog mit `vorschau.mjs arbeit/bausteine <ziel>.html` in eine Datei packen, damit Simon ihn am Handy und in der Claude-App durchscrollen kann.
+- **Zeig Simon in einer Nachricht:**
+  - die Katalog-Datei und je Abschnitt ein Bilderblatt,
+  - deine Empfehlung als fertige Auswahl („Einstieg B, Leistungen A, Ablauf A, Referenzen C, Text B, Schluss A“) mit einem Satz, warum sie zusammen durchzieht,
+  - deine Annahmen, je eine Zeile, und die Bitte um echtes Material.
+- Simon antwortet mit seiner Auswahl, auch gemischt oder mit Änderungswünschen. **In `site/` entsteht vor seiner Wahl nichts.**
+- **Aus der Auswahl wird das Drehbuch** `arbeit/drehbuch.md` (`handwerk.md` 1c): jede Zeile mit laut/leise, Baustein, Übergang, Rolle des Motivs, Farbe und Text-Bewegung. Passt die Auswahl nicht zu den Regeln (z. B. ein Drittel ohne lauten Moment), sag es mit einem Gegenvorschlag, statt still umzubauen.
+- Bei „mach einfach“: Du wählst selbst nach dem Drehbuch und nennst die Auswahl im Bericht.
 
 ## 3b. Entwurf (Stopp 1b)
 - Baue **zuerst nur den Moment** als Durchstich in `site/`: Er läuft grob, mit einfachen Formen. Der Rest der Seite ist noch Platzhalter.
@@ -88,7 +89,7 @@ Im SFH-Test kam das erst am Ende auf: Domain und Mail bei IONOS, die Seite lief 
 - Bei „mach einfach“: Statt Simon ruft du den `website-kritiker` für ein Merk-Urteil über den Durchstich. Sagt er „langweilig“, verbesserst du den Moment, bevor du weiterbaust.
 
 ## 4. Bauen
-- **Reihenfolge, damit immer etwas lauffähig ist:** erst der Moment (Durchstich), dann die ganze Seite grob, dann Feinschliff. Läuft der Durchstich nach etwa einem Drittel der Zeit nicht, eine Stufe einfacher bauen und es sagen (`3d-leistung.md`, „Umfang klein planen“). Im Haus-Fall der Probearbeit lief ein zu großer 3D-Plan zweimal in das Zeitlimit.
+- **Reihenfolge, damit immer etwas lauffähig ist:** erst der Moment (Durchstich), dann die ganze Seite grob nach dem Drehbuch, dann Feinschliff. **Jeder laute Baustein bekommt denselben Feinschliff wie der Einstieg.** Der Meterstab der Schreinerei war „sehr einfach gemacht, ohne Mühe“ (Simon), das darf unten nicht wieder passieren. Plane die Zeit so, dass der Feinschliff für alle lauten Bausteine reicht. Läuft der Durchstich nach etwa einem Drittel der Zeit nicht, eine Stufe einfacher bauen und es sagen (`3d-leistung.md`, „Umfang klein planen“). Im Haus-Fall der Probearbeit lief ein zu großer 3D-Plan zweimal in das Zeitlimit.
 - Nach `handwerk.md`, mit echten Bildern nach `bilder.md`. Bei 3D nach `3d-leistung.md`: Stufen, gedeckelte Pixeldichte, Rückfall ohne WebGL.
 - Hausschrift, Farben, Logo und Sprüche des Auftraggebers übernehmen (`handwerk.md` Abschnitt 1).
 - **Schrift tauschen heißt alle Regeln prüfen**, die sie benutzen (`font-style`, `<em>`, Stärken). Eine Schrift ohne Kursivschnitt wird sonst künstlich schräg.
