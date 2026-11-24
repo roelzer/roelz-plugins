@@ -9,6 +9,10 @@
 // Geeicht an den Probelauf-Seiten (docs/personal/website-bauer/probelauf-seiten): P1 und P2 schlagen bei W1 an,
 // P3 bei W9, P4 bei W2 und W8. Leistungswerte aus diesem Skript sind nur ein Vergleich: Ohne Grafikkarte rechnet
 // Chromium mit Software (SwiftShader). Die Abnahme der Leistung macht Simons Laptop.
+// Seit 0.3.3 (GitHub-Abgleich 24.11.2026, nur Ideen und Schwellen aus impeccable, Hallmark, Vercel Web Interface
+// Guidelines, gsap-skills und Anthropic frontend-design, eigene Umsetzung): W13 Inhalt bleibt unsichtbar, W14 Fokus
+// sichtbar, W15 Zoom gesperrt, W16 Breiten 320 und 1920 px, W17 Text fehlt am Handy, W18 Bewegung nur über transform
+// und opacity, W19 GSAP-Markierungen, dazu weitere W1-Merkmale (Verlaufstext, Leuchtrand, Creme, Beiwerk).
 import { createRequire } from "node:module";
 import http from "node:http";
 import fs from "node:fs";
@@ -150,6 +154,36 @@ else {
   if (k.split("\n").some((z) => z.length > 2000)) befund("P0", "Sicherheit", "Eine Zeile in _headers ist länger als 2000 Zeichen (Grenze von Cloudflare)");
 }
 
+// ---------- Zugang und Bewegung im eigenen Code (ohne Browser) ----------
+// Eigene Stile und Skripte: Dateien außerhalb von vendor/lib plus eingebettete <style>- und <script>-Blöcke.
+{
+  const eingebettet = (re) => html.map((f) => [...lies(f).matchAll(re)].map((m) => m[1]).join("\n")).join("\n");
+  const eigenCss = dateien.filter((f) => /\.css$/i.test(f) && !bibliothek(f) && !/\.min\.css$/i.test(f)).map((f) => lies(f)).join("\n") + "\n" + eingebettet(/<style(?:\s[^>]*)?>([\s\S]*?)<\/style>/gi);
+  const eigenJs = dateien.filter((f) => /\.m?js$/i.test(f) && !bibliothek(f)).map((f) => lies(f)).join("\n") + "\n" + eingebettet(/<script(?![^>]*\bsrc=)(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi);
+  const css = eigenCss.replace(/\/\*[\s\S]*?\*\//g, "");
+  // W15 Zoom gesperrt (Vercel Web Interface Guidelines)
+  for (const f of html) {
+    const m = lies(f).match(/<meta[^>]+name=["']viewport["'][^>]*>/i);
+    const inhalt = m ? ((m[0].match(/content=["']([^"']*)["']/i) || [])[1] || "") : "";
+    const max = (inhalt.match(/maximum-scale\s*=\s*([\d.]+)/i) || [])[1];
+    if (/user-scalable\s*=\s*(no|0)\b/i.test(inhalt) || (max && parseFloat(max) <= 1)) befund("P0", "W15", `Zoom gesperrt in ${f} (user-scalable=no bzw. maximum-scale=1) – nie sperren`, "Vercel Web Interface Guidelines");
+  }
+  // W14 Fokus: outline weggenommen, aber keine :focus-visible-Regel (Hallmark sloplint gate 26a, Vercel)
+  const ohneRand = css.match(/outline\s*:\s*(none|0)\s*(!important)?\s*[;}]/i);
+  if (ohneRand && !/:focus-visible/.test(css)) befund("P0", "W14", "outline: none ohne :focus-visible-Regel im CSS – Tastatur-Nutzer sehen nicht, wo sie sind", "Hallmark sloplint 26a, Vercel");
+  // W1 Federnde Bewegung (impeccable bounce-easing): cubic-bezier, dessen y-Werte über 0…1 hinausschießen
+  const federnd = [...css.matchAll(/cubic-bezier\(\s*([-\d.]+)\s*,\s*([-\d.]+)\s*,\s*([-\d.]+)\s*,\s*([-\d.]+)\s*\)/g)].filter((m) => [m[2], m[4]].some((y) => +y < 0 || +y > 1)).map((m) => m[0]);
+  if (federnd.length) befund("Hinweis", "W1", "Federnde Bewegung (Überschwinger) – Profis bremsen ab, ohne zurückzufedern", [...new Set(federnd)].slice(0, 3).join(", ") + " · impeccable bounce-easing");
+  // W18 Bewegung, die das Layout neu rechnet (Vercel, Hallmark): transition: all bzw. width/height/top/left
+  const bewegung = [];
+  if (/transition(-property)?\s*:\s*all\b/i.test(css)) bewegung.push("transition: all");
+  for (const m of css.matchAll(/transition(?:-property)?\s*:([^;}]*)/gi)) { const p = m[1].match(/(^|[\s,])(width|height|top|left)(?=[\s,]|$)/i); if (p) { bewegung.push(`transition von ${p[2]}`); break; } }
+  for (const m of css.matchAll(/@keyframes\s+([\w-]+)\s*\{((?:[^{}]*\{[^{}]*\})*)[^{}]*\}/gi)) { const p = m[2].match(/(^|[;{\s])(width|height|top|left)\s*:/i); if (p) { bewegung.push(`@keyframes ${m[1]} ändert ${p[2]}`); break; } }
+  if (bewegung.length) befund("Hinweis", "W18", "Animiert wird nur transform und opacity", bewegung.join(" · ") + " · Vercel, Hallmark");
+  // W19 GSAP-Markierungen im eigenen Code (gsap-skills): Prüfhilfe, die sichtbar mit ausgeliefert würde
+  if (/\bmarkers\s*:\s*(true|\{)/.test(eigenJs)) befund("P0", "W19", "GSAP ScrollTrigger mit markers: true im eigenen Code – Prüfhilfe vor der Lieferung entfernen", "gsap-skills");
+}
+
 // ---------- lokaler Server ----------
 const TYPEN = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".mjs": "text/javascript", ".css": "text/css",
   ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp", ".avif": "image/avif",
@@ -216,6 +250,8 @@ const kontrastFehler = new Map();
 const leereFlaechen = new Map();
 const ueberlappungen = [];
 let stilInfo = null;
+let ruhe = null, fokus = null;
+const textBestaende = {};
 
 for (const [name, breite, hoehe] of GERAETE) {
   const ctx = await browser.newContext({ viewport: { width: breite, height: hoehe }, deviceScaleFactor: 1, isMobile: name !== "desktop", hasTouch: name !== "desktop" });
@@ -384,7 +420,8 @@ for (const [name, breite, hoehe] of GERAETE) {
       speicher: { local: localStorage.length, session: sessionStorage.length } };
   }).catch(() => ({}));
   const cookies = (await ctx.cookies()).length;
-  if (name === "desktop") stilInfo = await stilAnalyse(page);
+  textBestaende[name] = await textBestand(page);
+  if (name === "desktop") { stilInfo = await stilAnalyse(page); ruhe = await ruheZustand(page); fokus = await fokusPruefen(page); }
   geraete[name] = { ladezeit_ms: ladezeit, seitenhoehe, fps_scroll: fps, langsame_stellen: langsam, konsolenfehler: konsole.slice(0, 8),
     fremde_hosts: [...fremd], fehlende_dateien: fehlend.slice(0, 8), cookies, ...info };
   await ctx.close();
@@ -406,8 +443,168 @@ for (const [name, breite, hoehe] of GERAETE) {
   if (laengste >= 2) befund("P0", "W12", `Ohne JavaScript steht die Seite über ${laengste + 1} Bildschirmhöhen still – mit <noscript> gleich den End-Zustand zeigen`);
   await ctx.close();
 }
+// Zwei Breiten mehr (Hallmark): 320 px (kleinstes Handy) und 1920 px (großer Bildschirm), nur Messung, keine Bilder
+const breiten = {};
+{
+  // ohne isMobile: Sonst zoomt Chromium bei zu breitem Inhalt heraus, und die Messung sieht kein seitliches Scrollen
+  const ctx = await browser.newContext({ viewport: { width: 320, height: 640 }, deviceScaleFactor: 1, hasTouch: true });
+  const page = await ctx.newPage();
+  await page.goto(basis, { waitUntil: "load", timeout: 60000 }).catch(() => {});
+  await page.waitForTimeout(1500);
+  breiten.b320 = await page.evaluate(() => {
+    const zuBreit = [...document.querySelectorAll("body *")].filter((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.right > innerWidth + 1 && ![...e.children].some((k) => k.getBoundingClientRect().right > innerWidth + 1); })
+      .slice(0, 4).map((e) => `${e.tagName.toLowerCase()}${e.className && typeof e.className === "string" ? "." + e.className.split(" ")[0] : ""} (${Math.round(e.getBoundingClientRect().right)} px)`);
+    // auch zu lange Wörter, die aus ihrem Kasten ragen (große Überschrift)
+    const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    while (w.nextNode() && zuBreit.length < 4) { const rg = document.createRange(); rg.selectNodeContents(w.currentNode); const r = rg.getBoundingClientRect(); if (r.width > 0 && r.right > innerWidth + 1) zuBreit.push(`Text „${w.currentNode.textContent.trim().slice(0, 24)}“ (${Math.round(r.right)} px)`); }
+    return { seitlich: document.documentElement.scrollWidth > innerWidth + 1, breite: document.documentElement.scrollWidth, zuBreit };
+  }).catch(() => null);
+  await ctx.close();
+}
+{
+  const ctx = await browser.newContext({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
+  const page = await ctx.newPage();
+  await page.goto(basis, { waitUntil: "load", timeout: 60000 }).catch(() => {});
+  await page.waitForTimeout(1500);
+  // breiteste Textzeile im Fließtext (Zeilen gemessen, nicht Kästen)
+  breiten.b1920 = await page.evaluate(() => {
+    const lang = [];
+    for (const e of document.querySelectorAll("p,li,dd,blockquote,figcaption,td")) {
+      if (e.textContent.trim().length < 80) continue;
+      const rg = document.createRange(); rg.selectNodeContents(e);
+      const w = Math.max(0, ...[...rg.getClientRects()].map((r) => r.width));
+      if (w > 1600) lang.push(`„${e.textContent.trim().slice(0, 30)}…“ ${Math.round(w)} px`);
+    }
+    return { zuBreit: lang.slice(0, 3) };
+  }).catch(() => null);
+  await ctx.close();
+}
+// Inhalt bleibt unsichtbar, noch einmal mit „Bewegung reduzieren“ (dort springen Einblendungen oft nicht an)
+let ruheReduziert = null;
+{
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, reducedMotion: "reduce" });
+  const page = await ctx.newPage();
+  await page.goto(basis, { waitUntil: "load", timeout: 60000 }).catch(() => {});
+  await page.addStyleTag({ content: "html,body{scroll-behavior:auto!important}" }).catch(() => {});
+  await page.waitForTimeout(1200);
+  ruheReduziert = await ruheZustand(page);
+  await ctx.close();
+}
 await browser.close();
 server.close();
+
+// ---------- Text, der sichtbar gerendert ist (für W17: fehlt am Handy) ----------
+async function textBestand(page) {
+  return page.evaluate(() => {
+    const m = {};
+    const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    while (w.nextNode()) {
+      const t = w.currentNode, txt = t.textContent.replace(/\s+/g, " ").trim(), e = t.parentElement;
+      if (txt.length < 2 || !e || e.closest("script,style,noscript,template,[aria-hidden='true']")) continue;
+      const rg = document.createRange(); rg.selectNodeContents(t);
+      const da = [...rg.getClientRects()].some((r) => r.width * r.height > 4) && getComputedStyle(e).visibility !== "hidden";
+      m[txt] = (m[txt] || 0) + (da ? 1 : 0);
+    }
+    return m;
+  }).catch(() => ({}));
+}
+
+// ---------- W13: Inhalt bleibt unsichtbar (impeccable content-hidden-at-rest) ----------
+// Einmal Schritt für Schritt bis ganz unten und wieder hoch (Zeit für IntersectionObserver), dabei merken, welcher Text
+// und welche Fläche je sichtbar war. Was nie sichtbar war und am Ende auf Deckkraft 0, visibility: hidden oder einem auf
+// null zugeschnittenen clip-path steht, sieht kein Besucher (Schreinerei-Test 23.11.2026: Team-Rahmen blieb leer).
+async function ruheZustand(page) {
+  return page.evaluate(async () => {
+    const warte = (ms) => new Promise((r) => setTimeout(r, ms));
+    // Menüs, Dialoge und Hover-Zustände in Bedienelementen sind absichtlich verborgen
+    const ABSICHT = "a,button,summary,label,select,[role=button],[role=dialog],[role=menu],dialog,[aria-modal=true],nav,[inert]";
+    const knoten = [];
+    const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    while (w.nextNode() && knoten.length < 4000) {
+      const t = w.currentNode, n = t.textContent.replace(/\s+/g, " ").trim().length, e = t.parentElement;
+      if (n < 2 || !e || e.closest("script,style,noscript,template,[aria-hidden='true']")) continue;
+      knoten.push({ t, e, n, gesehen: false });
+    }
+    const box = (k) => { const rg = document.createRange(); rg.selectNodeContents(k.t); return rg.getBoundingClientRect(); };
+    const imBild = (r) => r.width * r.height >= 1 && r.bottom > 0 && r.top < innerHeight;
+    const versteckt = (e) => { let o = 1; for (let n = e; n && n.nodeType === 1; n = n.parentElement) { o *= parseFloat(getComputedStyle(n).opacity); if (o < 0.05) return true; } return getComputedStyle(e).visibility === "hidden"; };
+    // äußerstes Element, das den Text verbirgt
+    const verstecker = (e) => { let wer = null; for (let n = e; n && n.nodeType === 1; n = n.parentElement) { const s = getComputedStyle(n); const vorne = n.parentElement ? getComputedStyle(n.parentElement).visibility : "visible"; if (parseFloat(s.opacity) < 0.05 || (s.visibility === "hidden" && vorne !== "hidden")) wer = n; } return wer; };
+    const nurLeser = (e) => { for (let n = e; n && n.nodeType === 1; n = n.parentElement) { const s = getComputedStyle(n); if (/rect\(0/.test(s.clip) || (s.overflow === "hidden" && n.getBoundingClientRect().width <= 2)) return true; } return false; };
+    const nullClip = (e, r) => {
+      const cp = getComputedStyle(e).clipPath; if (!cp || cp === "none") return false;
+      const m = cp.match(/^inset\(([^)]*)\)/);
+      if (m) {
+        const t = m[1].split(/\s+round\s+/)[0].trim().split(/\s+/); const [a, b = a, c = a, d = b] = t;
+        const px = (v, ganz) => (v.endsWith("%") ? (parseFloat(v) / 100) * ganz : parseFloat(v) || 0);
+        return px(a, r.height) + px(c, r.height) >= r.height - 0.5 || px(b, r.width) + px(d, r.width) >= r.width - 0.5;
+      }
+      return /^circle\(\s*0(px|%)?[\s)]/.test(cp);
+    };
+    const flaechen = [...document.querySelectorAll("body *")].slice(0, 4000).filter((e) => getComputedStyle(e).clipPath !== "none");
+    const frei = new Set();
+    const pruefe = () => {
+      for (const k of knoten) { if (k.gesehen) continue; const r = box(k); if (imBild(r) && !versteckt(k.e)) k.gesehen = true; }
+      for (const e of flaechen) { if (frei.has(e)) continue; const r = e.getBoundingClientRect(); if (imBild(r) && !nullClip(e, r)) frei.add(e); }
+    };
+    const H = () => document.documentElement.scrollHeight;
+    const schritt = Math.max(innerHeight * 0.5, (H() - innerHeight) / 60);
+    pruefe();
+    for (let y = schritt; y < H() - innerHeight; y += schritt) { scrollTo(0, y); await warte(140); pruefe(); }
+    scrollTo(0, H()); await warte(1200); pruefe();
+    for (let y = H() - innerHeight - schritt; y > 0; y -= schritt) { scrollTo(0, y); await warte(80); pruefe(); }
+    scrollTo(0, 0); await warte(1200); pruefe();
+    let gesamt = 0, weg = 0; const texte = [];
+    for (const k of knoten) {
+      const r = box(k); if (r.width * r.height < 1 || nurLeser(k.e)) continue;
+      gesamt += k.n;
+      if (k.gesehen || !versteckt(k.e)) continue;
+      const v = verstecker(k.e); if (v && v.closest(ABSICHT)) continue;
+      weg += k.n; if (texte.length < 4) texte.push(k.t.textContent.trim().slice(0, 30));
+    }
+    const leer = [];
+    for (const e of [...document.querySelectorAll("body *")].slice(0, 4000)) {
+      const r = e.getBoundingClientRect();
+      if (r.width < 40 || r.height < 40 || frei.has(e) || e.closest(ABSICHT) || !nullClip(e, r)) continue;
+      leer.push(`${e.tagName.toLowerCase()}${typeof e.className === "string" && e.className ? "." + e.className.trim().split(/\s+/)[0] : ""} (${Math.round(r.width)}×${Math.round(r.height)})`);
+    }
+    return { gesamt, weg, texte, flaechen: leer.slice(0, 4) };
+  }).catch((e) => ({ fehler: String(e).slice(0, 120) }));
+}
+
+// ---------- W14: Fokus sichtbar (Hallmark, Vercel) ----------
+// Ruhezustand aller Bedienelemente merken, dann bis zu 16× Tab: Ändert sich am fokussierten Element weder Rahmenlinie
+// (outline), Schatten, Rand, Hintergrund, Unterstreichung noch ein ::before/::after, sieht man den Fokus nicht.
+async function fokusPruefen(page) {
+  await page.evaluate(() => {
+    scrollTo(0, 0); document.activeElement?.blur?.();
+    const merk = (e, p) => {
+      const s = getComputedStyle(e, p); if (p && (s.content === "none" || s.content === "normal")) return "";
+      const rand = s.outlineStyle !== "none" && parseFloat(s.outlineWidth) > 0 && !/^rgba\([^)]*,\s*0\)$/.test(s.outlineColor) ? `${s.outlineStyle} ${s.outlineWidth} ${s.outlineColor} ${s.outlineOffset}` : "-";
+      return [rand, s.boxShadow, s.borderTopColor, s.borderTopWidth, s.borderBottomColor, s.borderBottomWidth, s.borderLeftColor, s.borderRightColor, s.backgroundColor, s.backgroundImage, s.textDecorationLine, p ? `${s.opacity} ${s.transform} ${s.width} ${s.height}` : ""].join("|");
+    };
+    window.__pfMerk = merk;
+    window.__pfRuhe = new Map([...document.querySelectorAll("a[href],button,input:not([type=hidden]),select,textarea,summary,[tabindex]:not([tabindex='-1'])")].map((e) => [e, [merk(e), merk(e, "::before"), merk(e, "::after")].join("#")]));
+  }).catch(() => {});
+  const gesehen = new Set(), ohne = [];
+  let geprueft = 0;
+  for (let i = 0; i < 16; i++) {
+    await page.keyboard.press("Tab").catch(() => {});
+    await page.waitForTimeout(150);
+    const r = await page.evaluate(() => {
+      const e = document.activeElement; if (!e || e === document.body || !window.__pfRuhe?.has(e)) return null;
+      const q = e.getBoundingClientRect(); if (q.width < 1 || q.height < 1) return { id: "-", leer: true };
+      if (!e.dataset.pfFokus) e.dataset.pfFokus = String(Math.random()).slice(2, 10);
+      const jetzt = [window.__pfMerk(e), window.__pfMerk(e, "::before"), window.__pfMerk(e, "::after")].join("#");
+      return { id: e.dataset.pfFokus, sichtbar: jetzt !== window.__pfRuhe.get(e), name: `${e.tagName.toLowerCase()} „${(e.textContent || e.getAttribute("aria-label") || "").trim().slice(0, 24)}“` };
+    }).catch(() => null);
+    if (!r || r.leer) continue;
+    if (gesehen.has(r.id)) break;   // einmal rum
+    gesehen.add(r.id); geprueft++;
+    if (!r.sichtbar) ohne.push(r.name);
+  }
+  return { geprueft, ohne };
+}
 
 // ---------- W1: KI- und Vorlagen-Merkmale (Desktop) ----------
 async function stilAnalyse(page) {
@@ -475,6 +672,58 @@ async function stilAnalyse(page) {
     }).map((e) => e.textContent.trim().slice(0, 30));
     const emoji = [...document.querySelectorAll("h1,h2,h3,button")].some((e) => /\p{Extended_Pictographic}/u.test(e.textContent));
     const lilaVerlauf = alle.some((e) => { const b = getComputedStyle(e).backgroundImage; if (!/gradient/.test(b)) return false; return (b.match(/rgba?\([^)]+\)/g) || []).some((c) => { const x = hsl(rgb(c)); return x.s > 0.4 && x.h >= 250 && x.h <= 300; }); });
+    // Verlaufstext (impeccable gradient-text)
+    const verlaufstext = alle.filter((e) => { const st = getComputedStyle(e); return (st.backgroundClip === "text" || st.webkitBackgroundClip === "text") && /gradient/.test(st.backgroundImage) && e.textContent.trim(); }).map((e) => e.textContent.trim().slice(0, 30));
+    // Neon-Leuchtrand (impeccable dark-glow): Schatten ohne Versatz, weich (≥ 3 px), farbig (Sättigung > 0,4)
+    const leuchten = (wert) => wert && wert !== "none" && wert.split(/,(?![^(]*\))/).some((sch) => {
+      const f = sch.match(/rgba?\([^)]*\)/); if (!f) return false;
+      const [x, y, unschaerfe = 0] = (sch.replace(f[0], "").match(/-?[\d.]+px/g) || []).map(parseFloat);
+      const c = rgb(f[0]); const a = c.length > 3 ? c[3] : 1; const x2 = hsl(c);
+      return x === 0 && y === 0 && unschaerfe >= 3 && x2.s > 0.4 && x2.l > 0.2 && a >= 0.1;
+    });
+    const leuchtrand = alle.filter((e) => { const st = getComputedStyle(e); if (!leuchten(st.boxShadow) && !leuchten(st.textShadow)) return false; const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; })
+      .map((e) => (e.textContent.trim() || e.tagName.toLowerCase()).slice(0, 24));
+    // Creme-Grund (impeccable cream-palette): größte Hintergrundfläche, genau gemessen
+    const genau = new Map();
+    for (const e of [document.documentElement, document.body, ...alle]) {
+      const st = getComputedStyle(e); const c = rgb(st.backgroundColor); if (c.length < 3 || (c.length > 3 && c[3] < 0.9)) continue;
+      const r = e.getBoundingClientRect(); const a = Math.min(r.width, innerWidth) * Math.min(r.height, 20000); if (a < 1) continue;
+      const k = c.slice(0, 3).map(Math.round).join(","); genau.set(k, (genau.get(k) || 0) + a);
+    }
+    const grund = ([...genau].sort((a, b) => b[1] - a[1])[0] || ["255,255,255"])[0].split(",").map(Number);
+    const creme = Math.min(...grund) >= 209 && grund[0] >= grund[1] && grund[1] >= grund[2] && grund[0] - grund[2] >= 6 && grund[0] - grund[2] <= 48;
+    const serifenTitel = [...document.querySelectorAll("h1,h2")].some((h) => { const f = getComputedStyle(h).fontFamily.toLowerCase().replace(/["']/g, ""); const erste = f.split(",")[0];
+      return !/sans|grotesk|mono/.test(erste) && (/(^|,)\s*serif\s*(,|$)/.test(f) || /georgia|times|garamond|playfair|fraunces|cormorant|baskerville|lora|caslon|merriweather|serif|crimson|spectral|newsreader/.test(erste)); });
+    const terrakotta = alle.some((e) => { const st = getComputedStyle(e); const r = e.getBoundingClientRect(); if (r.width * r.height < 1) return false;
+      return [rgb(st.color), rgb(st.backgroundColor), rgb(st.borderTopColor)].some((c) => { if (c.length < 3 || (c.length > 3 && c[3] < 0.5)) return false; const x = hsl(c); return x.h >= 10 && x.h <= 30 && x.s > 0.35 && x.l >= 0.35 && x.l <= 0.75; }); });
+    // Pulsierender Punkt (impeccable pulsing-dot): klein, rund, Animation ohne Ende – auch als ::before/::after
+    const rund = (st, w, h) => { const br = st.borderTopLeftRadius; return br.endsWith("%") ? parseFloat(br) >= 50 : parseFloat(br) >= Math.min(w, h) / 2 - 0.5; };
+    const pulsPunkte = alle.filter((e) => {
+      const st = getComputedStyle(e); const r = e.getBoundingClientRect();
+      if (st.animationName !== "none" && /infinite/.test(st.animationIterationCount) && r.width > 0 && r.height > 0 && r.width <= 16 && r.height <= 16 && rund(st, r.width, r.height)) return true;
+      return ["::before", "::after"].some((p) => { const ps = getComputedStyle(e, p); if (ps.content === "none" || ps.content === "normal" || ps.animationName === "none" || !/infinite/.test(ps.animationIterationCount)) return false;
+        const w = parseFloat(ps.width), h = parseFloat(ps.height); return w > 0 && h > 0 && w <= 16 && h <= 16 && rund(ps, w, h); });
+    }).length;
+    // Icon-Kachel über Überschrift (impeccable icon-tile-stack)
+    const kachel = (k, h) => { if (!k || k === h || k.contains(h)) return false; const r = k.getBoundingClientRect(); if (r.width < 12 || r.height < 12 || r.width > 64 || r.height > 64) return false;
+      const st = getComputedStyle(k); if (!(parseFloat(st.borderTopLeftRadius) > 0)) return false; const c = rgb(st.backgroundColor); const a = c.length > 3 ? c[3] : c.length === 3 ? 1 : 0; return a >= 0.05 || /gradient/.test(st.backgroundImage); };
+    const iconKacheln = [...document.querySelectorAll("h2,h3")].filter((h) => {
+      if (kachel(h.previousElementSibling, h)) return true;
+      for (let c = h, i = 0; i < 2 && c.parentElement; i++, c = c.parentElement) if (kachel(c.parentElement.firstElementChild, h)) return true;
+      return false;
+    }).length;
+    // Meta-Zeilen „A · B · C“ (Anthropic frontend-design, Hallmark)
+    const zweiPunkte = (e) => (e.textContent.match(/·/g) || []).length >= 2 && e.textContent.length < 200;
+    const metaZeilen = alle.filter((e) => { if (!zweiPunkte(e) || [...e.children].some(zweiPunkte)) return false; const r = e.getBoundingClientRect(); const st = getComputedStyle(e); return r.width > 0 && r.height > 0 && st.visibility !== "hidden" && parseFloat(st.opacity) > 0.05; }).length;
+    // Seitenstreifen an runder Karte (impeccable side-tab): nur links oder nur oben ein Rand von 2–12 px
+    const seitenstreifen = alle.filter((e) => {
+      const st = getComputedStyle(e); const b = (k) => (st[`border${k}Style`] === "none" ? 0 : parseFloat(st[`border${k}Width`]) || 0);
+      const l = b("Left"), t = b("Top"), r = b("Right"), u = b("Bottom");
+      const einseitig = (l >= 2 && l <= 12 && !t && !r && !u) || (t >= 2 && t <= 12 && !l && !r && !u);
+      if (!einseitig) return false;
+      const radius = Math.max(...["TopLeft", "TopRight", "BottomLeft", "BottomRight"].map((k) => parseFloat(st[`border${k}Radius`]) || 0));
+      const q = e.getBoundingClientRect(); return radius >= 4 && q.width >= 60 && q.height >= 30;
+    }).length;
     const karten = (() => { const m = new Map(); for (const e of alle) { const s = getComputedStyle(e); if (parseFloat(s.borderTopLeftRadius) >= 12 && (s.boxShadow !== "none" || s.borderTopWidth !== "0px")) { const r = e.getBoundingClientRect(); if (r.width > 180 && r.height > 120) { const k = `${Math.round(r.width / 20)}x${Math.round(r.height / 20)}`; m.set(k, (m.get(k) || 0) + 1); } } } return Math.max(0, ...m.values()); })();
     // Echtes Motiv (W2)
     const fotos = [...document.images].filter((i) => i.naturalWidth >= 600 && !/\.svg/i.test(i.currentSrc)).length + document.querySelectorAll("video").length;
@@ -487,7 +736,8 @@ async function stilAnalyse(page) {
     const reduzierteBewegung = [...document.styleSheets].some((sh) => { try { return [...sh.cssRules].some((r) => String(r.conditionText || r.media?.mediaText || "").includes("reduced-motion")); } catch { return false; } }) || /prefers-reduced-motion/.test([...document.scripts].map((s) => s.textContent).join(" "));
     return { dunkelAnteil, dunkleNeutral, akzente: [...akzente], neon, zinnober, hauptschriften, ueberschriften: [...new Set(ueberschriften)], fliess, groesste, laufweite,
       zeilenlaenge: Math.round(zeilenlaenge), labelsUeberUeberschrift, pfeilKnoepfe, akkordeon, glas, emoji, lilaVerlauf, karten, fotos, platzhalterFotos,
-      kursivSerif: [...new Set(kursivSerif)].slice(0, 3), kunstKursiv: [...new Set(kunstKursiv)].slice(0, 4), buehnen, laengsteUebergang: Math.max(0, ...dauern), lineareUebergaenge: linear.length, pflicht, reduzierteBewegung };
+      kursivSerif: [...new Set(kursivSerif)].slice(0, 3),
+      verlaufstext: [...new Set(verlaufstext)].slice(0, 3), leuchtrand: [...new Set(leuchtrand)].slice(0, 3), grund, creme, serifenTitel, terrakotta, pulsPunkte, iconKacheln, metaZeilen, seitenstreifen, kunstKursiv: [...new Set(kunstKursiv)].slice(0, 4), buehnen, laengsteUebergang: Math.max(0, ...dauern), lineareUebergaenge: linear.length, pflicht, reduzierteBewegung };
   }).catch((e) => ({ fehler: String(e) }));
 }
 
@@ -502,8 +752,14 @@ if (s.emoji) befund("P0", "W1", "Emoji in Überschriften oder Knöpfen", "Impecc
 if (s.kunstKursiv?.length) befund("P0", "W1", "Künstlich kursiv: kursiv gesetzt in einer Schrift ohne Kursivschnitt (wird schräg verzerrt) – beim Schrifttausch alle Regeln prüfen", s.kunstKursiv.join(" · "));
 for (const b of s.buehnen || []) befund("P0", "W11", `Scroll-Bühne ist ${b.h.toFixed(1)} Bildschirmhöhen lang (höchstens etwa 3; wichtige Inhalte rücken sonst zu weit nach unten)`, b.k);
 if (s.kursivSerif?.length) befund("P0", "W1", "Kursive Serife in Überschriften (KI-Merkmal, steht in handwerk.md Abschnitt 3)", s.kursivSerif.join(" · "));
+if (s.verlaufstext?.length) befund("P0", "W1", "Verlaufstext (Farbverlauf in der Schrift)", s.verlaufstext.join(" · ") + " · impeccable gradient-text");
+if (s.leuchtrand?.length) befund("P0", "W1", "Neon-Leuchtrand (farbiger Schatten ohne Versatz)", s.leuchtrand.join(" · ") + " · impeccable dark-glow");
+if (s.creme && s.serifenTitel && s.terrakotta) befund("P0", "W1", "Creme-Grund mit Serifen-Überschrift und Terrakotta-Akzent (Vorlagen-Look „edel“)", `Grund rgb(${s.grund.join(",")}) · impeccable cream-palette`);
+else if (s.creme) befund("Hinweis", "W1", "Creme-Grund – nur, wenn er aus dem Auftraggeber kommt", `rgb(${s.grund.join(",")}) · impeccable cream-palette`);
 const beiwerk = [s.labelsUeberUeberschrift >= 3 && `${s.labelsUeberUeberschrift}× Großbuchstaben-Label über Überschrift`, s.pfeilKnoepfe >= 3 && `${s.pfeilKnoepfe}× „→“ an Knöpfen`,
-  s.akkordeon >= 4 && `FAQ-Akkordeon (${s.akkordeon})`, s.glas >= 3 && `${s.glas}× Glas-Effekt`, s.karten >= 4 && `${s.karten} gleich große Karten (Baukasten)`].filter(Boolean);
+  s.akkordeon >= 4 && `FAQ-Akkordeon (${s.akkordeon})`, s.glas >= 3 && `${s.glas}× Glas-Effekt`, s.karten >= 4 && `${s.karten} gleich große Karten (Baukasten)`,
+  s.pulsPunkte >= 1 && `${s.pulsPunkte}× pulsierender Punkt`, s.iconKacheln >= 3 && `${s.iconKacheln}× Icon-Kachel über Überschrift`,
+  s.metaZeilen >= 3 && `${s.metaZeilen}× Meta-Zeile „A · B · C“`, s.seitenstreifen >= 1 && `${s.seitenstreifen}× farbiger Seitenstreifen an runder Karte`].filter(Boolean);
 if (beiwerk.length >= 3) befund("P0", "W1", "Vorlagen-Beiwerk gehäuft", beiwerk.join(" · "));
 else if (beiwerk.length) befund("Hinweis", "W1", "Vorlagen-Beiwerk", beiwerk.join(" · "));
 if (s.groesste && s.fliess && s.groesste / s.fliess < 3) befund("Hinweis", "W1", `Schwache Rangordnung: größte Überschrift nur ${(s.groesste / s.fliess).toFixed(1)}× Fließtext (Preisträger 4–10×)`);
@@ -537,8 +793,30 @@ for (const [n, g] of Object.entries(geraete)) {
   else if (g.fps_scroll !== null && g.fps_scroll < 30 && g.grossesCanvas) befund("Hinweis", "W6", `WebGL über mehr als die halbe Fläche und nur ${g.fps_scroll} fps ohne Grafikkarte (${n})`, "Stufen und Rückfall prüfen");
 }
 
+// W13 Inhalt bleibt unsichtbar – mit und ohne „Bewegung reduzieren“, aber nur ein Befund
+const ruheFehlt = (r) => r && !r.fehler && ((r.gesamt >= 200 && r.weg / r.gesamt > 0.3) || r.weg >= 150 || r.flaechen.length > 0);
+if (ruheFehlt(ruhe) || ruheFehlt(ruheReduziert)) {
+  const r = ruheFehlt(ruhe) ? ruhe : ruheReduziert;
+  const wann = ruheFehlt(ruhe) && ruheFehlt(ruheReduziert) ? "auch bei „Bewegung reduzieren“" : ruheFehlt(ruhe) ? "nach Scrollen bis unten und zurück" : "nur bei „Bewegung reduzieren“";
+  const teile = [r.weg ? `${r.weg} von ${r.gesamt} Zeichen Text unsichtbar (${r.texte.map((t) => `„${t}“`).join(", ")})` : "", r.flaechen.length ? `auf null zugeschnitten: ${r.flaechen.join(", ")}` : ""].filter(Boolean);
+  befund("P0", "W13", `Inhalt bleibt unsichtbar (${wann}) – Einblendung springt nicht an`, teile.join(" · ") + " · impeccable content-hidden-at-rest");
+}
+// W14 Fokus sichtbar
+if (fokus?.ohne.length) befund("P0", "W14", `${fokus.ohne.length} von ${fokus.geprueft} Bedienelementen zeigen mit Tab keinen sichtbaren Fokus`, fokus.ohne.slice(0, 4).join(", ") + " · Hallmark, Vercel");
+// W16 Zwei Breiten mehr
+if (breiten.b320?.seitlich) befund("P0", "W16", `Bei 320 px Breite scrollt die Seite seitlich (${breiten.b320.breite} px breit)`, breiten.b320.zuBreit.join(", ") + " · Hallmark");
+if (breiten.b1920?.zuBreit.length) befund("Hinweis", "W16", "Bei 1920 px läuft Fließtext breiter als 1600 px (Breite begrenzen)", breiten.b1920.zuBreit.join(" · ") + " · Hallmark");
+// W17 Text fehlt am Handy (Hallmark F25)
+let handyFehlt = 0; const handyBeispiele = [];
+if (textBestaende.desktop && textBestaende.handy) for (const [t, n] of Object.entries(textBestaende.desktop)) {
+  const fehlt = n - (textBestaende.handy[t] || 0); if (fehlt <= 0) continue;
+  handyFehlt += fehlt * t.split(" ").length; if (handyBeispiele.length < 3) handyBeispiele.push(`„${t.slice(0, 30)}“`);
+}
+if (handyFehlt >= 40) befund("Hinweis", "W17", `${handyFehlt} Wörter sind am Desktop sichtbar, am Handy nicht – Handy-Besucher brauchen denselben Inhalt`, handyBeispiele.join(", ") + " · Hallmark F25");
+
 const kontrastListe = Object.fromEntries(kontrastFehler);
-const ergebnis = { kontrast: kontrastListe, site, zeit: new Date().toISOString(), groesse_kb: groesseKB, p0: befunde.filter((b) => b.schwere === "P0").length, befunde, geraete, stil: stilInfo, bilder: aus };
+const ergebnis = { kontrast: kontrastListe, site, zeit: new Date().toISOString(), groesse_kb: groesseKB, p0: befunde.filter((b) => b.schwere === "P0").length, befunde, geraete, stil: stilInfo,
+  zugang: { ruhe, ruhe_reduziert: ruheReduziert, fokus, breiten, handy_fehlende_woerter: handyFehlt }, bilder: aus };
 fs.mkdirSync(path.dirname(jsonDatei), { recursive: true });
 fs.writeFileSync(jsonDatei, JSON.stringify(ergebnis, null, 2));
 for (const b of befunde) console.log(`${b.schwere.padEnd(7)} ${b.fehler.padEnd(9)} ${b.text}${b.beleg ? "  [" + b.beleg + "]" : ""}`);

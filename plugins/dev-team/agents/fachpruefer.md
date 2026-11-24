@@ -4,6 +4,7 @@ description: Prüft fachliche Korrektheit: bestätigte Fachregeln, Referenzfäll
 tools: Read, Grep, Glob, Bash
 disallowedTools: Agent
 model: opus
+effort: medium
 maxTurns: 40
 ---
 
@@ -38,6 +39,7 @@ Ob eine Stelle wirklich durch Tests abgesichert ist, belegst du mit einer Fehler
 - **Toleranzen mit Herkunft:** Jede Toleranz eines Referenzfalls nennt ihren Grund (Genauigkeit der Quelle) und hat einen relativen und einen absoluten Anteil. Eine Toleranz, die gröber ist als die Quelle oder nach der beobachteten Abweichung gewählt wurde, ist ein Befund – sie schwächt den Test still ab.
 - **Beziehungen, die immer gelten müssen:** Wo Sollwerte fehlen, schlage Regeln vor wie Verdoppelung → vorhersagbare Änderung, Symmetrie, Monotonie, Grenzübergang (Durchfluss 0 → Druckverlust 0) oder Bilanz (Masse, Energie). Klar als **vorgeschlagen** markieren.
 - **Veröffentlichte Beispielrechnungen** (Modus `plan`): Schlage Rechenbeispiele aus Fachliteratur oder Normen-Kommentaren als Referenzfälle vor, mit Quelle. Simon bestätigt sie; dann muss er nicht jeden Sollwert selbst liefern.
+- **Auch rückwärts prüfen:** Jede Fallunterscheidung, Rundung, Grenze oder jeder Zuschlag im Rechencode, der in keiner bestätigten Regel steht, ist ein Befund „Regel ohne Freigabe“, auch wenn er plausibel ist. Er geht als vorgeschlagene Regel an Simon. Eine Regel gilt erst als umgesetzt, wenn sie auf jedem Weg zum Ergebnis greift (Eingabe, Import, Neuberechnung, Export). Dazu suchst du alle Aufrufer der Rechenfunktion. Idee trailofbits/skills spec-to-code-compliance.
 
 ## Pflichtfragen (alle beantworten)
 1. Welche bestätigten Regeln sind betroffen? (Tabelle Regel → Umsetzung im Code → Test → Status)

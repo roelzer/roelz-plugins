@@ -8,7 +8,8 @@
 //   --aus     Ordner für leistung.json (Standard: <site-ordner>/../arbeit/pruefung)
 //   --seiten  Komma-Liste von Pfaden (Standard: nur die Startseite)
 // Lokal fehlt die Kompression des Servers, online liegt der Wert meist etwas höher. Unter 90 ist trotzdem ein Befund.
-// Exit-Code 1, wenn eine Seite unter 90 liegt.
+// Seit 0.3.3 misst Lighthouse auch die Barrierefreiheit (unter 90 nur ein Hinweis, kein Exit-Code).
+// Exit-Code 1, wenn eine Seite in der Leistung unter 90 liegt.
 import { createRequire } from "node:module";
 import { spawn } from "node:child_process";
 import http from "node:http";
@@ -61,7 +62,7 @@ for (const s of seiten) {
   // nicht blockierend starten: Der eingebaute Server läuft im selben Programm und muss antworten können
   const r = await new Promise((fertig) => {
     let stderr = "";
-    const k = spawn("npx", ["--yes", "lighthouse@12.6.1", url, "--quiet", "--only-categories=performance", "--output=json", `--output-path=${datei}`,
+    const k = spawn("npx", ["--yes", "lighthouse@12.6.1", url, "--quiet", "--only-categories=performance,accessibility", "--output=json", `--output-path=${datei}`,
       "--chrome-flags=--headless=new --no-sandbox"], { env: { ...process.env, ...(chrome ? { CHROME_PATH: chrome } : {}) } });
     k.stderr.on("data", (d) => (stderr += d));
     const uhr = setTimeout(() => k.kill("SIGKILL"), 300000);
@@ -72,6 +73,7 @@ for (const s of seiten) {
   const d = JSON.parse(fs.readFileSync(datei, "utf8"));
   const a = d.audits;
   ergebnisse.push({ seite: s, leistung: Math.round(d.categories.performance.score * 100),
+    barrierefreiheit: d.categories.accessibility ? Math.round(d.categories.accessibility.score * 100) : null,
     blockierzeit_ms: Math.round(a["total-blocking-time"].numericValue), lcp_s: +(a["largest-contentful-paint"].numericValue / 1000).toFixed(1),
     cls: +a["cumulative-layout-shift"].numericValue.toFixed(3), gesamt_kb: Math.round(a["total-byte-weight"].numericValue / 1024) });
   fs.rmSync(datei, { force: true });
@@ -80,8 +82,11 @@ server?.close();
 
 fs.mkdirSync(aus, { recursive: true });
 const unter = ergebnisse.filter((e) => e.fehler || e.leistung < ZIEL * 100);
-fs.writeFileSync(path.join(aus, "leistung.json"), JSON.stringify({ zeit: new Date().toISOString(), profil: "Lighthouse Handy (Standard)", ziel: ZIEL * 100, ok: !unter.length, ergebnisse }, null, 2));
-for (const e of ergebnisse) console.log(e.fehler ? `${e.seite}: FEHLER ${e.fehler}` : `${e.seite}: Leistung ${e.leistung}/100 · Blockierzeit ${e.blockierzeit_ms} ms · LCP ${e.lcp_s} s · CLS ${e.cls} · ${e.gesamt_kb} KB`);
-console.log(unter.length ? `\nUnter ${ZIEL * 100}: ${unter.map((e) => e.seite).join(", ")}. Typische Ursache: 3D oder große Skripte beim Laden. 3D erst bei der ersten Bewegung laden, am Handy ohne Schatten.` : `\nAlle Seiten ab ${ZIEL * 100}.`);
+const hinweise = ergebnisse.filter((e) => e.barrierefreiheit !== null && e.barrierefreiheit !== undefined && e.barrierefreiheit < ZIEL * 100)
+  .map((e) => `${e.seite}: Barrierefreiheit ${e.barrierefreiheit}/100 (unter ${ZIEL * 100}) – Fokus, Beschriftungen, Kontrast im Lighthouse-Bericht ansehen`);
+fs.writeFileSync(path.join(aus, "leistung.json"), JSON.stringify({ zeit: new Date().toISOString(), profil: "Lighthouse Handy (Standard)", ziel: ZIEL * 100, ok: !unter.length, hinweise, ergebnisse }, null, 2));
+for (const e of ergebnisse) console.log(e.fehler ? `${e.seite}: FEHLER ${e.fehler}` : `${e.seite}: Leistung ${e.leistung}/100 · Barrierefreiheit ${e.barrierefreiheit ?? "–"}/100 · Blockierzeit ${e.blockierzeit_ms} ms · LCP ${e.lcp_s} s · CLS ${e.cls} · ${e.gesamt_kb} KB`);
+console.log(unter.length ? `\nUnter ${ZIEL * 100}: ${unter.map((e) => e.seite).join(", ")}. Typische Ursache: 3D oder große Skripte beim Laden. 3D erst bei der ersten Bewegung laden, am Handy ohne Schatten.` : `\nLeistung aller Seiten ab ${ZIEL * 100}.`);
+for (const h of hinweise) console.log(`Hinweis: ${h}`);
 console.log(`Ergebnis: ${path.join(aus, "leistung.json")}`);
 process.exit(unter.length ? 1 : 0);

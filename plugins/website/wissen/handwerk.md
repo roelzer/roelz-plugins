@@ -43,11 +43,12 @@ In der Probearbeit waren alle Seiten des Website-Bauers fehlerfrei und bestanden
 - Nachgebaut wird nichts. Übernommen werden Maße und Prinzipien, keine Dateien (die Sperre blockt Downloads von Vorbild-Seiten).
 
 ## 3. KI-Merkmale: nicht verwenden (gegen W1)
-Quelle: Anthropic-Skill `frontend-design` (2026), Impeccable, Anthropic Cookbook. Das Prüfskript erkennt die messbaren davon.
-- **Farben:** fast schwarzer Grund mit **einer** grellen Akzentfarbe (Säuregrün, Neon-Gelbgrün, Zinnober). Nachtblau oder Schwarz mit Neon. Lila-Verläufe. Creme `#F4F1EA` mit Serifen-Titel und Terrakotta `#D97757`. Cyan auf Dunkel, Neon-Leuchtränder, Verlaufstext.
+Quelle: Anthropic-Skill `frontend-design` (2026), Impeccable, Anthropic Cookbook, Hallmark (GitHub-Abgleich 24.11.2026). Das Prüfskript erkennt die messbaren davon.
+- **Farben:** fast schwarzer Grund mit **einer** grellen Akzentfarbe (Säuregrün, Neon-Gelbgrün, Zinnober). Nachtblau oder Schwarz mit Neon. Lila-Verläufe. Creme `#F4F1EA` mit Serifen-Titel und Terrakotta `#D97757` (Prüfskript W1: P0, Creme allein ist ein Hinweis). Cyan auf Dunkel. Neon-Leuchtrand: farbiger, weicher Schatten ohne Versatz um Knöpfe oder Schrift (Prüfskript W1). Verlaufstext: ein Farbverlauf in der Schrift selbst (Prüfskript W1). Getöntes Fast-Schwarz wie `#0B0B0B` oder `#111` als Grund, weil es sicher wirkt, nicht weil es gewählt wurde. Dunkel ist erlaubt, wenn der Ton aus dem Auftraggeber kommt.
 - **Schrift:** Inter (auch Inter Tight), Roboto, Arial, Space Grotesk, Geist als Hauptschrift. **Kursive Serife in jeder Form**: als „edler“ Titel, als zweite Zeile („am Irle.“), als Einschub („seit 1977“) oder in Kopf- und Fußzeile. Simon, 19.11.2026: „diese kursiv schrift is auch KI typisch“. Das Prüfskript meldet es als P0. Stattdessen die Hausschrift in der Akzentfarbe.
-- **Aufbau:** gleich große Karten mit einem Radius und weichem Schatten (Bento-Baukasten), Icon-Kachel über jeder Überschrift, Großbuchstaben-Label über jeder Überschrift, „01/02/03“ ohne echte Reihenfolge, große Zahl mit kleinem Label und Verlauf, ein einzeln eingefärbtes Wort im Titel, FAQ-Akkordeon als Füllung, durchgestrichene „Das bekommen Sie nicht“-Liste, „→“ an jedem Knopf.
-- **Bewegung:** jede Sektion gleitet von unten herein, Hover-Effekt auf jeder Karte, pulsierender Punkt, Laufband, Cursor-Blob, alles schwebt.
+- **Aufbau:** gleich große Karten mit einem Radius und weichem Schatten (Bento-Baukasten), Icon-Kachel über jeder Überschrift (Prüfskript W1, Beiwerk), Großbuchstaben-Label über jeder Überschrift, Labels in der Form „WORT — Bruchstück“, Meta-Zeilen mit Mittelpunkt wie „Küche · Eiche · 2024“ (Prüfskript W1, Beiwerk), Monospace für kleine Datenlabels, ohne dass es um Technik geht, farbiger Seitenstreifen links oder oben an runden Karten (Prüfskript W1, Beiwerk), Zeitungs-Layout mit Haarlinien und ganz ohne Radius als „seriöse“ Pose, „01/02/03“ ohne echte Reihenfolge, große Zahl mit kleinem Label und Verlauf, ein einzeln eingefärbtes Wort im Titel, FAQ-Akkordeon als Füllung, durchgestrichene „Das bekommen Sie nicht“-Liste, „→“ an jedem Knopf.
+- **Bewegung:** jede Sektion gleitet von unten herein, Hover-Effekt auf jeder Karte, pulsierender Punkt (Prüfskript W1, Beiwerk), Laufband, Cursor-Blob, alles schwebt. Federnde Bewegung, die über das Ziel schießt und zurückschwingt (`cubic-bezier` mit Werten unter 0 oder über 1, Prüfskript W1).
+- **Vor der Abgabe ein Teil streichen** (Anthropic `frontend-design`): Such das eine Schmuckelement, das nichts erzählt, und nimm es raus.
 - **Bilder:** selbst gezeichnete Szenen, Maskottchen, Emoji statt Symbolen, Glas-Effekte als Deko.
 Gegenmittel ist nicht „das Gegenteil“, sondern die Herleitung aus dem Auftraggeber (Abschnitt 1).
 
@@ -57,7 +58,10 @@ Gegenmittel ist nicht „das Gegenteil“, sondern die Herleitung aus dem Auftra
 - **Zeilenlänge:** Fließtext 30–64 ch breit (Practical Typography: 45–90 Zeichen).
 - **Farben:** zwei Grundfarben, höchstens ein Akzent, warm-erdig oder Schwarz-Weiß.
 - **Schriften:** Display-Grotesk, oft mit einer Serife als Kontrast. Kostenlos und selbst hostbar sind z. B. Mona Sans (die Schrift der Lando-Seite), Work Sans, IBM Plex. Fontshare ist kostenlos kommerziell nutzbar, aber nicht OFL: Lizenzdatei lesen.
-- **Bewegung:** Bedienelemente 150–400 ms, große einmalige Auftritte 600–1000 ms, immer abbremsend (z. B. `cubic-bezier(.19,1,.22,1)` oder `cubic-bezier(.22,1,.36,1)`), nie linear. NN/g: Ab 500 ms wirken wiederkehrende Animationen zäh.
+- **Bewegung:** Bedienelemente 150–400 ms, große einmalige Auftritte 600–1000 ms, immer abbremsend (z. B. `cubic-bezier(.19,1,.22,1)` oder `cubic-bezier(.22,1,.36,1)`), nie linear und nie federnd. NN/g: Ab 500 ms wirken wiederkehrende Animationen zäh.
+- **Animiert werden nur `transform` und `opacity`.** Breite, Höhe, `top` und `left` zwingen den Browser, das Layout in jedem Bild neu zu rechnen, und das ruckelt. Nie `transition: all`, sondern die Eigenschaften einzeln nennen (Vercel, Hallmark; Prüfskript W18).
+- **Eingeblendetes muss auch ankommen.** Was mit `opacity: 0` oder einem auf null zugeschnittenen `clip-path` startet, braucht einen Auslöser, der sicher feuert, und bei „Bewegung reduzieren“ den End-Zustand (Prüfskript W13, siehe Stolperstein in 1b).
+- **Alle Breiten:** von 320 px (kleines Handy, nichts darf seitlich scrollen) bis 1920 px (Fließtext nicht breiter als etwa 1600 px, besser schmaler). Am Handy fehlt kein Inhalt, der am Desktop steht (Hallmark; Prüfskript W16, W17).
 - **Ein Wow-Moment je Seite.** Daneben nur ruhige Einblendungen.
 - **Hausschrift mit nur einer Stärke kräftiger machen** (Simon: „Schriftart gern noch bissle dicker“): Kontur in der eigenen Farbe mit `-webkit-text-stroke: 0.06–0.08em currentColor; paint-order: stroke fill;` und Laufweite +0,02 em. Die Kontur wächst dann nach außen, die Buchstaben bleiben scharf.
 - **Wow heißt nicht laut** (Simon: „sehr in die fresse, könnte teilweise noch bisschen dezenter sein“). Nur der eine große Moment darf riesig sein. Überschriften sonst etwa 40–90 px am Desktop, Fließtext-Sätze normal fett, viel Luft. Lieber eine kräftige Form (z. B. eine dicke Ziffer als Fenster ins Foto) als viele große Schriften.
@@ -82,12 +86,15 @@ Gegenmittel ist nicht „das Gegenteil“, sondern die Herleitung aus dem Auftra
 ## 8. Grenzen und Recht (Kurzfassung, siehe `wissen/recht.md`)
 - Keine fremden Server: Schriften, Bibliotheken, Bilder liegen in `site/`. Keine Tracker. Ohne Cookies, Browser-Speicher und fremde Server braucht es keinen Cookie-Banner.
 - Impressum und Datenschutz immer als eigene Seiten mit markierten Platzhaltern.
+- **Tastatur:** Jedes Bedienelement zeigt einen sichtbaren Fokus über `:focus-visible`, mit mindestens 3:1 Kontrast zum Grund (z. B. 2–3 px Rahmenlinie mit Abstand). `outline: none` nur zusammen mit einem eigenen Fokus-Stil. Eine feste Kopfleiste darf das fokussierte Element nicht verdecken (`scroll-padding-top` in Höhe der Leiste). Der Kontakt-Knopf ist allein mit der Tab-Taste erreichbar (Prüfskript W14).
+- **Zoom nie sperren:** kein `user-scalable=no` und kein `maximum-scale=1` im Viewport-Tag (Vercel; Prüfskript W15).
 - `prefers-reduced-motion` beachten. Automatische Bewegung über 5 s braucht eine Pause-Möglichkeit (WCAG 2.2.2). Keine Scroll-Übernahme mit wichtigem Text darin, am Handy meiden (NN/g).
 - Veröffentlichen nur auf Simons ausdrückliches Ja nach der Vorschau.
 
 ## 9. Lieferung (gegen W7)
 - `website/<name>/site/` enthält nur, was auf den Server gehört. Vorbilder, Rohfassungen, Prüfungen, Quellcode zum Bauen, `node_modules` und Berichte liegen in `website/<name>/arbeit/`.
 - `site/QUELLEN.md` darf mit (Lizenzen und Namensnennungen).
+- Prüfhilfen kommen vor der Lieferung raus, z. B. `markers: true` bei GSAP ScrollTrigger (gsap-skills; Prüfskript W19).
 
 ## 10. Simons Geschmack (aus dem SFH-Test, 19.11.2026)
 Gilt für Simon und als Ausgangspunkt für Auftraggeber, die er mitbringt. Jede Zeile ist ein Zitat oder eine umgesetzte Anmerkung.

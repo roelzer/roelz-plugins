@@ -1,10 +1,15 @@
 {
   "name": "tool-scout",
   "displayName": "Tool-Scout",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Findet und prüft fertige Skills, Agenten, Plugins und MCP-Server und gibt eine begründete Empfehlung. Installiert nie selbst.",
   "author": {
     "name": "Simon Rölz"
   },
-  "keywords": ["discovery", "security-review", "plugins", "skills"]
+  "keywords": [
+    "discovery",
+    "security-review",
+    "plugins",
+    "skills"
+  ]
 }

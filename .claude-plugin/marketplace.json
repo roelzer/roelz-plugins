@@ -1,6 +1,6 @@
 {
   "name": "roelz-plugins",
-  "description": "Simons Claude-Code-Plugins: Dev-Team, Team-Tafel, Tool-Scout, Personaler, Video-Editor, Website-Bauer und Recherche. Ohne Firmen- oder Kundenwissen, auch auf Arbeitsrechnern nutzbar.",
+  "description": "Simons Claude-Code-Plugins: Dev-Team, Team-Tafel, Tool-Scout, Personaler, Video-Editor, Website-Bauer, Spiele-Bauer und Recherche. Ohne Firmen- oder Kundenwissen, auch auf Arbeitsrechnern nutzbar.",
   "owner": {
     "name": "Simon Rölz"
   },
@@ -42,9 +42,15 @@
       "category": "productivity"
     },
     {
+      "name": "spiele",
+      "source": "./plugins/spiele",
+      "description": "In Probearbeit. Spiele-Bauer: eigene kleine Browserspiele für Handy und Laptop, 2D oder 3D – Spaßprojekte und Mini-Spiele für Vereins- und Firmenseiten. Eigene Idee mit erster Minute, Stellschrauben, Prüfskript ohne KI (Bot, Hochkant, Bildzeit, iframe), unabhängiger Prüfer, nur kostenlose Werkzeuge, keine fremden Server, Veröffentlichen nur auf Simons Ja.",
+      "category": "productivity"
+    },
+    {
       "name": "recherche",
       "source": "./plugins/recherche",
-      "description": "YouTube-Recherche über die offizielle YouTube Data API: Kanäle und Themen durchsuchen, Beschreibungen, Kapitel, Links und Kommentare lesen, Begleit-Blogs finden, gezielt Transkripte erbitten. Kein Herunterladen, kostenlos (10.000 Einheiten/Tag).",
+      "description": "Profi-Recherche: wie die besten Fachleute in einem Gebiet arbeiten, was es schon gibt (vor allem auf GitHub: Projekte, Plugins, Skills, Agenten, Werkzeuge) und was davon nutzbar ist, mit Quellen und Belastbarkeit. Dazu YouTube-Recherche über die offizielle Data API. Nur lesen, kostenlos.",
       "category": "productivity"
     }
   ]

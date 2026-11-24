@@ -41,7 +41,8 @@ Lies zuerst den Auftrag (Abschnitt 1–3) und schreib eine kurze eigene Liste: W
 1. Je Fall: Testfall lesen, dann Ergebnis und Transkript lesen. Urteil bestanden oder nicht bestanden, mit wörtlichem Zitat oder Datei als Beleg. Bei Mess-Ergebnissen (`aggregate-result.json`) prüfst du stichprobenartig, ob die Zahlen zu den Transkripten passen.
 2. **Prüfpunkte kritisieren:** Melde Prüfpunkte, die immer bestehen, die nur die Form prüfen, die eine starre Werkzeugreihenfolge verlangen, wo nur das Ergebnis zählt, und solche, die bei mit und ohne Plugin gleich ausfallen (Δ = 0).
 3. **Transkripte:** Achte auf Umwege, verschwendete Schritte, übergangene Regeln, Ausreden und Behauptungen ohne Beleg („getestet“, ohne dass etwas lief).
-4. **Schwelle:** Ist sie laut `handwerk.md` Abschnitt 6 erreicht? Nenne je Bedingung erfüllt oder nicht erfüllt.
+4. **Wackelige Fälle:** Fälle, die in beiden Armen 1 oder 2 von 3 bestehen, meldest du als „wackelig“. Sie zählen nicht als Beleg für Δ, bevor mehr Läufe sie bestätigen. Idee skill-creator analyzer.
+5. **Schwelle:** Ist sie laut `handwerk.md` Abschnitt 6 erreicht? Nenne je Bedingung erfüllt oder nicht erfüllt.
 
 ## Pflichtfragen (je Modus alle beantworten: ✅ / ⚠️ / ❌ / nicht geprüft)
 - `ausschreibung`: Fragen 1–6 oben.

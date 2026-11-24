@@ -13,6 +13,11 @@ Schreinerei) und kleine Testseiten in tests/seiten. Positivbeispiel: tests/seite
   ballast (unbenutzte Datei) → Ballast, buehne-ohne-js (420vh-Bühne, ohne JavaScript Stillstand) → W11 und W12.
 - tests/seiten/unsicher muss die Sicherheits- und Rechtsprüfungen auslösen (Inline-Ereignis, Schlüssel, Source Map,
   EXIF/GPS im Foto, Autor im PDF, fehlende Header, OS-Plattform-Link).
+- Aus dem GitHub-Abgleich (24.11.2026, Ideen von impeccable, Hallmark, Vercel, gsap-skills): je Seite eine neue harte
+  Regel – w1-verlaufstext, w1-leuchtrand, w1-creme → W1; w13-unsichtbar (Text) und w13-rahmen (auf null
+  zugeschnittener Rahmen wie im Schreinerei-Test) → W13; w14-fokus → W14 (Messung mit Tab und CSS-Text); w15-zoom → W15;
+  w16-schmal (bei 320 px zu breit) → W16; w19-markers → W19. gut-zugang (Einblendung, die anspringt, eigener
+  Fokus-Stil, verstecktes Menü, Text nur für Bildschirmleser, Hover-Zustände in Links) darf keinen harten Befund haben.
 Hinweis: Der schwarze Balken aus P4 war ein Zustand beim Laden und ließ sich nicht wieder hervorrufen; W8 wird deshalb
 an einer Testseite geprüft. P3 (3D-Rundgang) ist ohne Grafikkarte zu langsam für einen Test.
 Braucht Node und Playwright mit Chromium. Dauer: einige Minuten.
@@ -89,6 +94,39 @@ class Eichung(unittest.TestCase):
         e = pruefen(os.path.join(SEITEN, "buehne-ohne-js"))
         self.assertTrue(harte(e, "W11"))
         self.assertTrue(harte(e, "W12"))
+
+    def test_verlaufstext(self):
+        self.assertTrue(any("Verlaufstext" in b["text"] for b in harte(pruefen(os.path.join(SEITEN, "w1-verlaufstext")), "W1")))
+
+    def test_neon_leuchtrand(self):
+        self.assertTrue(any("Leuchtrand" in b["text"] for b in harte(pruefen(os.path.join(SEITEN, "w1-leuchtrand")), "W1")))
+
+    def test_creme_serife_terrakotta(self):
+        self.assertTrue(any("Creme" in b["text"] for b in harte(pruefen(os.path.join(SEITEN, "w1-creme")), "W1")))
+
+    def test_inhalt_bleibt_unsichtbar(self):
+        self.assertTrue(harte(pruefen(os.path.join(SEITEN, "w13-unsichtbar")), "W13"))
+
+    def test_rahmen_bleibt_leer(self):
+        self.assertTrue(any("zugeschnitten" in b["beleg"] for b in harte(pruefen(os.path.join(SEITEN, "w13-rahmen")), "W13")))
+
+    def test_fokus_unsichtbar(self):
+        texte = " | ".join(b["text"] for b in harte(pruefen(os.path.join(SEITEN, "w14-fokus")), "W14"))
+        self.assertIn("mit Tab keinen sichtbaren Fokus", texte)
+        self.assertIn("ohne :focus-visible", texte)
+
+    def test_zoom_gesperrt(self):
+        self.assertTrue(harte(pruefen(os.path.join(SEITEN, "w15-zoom")), "W15"))
+
+    def test_320_seitlich(self):
+        self.assertTrue(harte(pruefen(os.path.join(SEITEN, "w16-schmal")), "W16"))
+
+    def test_gsap_markers(self):
+        self.assertTrue(harte(pruefen(os.path.join(SEITEN, "w19-markers")), "W19"))
+
+    def test_zugang_ohne_fehlalarm(self):
+        e = pruefen(os.path.join(SEITEN, "gut-zugang"))
+        self.assertEqual(e["p0"], 0, [b["text"] for b in e["befunde"] if b["schwere"] == "P0"])
 
     def test_ablauf_bildserie(self):
         aus = tempfile.mkdtemp()

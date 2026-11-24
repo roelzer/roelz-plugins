@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fangen</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #14202b; }
+  canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+</style>
+</head>
+<body>
+<!-- Eichvorlage „gut“ für spielpruefen.mjs: lokal, Spielfläche füllt die Höhe, touch-action nur auf dem Canvas,
+     fester Zeitschritt, ?seed=N, window.game.step(), render_game_to_text(). Kein echtes Spiel, nur ein Messobjekt. -->
+<canvas id="feld" data-spielflaeche aria-label="Spielfeld"></canvas>
+<script>
+const TUNE = { fallTempo: { value: 0.35, min: 0.1, max: 1, step: 0.05 }, korbBreite: { value: 0.3, min: 0.1, max: 0.6, step: 0.05 } };
+const seed = Number(new URLSearchParams(location.search).get("seed")) || Date.now() % 100000;
+let s = seed; const zufall = () => ((s = (s * 16807) % 2147483647) / 2147483647);
+const c = document.getElementById("feld"), g = c.getContext("2d");
+let zustand;
+function neu() { zustand = { modus: "spiel", punkte: 0, leben: 3, korb: 0.5, teile: [], uhr: 0 }; }
+neu();
+const DT = 1000 / 60;
+function schritt() {
+  const z = zustand; if (z.modus !== "spiel") return;
+  z.uhr += DT;
+  if (z.uhr % 600 < DT) z.teile.push({ x: 0.1 + zufall() * 0.8, y: 0, gut: zufall() < 0.6 });
+  for (const t of z.teile) t.y += TUNE.fallTempo.value * DT / 1000;
+  for (const t of z.teile.filter((t) => t.y >= 0.9)) {
+    const drin = Math.abs(t.x - z.korb) < TUNE.korbBreite.value / 2;
+    if (drin && t.gut) z.punkte++; else if (drin || t.gut) z.leben--;
+    t.weg = true;
+  }
+  z.teile = z.teile.filter((t) => !t.weg);
+  if (z.leben <= 0) z.modus = "ende";
+}
+function ziel(e) { const r = c.getBoundingClientRect(); if (zustand.modus === "ende") return neu(); zustand.korb = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)); }
+c.addEventListener("pointerdown", ziel); c.addEventListener("pointermove", (e) => { if (e.buttons || e.pointerType === "mouse") ziel(e); });
+addEventListener("keydown", (e) => { if (zustand.modus === "ende") neu(); if (e.key === "ArrowLeft") zustand.korb = Math.max(0, zustand.korb - 0.1); if (e.key === "ArrowRight") zustand.korb = Math.min(1, zustand.korb + 0.1); });
+function zeichne() {
+  if (c.width !== c.clientWidth || c.height !== c.clientHeight) { c.width = c.clientWidth; c.height = c.clientHeight; }
+  const w = c.width, h = c.height;
+  g.fillStyle = "#14202b"; g.fillRect(0, 0, w, h);
+  for (const t of zustand.teile) { g.fillStyle = t.gut ? "#f2c230" : "#d9534f"; g.beginPath(); g.arc(t.x * w, t.y * h, 16, 0, 7); g.fill(); }
+  g.fillStyle = "#8fd18f"; g.fillRect((zustand.korb - TUNE.korbBreite.value / 2) * w, h * 0.9, TUNE.korbBreite.value * w, 14);
+  g.fillStyle = "#fff"; g.font = "20px sans-serif"; g.fillText(zustand.modus === "ende" ? "Nochmal? Tippen" : zustand.punkte + " · " + "♥".repeat(zustand.leben), 16, 32);
+}
+let rest = 0, letzte = performance.now();
+function lauf(t) { rest += Math.min(250, t - letzte); letzte = t; while (rest >= DT) { schritt(); rest -= DT; } zeichne(); requestAnimationFrame(lauf); }
+requestAnimationFrame(lauf);
+window.game = { step(ms = DT) { for (let i = 0; i < Math.max(1, Math.round(ms / DT)); i++) schritt(); }, tune: TUNE };
+window.render_game_to_text = () => JSON.stringify({ modus: zustand.modus, punkte: zustand.punkte, leben: zustand.leben, korb: zustand.korb });
+</script>
+</body>
+</html>

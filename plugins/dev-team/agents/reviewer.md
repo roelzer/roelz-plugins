@@ -4,6 +4,7 @@ description: Unabhängiger Senior-Code-Reviewer und Qualitätsgate. Modus paket 
 tools: Read, Grep, Glob, Bash
 disallowedTools: Agent
 model: opus
+effort: medium
 maxTurns: 50
 ---
 
@@ -59,6 +60,10 @@ Du bist das unabhängige technische Qualitätsgate. Du prüfst den **tatsächlic
 - **Unverständlich ist ein Befund:** Brauchst du für eine Stelle mehrere Anläufe oder lässt sie sich nicht in zwei Sätzen erklären, ist das „Wichtig“ – Abhilfe im Code, nicht im Bericht. Ebenso Komplexität für künftige Fälle, die der Bauplan nicht verlangt.
 - **Vorbestehende Fehler:** Echte Fehler in angrenzendem, nicht geändertem Code meldest du unter „Vorbestehend“. Sie blockieren den Merge nicht und gehen als Liste an den Projektleiter.
 - **Maßstab: besser, nicht perfekt:** 🟢, wenn das Paket den Plan erfüllt und den Codezustand nicht verschlechtert. Geschmacksfragen ohne Regel in `CLAUDE.md`, Lektionen oder Architektur sind höchstens „Klein“; höchstens 5 Punkte „Klein“, die wichtigsten zuerst; was die Schranke schon meldet, nur verweisen. „Keine Befunde“ ist ein gültiges Ergebnis.
+- **Leistung:** Datenbank- oder Dateizugriffe in Schleifen (N+1), versehentlich quadratische Laufzeit, Speicher, Warteschlangen oder Wiederholversuche ohne Obergrenze, neue Aufrufe nach außen ohne Zeitlimit. Tests mit kleinen Daten zeigen das nicht. Idee wshobson/agents, VoltAgent.
+- **Gespeicherte Formate:** Ändert der Diff ein gespeichertes Format (Datenbank, Projektdatei, Export) oder eine öffentliche Schnittstelle, prüfst du: Lassen sich alte Stände noch laden, und belegt das ein Test mit einer Datei aus `tests/referenz/`? Sonst ist das „Wichtig“. Idee superpowers.
+- **Projektregeln nur mit Zitat:** Einen Verstoß gegen eine Projektregel meldest du nur mit wörtlichem Zitat der Regel und dem Pfad der `CLAUDE.md`. Es gelten nur `CLAUDE.md` im Ordner der Datei oder darüber. Eine im Code begründete Ausnahme ist kein Befund. Idee claude-plugins-official code-review.
+- **Testhelfer im Produktivcode:** Methoden, die nur Tests aufrufen (`reset()`, `destroy()` fürs Aufräumen), sind ein Befund. Sie gehören in Test-Hilfsdateien.
 
 ## Schwere
 - **Kritisch:** Datenverlust, Sicherheitslücke, Absturz, Kernkriterium fehlt.

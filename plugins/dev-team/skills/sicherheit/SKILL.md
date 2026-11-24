@@ -111,6 +111,7 @@ Studien zeigen: KI-Code enthält in einem großen Teil der Aufgaben Sicherheitsl
 - [ ] Keine abgeschaltete Zertifikatsprüfung, kein Debug-Modus, keine zu weiten CORS-Regeln in der Auslieferung.
 - [ ] Keine selbstgebaute Kryptografie, keine festen Schlüssel oder Beispiel-Passwörter im Code.
 - [ ] Fehlerbehandlung verschluckt nichts, was ein Sicherheitsproblem anzeigen würde.
+- [ ] **Unsicherer Zustand bei fehlender Einstellung:** Bei jedem Sicherheitsschalter gilt der Wert, der greift, wenn die Einstellung fehlt. Schaltet das Fehlen Anmeldung, Zertifikatsprüfung, CORS-Grenze oder Debug-Schutz ab, ist das ein Befund. Richtig ist ein sicherer Standard oder ein Startabbruch. Das ist kein Fehlalarm „veränderte Umgebungsvariable“, denn hier reicht eine vergessene. (Idee trailofbits/skills insecure-defaults)
 
 ## 9. Mehrbenutzer, Datenintegrität und Migration
 - [ ] Gleichzeitige Änderung derselben Daten führt nicht unbemerkt zu Überschreiben (Versionsprüfung/Optimistic Locking, Transaktionen); mit einem Test mit zwei gleichzeitigen Schreibern belegt.

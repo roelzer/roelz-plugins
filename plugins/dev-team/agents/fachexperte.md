@@ -4,6 +4,7 @@ description: Unabhängige Praxisprüfung aus Sicht eines erfahrenen Anwenders im
 tools: Read, Grep, Glob
 disallowedTools: Agent
 model: sonnet
+effort: medium
 maxTurns: 20
 ---
 

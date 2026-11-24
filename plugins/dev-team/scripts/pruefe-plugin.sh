@@ -67,6 +67,27 @@ v="$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$pl/.cla
 for datei in ../../ANLEITUNG.md ANLEITUNG.md; do
   [ -f "$datei" ] && ! grep -q "Version ${v%.*}" "$datei" && f "$datei nennt nicht Version ${v%.*}"
 done
+python3 - "$pl" "$v" <<'PYEOF' || f "team.json-Version passt nicht zu plugin.json (Sitzungsstart meldet sonst keinen Versionswechsel)"
+import json, sys
+sys.exit(0 if json.load(open(sys.argv[1] + "/team.json", encoding="utf-8")).get("version") == sys.argv[2] else 1)
+PYEOF
+grep -q "Version ${v%.*}" "$pl/wissen/grundgesetz.md" || f "Grundgesetz nennt nicht Version ${v%.*}"
+# Jede Modellangabe für eine Rolle im Skill auftrag muss in team.json erlaubt sein
+python3 - "$pl" <<'PYEOF' || f "Skill auftrag nennt ein Modell, das team.json für die Rolle nicht erlaubt"
+import json, re, sys
+pl = sys.argv[1]
+team = json.load(open(pl + "/team.json", encoding="utf-8"))["agenten"]
+text = open(pl + "/skills/auftrag/SKILL.md", encoding="utf-8").read()
+fehler = 0
+for zeile in text.splitlines():
+    for rolle in re.findall(r"`([a-z-]+)`", zeile):
+        if rolle not in team:
+            continue
+        for modell in re.findall(r'model:\s*"(opus|sonnet|haiku)"', zeile):
+            if modell not in team[rolle]["modelle"] and len(re.findall(r"`([a-z-]+)`", zeile)) == 1:
+                print("Rolle %s, Modell %s nicht erlaubt: %s" % (rolle, modell, zeile.strip()[:90])); fehler = 1
+sys.exit(fehler)
+PYEOF
 ls "$pl"/CHANGELOG*.md >/dev/null 2>&1 || f "kein Changelog"
 grep -q "$v" "$pl"/CHANGELOG*.md 2>/dev/null || f "Changelog erwähnt Version $v nicht"
 

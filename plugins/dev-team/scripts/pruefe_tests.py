@@ -696,6 +696,12 @@ def teamplan_pruefen(e, wurzel, hauptordner, basis, konfig, fg):
         return
     gelaufen = _berichte_seit(hauptordner, seit)
     pflicht = {"reviewer": "Untergrenze: ein unabhängiges Review vor dem Merge nach main"}
+    # Vorbild Promptgeflüster (3.24): Fehler entstehen bei Umbauten, nicht bei zwei Zeilen. Kleine Änderungen ohne
+    # Risiko-Auslöser brauchen kein eigenes Review, Schranke und statische Analyse decken sie ab.
+    zahlen = sh(["git", "diff", "--numstat", basis, "HEAD", "--", ".", ":(exclude)docs", ":(exclude)tests",
+                 ":(exclude)*.md", ":(exclude)*.lock", ":(exclude)package-lock.json"], wurzel).stdout or ""
+    code_zeilen = sum(int(a) + int(b) for a, b, *_ in (z.split("\t") for z in zahlen.splitlines())
+                      if a.isdigit() and b.isdigit())
     besetzung = str((konfig or {}).get("besetzung") or "bedarf").lower()
     if besetzung in ("kunde", "voll") or (konfig or {}).get("kundendaten"):
         pflicht["sicherheitspruefer"] = "Untergrenze bei Kundendaten: Sicherheitsprüfung"
@@ -709,6 +715,9 @@ def teamplan_pruefen(e, wurzel, hauptordner, basis, konfig, fg):
     treffer = RISIKO_MUSTER.search(neu)
     if treffer:
         pflicht.setdefault("sicherheitspruefer", "Risiko-Auslöser im Code (z. B. '%s')" % treffer.group(0))
+    elif code_zeilen < 300 and len(pflicht) == 1:
+        pflicht.pop("reviewer")
+        e.o("Kleine Änderung (%d Code-Zeilen, kein Risiko-Auslöser): kein eigenes Review nötig." % code_zeilen)
     for rolle, grund in pflicht.items():
         if rolle not in gelaufen:
             melde("%s – `%s` ist seit Auftragsbeginn nicht gelaufen (kein Bericht in docs/pruefberichte/)." % (grund, rolle))

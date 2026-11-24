@@ -1,5 +1,58 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.25.0 – Praxistest und GitHub-Abgleich: Fehler behoben, Rollen geschärft
+Anlass: Simon: „prüf nochmal alles, dass es wirklich genau tut, was es soll“ und „recherchieren, was es auf GitHub schon gibt“.
+
+**Praxistest (Stundenzettel-Programm, Autopilot, unbeaufsichtigt):**
+- Gut: Das Team baute ohne Rückfrage durch. Tester, Reviewer und Sicherheitsprüfer fanden echte Fehler: eine verschluckte Zeile, gemischte Zeichenkodierung und einen Absturz unter Windows. Alle sind behoben und mit Tests abgesichert.
+- Fehler 1: `.claude/dev-team.json` ließ sich mit Write nicht anlegen, weil Claude Code bei `.claude/` immer nachfragt. Die Schranke lief deshalb nie, die statische Analyse wurde nie eingerichtet. **Neu:** `scripts/einstellungen.py --anlegen` legt die Datei über die Shell an und erkennt Technik, Testbefehl, Zählmuster und statische Analyse (ruff/mypy, tsc/eslint, PHPStan). Am Test-Projekt fand die Analyse danach sofort 116 Stellen.
+- Fehler 2: Trotz roter Schranke wurde auf `master` zusammengeführt. **Neu:** nie Merge nach `main` ohne grüne Schranke. Sonst bleibt der Stand auf dem Arbeitsbranch und kommt unter „Nur Simon“.
+
+**Widersprüche aus 3.23/3.24 behoben** (die Selbstprüfung war dort nicht gelaufen):
+- `team.json` hatte noch die Version 3.22.1. Der Sitzungsstart meldete deshalb keinen Versionswechsel.
+- Der Kritiker durfte laut `team.json` kein Sonnet nutzen, obwohl er seit 3.23 in zwei Armen läuft.
+- Das Grundgesetz nannte noch Version 3.8.
+- Die Sätze „baust nicht selbst“, „Reviewer prüft jedes Paket“ und „frischer Entwickler ab Runde 4“ widersprachen dem Ablauf.
+- `pruefe-plugin.sh` prüft das jetzt: `team.json`-Version, Grundgesetz-Version und Modellangaben im Skill `auftrag` gegen `team.json`.
+
+**Aus dem GitHub-Abgleich** (6 Recherchen; Vorbilder: obra/superpowers, anthropics/claude-plugins-official, trailofbits/skills, gstack, wshobson/agents, VoltAgent, oh-my-claudecode, spec-kit; nur Ideen in eigenen Worten):
+- **Durchlauf-Wächter an die Sitzung gebunden:** Andere Fenster im selben Projekt halten normal an. Verwaiste Marken (30 Minuten ohne Aktivität) übernimmt eine neue Sitzung. Vorbild ralph-loop, dort gab es fünf Issues zu genau diesem Fehler.
+- **Nach dem automatischen Zusammenfassen** liest der Projektleiter den Abschnitt seiner Phase und die Fix-Schleife neu, weil der Skill-Text gekürzt ist.
+- **Prüferaufträge ohne Vorab-Urteile** („nicht melden“, „höchstens Klein“).
+- **Reviewer:** Leistung (N+1, unbegrenztes Wachstum, Zeitlimits), gespeicherte Formate (alte Stände laden), Projektregeln nur mit Zitat, Testhelfer im Produktivcode.
+- **Tester:** vollständige Attrappen. **Entwickler:** keine Methoden nur für Tests.
+- **Sicherheitsprüfer:**
+  - Angriffsketten
+  - „kein Angriff aus dem Himmel“
+  - entfernte Schutzstellen per `git log -S`
+  - KI-Agenten in GitHub-Workflows
+- **Skill Sicherheit:** unsicherer Zustand bei fehlender Einstellung.
+- **Fachprüfer:** auch rückwärts prüfen (Logik ohne bestätigte Regel), Regel greift auf jedem Weg.
+- **Produktprüfer:** saubere Bildbelege, Bilder erst neutral beschreiben. **Rechercheur:** Zahlen wörtlich mit Einheit. **Auditor:** „fehlt“ mit Suchorten belegen.
+- **Architekt:**
+  - Agenten-Probe
+  - Spalten statt JSON-Klumpen
+  - kein Bauplan-Satz ohne Entscheidung
+  - Rückfragen in drei Stapel
+  - Technik mit Support-Ende
+- **Kritiker:** Plan gegen echten Code, unglückliche Wege (doppelt abgeschickt, Zurück, abgelaufene Sitzung, zweiter Tab, Teilerfolg).
+- **Designer:** unglückliche Wege, Knopftexte ohne Fehlklick, Bildschirmart zuerst.
+- **Langfrist-Architekt:** prüft Einträge statt Gedächtnis. **Pragmatiker:** erst das Problem. **Gastgeber:** Klickbudget je Hauptablauf.
+- `wissen/oberflaeche.md`: Dashboards ohne riesige Zahlen-Helden (Widerspruch zum Designer behoben).
+- Tests: Sitzungsbindung, Übernahme verwaister Marken. Alle 209 grün, `pruefe-plugin.sh` grün.
+
+## 3.24.0 – Nach dem Vorbild Promptgeflüster: Denkaufwand, Review-Schwelle, Fehlersuche
+Anlass: Simon nach drei weiteren Promptgeflüster-Videos (Befehle, Code Guardian, „Erst planen“): „bau sonst alles nach seinem Vorbild um“.
+- **Denkaufwand je Rolle** (`effort` im Steckbrief):
+  - **Mittel** für alle Rollen. Laut seiner Messung finden Prüfer auf „mittel“ 99 % der Fehler, „hoch“ und „sehr hoch“ kosten dort nur mehr.
+  - **Hoch** nur für den Kritiker bei der Planprüfung.
+  - **Sehr hoch** beim Aufruf nur für den frischen Entwickler ab Fix-Runde 3 und für hartnäckige Fehlersuche in bestehendem Code.
+- **Review-Schwelle:** Ein Paket-Review gibt es nur ab 300 Code-Zeilen, bei Risiko-Auslöser, Datenmodell- oder Schnittstellenänderung oder Stufe Groß. Stufe Klein läuft ohne Rückfrage und ohne Review, wenn sie klein und risikofrei ist. Die Schranke verlangt das Review nur noch dann. Das Gesamt-Review am Meilenstein bleibt.
+- **Fix-Schleife:** Nach zwei erfolglosen Runden übernimmt ein frischer Entwickler, laut Empfehlung von Anthropic. Vorher war es nach drei.
+- **Fehlersuche:** Der Entwickler hört nicht bei der ersten Ursache auf. Er prüft, ob sie alle Beobachtungen erklärt und ob derselbe Fehler noch an anderen Stellen sitzt.
+- Offene Befunde nach Runde 5 gehen an den Entscheidungsrat statt an Simon.
+- Tests: kleine Änderung ohne Review, Risiko-Auslöser mit Review. Alle 206 grün.
+
 ## 3.23.0 – Autopilot für alle Projekte mit Entscheidungsrat, doppelte Planprüfung, statische Analyse
 Anlass:
 - Simon: „ich will auch dass alles autonom läuft“, für alle Projekte.

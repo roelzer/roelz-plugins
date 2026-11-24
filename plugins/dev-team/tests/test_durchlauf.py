@@ -33,8 +33,11 @@ class TestDurchlauf(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.p, ignore_errors=True)
 
-    def stop(self, aktiv=False):
-        r = subprocess.run(["bash", DURCHLAUF], input=json.dumps({"stop_hook_active": aktiv}), text=True,
+    def stop(self, aktiv=False, sitzung=None):
+        daten = {"stop_hook_active": aktiv}
+        if sitzung:
+            daten["session_id"] = sitzung
+        r = subprocess.run(["bash", DURCHLAUF], input=json.dumps(daten), text=True,
                            capture_output=True, env=dict(os.environ, CLAUDE_PROJECT_DIR=self.p))
         self.assertEqual(r.returncode, 0, r.stderr)
         return json.loads(r.stdout) if r.stdout.strip() else None
@@ -56,6 +59,13 @@ class TestDurchlauf(unittest.TestCase):
         self.assertEqual(antwort["decision"], "block")
         self.assertIn("mach weiter", antwort["reason"])
         self.assertIsNone(self.stop(aktiv=True))  # nie eine Endlosschleife
+
+    def test_marke_gehoert_der_ersten_sitzung(self):
+        self.an()
+        self.assertEqual(self.stop(sitzung="pl-1")["decision"], "block")
+        self.assertIn("sitzung: pl-1", open(os.path.join(self.p, ".dev-team", "durchlauf")).read())
+        self.assertIsNone(self.stop(sitzung="fenster-2"))  # anderes Fenster hält normal an
+        self.assertEqual(self.stop(sitzung="pl-1")["decision"], "block")
 
     def zeile(self, ereignis, kennung=None, vor=0):
         with open(os.path.join(self.p, ".dev-team", "kennzahlen.jsonl"), "a") as f:
@@ -225,18 +235,28 @@ class TestKontext(unittest.TestCase):
 class TestSitzungsstartDurchlauf(unittest.TestCase):
     """Neue Cloud-Sitzung = neuer Container ohne .dev-team/: der Durchlauf kommt aus der Übergabe zurück."""
 
-    def lauf(self, uebergabe, claude_md=None):
+    def lauf(self, uebergabe, claude_md=None, marke=None, alter_min=0, quelle="startup"):
         d = tempfile.mkdtemp(prefix="start-")
         try:
             os.makedirs(os.path.join(d, "docs"))
+            if marke is not None:
+                os.makedirs(os.path.join(d, ".dev-team"))
+                pfad = os.path.join(d, ".dev-team", "durchlauf")
+                with open(pfad, "w") as f:
+                    f.write(marke)
+                alt = time.time() - alter_min * 60
+                os.utime(pfad, (alt, alt))
             with open(os.path.join(d, "docs", "SITZUNGSUEBERGABE.md"), "w") as f:
                 f.write(uebergabe)
             if claude_md:
                 with open(os.path.join(d, "CLAUDE.md"), "w") as f:
                     f.write(claude_md)
-            r = subprocess.run(["bash", SITZUNGSSTART], input="{}", text=True, capture_output=True,
+            r = subprocess.run(["bash", SITZUNGSSTART], input=json.dumps({"source": quelle}), text=True,
+                               capture_output=True,
                                env=dict(os.environ, CLAUDE_PLUGIN_ROOT=PLUGIN, CLAUDE_PROJECT_DIR=d, HOME=d))
-            return r.stdout, os.path.exists(os.path.join(d, ".dev-team", "durchlauf"))
+            pfad = os.path.join(d, ".dev-team", "durchlauf")
+            self.marke_danach = open(pfad).read() if os.path.exists(pfad) else None
+            return r.stdout, os.path.exists(pfad)
         finally:
             shutil.rmtree(d, ignore_errors=True)
 
@@ -245,6 +265,15 @@ class TestSitzungsstartDurchlauf(unittest.TestCase):
             aus, an = self.lauf(text)
             self.assertTrue(an, text)
             self.assertIn("Durchlauf wieder eingeschaltet", aus)
+
+    def test_verwaiste_marke_wird_uebernommen(self):
+        aus, an = self.lauf("**Durchlauf:** an\n", marke="x\nsitzung: alt\n", alter_min=45)
+        self.assertTrue(an)
+        self.assertNotIn("sitzung: alt", self.marke_danach)  # nächster Stop der neuen Sitzung übernimmt sie
+
+    def test_aktive_marke_bleibt_beim_besitzer(self):
+        aus, an = self.lauf("**Durchlauf:** an\n", marke="x\nsitzung: pl-1\n", alter_min=5)
+        self.assertIn("sitzung: pl-1", self.marke_danach)
 
     def test_durchlauf_aus_oder_vorlage_bleibt_aus(self):
         for text in ("**Durchlauf:** aus\n", "**Durchlauf:** an / aus (an = Simons Freigabe gilt weiter)\n"):

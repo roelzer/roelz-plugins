@@ -438,6 +438,9 @@ class TestSchranke(unittest.TestCase):
 
     def test_teamplan_und_untergrenzen(self):
         self.schreibe(".dev-team/plugin-version", "3.20.0\n")
+        self.schreibe("src/gross.py", "".join("def f%d():\n    return %d\n" % (i, i) for i in range(160)))
+        git(self.p, "add", "src/gross.py")
+        git(self.p, "commit", "-qm", "gross")
         code, aus = self.lauf("--rolle", "projektleiter", "--ohne-lauf")
         self.assertEqual(code, 1, aus)
         self.assertIn("Kein Teamplan", aus)
@@ -653,6 +656,22 @@ class TestSchranke(unittest.TestCase):
         self.konfig({"testbefehl": "%s -m unittest discover -s tests -t . -v" % sys.executable,
                      "testzahl_muster": r"Ran (\d+) tests?", "zusatzbefehle": ["echo zusatz"]})
         self.assertEqual(self.lauf("--rolle", "entwickler", "--ohne-lauf")[0], 1)
+
+    def test_kleine_aenderung_ohne_review(self):
+        self.schreibe(".dev-team/plugin-version", "3.24.0\n")
+        self.schreibe("docs/TEAMPLAN.md", "| Aufgabe | wer | warum |\n|---|---|---|\n| Bauen | ich | klein |\n")
+        self.schreibe("src/klein.py", "def f():\n    return 1\n")
+        git(self.p, "add", "-A")
+        git(self.p, "commit", "-qm", "klein")
+        code, aus = self.lauf("--rolle", "projektleiter", "--ohne-lauf")
+        self.assertIn("kein eigenes Review nötig", aus)
+        self.assertNotIn("`reviewer` ist seit Auftragsbeginn nicht gelaufen", aus)
+        # mit Risiko-Auslöser bleibt das Review Pflicht
+        self.schreibe("src/klein.py", "def login(password):\n    return password\n")
+        git(self.p, "add", "-A")
+        git(self.p, "commit", "-qm", "login")
+        code, aus = self.lauf("--rolle", "projektleiter", "--ohne-lauf")
+        self.assertIn("`reviewer` ist seit Auftragsbeginn nicht gelaufen", aus)
 
     def test_entwickler_darf_anleitungen_unter_docs(self):
         self.schreibe("docs/anleitung/update.md", "# Update\n")

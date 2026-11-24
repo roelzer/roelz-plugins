@@ -1,0 +1,12 @@
+*.map
+.env*
+.git
+node_modules
+*.md
+!QUELLEN.md
+*.bak
+*.log
+*.zip
+*.psd
+package*.json
+.assetsignore
