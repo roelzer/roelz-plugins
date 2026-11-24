@@ -9,7 +9,7 @@
 // 3. Bilder, Klänge oder Musik von Seiten außerhalb der freien Quellen herunterladen, yt-dlp: gesperrt.
 // Ehrlich: Eine Befehls-Sperre fängt bekannte Befehle, keine Umwege über eigene Programme.
 import path from "node:path";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 
 // Gilt nur dort, wo der Spiele-Bauer arbeitet (Ordner spiele/ im aktuellen oder einem oberen Ordner).
 function spieleProjekt(cwd) {
@@ -40,6 +40,36 @@ function freigegebeneHosts(ordner) {
 
 // Text in einem Heredoc ist Dateiinhalt, kein Befehl (CREDITS.md mit „git push“ als Pflegehinweis). Ausnahme: Der Heredoc
 // geht an eine Shell, dann zählt er als Befehl. Gleiche Regel wie in der Website-Sperre.
+// Veröffentlichen laut Auftrag (Simon, 24.11.2026): erlaubt ohne Rückfrage, wenn spiele/<name>/arbeit/veroeffentlichen.md
+// Simons Auftrag wörtlich zitiert (Zeile „Simon: „…““) und arbeit/pruefung.json (spielpruefen.mjs) keinen FEHLER hat
+// und neuer ist als jede Spieldatei. Sonst fragt Claude Code Simon.
+function juengste(ordner) {
+  let t = 0;
+  const geh = (d) => { for (const n of readdirSync(d, { withFileTypes: true })) { const p = path.join(d, n.name); if (n.isDirectory()) { if (!["node_modules", "arbeit"].includes(n.name)) geh(p); } else t = Math.max(t, statSync(p).mtimeMs); } };
+  try { geh(ordner); } catch {}
+  return t;
+}
+export function auftragsFreigabe(cwd) {
+  let d = path.resolve(cwd || process.cwd()), w = null;
+  for (let i = 0; i < 10; i++) { if (existsSync(path.join(d, "spiele"))) { w = d; break; } const o = path.dirname(d); if (o === d) break; d = o; }
+  if (!w) return null;
+  let namen = [];
+  try { namen = readdirSync(path.join(w, "spiele")); } catch { return null; }
+  for (const n of namen) {
+    const arbeit = path.join(w, "spiele", n, "arbeit");
+    const frei = path.join(arbeit, "veroeffentlichen.md");
+    if (!existsSync(frei) || !/^\s*[-*]?\s*Simon\s*:\s*\S/im.test(readFileSync(frei, "utf8"))) continue;
+    const pj = path.join(arbeit, "pruefung.json");
+    if (!existsSync(pj)) return { ok: false, grund: "Auftrag sagt veröffentlichen, aber spielpruefen.mjs ist noch nicht gelaufen." };
+    let fehler = 1;
+    try { fehler = (JSON.parse(readFileSync(pj, "utf8")).befunde || []).filter((b) => b.schwere === "FEHLER").length; } catch {}
+    if (fehler) return { ok: false, grund: `Auftrag sagt veröffentlichen, aber die Prüfung hat ${fehler} FEHLER.` };
+    if (statSync(pj).mtimeMs < juengste(path.join(w, "spiele", n))) return { ok: false, grund: "Auftrag sagt veröffentlichen, aber das Spiel wurde nach der letzten Prüfung geändert." };
+    return { ok: true, grund: `Veröffentlichen laut Auftrag (spiele/${n}/arbeit/veroeffentlichen.md), Prüfung ohne FEHLER.` };
+  }
+  return null;
+}
+
 export function ohneHeredocText(befehl) {
   const zeilen = befehl.split("\n"); const raus = []; let ende = null;
   for (const z of zeilen) {
@@ -76,7 +106,11 @@ export function pruefe(eingabe) {
   if (werkzeug !== "Bash" && werkzeug !== "PowerShell") return null;
   const befehl = ohneHeredocText(String(t.command || ""));
   if (!spieleProjekt(eingabe.cwd) && !/spiele\//.test(befehl)) return null;
-  if (VEROEFFENTLICHEN.test(befehl)) return { art: "ask", grund: "Veröffentlichen nur auf Simons ausdrückliches Ja zu genau dieser Fassung. Simon, willst du das jetzt wirklich online stellen?" };
+  if (VEROEFFENTLICHEN.test(befehl)) {
+    const f = auftragsFreigabe(eingabe.cwd);
+    if (f && f.ok) return { art: "allow", grund: f.grund };
+    return { art: "ask", grund: (f ? f.grund + " " : "") + "Veröffentlichen nur, wenn der Auftrag es verlangt oder auf Simons ausdrückliches Ja zu genau dieser Fassung. Simon, willst du das jetzt wirklich online stellen?" };
+  }
   if (UPLOAD.test(befehl)) return { art: "deny", grund: "Hochladen ist gesperrt – Simon bekommt das Spiel als Datei." };
   if (VIDEO_LADEN.test(befehl)) return { art: "deny", grund: "Musik oder Videos von YouTube haben keine klare Lizenz. Ton im Code erzeugen (ZzFX, jsfxr) oder CC0-Klänge nehmen." };
   const laden = befehl.match(/\b(curl|wget|Invoke-WebRequest|iwr)\b[^|;&\n]*/gi) || [];

@@ -7,7 +7,7 @@
 //    (Vorbilder ansehen ja, ihre Dateien übernehmen nein).
 // Ehrlich: Eine Befehls-Sperre fängt bekannte Befehle, keine Umwege über eigene Programme.
 import path from "node:path";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 
 // Die Sperre gilt nur dort, wo der Website-Bauer arbeitet (Ordner website/ im aktuellen oder einem oberen Ordner),
 // damit git push oder Downloads in anderen Projekten (Dev-Team) nicht ausgebremst werden.
@@ -22,6 +22,44 @@ const UPLOAD = /\b(curl|wget|Invoke-WebRequest|iwr)\b[^|;&]*(\s-F\b|\s-T\b|\s-d\
 const FREMD_IN_SEITE = /(fonts\.googleapis\.com|fonts\.gstatic\.com|use\.typekit\.net|p\.typekit\.net|fonts\.bunny\.net|cdn\.jsdelivr\.net|unpkg\.com|cdnjs\.cloudflare\.com|code\.jquery\.com|cdn\.tailwindcss\.com|googletagmanager\.com|google-analytics\.com|gtag\(|connect\.facebook\.net|plausible\.io|hotjar|clarity\.ms|matomo|youtube\.com\/embed|maps\.googleapis\.com|api\.mapbox|prod\.spline\.design|unsplash\.com\/photos|images\.unsplash\.com|images\.pexels\.com)/i;
 const MEDIEN = /\.(jpe?g|png|webp|avif|gif|svg|glb|gltf|bin|hdr|exr|ktx2|woff2?|ttf|otf|mp4|webm|mov)(\?|\s|"|'|$)/i;
 const FREIE_QUELLEN = /(polyhaven\.(com|org)|api\.openverse\.org|openverse\.org|images\.unsplash\.com|unsplash\.com|images\.pexels\.com|pexels\.com|upload\.wikimedia\.org|wikimedia\.org|rawpixel\.com|stocksnap\.io|ambientcg\.com|registry\.npmjs\.org|github\.com|githubusercontent\.com|fonts\.google\.com|gwfh\.mranftl\.com|fontshare\.com|api\.fontshare\.com|velvetyne\.fr|kenney\.nl|khronos\.org|localhost|127\.0\.0\.1)/i;
+
+// Veröffentlichen laut Auftrag (Simon, 24.11.2026: „angenommen es steht im Auftrag, dann soll das auch gleich erstellt
+// und gepusht werden“, ohne dreimal zu bestätigen). Erlaubt ohne Rückfrage, wenn
+//   1. website/<name>/arbeit/veroeffentlichen.md Simons Auftrag wörtlich zitiert (Zeile „Simon: „…““) und
+//   2. die jüngste Prüfung (arbeit/pruefung/pruefung.json) keinen P0 hat und neuer ist als jede Datei in site/.
+// Sonst fragt Claude Code Simon wie bisher.
+function wurzelMitWebsite(cwd) {
+  let d = path.resolve(cwd || process.cwd());
+  for (let i = 0; i < 10; i++) { if (existsSync(path.join(d, "website"))) return d; const o = path.dirname(d); if (o === d) break; d = o; }
+  return null;
+}
+function juengste(ordner) {
+  let t = 0;
+  const geh = (d) => { for (const n of readdirSync(d, { withFileTypes: true })) { const p = path.join(d, n.name); if (n.isDirectory()) { if (n.name !== "node_modules") geh(p); } else t = Math.max(t, statSync(p).mtimeMs); } };
+  try { geh(ordner); } catch {}
+  return t;
+}
+export function auftragsFreigabe(cwd) {
+  const w = wurzelMitWebsite(cwd);
+  if (!w) return null;
+  let namen = [];
+  try { namen = readdirSync(path.join(w, "website")); } catch { return null; }
+  for (const n of namen) {
+    const arbeit = path.join(w, "website", n, "arbeit");
+    const frei = path.join(arbeit, "veroeffentlichen.md");
+    if (!existsSync(frei)) continue;
+    const text = readFileSync(frei, "utf8");
+    if (!/^\s*[-*]?\s*Simon\s*:\s*\S/im.test(text)) continue;
+    const pj = path.join(arbeit, "pruefung", "pruefung.json");
+    if (!existsSync(pj)) return { ok: false, grund: "Auftrag sagt veröffentlichen, aber es gibt noch keine Prüfung (pruefen.mjs)." };
+    let p0 = 1;
+    try { p0 = (JSON.parse(readFileSync(pj, "utf8")).befunde || []).filter((b) => b.schwere === "P0").length; } catch {}
+    if (p0) return { ok: false, grund: `Auftrag sagt veröffentlichen, aber die Prüfung hat ${p0} P0.` };
+    if (statSync(pj).mtimeMs < juengste(path.join(w, "website", n, "site"))) return { ok: false, grund: "Auftrag sagt veröffentlichen, aber die Seite wurde nach der letzten Prüfung geändert." };
+    return { ok: true, grund: `Veröffentlichen laut Auftrag (website/${n}/arbeit/veroeffentlichen.md), Prüfung ohne P0.` };
+  }
+  return null;
+}
 
 function inLieferung(datei) {
   const p = String(datei || "").split(path.sep).join("/");
@@ -56,7 +94,11 @@ export function pruefe(eingabe) {
   if (werkzeug !== "Bash" && werkzeug !== "PowerShell") return null;
   const befehl = ohneHeredocText(String(t.command || ""));
   if (!websiteProjekt(eingabe.cwd) && !/website\//.test(befehl)) return null;
-  if (VEROEFFENTLICHEN.test(befehl)) return { art: "ask", grund: "Veröffentlichen nur auf Simons ausdrückliches Ja nach der Vorschau (Stopp 2). Simon, willst du das jetzt wirklich online stellen?" };
+  if (VEROEFFENTLICHEN.test(befehl)) {
+    const f = auftragsFreigabe(eingabe.cwd);
+    if (f && f.ok) return { art: "allow", grund: f.grund };
+    return { art: "ask", grund: (f ? f.grund + " " : "") + "Veröffentlichen nur, wenn der Auftrag es verlangt oder auf Simons ausdrückliches Ja nach der Vorschau (Stopp 2). Simon, willst du das jetzt wirklich online stellen?" };
+  }
   if (UPLOAD.test(befehl)) return { art: "deny", grund: "Hochladen ist gesperrt – Simon bekommt die lokale Seite." };
   const laden = befehl.match(/\b(curl|wget|Invoke-WebRequest|iwr)\b[^|;&\n]*/gi) || [];
   for (const teil of laden) {

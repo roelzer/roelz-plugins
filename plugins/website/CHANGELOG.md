@@ -1,5 +1,12 @@
 # Änderungsprotokoll Website-Bauer
 
+## 0.3.4 – Veröffentlichen laut Auftrag ohne Rückfrage
+Simon, 24.11.2026: „sowas wie Cloudflare pushen, will ich, dass ich nicht 3 mal bestätigen muss … angenommen es steht im Auftrag, dann soll das auch gleich erstellt werden und dann gepusht“.
+- Steht das Veröffentlichen im Auftrag, schreibt der Skill zu Beginn `arbeit/veroeffentlichen.md` mit Simons Satz wörtlich.
+- Die Sperre lässt `wrangler deploy` und Co. dann **ohne Rückfrage** durch („allow“, damit fragt auch Claude Code nicht mehr). Bedingung: Die jüngste Prüfung hat keinen P0 und ist neuer als jede Datei in `site/`.
+- Fehlt der Auftrag, ist die Prüfung rot oder veraltet, fragt Claude Code wie bisher.
+- Tests dazu.
+
 ## 0.3.3 – Mehr Prüfregeln aus dem GitHub-Abgleich (24.11.2026)
 Anlass: GitHub-Abgleich 24.11.2026. Quellen: impeccable, Hallmark, Vercel Web Interface Guidelines, gsap-skills, Anthropic `frontend-design`. Übernommen sind nur Ideen und Schwellen, die Umsetzung ist eigen, kein fremder Code.
 - Prüfskript, KI-Look (W1):

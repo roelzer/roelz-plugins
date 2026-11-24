@@ -53,6 +53,19 @@ class Sperre(unittest.TestCase):
     def test_befehl_nach_heredoc_zaehlt(self):
         self.assertEqual(entscheidung(bash("cat > a.txt <<'EOF'\nhallo\nEOF\ngit push")), "ask")
 
+    def test_veroeffentlichen_laut_auftrag_ohne_rueckfrage(self):
+        d = tempfile.mkdtemp()
+        spiel = os.path.join(d, "spiele", "x"); arbeit = os.path.join(spiel, "arbeit")
+        os.makedirs(arbeit)
+        open(os.path.join(spiel, "index.html"), "w").write("<canvas></canvas>")
+        self.assertEqual(entscheidung(bash("npx wrangler deploy", cwd=d)), "ask")
+        open(os.path.join(arbeit, "veroeffentlichen.md"), "w").write("Simon: „mach das Spiel und stell es online“\n")
+        time.sleep(0.05)
+        open(os.path.join(arbeit, "pruefung.json"), "w").write('{"befunde": [{"schwere": "FEHLER", "fehler": "S1", "text": "x"}]}')
+        self.assertEqual(entscheidung(bash("npx wrangler deploy", cwd=d)), "ask")
+        open(os.path.join(arbeit, "pruefung.json"), "w").write('{"befunde": [{"schwere": "Hinweis", "fehler": "S6", "text": "x"}]}')
+        self.assertEqual(entscheidung(bash("npx wrangler deploy", cwd=d)), "allow")
+
     def test_andere_projekte_unberuehrt(self):
         self.assertIsNone(bash("git push origin main", cwd=tempfile.mkdtemp()))
 
