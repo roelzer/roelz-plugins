@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Scrollt</title>
+<style>html, body { margin: 0; } canvas { display: block; width: 100%; height: 300px; background: #234; }</style>
+</head>
+<body>
+<!-- Eichvorlage „scrollt“: Spielfläche zu flach (300 von 844 px) und ohne touch-action, Wisch ohne preventDefault.
+     spielpruefen.mjs muss S2 (Hochkant) und S4 (Wisch scrollt die äußere Seite) melden. -->
+<canvas id="feld"></canvas>
+<script>const g = document.getElementById("feld").getContext("2d"); let i = 0; (function l() { g.fillStyle = i++ % 2 ? "#345" : "#234"; g.fillRect(0, 0, 20, 20); requestAnimationFrame(l); })();</script>
+</body>
+</html>

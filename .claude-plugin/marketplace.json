@@ -1,6 +1,6 @@
 {
   "name": "roelz-plugins",
-  "description": "Simons Claude-Code-Plugins: Dev-Team, Team-Tafel, Tool-Scout, Personaler, Video-Editor, Website-Bauer und Recherche. Ohne Firmen- oder Kundenwissen, auch auf Arbeitsrechnern nutzbar.",
+  "description": "Simons Claude-Code-Plugins: Dev-Team, Team-Tafel, Tool-Scout, Personaler, Video-Editor, Website-Bauer, Spiele-Bauer und Recherche. Ohne Firmen- oder Kundenwissen, auch auf Arbeitsrechnern nutzbar.",
   "owner": {
     "name": "Simon Rölz"
   },
@@ -39,6 +39,12 @@
       "name": "website",
       "source": "./plugins/website",
       "description": "Website-Bauer: Vereins-, Firmen-, Muster- und Projektseiten mit 3D auf Spitzenniveau – nur kostenlose Werkzeuge, kein KI-Look. Vorbilder und Idee zuerst, echte Bilder, Prüfskript ohne KI, unabhängiger Kritiker, Veröffentlichen nur auf Simons Ja.",
+      "category": "productivity"
+    },
+    {
+      "name": "spiele",
+      "source": "./plugins/spiele",
+      "description": "Spiele-Bauer: eigene kleine Browserspiele für Handy und Laptop, 2D oder 3D – Spaßprojekte und Mini-Spiele für Vereins- und Firmenseiten. Eigene Idee mit erster Minute, Stellschrauben, Prüfskript ohne KI (Bot, Hochkant, Bildzeit, iframe), unabhängiger Prüfer, nur kostenlose Werkzeuge, keine fremden Server, Veröffentlichen nur auf Simons Ja.",
       "category": "productivity"
     },
     {

@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f6f1e9">
+<title>Tägliche Knobelei</title>
+<meta name="description" content="Jeden Tag ein neues Zahlenrätsel für die ganze Familie – wer ist am schnellsten?">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23e2725b'/%3E%3Ctext x='32' y='45' font-size='36' text-anchor='middle' fill='white' font-family='Arial' font-weight='700'%3E7%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#f6f1e9; --surface:#fffdf9; --surface-2:#f0e8dc; --ink:#2b2622; --ink-2:#6e655c;
+  --line:#d9cdbd; --line-strong:#4a4139; --accent:#e2725b; --accent-ink:#fff; --accent-soft:#fbe1d9;
+  --given:#2b2622; --entered:#2f6f9f; --bad:#c43d3d; --bad-soft:#f8d7d3; --ok:#3b8a5a; --ok-soft:#dcefe2;
+  --sel:#ffe8a3; --peer:#f6eedd; --same:#f3d9a0; --shadow:0 6px 24px rgba(60,40,20,.10);
+  --radius:18px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1c1917; --surface:#262220; --surface-2:#312c29; --ink:#f3ede6; --ink-2:#b1a69b;
+    --line:#4a423c; --line-strong:#cfc4b8; --accent:#ef8a73; --accent-ink:#1c1917; --accent-soft:#4a2e27;
+    --given:#f3ede6; --entered:#8cc3ee; --bad:#ff8a80; --bad-soft:#4d2523; --ok:#7fcf9b; --ok-soft:#203a2a;
+    --sel:#5a4a1f; --peer:#2e2925; --same:#6b5525; --shadow:0 6px 24px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1c1917; --surface:#262220; --surface-2:#312c29; --ink:#f3ede6; --ink-2:#b1a69b;
+  --line:#4a423c; --line-strong:#cfc4b8; --accent:#ef8a73; --accent-ink:#1c1917; --accent-soft:#4a2e27;
+  --given:#f3ede6; --entered:#8cc3ee; --bad:#ff8a80; --bad-soft:#4d2523; --ok:#7fcf9b; --ok-soft:#203a2a;
+  --sel:#5a4a1f; --peer:#2e2925; --same:#6b5525; --shadow:0 6px 24px rgba(0,0,0,.35);
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:ui-rounded,"SF Pro Rounded","Nunito","Segoe UI",system-ui,-apple-system,sans-serif;
+  -webkit-tap-highlight-color:transparent; min-height:100dvh;
+}
+button{font:inherit;color:inherit}
+.app{max-width:520px;margin:0 auto;padding:12px 16px calc(24px + env(safe-area-inset-bottom))}
+header.top{display:flex;align-items:center;gap:10px;padding:6px 0 14px}
+.logo{width:40px;height:40px;border-radius:12px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:800;font-size:22px;flex:none}
+.brand{flex:1;min-width:0}
+.brand h1{font-size:20px;margin:0;line-height:1.1;letter-spacing:-.01em}
+.brand small{color:var(--ink-2);font-size:13px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 12px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px;max-width:42vw}
+.chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.iconbtn{border:1px solid var(--line);background:var(--surface);border-radius:12px;width:40px;height:40px;display:grid;place-items:center;cursor:pointer;flex:none}
+.card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:16px}
+.hero{background:linear-gradient(135deg,var(--accent) 0%,#d9a441 130%);color:#fff}
+:root[data-theme="dark"] .hero{color:#1c1917}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .hero{color:#1c1917}}
+.hero h2{margin:0 0 4px;font-size:24px}
+.hero p{margin:0 0 14px;opacity:.92}
+.btn{border:0;border-radius:14px;padding:13px 18px;font-weight:700;font-size:16px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.light{background:rgba(255,255,255,.95);color:#2b2622}
+.btn.ghost{background:var(--surface-2);color:var(--ink)}
+.btn.block{width:100%}
+.btn:active{transform:scale(.98)}
+h3{font-size:16px;margin:0 0 12px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+h3 small{font-weight:500;color:var(--ink-2);font-size:13px}
+.muted{color:var(--ink-2);font-size:14px}
+.levels{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.lvl{aspect-ratio:1;border-radius:14px;border:1px solid var(--line);background:var(--surface-2);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-weight:800;font-size:20px;position:relative}
+.lvl small{font-size:11px;font-weight:600;color:var(--ink-2)}
+.lvl.done{background:var(--ok-soft);border-color:transparent}
+.lvl.done::after{content:"✓";position:absolute;top:4px;right:8px;font-size:13px;color:var(--ok)}
+.lvl.locked{opacity:.45;cursor:not-allowed}
+table.board{width:100%;border-collapse:collapse;font-size:15px}
+table.board td{padding:9px 4px;border-bottom:1px solid var(--line)}
+table.board tr:last-child td{border-bottom:0}
+table.board td.rank{width:34px;font-weight:800;color:var(--ink-2)}
+table.board td.t{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+table.board tr.me td{color:var(--accent)}
+.empty{color:var(--ink-2);font-size:14px;padding:6px 0}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row > .btn{flex:1}
+
+/* Game */
+.gamebar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.gamebar .title{flex:1;min-width:0}
+.gamebar .title b{display:block;font-size:17px}
+.gamebar .title small{color:var(--ink-2);font-size:13px}
+.timer{font-variant-numeric:tabular-nums;font-weight:800;font-size:22px;background:var(--surface);padding:6px 12px;border-radius:12px;box-shadow:var(--shadow)}
+.grid{
+  --n:6; display:grid; grid-template-columns:repeat(var(--n),1fr);
+  width:min(100%, 480px); aspect-ratio:1; margin:0 auto 14px;
+  background:var(--line-strong); border:3px solid var(--line-strong); border-radius:14px; overflow:hidden; gap:1px;
+  touch-action:manipulation; user-select:none;
+}
+.cell{
+  background:var(--surface); display:grid; place-items:center; position:relative; cursor:pointer;
+  font-weight:700; color:var(--entered); font-size:calc(min(100vw - 40px, 480px) / var(--n) * .52);
+  font-variant-numeric:tabular-nums;
+}
+.cell.given{color:var(--given);font-weight:800}
+.cell.peer{background:var(--peer)}
+.cell.same{background:var(--same)}
+.cell.sel{background:var(--sel)}
+.cell.bad{color:var(--bad)}
+.cell.bad.sel,.cell.bad{background-image:linear-gradient(var(--bad-soft),var(--bad-soft))}
+.cell.br{box-shadow:inset -2px 0 0 var(--line-strong)}
+.cell.bb{box-shadow:inset 0 -2px 0 var(--line-strong)}
+.cell.br.bb{box-shadow:inset -2px 0 0 var(--line-strong), inset 0 -2px 0 var(--line-strong)}
+.cell.pop{animation:pop .25s ease}
+@keyframes pop{50%{transform:scale(1.12)}}
+.notes{position:absolute;inset:2px;display:grid;font-size:calc(min(100vw - 40px, 480px) / var(--n) * .2);color:var(--ink-2);font-weight:600;line-height:1}
+.notes span{display:grid;place-items:center}
+.grid.win .cell{animation:wave .6s ease both}
+@keyframes wave{40%{background:var(--ok-soft)}}
+.pad{display:grid;grid-template-columns:repeat(var(--cols,6),minmax(0,1fr));gap:8px;margin-bottom:10px}
+.pad.nine{gap:5px}
+.pad.nine button{font-size:20px;min-height:50px;border-radius:10px}
+body.playing header.top{display:none}
+@media (max-width:360px){.brand h1{font-size:17px}.brand small{font-size:12px}}
+.pad button{border:0;background:var(--surface);box-shadow:var(--shadow);border-radius:14px;min-height:54px;font-size:24px;font-weight:800;cursor:pointer;color:var(--ink)}
+.pad button:active{background:var(--accent-soft)}
+.pad button.used{opacity:.35}
+.tools{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tools button{border:0;background:var(--surface-2);border-radius:14px;min-height:56px;font-size:12px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--ink)}
+.tools button .ic{font-size:20px;line-height:1}
+.tools button.on{background:var(--accent);color:var(--accent-ink)}
+.howto{font-size:14px;color:var(--ink-2);text-align:center;margin:12px 0 0}
+
+/* Dialog */
+dialog{border:0;border-radius:22px;padding:0;background:var(--surface);color:var(--ink);width:min(92vw,420px);box-shadow:0 20px 60px rgba(0,0,0,.3)}
+dialog::backdrop{background:rgba(20,15,10,.45);backdrop-filter:blur(2px)}
+.dlg{padding:22px}
+.dlg h2{margin:0 0 6px;font-size:22px}
+.big{font-size:44px;font-weight:800;font-variant-numeric:tabular-nums;margin:8px 0;color:var(--accent)}
+.dlg input,.dlg textarea{width:100%;font:inherit;font-size:16px;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);margin:6px 0 12px}
+.dlg textarea{min-height:110px;resize:vertical}
+.plist{display:flex;flex-direction:column;gap:8px;margin:10px 0 14px}
+.plist button{text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:12px;cursor:pointer;font-size:16px;display:flex;justify-content:space-between}
+.plist button.cur{border-color:var(--accent);background:var(--accent-soft)}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:10;max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:5}
+[hidden]{display:none!important}
+@media (min-width:600px){ .pad button{min-height:58px} }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="logo" aria-hidden="true">7</div>
+    <div class="brand"><h1>Tägliche Knobelei</h1><small id="todayLabel"></small></div>
+    <button class="chip" id="playerChip" aria-label="Spieler wechseln">👤 <span id="playerName">Spieler</span></button>
+    <button class="iconbtn" id="themeBtn" aria-label="Hell/Dunkel umschalten">🌙</button>
+  </header>
+
+  <!-- HOME -->
+  <main id="home">
+    <section class="card hero">
+      <h2 id="heroTitle">Rätsel des Tages</h2>
+      <p id="heroText">Alle in der Familie bekommen heute dasselbe Rätsel. Wer löst es am schnellsten?</p>
+      <button class="btn light block" id="playDaily">Los geht's ▶</button>
+    </section>
+
+    <section class="card">
+      <h3>Heute in der Familie <small id="boardDate"></small></h3>
+      <div id="board"></div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn ghost" id="importBtn">📋 Ergebnis einfügen</button>
+        <button class="btn ghost" id="shareBoardBtn">📤 Teilen</button>
+      </div>
+      <p class="muted" style="margin:10px 0 0">Tipp: Nach dem Lösen das Ergebnis in die Familiengruppe schicken. Die anderen fügen es hier mit „Ergebnis einfügen“ ein – fertig ist die Rangliste.</p>
+    </section>
+
+    <section class="card">
+      <h3>Übungslevel <small id="lvlProgress"></small></h3>
+      <div class="levels" id="levels"></div>
+    </section>
+
+    <section class="card">
+      <h3>So geht's</h3>
+      <p class="muted" style="margin:0">In jeder Zeile, jeder Spalte und jedem dick umrandeten Kästchen kommt jede Zahl genau einmal vor. Feld antippen, dann Zahl wählen. Mit ✏️ machst du kleine Notizen. Ein Tipp kostet 30 Sekunden Strafzeit.</p>
+    </section>
+  </main>
+
+  <!-- GAME -->
+  <main id="game" hidden>
+    <div class="gamebar">
+      <button class="iconbtn" id="backBtn" aria-label="Zurück">←</button>
+      <div class="title"><b id="gameTitle">Rätsel</b><small id="gameSub"></small></div>
+      <div class="timer" id="timer">0:00</div>
+    </div>
+    <div class="grid" id="grid" role="grid" aria-label="Rätselfeld"></div>
+    <div class="pad" id="pad"></div>
+    <div class="tools">
+      <button id="undoBtn"><span class="ic">↶</span>Zurück</button>
+      <button id="eraseBtn"><span class="ic">⌫</span>Löschen</button>
+      <button id="notesBtn"><span class="ic">✏️</span>Notizen</button>
+      <button id="hintBtn"><span class="ic">💡</span>Tipp +30s</button>
+    </div>
+    <p class="howto">Jede Zahl genau einmal pro Zeile, Spalte und Kästchen.</p>
+  </main>
+</div>
+
+<!-- Dialogs -->
+<dialog id="winDlg"><div class="dlg">
+  <h2 id="winTitle">Geschafft! 🎉</h2>
+  <div class="muted" id="winSub"></div>
+  <div class="big" id="winTime">0:00</div>
+  <div class="muted" id="winExtra" style="margin-bottom:16px"></div>
+  <div class="row">
+    <button class="btn primary" id="winShare">📤 Ergebnis teilen</button>
+    <button class="btn ghost" id="winNext">Weiter</button>
+  </div>
+</div></dialog>
+
+<dialog id="playerDlg"><div class="dlg">
+  <h2>Wer spielt?</h2>
+  <p class="muted" style="margin:0">Jeder bekommt eine eigene Zeit. Mehrere Personen können dasselbe Handy benutzen.</p>
+  <div class="plist" id="plist"></div>
+  <label class="muted" for="newPlayer">Neue Person</label>
+  <input id="newPlayer" maxlength="20" placeholder="z. B. Oma, Papa, Lina" autocomplete="off">
+  <div class="row">
+    <button class="btn primary" id="addPlayer">Hinzufügen</button>
+    <button class="btn ghost" id="closePlayer">Fertig</button>
+  </div>
+</div></dialog>
+
+<dialog id="importDlg"><div class="dlg">
+  <h2>Ergebnis einfügen</h2>
+  <p class="muted" style="margin:0">Füge hier die Nachricht ein, die jemand aus der Familie geteilt hat (auch mehrere auf einmal).</p>
+  <textarea id="importText" placeholder="🧩 Tägliche Knobelei #328 …&#10;Oma: 2:14"></textarea>
+  <div class="row">
+    <button class="btn primary" id="doImport">Übernehmen</button>
+    <button class="btn ghost" id="closeImport">Abbrechen</button>
+  </div>
+</div></dialog>
+
+<div class="toast" id="toast"></div>
+
+<!-- ===== Spiel-Logik (rein, ohne DOM) ===== -->
+<script id="logic">
+const Logic = (() => {
+  function hashStr(s){ let h=1779033703^s.length; for(let i=0;i<s.length;i++){ h=Math.imul(h^s.charCodeAt(i),3432918353); h=h<<13|h>>>19; } return (h>>>0); }
+  function rng(seed){ let a=seed>>>0; return function(){ a=(a+0x6D2B79F5)>>>0; let t=a; t=Math.imul(t^t>>>15,t|1); t^=t+Math.imul(t^t>>>7,t|61); return ((t^t>>>14)>>>0)/4294967296; }; }
+  function shuffle(arr,r){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(r()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+  const BOX = {4:[2,2],6:[2,3],9:[3,3]};
+  function peersOf(n){
+    const [br,bc]=BOX[n]; const peers=[];
+    for(let i=0;i<n*n;i++){
+      const r=Math.floor(i/n), c=i%n, s=new Set();
+      for(let k=0;k<n;k++){ s.add(r*n+k); s.add(k*n+c); }
+      const r0=Math.floor(r/br)*br, c0=Math.floor(c/bc)*bc;
+      for(let a=0;a<br;a++) for(let b=0;b<bc;b++) s.add((r0+a)*n+c0+b);
+      s.delete(i); peers.push([...s]);
+    }
+    return peers;
+  }
+  const peerCache={};
+  function peers(n){ return peerCache[n]||(peerCache[n]=peersOf(n)); }
+  function candidates(g,i,n){ const used=new Set(); for(const p of peers(n)[i]) if(g[p]) used.add(g[p]); const out=[]; for(let v=1;v<=n;v++) if(!used.has(v)) out.push(v); return out; }
+  // Zählt Lösungen bis "limit"
+  function countSolutions(g,n,limit=2){
+    g=g.slice(); let count=0;
+    (function solve(){
+      if(count>=limit) return;
+      let best=-1, bestC=null;
+      for(let i=0;i<g.length;i++) if(!g[i]){ const c=candidates(g,i,n); if(c.length===0) return; if(!bestC||c.length<bestC.length){best=i;bestC=c; if(c.length===1)break;} }
+      if(best<0){ count++; return; }
+      for(const v of bestC){ g[best]=v; solve(); if(count>=limit) break; }
+      g[best]=0;
+    })();
+    return count;
+  }
+  // Nur mit "einfacher Logik" lösbar (Einzige Kandidaten + Versteckte Einzelne) – kein Raten nötig
+  function units(n){
+    if(units[n]) return units[n];
+    const [br,bc]=BOX[n], u=[];
+    for(let r=0;r<n;r++) u.push([...Array(n).keys()].map(c=>r*n+c));
+    for(let c=0;c<n;c++) u.push([...Array(n).keys()].map(r=>r*n+c));
+    for(let r0=0;r0<n;r0+=br) for(let c0=0;c0<n;c0+=bc){ const b=[]; for(let a=0;a<br;a++) for(let k=0;k<bc;k++) b.push((r0+a)*n+c0+k); u.push(b); }
+    return units[n]=u;
+  }
+  function logicSolvable(g,n){
+    g=g.slice(); let progress=true;
+    while(progress){
+      progress=false;
+      for(let i=0;i<g.length;i++) if(!g[i]){ const c=candidates(g,i,n); if(!c.length) return false; if(c.length===1){ g[i]=c[0]; progress=true; } }
+      for(const u of units(n)) for(let v=1;v<=n;v++){
+        if(u.some(i=>g[i]===v)) continue;
+        const spots=u.filter(i=>!g[i]&&candidates(g,i,n).includes(v));
+        if(spots.length===1){ g[spots[0]]=v; progress=true; }
+      }
+    }
+    return g.every(Boolean);
+  }
+  function fullGrid(n,r){
+    const g=new Array(n*n).fill(0);
+    (function fill(i){
+      if(i===g.length) return true;
+      for(const v of shuffle(candidates(g,i,n),r)){ g[i]=v; if(fill(i+1)) return true; }
+      g[i]=0; return false;
+    })(0);
+    return g;
+  }
+  function generate(n,clues,seedStr,easyLogic=true){
+    const r=rng(hashStr(seedStr));
+    const solution=fullGrid(n,r);
+    const puzzle=solution.slice();
+    let filled=n*n;
+    for(const i of shuffle([...Array(n*n).keys()],r)){
+      if(filled<=clues) break;
+      const keep=puzzle[i]; puzzle[i]=0;
+      const okay = easyLogic ? logicSolvable(puzzle,n) : countSolutions(puzzle,n,2)===1;
+      if(!okay) puzzle[i]=keep; else filled--;
+    }
+    return {n,box:BOX[n],puzzle,solution};
+  }
+  // Tagesrätsel: gleich für alle, abhängig nur vom Datum
+  const EPOCH = Date.UTC(2026,0,1);
+  function dayKey(d=new Date()){ const p=x=>String(x).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`; }
+  function dayNumber(key){ const [y,m,d]=key.split('-').map(Number); return Math.round((Date.UTC(y,m-1,d)-EPOCH)/86400000)+1; }
+  function daily(key){ const p=generate(6,14,'knobelei-tag-'+key); p.id='day-'+key; p.kind='daily'; p.no=dayNumber(key); return p; }
+  const LEVELS=[
+    {n:4,clues:10,name:'Mini'},{n:4,clues:8,name:'Mini'},{n:4,clues:6,name:'Mini'},{n:4,clues:5,name:'Mini'},
+    {n:6,clues:24,name:'Leicht'},{n:6,clues:20,name:'Leicht'},{n:6,clues:17,name:'Mittel'},{n:6,clues:14,name:'Mittel'},
+    {n:9,clues:44,name:'Groß'},{n:9,clues:38,name:'Groß'},{n:9,clues:32,name:'Knifflig'},{n:9,clues:26,name:'Profi',hard:true}
+  ];
+  function level(i){ const L=LEVELS[i]; const p=generate(L.n,L.clues,'knobelei-level-'+(i+1),!L.hard); p.id='lvl-'+(i+1); p.kind='level'; p.no=i+1; p.name=L.name; return p; }
+  function fmt(sec){ sec=Math.max(0,Math.round(sec)); const h=Math.floor(sec/3600), m=Math.floor(sec%3600/60), s=sec%60; return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(s).padStart(2,'0'); }
+  function parseTime(t){ const p=t.split(':').map(Number); return p.length===3? p[0]*3600+p[1]*60+p[2] : p[0]*60+p[1]; }
+  // Geteilte Nachrichten lesen: "#328" und Zeilen "Name: 2:14"
+  function parseShared(text){
+    const out=[]; const blocks=text.split(/(?=🧩|Tägliche Knobelei #)/);
+    for(const b of blocks){
+      const m=b.match(/Knobelei\s*#(\d+)/); if(!m) continue;
+      const no=+m[1];
+      const re=/^\s*(?:[🥇🥈🥉]|\d+\.)?\s*([^\n:#]{1,24}?)\s*:\s*(\d{1,2}:\d{2}(?::\d{2})?)/gmu; let x;
+      while((x=re.exec(b))){ const name=x[1].trim(); if(!name||/knobelei/i.test(name)) continue; out.push({no,name,time:parseTime(x[2])}); }
+    }
+    return out;
+  }
+  return {generate,countSolutions,logicSolvable,daily,level,LEVELS,dayKey,dayNumber,fmt,parseTime,parseShared,peers};
+})();
+if (typeof module!=='undefined') module.exports=Logic;
+</script>
+
+<!-- ===== Oberfläche ===== -->
+<script>
+(() => {
+const $ = s => document.querySelector(s);
+const store = {
+  get(k,d){ try{ const v=localStorage.getItem('knobelei:'+k); return v?JSON.parse(v):d; }catch(e){ return d; } },
+  set(k,v){ try{ localStorage.setItem('knobelei:'+k,JSON.stringify(v)); }catch(e){} }
+};
+let data = store.get('data', {players:['Ich'], current:'Ich', results:{}, levels:{}, games:{}, imported:{}});
+data.players ||= ['Ich']; data.results ||= {}; data.levels ||= {}; data.games ||= {}; data.imported ||= {};
+if(!data.players.includes(data.current)) data.current=data.players[0];
+const save = () => store.set('data', data);
+
+// Theme
+const theme = store.get('theme', null);
+if(theme) document.documentElement.dataset.theme = theme;
+$('#themeBtn').onclick = () => {
+  const dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme==='dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = dark ? 'light' : 'dark'; document.documentElement.dataset.theme = next; store.set('theme', next);
+};
+
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'),2200); }
+
+let today = Logic.dayKey();
+const dateFmt = k => { const [y,m,d]=k.split('-'); return `${d}.${m}.${y}`; };
+const weekday = k => new Date(k+'T12:00:00').toLocaleDateString('de-DE',{weekday:'long'});
+
+// ---------- Home ----------
+function renderHome(){
+  today = Logic.dayKey();
+  const no = Logic.dayNumber(today);
+  for(const k of Object.keys(data.games)) if(k.includes('|day-') && !k.endsWith('|day-'+today)) delete data.games[k];
+  $('#todayLabel').textContent = `${weekday(today)}, ${dateFmt(today)}`;
+  $('#playerName').textContent = data.current;
+  $('#boardDate').textContent = `Rätsel #${no}`;
+  const mine = (data.results[today]||{})[data.current];
+  const running = data.games[data.current+'|day-'+today];
+  if(mine){
+    $('#heroTitle').textContent = `Gelöst in ${Logic.fmt(mine.time)} ✓`;
+    $('#heroText').textContent = `Rätsel #${no} hast du geschafft. Morgen gibt's ein neues – bis dahin: Übungslevel!`;
+    $('#playDaily').textContent = '📤 Ergebnis teilen';
+  } else {
+    $('#heroTitle').textContent = `Rätsel des Tages #${no}`;
+    $('#heroText').textContent = running ? 'Du hast schon angefangen – die Uhr läuft weiter!' : 'Alle in der Familie bekommen heute dasselbe Rätsel. Wer löst es am schnellsten?';
+    $('#playDaily').textContent = running ? 'Weiterspielen ▶' : "Los geht's ▶";
+  }
+  renderBoard();
+  // Levels
+  const lv = data.levels[data.current]||{};
+  const el = $('#levels'); el.innerHTML='';
+  let doneCount=0;
+  Logic.LEVELS.forEach((L,i)=>{
+    const done = lv[i+1]; if(done) doneCount++;
+    const locked = i>0 && !lv[i] && !done;
+    const b=document.createElement('button');
+    b.className='lvl'+(done?' done':'')+(locked?' locked':'');
+    b.innerHTML = `${locked?'🔒':i+1}<small>${done?Logic.fmt(done):L.n+'×'+L.n}</small>`;
+    b.setAttribute('aria-label',`Level ${i+1}, ${L.name} ${L.n} mal ${L.n}`+(locked?', gesperrt':''));
+    b.onclick = () => locked ? toast('Erst das vorherige Level lösen 🙂') : startGame(Logic.level(i));
+    el.appendChild(b);
+  });
+  $('#lvlProgress').textContent = `${doneCount}/${Logic.LEVELS.length} geschafft`;
+}
+function boardEntries(){
+  const no=Logic.dayNumber(today), map=new Map();
+  for(const [name,r] of Object.entries(data.results[today]||{})) map.set(name.toLowerCase(),{name,time:r.time,local:true});
+  for(const r of (data.imported[no]||[])){ const k=r.name.toLowerCase(); if(!map.has(k)||map.get(k).time>r.time) map.set(k,{name:r.name,time:r.time}); }
+  return [...map.values()].sort((a,b)=>a.time-b.time);
+}
+function renderBoard(){
+  const list=boardEntries(), el=$('#board');
+  if(!list.length){ el.innerHTML='<div class="empty">Noch niemand hat heute gelöst. Sei die oder der Erste!</div>'; return; }
+  const medals=['🥇','🥈','🥉'];
+  el.innerHTML = '<table class="board">'+list.map((e,i)=>`<tr class="${e.name===data.current?'me':''}"><td class="rank">${medals[i]||i+1+'.'}</td><td>${esc(e.name)}</td><td class="t">${Logic.fmt(e.time)}</td></tr>`).join('')+'</table>';
+}
+const esc = s => s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function shareText(withBoard){
+  const no=Logic.dayNumber(today);
+  let lines;
+  if(withBoard){ const medals=['🥇','🥈','🥉']; lines=boardEntries().map((e,i)=>`${medals[i]||(i+1)+'.'} ${e.name}: ${Logic.fmt(e.time)}`); }
+  else { const r=(data.results[today]||{})[data.current]; lines=r?[`${data.current}: ${Logic.fmt(r.time)}${r.hints?` (${r.hints} Tipp${r.hints>1?'s':''})`:''}`]:[]; }
+  return `🧩 Tägliche Knobelei #${no} (${dateFmt(today)})\n${lines.join('\n')}\nSchaffst du's schneller?`;
+}
+async function share(text){
+  const url = location.protocol.startsWith('http') ? location.href.split('#')[0] : '';
+  const full = url ? text+'\n'+url : text;
+  if(navigator.share){ try{ await navigator.share({text:full}); return; }catch(e){ if(e.name==='AbortError') return; } }
+  try{ await navigator.clipboard.writeText(full); toast('In die Zwischenablage kopiert – jetzt in die Familiengruppe einfügen!'); }
+  catch(e){ prompt('Diesen Text kopieren und teilen:', full); }
+}
+
+$('#playDaily').onclick = () => (data.results[today]||{})[data.current] ? share(shareText(false)) : startGame(Logic.daily(today));
+$('#shareBoardBtn').onclick = () => boardEntries().length ? share(shareText(true)) : toast('Noch keine Ergebnisse zum Teilen');
+$('#importBtn').onclick = () => { $('#importText').value=''; $('#importDlg').showModal(); };
+$('#closeImport').onclick = () => $('#importDlg').close();
+$('#doImport').onclick = () => {
+  const items = Logic.parseShared($('#importText').value);
+  if(!items.length){ toast('Kein Ergebnis gefunden – bitte die ganze Nachricht einfügen'); return; }
+  const todayNo=Logic.dayNumber(today); let n=0, old=0;
+  for(const it of items){
+    if(it.no!==todayNo){ old++; }
+    const arr = data.imported[it.no] ||= [];
+    const ex = arr.find(a=>a.name.toLowerCase()===it.name.toLowerCase());
+    if(ex){ ex.time=Math.min(ex.time,it.time); } else arr.push({name:it.name,time:it.time});
+    n++;
+  }
+  // nur die letzten 14 Tage aufheben
+  for(const k of Object.keys(data.imported)) if(+k < todayNo-14) delete data.imported[k];
+  save(); $('#importDlg').close(); renderBoard();
+  toast(old===n ? 'Das war ein Ergebnis von einem anderen Tag' : `${n-old} Ergebnis${n-old>1?'se':''} übernommen`);
+};
+
+// Spieler
+function renderPlayers(){
+  const el=$('#plist'); el.innerHTML='';
+  for(const p of data.players){
+    const b=document.createElement('button'); b.className=p===data.current?'cur':'';
+    const r=(data.results[today]||{})[p];
+    b.innerHTML=`<span>${esc(p)}</span><span class="muted">${r?'heute '+Logic.fmt(r.time):''}</span>`;
+    b.onclick=()=>{ data.current=p; save(); renderPlayers(); renderHome(); };
+    el.appendChild(b);
+  }
+}
+$('#playerChip').onclick = () => { renderPlayers(); $('#newPlayer').value=''; $('#playerDlg').showModal(); };
+$('#closePlayer').onclick = () => $('#playerDlg').close();
+$('#addPlayer').onclick = () => {
+  const name=$('#newPlayer').value.trim().replace(/[:#\n]/g,'');
+  if(!name) return;
+  if(data.players.some(p=>p.toLowerCase()===name.toLowerCase())){ toast('Den Namen gibt es schon'); return; }
+  if(data.players.length===1 && data.players[0]==='Ich' && !Object.keys(data.results).length) data.players=[];
+  data.players.push(name); data.current=name; save(); $('#newPlayer').value=''; renderPlayers(); renderHome();
+};
+$('#newPlayer').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#addPlayer').click(); });
+
+// ---------- Spiel ----------
+let G=null, tick=null;
+function startGame(p){
+  const key=data.current+'|'+p.id;
+  let st=data.games[key];
+  if(!st || st.puzzle.join()!==p.puzzle.join()){
+    st={puzzle:p.puzzle, values:p.puzzle.slice(), notes:Array(p.n*p.n).fill(0), start:Date.now(), penalty:0, hints:0};
+    data.games[key]=st; save();
+  }
+  G={p, key, st, sel:p.puzzle.indexOf(0), notesMode:false, undo:[]};
+  $('#home').hidden=true; $('#game').hidden=false; document.body.classList.add('playing'); scrollTo(0,0);
+  $('#gameTitle').textContent = p.kind==='daily' ? `Rätsel des Tages #${p.no}` : `Level ${p.no} · ${p.name}`;
+  $('#gameSub').textContent = `${data.current} · ${p.n}×${p.n}`;
+  const grid=$('#grid'); grid.style.setProperty('--n',p.n); grid.classList.remove('win'); grid.innerHTML='';
+  const [br,bc]=p.box;
+  for(let i=0;i<p.n*p.n;i++){
+    const r=Math.floor(i/p.n), c=i%p.n, d=document.createElement('div');
+    d.className='cell'+((c%bc===bc-1&&c<p.n-1)?' br':'')+((r%br===br-1&&r<p.n-1)?' bb':'');
+    d.setAttribute('role','gridcell');
+    d.onpointerdown=e=>{ e.preventDefault(); G.sel=i; draw(); };
+    grid.appendChild(d);
+  }
+  const pad=$('#pad'); pad.innerHTML=''; pad.classList.toggle('nine',p.n===9); pad.style.setProperty('--cols', p.n===9?9:p.n);
+  for(let v=1;v<=p.n;v++){ const b=document.createElement('button'); b.textContent=v; b.setAttribute('aria-label','Zahl '+v); b.onclick=()=>input(v); pad.appendChild(b); }
+  draw(); clearInterval(tick); tick=setInterval(updateTimer,250); updateTimer();
+}
+const elapsed = () => (Date.now()-G.st.start)/1000 + G.st.penalty;
+function updateTimer(){ if(G && !G.done) $('#timer').textContent=Logic.fmt(elapsed()); }
+function conflicts(){
+  const {n}=G.p, v=G.st.values, peers=Logic.peers(n), bad=new Set();
+  for(let i=0;i<n*n;i++) if(v[i]) for(const q of peers[i]) if(v[q]===v[i]){ bad.add(i); }
+  return bad;
+}
+function draw(popIdx){
+  const {n,box}=G.p, v=G.st.values, cells=$('#grid').children, bad=conflicts();
+  const sel=G.sel, sr=Math.floor(sel/n), sc=sel%n, [br,bc]=box;
+  const selVal=sel>=0?v[sel]:0;
+  for(let i=0;i<n*n;i++){
+    const r=Math.floor(i/n), c=i%n, el=cells[i];
+    const peer = sel>=0 && (r===sr||c===sc||(Math.floor(r/br)===Math.floor(sr/br)&&Math.floor(c/bc)===Math.floor(sc/bc)));
+    el.classList.toggle('given', !!G.p.puzzle[i]);
+    el.classList.toggle('sel', i===sel);
+    el.classList.toggle('peer', peer && i!==sel);
+    el.classList.toggle('same', !!selVal && v[i]===selVal && i!==sel);
+    el.classList.toggle('bad', bad.has(i) && !G.p.puzzle[i]);
+    if(v[i]) el.textContent=v[i];
+    else if(G.st.notes[i]){
+      const cols=n===4?2:3; let h=`<div class="notes" style="grid-template-columns:repeat(${cols},1fr)">`;
+      for(let k=1;k<=n;k++) h+=`<span>${G.st.notes[i]&(1<<k)?k:''}</span>`;
+      el.innerHTML=h+'</div>';
+    } else el.textContent='';
+    el.setAttribute('aria-label',`Zeile ${r+1}, Spalte ${c+1}: ${v[i]||'leer'}`);
+  }
+  if(popIdx!=null){ const el=cells[popIdx]; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+  // aufgebrauchte Zahlen ausgrauen
+  const cnt=Array(n+1).fill(0); v.forEach(x=>cnt[x]++);
+  [...$('#pad').children].forEach((b,k)=>b.classList.toggle('used',cnt[k+1]>=n));
+  $('#notesBtn').classList.toggle('on',G.notesMode);
+}
+function pushUndo(){ G.undo.push({values:G.st.values.slice(),notes:G.st.notes.slice()}); if(G.undo.length>200) G.undo.shift(); }
+function input(v){
+  if(!G||G.done||G.sel<0||G.p.puzzle[G.sel]) return;
+  const i=G.sel; pushUndo();
+  if(G.notesMode && !G.st.values[i]){ G.st.notes[i]^=(1<<v); }
+  else {
+    G.st.values[i] = G.st.values[i]===v ? 0 : v;
+    if(G.st.values[i]){ // Notizen in Nachbarn aufräumen
+      G.st.notes[i]=0; for(const q of Logic.peers(G.p.n)[i]) G.st.notes[q]&=~(1<<v);
+    }
+  }
+  save(); draw(i); checkWin();
+}
+function erase(){ if(!G||G.done||G.sel<0||G.p.puzzle[G.sel]) return; pushUndo(); G.st.values[G.sel]=0; G.st.notes[G.sel]=0; save(); draw(); }
+$('#eraseBtn').onclick=erase;
+$('#undoBtn').onclick=()=>{ if(!G||G.done) return; const u=G.undo.pop(); if(!u) return toast('Nichts zum Zurücknehmen'); G.st.values=u.values; G.st.notes=u.notes; save(); draw(); };
+$('#notesBtn').onclick=()=>{ G.notesMode=!G.notesMode; draw(); toast(G.notesMode?'Notizen an: kleine Zahlen merken':'Notizen aus'); };
+$('#hintBtn').onclick=()=>{
+  if(!G||G.done) return;
+  const v=G.st.values, s=G.p.solution;
+  let i = (G.sel>=0 && !G.p.puzzle[G.sel] && v[G.sel]!==s[G.sel]) ? G.sel : -1;
+  if(i<0){ const wrong=[...v.keys()].filter(k=>v[k]&&v[k]!==s[k]); const empty=[...v.keys()].filter(k=>!v[k]); i=(wrong[0]??empty[Math.floor(Math.random()*empty.length)]); }
+  if(i==null) return;
+  pushUndo(); v[i]=s[i]; G.st.notes[i]=0; G.st.penalty+=30; G.st.hints++; G.sel=i; save(); draw(i);
+  toast(`Tipp: ${s[i]} (+30 Sekunden)`); checkWin();
+};
+function checkWin(){
+  const v=G.st.values, s=G.p.solution;
+  if(v.some((x,i)=>x!==s[i])) return;
+  G.done=true; clearInterval(tick);
+  const t=Math.round(elapsed()); $('#timer').textContent=Logic.fmt(t);
+  delete data.games[G.key];
+  let extra='';
+  if(G.p.kind==='daily'){
+    const day=data.results[today] ||= {};
+    if(!day[data.current]) day[data.current]={time:t,hints:G.st.hints};
+    const rank=boardEntries().findIndex(e=>e.name===data.current)+1;
+    extra = rank===1 ? 'Du bist heute die Nummer 1! 🥇' : `Platz ${rank} von ${boardEntries().length} in der Familie`;
+    $('#winShare').hidden=false; $('#winNext').textContent='Zur Übersicht';
+  } else {
+    const lv=data.levels[data.current] ||= {}; const prev=lv[G.p.no];
+    if(!prev||t<prev) lv[G.p.no]=t;
+    extra = prev ? (t<prev?'Neue Bestzeit! 🎯':`Bestzeit: ${Logic.fmt(prev)}`) : 'Level geschafft!';
+    $('#winShare').hidden=true;
+    $('#winNext').textContent = G.p.no<Logic.LEVELS.length ? `Level ${G.p.no+1} ▶` : 'Zur Übersicht';
+  }
+  save();
+  $('#winTitle').textContent='Geschafft! 🎉';
+  $('#winSub').textContent=$('#gameTitle').textContent+(G.st.hints?` · ${G.st.hints} Tipp${G.st.hints>1?'s':''}`:'');
+  $('#winTime').textContent=Logic.fmt(t);
+  $('#winExtra').textContent=extra;
+  $('#grid').classList.add('win');
+  [...$('#grid').children].forEach((c,i)=>c.style.animationDelay=((Math.floor(i/G.p.n)+i%G.p.n)*35)+'ms');
+  confetti();
+  setTimeout(()=>$('#winDlg').showModal(),650);
+}
+$('#winShare').onclick=()=>share(shareText(false));
+$('#winNext').onclick=()=>{
+  $('#winDlg').close();
+  if(G.p.kind==='level' && G.p.no<Logic.LEVELS.length) startGame(Logic.level(G.p.no));
+  else goHome();
+};
+function goHome(){ clearInterval(tick); G=null; $('#game').hidden=true; $('#home').hidden=false; document.body.classList.remove('playing'); renderHome(); }
+$('#backBtn').onclick=goHome;
+
+document.addEventListener('keydown',e=>{
+  if(!G||$('#game').hidden||document.querySelector('dialog[open]')) return;
+  const n=G.p.n, k=e.key;
+  if(/^[1-9]$/.test(k) && +k<=n){ input(+k); e.preventDefault(); }
+  else if(k==='Backspace'||k==='Delete'||k==='0'){ erase(); e.preventDefault(); }
+  else if(k.startsWith('Arrow')){
+    let r=Math.floor(G.sel/n), c=G.sel%n; if(G.sel<0){r=0;c=0;}
+    if(k==='ArrowUp') r=(r+n-1)%n; if(k==='ArrowDown') r=(r+1)%n; if(k==='ArrowLeft') c=(c+n-1)%n; if(k==='ArrowRight') c=(c+1)%n;
+    G.sel=r*n+c; draw(); e.preventDefault();
+  }
+  else if(k==='n'||k==='N'){ $('#notesBtn').click(); }
+  else if((e.ctrlKey||e.metaKey)&&k==='z'){ $('#undoBtn').click(); e.preventDefault(); }
+});
+
+function confetti(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const c=document.createElement('canvas'); c.className='confetti'; document.body.appendChild(c);
+  const ctx=c.getContext('2d'), W=c.width=innerWidth*devicePixelRatio, H=c.height=innerHeight*devicePixelRatio;
+  c.style.width='100%'; c.style.height='100%';
+  const cols=['#e2725b','#d9a441','#3b8a5a','#2f6f9f','#c86fb4'];
+  const ps=Array.from({length:120},()=>({x:W/2,y:H*.35,vx:(Math.random()-.5)*W*.03,vy:-Math.random()*H*.025-H*.005,s:(4+Math.random()*6)*devicePixelRatio,c:cols[Math.random()*5|0],r:Math.random()*6}));
+  let f=0;(function step(){ ctx.clearRect(0,0,W,H);
+    for(const p of ps){ p.x+=p.vx; p.y+=p.vy; p.vy+=H*.0009; p.vx*=.99; p.r+=.2; ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillStyle=p.c; ctx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2); ctx.restore(); }
+    if(++f<110) requestAnimationFrame(step); else c.remove(); })();
+}
+
+// Tageswechsel / Rückkehr in die App
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden && !G && Logic.dayKey()!==today) renderHome(); });
+renderHome();
+})();
+</script>
+</body>
+</html>

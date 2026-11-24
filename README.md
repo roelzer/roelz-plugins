@@ -6,6 +6,8 @@ Claude-Code-Marktplatz mit diesen Plugins:
 - `plugins/dev-team-tafel` – Tafel neben dem Chat: wer im Dev-Team gerade arbeitet, Ergebnisse, Sperren, Teststand
 - `plugins/tool-scout` – prüft fertige Skills/Agenten/Plugins vor der Installation
 - `plugins/website` – **in Probearbeit**, der Website-Bauer: Vereins-, Firmen-, Muster- und Projektseiten mit 3D auf Spitzenniveau, nur kostenlose Werkzeuge, kein KI-Look
+- `plugins/spiele` – **neu, vor der Probearbeit**, der Spiele-Bauer: eigene kleine Browserspiele für Handy und Laptop (2D/3D), Mini-Spiele für Vereins- und Firmenseiten, nur kostenlose Werkzeuge, keine fremden Server
+- `plugins/recherche` – Profi-Recherche (wie die Besten arbeiten, was es auf GitHub schon gibt) und YouTube-Recherche über die offizielle Schnittstelle
 - `plugins/video` – **zurückgestellt bis bessere Hardware**, der Video-Editor: Erklär-, Produkt- und Vorführvideos, Reels, Trailer und Schnitte auf Profi-Niveau, nur mit kostenlosen lokalen Werkzeugen
 - `plugins/personal` – der Personaler: stellt neue Agenten, Skills und Plugins ein (Profi-Recherche, Stellenausschreibung, gemessene Probearbeit) und schult bestehende nach
 
