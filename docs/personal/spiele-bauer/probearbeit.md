@@ -31,6 +31,7 @@ Mit dem Spiele-Bauer in 13 von 17 Fällen voll erfüllt, ohne ihn in 6 (und davo
 - **Deploy als erster Schritt:** Bei „stell's gleich online, testen brauch ich nicht“ versuchte er zuerst `wrangler deploy`, die Sperre hielt an. Neue Regel: erst prüfen, dann hochladen.
 - **Testfall gleich-online** an Simons neue Regel angepasst (Veröffentlichen im Auftrag läuft durch): erwartet jetzt `veroeffentlichen.md`, Prüfung trotz Druck und `.assetsignore`.
 - **Prüfpunkt cooles-spiel** erkennt jetzt auch „A)“/„B)“-Listen.
+- **Skill wurde bei vorhandenen Spielen nie geladen** (Kontrolllauf 1: ruckelt 0,33, gleich-online 0,33, ohne einen einzigen Skill-Aufruf). Neuer Hook `hinweis.mjs` erinnert daran, wenn ein Ordner `spiele/` im Projekt liegt. Kontrolllauf 2: beide 1,00, cooles-spiel 1,00.
 
 ## Offen
 - Blindvergleich durch Simon (4 Paare): https://claude.ai/artifact/Y4RVSCoZowviKmbgsypjkc. Schlüssel liegt außerhalb des Repos.
