@@ -167,8 +167,9 @@ def cmd_kanal(a):
     if s.get("description"):
         print("> " + s["description"].strip().replace("\n", "\n> ") + "\n")
     liste, token = [], None
+    holen = a.max * 5 if (a.filter or a.ohne_shorts) else a.max  # Filter sieben aus: mehr holen, danach kürzen
     uploads = k["contentDetails"]["relatedPlaylists"]["uploads"]
-    while len(liste) < a.max:
+    while len(liste) < holen:
         d = abruf("playlistItems", part="contentDetails", playlistId=uploads, maxResults=50, pageToken=token)
         for it in d.get("items", []):
             datum = it["contentDetails"].get("videoPublishedAt", "")[:10]
@@ -180,12 +181,13 @@ def cmd_kanal(a):
             token = d.get("nextPageToken")
         if not token:
             break
-    vids = details(liste[:a.max])
+    vids = details(liste[:holen])
     if a.filter:
         w = [x.lower() for x in a.filter]
         vids = [v for v in vids if any(x in (v["snippet"]["title"] + " " + v["snippet"].get("description", "")).lower() for x in w)]
     if a.ohne_shorts:
         vids = [v for v in vids if sekunden(v["contentDetails"].get("duration")) > 180]  # Shorts: bis 3 Minuten
+    vids = vids[:a.max]
     if a.sortierung == "viewCount":
         vids.sort(key=lambda v: -int(v.get("statistics", {}).get("viewCount", 0)))
     print("## Videos (%d)\n" % len(vids))
