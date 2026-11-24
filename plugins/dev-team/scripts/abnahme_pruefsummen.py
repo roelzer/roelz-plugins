@@ -154,9 +154,12 @@ def aufgedeckt_finden(wurzel, rel):
 
 
 def aufgedeckt_mit_summe(wurzel):
+    """Alle Testdateien unter tests/ nach Prüfsumme. Aufgedeckt zählt überall unter tests/, nicht nur unter
+    tests/abnahme/: entscheidend ist der unveränderte Inhalt (Prüfsumme), nicht der Ordner. Sonst verlangte die
+    Schranke für einen offen unter tests/ liegenden Abnahmetest einen Umzug samt Freigabe (a88, 24.11.2026)."""
     summen = {}
-    for ordner, unter, dateien in os.walk(os.path.join(wurzel, "tests", "abnahme")):
-        unter[:] = [u for u in unter if u != "__pycache__"]
+    for ordner, unter, dateien in os.walk(os.path.join(wurzel, "tests")):
+        unter[:] = [u for u in unter if u not in ("__pycache__", "node_modules", ".pytest_cache")]
         for d in dateien:
             if ist_testdatei(d):
                 summen.setdefault(summe(os.path.join(ordner, d)), []).append(os.path.join(ordner, d))
@@ -182,8 +185,8 @@ def pruefen(hauptordner, wurzel=None, vollstaendig=False):
                 fehler.append("Aufgedeckter Abnahmetest %s weicht von der festgehaltenen Fassung ab."
                               % os.path.relpath(f, wurzel).replace("\\", "/"))
         if vollstaendig and os.path.isdir(os.path.join(wurzel, "tests", "abnahme")) and soll not in aufgedeckt:
-            fehler.append("Abnahmetest %s liegt nicht unverändert unter tests/abnahme/ vor (aufgedeckt wird "
-                          "immer die festgehaltene Fassung, Inhalt unverändert)." % rel)
+            fehler.append("Abnahmetest %s liegt nicht unverändert unter tests/ vor (aufgedeckt wird "
+                          "immer die festgehaltene Fassung, Inhalt unverändert; der Ordner ist egal)." % rel)
     return fehler
 
 

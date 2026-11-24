@@ -1,5 +1,11 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.22.2 – Kein Umzug für offen liegende Abnahmetests, Berichte richtig zugeordnet
+Anlass: a88-Stand (24.11.2026). Die Schranke blieb trotz anerkannter Prüfsumme auf NICHT OK, und der Projektleiter wollte von Simon „Umzug ja“.
+- **Aufgedeckte Abnahmetests zählen überall unter `tests/`**, nicht nur unter `tests/abnahme/`. Entscheidend ist die unveränderte Prüfsumme, nicht der Ordner. Ein abgeschwächter Test bleibt rot, egal wo er liegt.
+- **Prüfberichte:** Rollen mit Bindestrich (`langfrist-architekt`) und Kennungen mit Bindestrich wurden falsch zugeordnet. Die Untergrenze galt dann als nicht gelaufen. Jetzt werden bekannte Rollen zuerst erkannt.
+- Tests: aufgedeckt außerhalb von `tests/abnahme/`, Berichte mit Bindestrich.
+
 ## 3.22.1 – Video-Studio entfernt
 
 Anlass: Simon: „Das Video-Studio können wir löschen, Higgsfield kostet ja und ist somit für uns raus.“
