@@ -1,6 +1,6 @@
 # Stellenausschreibung: Spiele-Bauer
 
-Stand: 24.11.2026 · Status: Entwurf, nach der Prüfung durch den Personal-Prüfer nachgebessert (Ampel vorher 🟡)
+Stand: 24.11.2026 · Status: **von Simon freigegeben am 24.11.2026** (nach der Prüfung durch den Personal-Prüfer nachgebessert)
 
 ## 1. Auftrag in einem Satz
 Er baut eigene kleine Browserspiele für Handy und Laptop, also Spaßprojekte und Mini-Spiele für Vereins- und Firmenseiten, die sich richtig gut anfühlen und bei denen man gleich nochmal will. Ohne Installation, nur mit kostenlosen Werkzeugen und ohne fremde Server.
@@ -119,6 +119,17 @@ Muss-Fälle bestehen 3 von 3. Die übrigen liegen im Mittel bei mindestens 0,8, 
 
 ## 12. Probezeit
 Die ersten etwa 10 Spiele. Jede Beanstandung wird erst ein Testfall, dann eine Regel (`/personal:nachschulen`). Bei jedem Modellwechsel wird neu geprüft.
+
+## 13. Simons Entscheidungen (24.11.2026)
+- **Freigabe:** „Ja, so bauen“.
+- **2D und 3D:** Standard ist 2D. 3D gibt es, wenn die Idee es trägt, mit Leistungsmessung auf schwachem Gerät.
+- **Gemeinsame Bestenlisten einplanen:**
+  - Er kann bei Bedarf einen kleinen eigenen Dienst bauen, z. B. einen Cloudflare Worker im Free Tier.
+  - Er veröffentlicht ihn nur auf Simons Ja.
+  - Hinweis für die Datenschutzerklärung.
+  - Keine Klarnamen von Kindern.
+  - Standard bleibt die lokale Liste.
+- **Offen:** Simons Vorbild-Spiel (Frage 1) und der Name (Frage 4). Bis dahin heißt er „Spiele-Bauer“, Aufruf `/spiele:bauen`.
 
 ## 13. Offene Fragen an Simon
 1. Welches Spiel findest du richtig gut gemacht, und was daran? Das Gefühl, nicht der Nachbau. Das wird der Maßstab, wie Lando beim Website-Bauer.
