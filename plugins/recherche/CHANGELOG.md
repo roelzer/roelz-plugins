@@ -1,5 +1,9 @@
 # Änderungsprotokoll Recherche
 
+## 0.2.1 – Abgrenzung und Abbruch (24.11.2026)
+- **profi:** „Nicht für“ gegenüber tool-scout:scout, wegen gleicher Auslösesätze.
+- **profi:** Abbruchkriterien (zwei Quellen je Kernpraktik, zwei Runden ohne Neues, etwa 15 Quellen).
+
 ## 0.2.0 – Profi-Recherche (24.11.2026)
 Simon: „auch der Recherche-Skill soll das alles beinhalten: recherchieren, wie die Fachleute in den Gebieten das machen und was es schon im Internet, vor allem auf GitHub, gibt und was wir davon nutzen können“.
 - Neuer Skill `profi` mit drei Fragen:

@@ -1,7 +1,7 @@
 {
   "name": "recherche",
   "displayName": "Recherche",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Recherche wie die Profis: wie die besten Fachleute arbeiten, was es schon gibt (vor allem auf GitHub) und was davon nutzbar ist; dazu YouTube-Recherche über die offizielle Data API. Nur lesen, kostenlos.",
   "author": {
     "name": "Simon Rölz"

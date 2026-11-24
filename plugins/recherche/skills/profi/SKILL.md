@@ -1,6 +1,6 @@
 ---
 name: profi
-description: Profi-Recherche zu einem Gebiet. Klärt, wie die nachweislich besten Fachleute arbeiten, was es schon gibt (vor allem auf GitHub, dazu Plugins, Skills, Agenten und Werkzeuge) und was davon für Simon oder seine Plugins nutzbar ist, mit Quellen und Belastbarkeit. Nutzen bei „recherchier mal, wie die Profis … machen“, „was gibt es schon für …“, „gibt es auf GitHub was für …“, „wie machen das die Besten“, auch als Vorarbeit für neue Agenten, Skills und Plugins.
+description: Profi-Recherche zu einem Gebiet. Klärt, wie die nachweislich besten Fachleute arbeiten, was es schon gibt (vor allem auf GitHub, dazu Plugins, Skills, Agenten und Werkzeuge) und was davon für Simon oder seine Plugins nutzbar ist, mit Quellen und Belastbarkeit. Nutzen bei „recherchier mal, wie die Profis … machen“, „was gibt es schon für …“, „gibt es auf GitHub was für …“, „wie machen das die Besten“, auch als Vorarbeit für neue Agenten, Skills und Plugins. Nicht für die reine Suche nach einem Claude-Code-Plugin, Skill oder MCP-Server zum Installieren („gibt es dafür schon was?“) – das macht tool-scout:scout.
 argument-hint: "[Gebiet oder Frage]"
 ---
 
@@ -42,6 +42,13 @@ Bei kleinen Fragen machst du es selbst, sonst startest du 2–4 Lese-Agenten in 
 - Wie haben die Besten KI-Agenten für diese Aufgabe gebaut, und woran sind sie gescheitert? Gemeint sind Anthropic-Doku, Engineering-Blog, Studien und Benchmarks.
 
 **Werkzeugstand** (bei Werkzeug-Gebieten): Was ist aktuell (Version, Preis, Lizenz, Grenzen)? Was läuft kostenlos und lokal?
+
+**Abbruch**, sobald eins zutrifft:
+- jede Kernpraktik hat zwei unabhängige Quellen,
+- zwei Suchrunden brachten nichts Neues,
+- etwa 15 geprüfte Quellen.
+
+Dann schreiben, nicht weitersuchen.
 
 ## 2. Jeden Fund prüfen (für B)
 Je Repo oder Werkzeug, aus der Quelle selbst gelesen:

@@ -1,5 +1,15 @@
 # Änderungsprotokoll Personaler
 
+## 1.2.0 – GitHub-Abgleich (24.11.2026)
+Vorbilder: anthropics/skills skill-creator, obra/superpowers, SkillForge, SkillSpector (nur Ideen):
+- **Fall `nicht-ausloesen`:** echte Beinahe-Treffer mit gleichen Stichwörtern, mindestens einer aus einem Nachbar-Plugin.
+- **Fall `druck`:** verbindet zwei bis drei Druckarten.
+- **Beschreibung:** vorher die Überschneidungen der Auslösesätze im ganzen Repo suchen.
+- **Vorher gegen nachher:** je Fall mit fest gesetztem Modell und Prüfermodell (`vorher.json`).
+- **Subjektive Fälle:** Simon urteilt blind (A/B in zufälliger Reihenfolge).
+- **Prüfer:** meldet wackelige Fälle (1–2 von 3 in beiden Armen), die nicht als Beleg zählen.
+- **Nachschulen:** Bei unklarer Ursache fragt ein frischer Subagent: „Wie hätte der Text lauten müssen?“ Das ist ein Hinweis, bestätigt erst durch rot → grün.
+
 ## 1.1.0 – Lektionen aus der ersten Einstellung (Video-Editor)
 
 Anlass: Der Video-Editor war sauber, aber ohne Wow. Simon: „okay also auf deutsch video geht nur mit besserer hardware“. Dass Wow 3D braucht und ohne Grafikkarte etwa 55 s pro Bild rendert, fiel erst an Stopp 2 auf.
