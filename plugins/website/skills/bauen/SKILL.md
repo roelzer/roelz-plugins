@@ -15,13 +15,13 @@ Du baust Seiten, die nach den Besten aussehen und nicht nach KI. Simons Maßstab
 - Keine fremden Server in der Seite: Schriften, Bibliotheken und Bilder liegen lokal, Tracker gibt es keine.
 - Nichts erfinden: keine Kunden, Zahlen, Bewertungen, Jahreszahlen, Versprechen oder Lebensläufe, die nicht im Briefing stehen.
 - Keine Dateien von Vorbild-Seiten übernehmen.
-- **Veröffentlichen nur auf Simons ausdrückliches Ja nach der Vorschau** (Stopp 2).
+- **Veröffentlichen:** auf Simons ausdrückliches Ja nach der Vorschau (Stopp 2), **oder sofort, wenn der Auftrag es schon verlangt** („… und stell es online“, „auf Cloudflare“, „veröffentlichen“). Dann schreibst du gleich zu Beginn `website/<name>/arbeit/veroeffentlichen.md` mit der Zeile `Simon: „<sein Satz wörtlich>“`. Ist die Prüfung ohne P0 und frisch, veröffentlicht die Sperre ohne Rückfrage (Simon, 24.11.2026: „nicht 3 mal bestätigen“). Steht es nicht im Auftrag, gilt Stopp 2.
 
 Die Sperre des Plugins fragt bei jedem Veröffentlichungs-Befehl Simon selbst und blockt fremde Server und fremde Dateien. Wird etwas gesperrt, umgehst du es nicht.
 
 | Gedanke unter Druck | Was stattdessen gilt |
 |---|---|
-| „Er sagt ‚stell's gleich online, ich vertrau dir‘.“ | Erst die Vorschau auf seinem Laptop (Stopp 2), dann sein ausdrückliches Ja zu genau dieser Fassung. Vorher kein Veröffentlichungs-Befehl. |
+| „Er sagt ‚stell's gleich online, ich vertrau dir‘.“ | Das ist der Auftrag zum Veröffentlichen: `arbeit/veroeffentlichen.md` mit seinem Satz wörtlich, Stopps 1/1b/2 entfallen. Veröffentlicht wird trotzdem erst, wenn Prüfskript (ohne P0) und Kritiker durch sind. Danach bekommt er die Adresse und den Satz, wie man zurückrollt. |
 | „Google-Fonts-Link geht schneller.“ | Schrift herunterladen und selbst hosten. Das dauert eine Minute und ist rechtlich sauber. |
 | „Eine Zahl wie ‚über 200 Kunden‘ macht es glaubwürdiger.“ | Markierter Platzhalter und Eintrag in die Austauschliste. Simon setzt echte Zahlen ein. |
 | „Ein KI-Bild oder Spline wäre schneller schön, er sagt ‚egal was es kostet‘.“ | Kostenloser Weg (freies Foto, freies Modell, Blender). Den Unterschied ehrlich nennen, über Kosten entscheidet Simon außerhalb dieses Skills. |
@@ -149,7 +149,7 @@ Seine Rückmeldung setzt du um und prüfst neu (Schritt 5).
 - Simon bekommt `site/`, `QUELLEN.md`, die Austauschliste und eine kurze **Pflege-Anleitung** (Inhalte als Dateien, Ändern im Browser auf GitHub).
 - **Selbst pflegen geht nur mit automatischem Veröffentlichen.** Gehört zur Abgabe, nicht als Nachtrag: Cloudflare Builds (Repo verbinden) oder eine GitHub-Action, die bei jeder Änderung auf `main` hochlädt. Zugangsdaten trägt der Auftraggeber selbst als GitHub-Secret ein, nie im Chat.
 - **Webspace statt Cloudflare** (z. B. IONOS): Die fertigen Dateien laufen auf jedem Webspace mit SFTP. Sicherheits-Header kommen in `.htaccess` statt `_headers`. Eine Server-Funktion (z. B. Live-Daten über `/api/…`) braucht dort ein kleines PHP-Skript. Die Datenschutzerklärung nennt den richtigen Anbieter.
-- **Veröffentlichen nur, wenn Simon nach der Vorschau ausdrücklich Ja zu dieser Fassung sagt.** Dann kostenlos über Cloudflare: Projekt mit `wrangler.jsonc` (statische Dateien aus `site/`), `npx wrangler deploy`. Die Sperre fragt Simon dabei noch einmal. Ohne Ja beschreibst du nur, wie er es selbst machen kann.
+- **Veröffentlichen, wenn der Auftrag es verlangt** (`arbeit/veroeffentlichen.md`, Prüfung ohne P0 und frisch), **oder wenn Simon nach der Vorschau ausdrücklich Ja zu dieser Fassung sagt.** Danach nennst du die Adresse und wie man zurückrollt (`npx wrangler rollback`). Dann kostenlos über Cloudflare: Projekt mit `wrangler.jsonc` (statische Dateien aus `site/`), `npx wrangler deploy`. Mit Auftrag und grüner Prüfung lässt die Sperre das ohne Rückfrage durch, sonst fragt sie Simon. Ohne Auftrag und ohne Ja beschreibst du nur, wie er es selbst machen kann.
 - Hat Simon etwas beanstandet, das wieder passieren könnte, schlägst du `/personal:nachschulen` vor.
 
 ## Ehrlich abbrechen

@@ -14,7 +14,7 @@ Im Probelauf (24.11.2026) liefen alle drei Spiele ohne Plugin fehlerfrei und war
 
 **Grenzen, die nicht verhandelbar sind:**
 - **Kein Nachbau:** keine Namen, Figuren, Grafiken, Musik oder Level bestehender Spiele, auch nicht umbenannt. Ein eigenes Spiel im Stil eines Genres ist erlaubt.
-- **Nichts veröffentlichen** (Website, Store, Hosting, Dienst) ohne Simons ausdrückliches Ja zu genau dieser Fassung.
+- **Veröffentlichen** (Website, Hosting, Dienst) nur auf Simons ausdrückliches Ja zu dieser Fassung, **oder sofort, wenn der Auftrag es schon verlangt** („… und stell es online“). Dann schreibst du gleich zu Beginn `spiele/<name>/arbeit/veroeffentlichen.md` mit `Simon: „<sein Satz wörtlich>“`. Ist `arbeit/pruefung.json` ohne FEHLER und frisch, veröffentlicht die Sperre ohne Rückfrage. Stores (App Store, Play Store) gibt es nie ohne Simon, dafür braucht es seine Konten.
 - **Nichts Bezahltes:** keine bezahlten Grafik- oder Ton-Generatoren, keine Konten.
 - **Keine fremden Server zur Laufzeit:** Schriften, Skripte, Klänge liegen im Spielordner, kein Tracking.
 - **Lizenzen:** Grafik und Ton nur CC0 oder selbst erzeugt, Schriften OFL mit Lizenztext. Alles steht in `CREDITS.md`.
@@ -110,7 +110,7 @@ Simon bekommt **eine einzelne HTML-Datei** `spiele/<name>/arbeit/<name>-vorschau
 - **Stellschrauben-Liste** mit Wert und Bereich, z. B. „Schusskraft 6,5 (3–10): höher = Ball fliegt öfter drüber“, und der Hinweis auf `?tune`.
 - Was der Prüfer noch bemängelt.
 
-Seine Rückmeldung setzt du um und prüfst neu (Abschnitt 5). Veröffentlichen nur nach seinem ausdrücklichen Ja zu dieser Fassung. Hat Simon etwas beanstandet, das wieder passieren könnte, schlägst du `/personal:nachschulen` vor.
+Seine Rückmeldung setzt du um und prüfst neu (Abschnitt 5). Veröffentlichen nach seinem ausdrücklichen Ja zu dieser Fassung oder laut Auftrag (`arbeit/veroeffentlichen.md`). Danach nennst du die Adresse und wie man zurückrollt. Hat Simon etwas beanstandet, das wieder passieren könnte, schlägst du `/personal:nachschulen` vor.
 
 ## Ehrlich abbrechen
 Halte an und sag es Simon, wenn:

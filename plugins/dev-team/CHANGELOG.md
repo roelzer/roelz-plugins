@@ -1,5 +1,9 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.25.2 – Ausliefern laut Auftrag ohne Rückfrage
+Simon, 24.11.2026: „sowas wie Cloudflare pushen, will ich, dass ich nicht 3 mal bestätigen muss … angenommen es steht im Auftrag, dann soll das auch gleich erstellt werden und dann gepusht“.
+- Grundgesetz, Skill `auftrag` und Entscheidungsrat: Ausliefern und Veröffentlichen ohne weitere Rückfrage, wenn der Auftrag es verlangt („ausliefern“, „online stellen“, „deployen“, „auf Cloudflare“, „veröffentlichen“) und alles belegt grün ist. Simons Satz kommt wörtlich nach `docs/ENTSCHEIDUNGEN.md`.
+
 ## 3.25.1 – Kleinigkeiten wieder in 1–2 Minuten
 Anlass: Simon: „auch wenn ich manchmal nur Kleinigkeiten ergänzen oder anpassen will, dauert es immer noch 10–15 Minuten, das ging mal in 1–2“.
 

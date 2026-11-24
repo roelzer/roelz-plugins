@@ -14,7 +14,7 @@ Anlass: Simon: „ich will, dass alles autonom läuft“, für alle Projekte (24
 Das ist keine Entscheidungsfrage, sondern eine Grenze:
 - **Was technisch nur ein Mensch kann:** Konten, Zahlungen, echte Geräte, Netzwerk.
 - **Was nach außen geht oder nicht umkehrbar ist:**
-  - Veröffentlichen und Ausliefern. Ausnahme: Simon schreibt beim Auftrag ausdrücklich „ausliefern“.
+  - Veröffentlichen und Ausliefern. Ausnahme: Der Auftrag verlangt es schon („ausliefern“, „online stellen“, „deployen“, „veröffentlichen“). Dann geht es ohne Rückfrage, sobald alles grün ist.
   - Produktive Datenbanken und Migrationen.
   - Daten löschen oder überschreiben, die nicht neu angelegt wurden.
   - Daten an externe Dienste senden.

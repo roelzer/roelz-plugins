@@ -1,6 +1,6 @@
 # Dev-Team – Anleitung
 
-Stand: November 2026 · Version 3.25.1
+Stand: November 2026 · Version 3.25.2
 
 Dieses Repo enthält Plugins für Claude Code, vor allem **`dev-team`**, **`tool-scout`** und den Personaler **`personal`**. Keines enthält Firmen- oder Kundenwissen; sie dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
 
@@ -245,6 +245,22 @@ Damit der Lauf nicht bei der ersten Rückfrage stehen bleibt, braucht Claude Cod
 - **Laptop nicht schlafen lassen,** solange ein Lauf arbeiten soll (Windows: Energieoptionen → „Nie“ im Netzbetrieb, oder einmalig `powercfg /change standby-timeout-ac 0`). Endet die Sitzung (App zu, Laptop aus), stehen die Agenten bis zur nächsten Sitzung. Echte Nachtarbeit geht nur als **Cloud-Sitzung/Routine** auf GitHub – das richten wir gezielt ein.
 - **Nicht** `bypassPermissions`: Dann fallen alle Rückfragen weg, auch für Befehle außerhalb des Projekts.
 - Optional später die **Sandbox** von Claude Code: Sie sperrt auf Betriebssystemebene und schließt die Shell-Lücke, läuft aber nur unter Linux, macOS und WSL2 (nicht unter normalem Windows). Unter Windows hilft stattdessen die CI-Vorlage `vorlagen/ci-github.yml`: GitHub prüft bei jedem Push die Tests und Schranken auf einem Rechner, an den kein Agent herankommt.
+
+## 10b. Rechte: Veröffentlichen ohne dreimal Bestätigen (seit 24.11.2026)
+**Steht im Auftrag, dass etwas online soll** („… und stell es online“, „auf Cloudflare“, „ausliefern“, „veröffentlichen“), dann wird es gebaut, geprüft und **ohne weitere Rückfrage** veröffentlicht, sobald alle Prüfungen grün sind. Das gilt für Dev-Team, Website-Bauer und Spiele-Bauer. Steht es nicht im Auftrag, fragt das Team wie bisher.
+
+Damit wirklich nichts nachfragt, braucht es einmalig zwei Dinge:
+1. **Cloudflare-Zugang:**
+   - **Cloud-Sitzung:** In den Einstellungen der Umgebung ein Network secret für `api.cloudflare.com` anlegen (Bearer-Token, nur mit dem Recht „Workers bearbeiten“).
+   - **Eigener Rechner:** einmal `npx wrangler login`.
+   - Den Token nie in den Chat schreiben.
+2. **Claude Code selbst:** Die Sperren der Plugins geben den Befehl frei, wenn der Auftrag stimmt. Im Modus „Auto“ kann Claudes eigene Sicherheitsprüfung trotzdem einmal nachfragen. Wer das nicht will, erlaubt unter `/permissions` dauerhaft `Bash(npx wrangler deploy:*)`.
+
+Nie automatisch, auch nicht laut Auftrag:
+- Veröffentlichen mit roter oder veralteter Prüfung,
+- App Store und Play Store (brauchen deine Konten),
+- Löschen echter Daten,
+- neue laufende Kosten.
 
 ## 11. Senior-Qualitätsregeln und Grenzen der Autonomie
 

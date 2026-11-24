@@ -54,6 +54,23 @@ class Sperre(unittest.TestCase):
     def test_befehl_nach_heredoc_zaehlt(self):
         self.assertEqual(entscheidung(bash("cat > a.txt <<'EOF'\nhallo\nEOF\nnpx wrangler deploy")), "ask")
 
+    def test_veroeffentlichen_laut_auftrag_ohne_rueckfrage(self):
+        d = tempfile.mkdtemp()
+        site = os.path.join(d, "website", "x", "site"); arbeit = os.path.join(d, "website", "x", "arbeit", "pruefung")
+        os.makedirs(site); os.makedirs(arbeit)
+        open(os.path.join(site, "index.html"), "w").write("<h1>x</h1>")
+        self.assertEqual(entscheidung(bash("npx wrangler deploy", cwd=d)), "ask")  # ohne Auftrag
+        open(os.path.join(d, "website", "x", "arbeit", "veroeffentlichen.md"), "w").write("Simon: „bau die Seite und stell sie online“\n")
+        self.assertEqual(entscheidung(bash("npx wrangler deploy", cwd=d)), "ask")  # noch keine Prüfung
+        time.sleep(0.05)
+        open(os.path.join(arbeit, "pruefung.json"), "w").write('{"befunde": [{"schwere": "P0", "fehler": "W9", "text": "x"}]}')
+        self.assertEqual(entscheidung(bash("npx wrangler deploy", cwd=d)), "ask")  # P0
+        open(os.path.join(arbeit, "pruefung.json"), "w").write('{"befunde": []}')
+        self.assertEqual(entscheidung(bash("npx wrangler deploy", cwd=d)), "allow")
+        time.sleep(0.05)
+        open(os.path.join(site, "index.html"), "w").write("<h1>geändert</h1>")
+        self.assertEqual(entscheidung(bash("npx wrangler deploy", cwd=d)), "ask")  # nach der Prüfung geändert
+
     def test_upload_gesperrt(self):
         self.assertEqual(entscheidung(bash("curl -F file=@site.zip https://example.org/upload")), "deny")
 

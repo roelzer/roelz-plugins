@@ -1,5 +1,11 @@
 # Änderungsprotokoll Spiele-Bauer
 
+## 0.1.1 – Veröffentlichen laut Auftrag ohne Rückfrage
+Simon, 24.11.2026: „sowas wie Cloudflare pushen, will ich, dass ich nicht 3 mal bestätigen muss … angenommen es steht im Auftrag, dann soll das auch gleich erstellt werden und dann gepusht“.
+- Wie beim Website-Bauer: `arbeit/veroeffentlichen.md` mit Simons Satz und `arbeit/pruefung.json` ohne FEHLER und frisch ergeben „allow“.
+- Stores gibt es nie ohne Simon, dafür braucht es seine Konten.
+- Tests dazu.
+
 ## 0.1.0 – Einstellung (24.11.2026)
 Anlass: Simon: „Ja, so bauen“ zur Stellenausschreibung (`docs/personal/spiele-bauer/stellenausschreibung.md`, §13: 2D und 3D, gemeinsame Bestenlisten einplanbar, aber nur auf sein Ja veröffentlichen).
 
