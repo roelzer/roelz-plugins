@@ -679,6 +679,37 @@ class TestSchranke(unittest.TestCase):
         self.assertEqual(code, 1, aus)
         self.assertIn("fehlt", aus)
 
+    def test_aufgedeckt_ausserhalb_abnahme_ordner(self):
+        # a88 (24.11.2026): Abnahmetest liegt unverändert offen unter tests/ statt tests/abnahme/ → kein Umzug nötig
+        self.schreibe(".dev-team/verdeckt/test_a88.py", "def test_a88():\n    assert 2 * 2 == 4\n")
+        self.assertEqual(self.skript("abnahme_pruefsummen.py", "--schreiben")[0], 0)
+        git(self.p, "add", "-f", "docs/ABNAHME_PRUEFSUMMEN.txt")
+        git(self.p, "commit", "-qm", "plan")
+        self.basis = git(self.p, "rev-parse", "HEAD").strip()
+        os.remove(os.path.join(self.p, ".dev-team", "verdeckt", "test_a88.py"))
+        self.schreibe("tests/abnahme/LIESMICH.md", "Abnahme\n")
+        self.schreibe("tests/test_a88.py", "def test_a88():\n    assert 2 * 2 == 4\n")
+        code, aus = self.lauf("--rolle", "projektleiter", "--ohne-lauf")
+        self.assertNotIn("liegt nicht unverändert", aus)
+        self.assertNotIn("gelöscht", aus)
+        # abgeschwächt unter tests/ → weiter rot
+        self.schreibe("tests/test_a88.py", "def test_a88():\n    assert True\n")
+        code, aus = self.lauf("--rolle", "projektleiter", "--ohne-lauf")
+        self.assertEqual(code, 1, aus)
+        self.assertIn("liegt nicht unverändert unter tests/ vor", aus)
+
+    def test_berichte_rollen_mit_bindestrich(self):
+        sys.path.insert(0, os.path.join(PLUGIN, "scripts"))
+        import pruefe_tests
+        self.schreibe("docs/pruefberichte/20991231-235959-langfrist-architekt-ab12.md", "x\n")
+        self.schreibe("docs/pruefberichte/20991231-235959-reviewer-a1b2-c3.md", "x\n")
+        self.schreibe("docs/pruefberichte/20000101-000000-tester-alt.md", "x\n")
+        gelaufen = pruefe_tests._berichte_seit(self.p, 1700000000)
+        self.assertIn("langfrist-architekt", gelaufen)
+        self.assertIn("reviewer", gelaufen)
+        self.assertNotIn("langfrist", gelaufen)
+        self.assertNotIn("tester", gelaufen)
+
     def test_verdeckt_ohne_liste_rot_beim_merge(self):
         self.schreibe(".dev-team/verdeckt/test_abn_a1.py", "def test_a1():\n    assert 1 + 1 == 2\n")
         code, aus = self.lauf("--rolle", "projektleiter", "--ohne-lauf")

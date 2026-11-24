@@ -641,10 +641,20 @@ def _berichte_seit(hauptordner, seit_ts):
     ordner = os.path.join(hauptordner, "docs", "pruefberichte")
     grenze = datetime.fromtimestamp(seit_ts).strftime("%Y%m%d-%H%M%S")
     for name in (os.listdir(ordner) if os.path.isdir(ordner) else []):
-        m = re.match(r"^(\d{8}-\d{6})-([a-z-]+?)-[A-Za-z0-9_-]+\.md$", name)
-        if m and m.group(1) >= grenze:
-            gelaufen.add(m.group(2))
+        m = re.match(r"^(\d{8}-\d{6})-([a-z-]+)-([A-Za-z0-9_-]+)\.md$", name)
+        if not (m and m.group(1) >= grenze):
+            continue
+        # Rolle = der Teil zwischen Zeit und Kennung. Rollen mit Bindestrich (langfrist-architekt) und Kennungen
+        # mit Bindestrich machen die Grenze mehrdeutig: bekannte Rollen zuerst, längste zuerst.
+        mitte = name[16:-3]
+        rolle = next((r for r in sorted(ROLLEN, key=len, reverse=True) if mitte.startswith(r + "-")), None)
+        gelaufen.add(rolle or m.group(2).split("-")[0])
     return gelaufen
+
+
+ROLLEN = {"reviewer", "kritiker", "architekt", "tester", "designer", "fachpruefer", "sicherheitspruefer", "gastgeber",
+          "produktpruefer", "entwickler", "rechercheur", "langfrist-architekt", "auditor", "pragmatiker", "projektleiter",
+          "general-purpose"}
 
 
 def teamplan_pruefen(e, wurzel, hauptordner, basis, konfig, fg):
