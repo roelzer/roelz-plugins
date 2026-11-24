@@ -78,3 +78,6 @@ Motiv: eine Musterfliese. Gewerk-Zeichen: das Fugenkreuz. Farben aus dem Materia
 - **Ein Modell, viele Texturen**, wenn 3D: Stripe nutzt ein Buchmodell mit 84 KB für alle Bücher.
 - **Bewegung reduzieren:** Jeder Baustein hat einen ruhigen Zustand für `prefers-reduced-motion` (AirPods: 23 Regeln dafür).
 - Nur `transform`, `opacity`, `clip-path` animieren, nichts, was das Layout neu rechnet (W18).
+- **Viele Einzelteile auf ein Canvas** (Honig-Katalog, 24.11.2026): Eine Wabe aus über 800 SVG-Zellen, die je per CSS-Variable rechnen, kostet bei jedem Bild alle Zellen neu. Ab etwa 200 bewegten Teilen in einer Szene: auf ein `<canvas>` zeichnen oder ein Muster (SVG-`<pattern>`, Maske) mit einer einzigen bewegten Ebene.
+- **Keine Endlosschleifen, nur Sichtbares animieren:** Selbstlauf und Schmuckbänder laufen nur, solange sie im Bild sind (IntersectionObserver), ein Selbstlauf mit 30 Bildern/s reicht, Bereiche außerhalb mit `content-visibility: auto`. Der Honig-Katalog animierte eingebettet alle 17 Bausteine pausenlos und stürzte am iPhone ab. `vorschau.mjs --pruefen` misst das jetzt (FEHLER ab 40 % Leerlauf-Rechenzeit).
+

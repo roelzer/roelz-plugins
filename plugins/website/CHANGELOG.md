@@ -1,5 +1,12 @@
 # Änderungsprotokoll Website-Bauer
 
+## 0.4.1 – Katalog stürzte am iPhone ab, Baustein-Bibliothek
+Simon, 24.11.2026: „Die Seite stürzt immer wieder ab“ (Honig-Bausteinkatalog in der Claude-App).
+- **Ursache:** Eingebettet liefen alle 17 Bausteine pausenlos, dazu ein Schmuckband mit 865 Wabenzellen. Gemessen wurden 76–86 % Rechenzeit im Leerlauf. Vier Fotos waren 13-mal eingebettet (2,5 MB).
+- **`vorschau.mjs`:** Jedes Bild wird genau einmal eingebettet (CSS über `var(--vb-N)`, `<img>` bekommt die Quelle beim Laden). Ordner wie `fotos/`, `pruefung/` und die eigene Ausgabe kommen nicht mit hinein (ein zweiter Lauf ergab vorher 165 MB). `--pruefen` misst die Leerlauf-Last eingebettet am Handy: FEHLER ab 40 %, Hinweis ab 25 %. Tests dazu.
+- **Regeln** (`wissen/bausteine.md`, Skill Stopp 1): ab etwa 200 bewegten Teilen auf ein Canvas, nur Sichtbares animieren, keine Endlosschleifen, Katalog vor dem Versand mit `--pruefen`.
+- **Baustein-Bibliothek** (Gerüst): `bibliothek/` mit README, Scroll-Helfer `_kern/scroll.js`, `scripts/bibliothek.mjs` (Katalog, Messung, Aufnahmeregeln) und neuer Skill `website:bibliothek` zum Erweitern, wenn Kontingent übrig ist.
+
 ## 0.4.0 – Das Wow zieht sich durch, Bausteine zur Auswahl, Kunden pflegen selbst
 Simon, 24.11.2026: „das obere ist immer noch am coolsten, nach unten hin z. B. der Meterstab war halt sehr einfach wieder gemacht, ohne Mühe, das Wow soll nicht nur oben sein, sondern sich durchziehen“, „Vorschläge für Bausteine liefern, ich wähl aus und dann zusammenbauen“, Kunden pflegen die Seite selbst. Neue Vorbilder: Zoox, AirPods 5, Scale („vor allem Scale ist echt krass“), Stripe Press, ikilledacactus, ausgewertet mit Bildserien, Technik und fps-Messung.
 - **`handwerk.md` 1c „Das Wow zieht sich durch“:** acht Prinzipien aus den Vorbildern (Motiv verwandelt sich mindestens dreimal, eigener Übergang je Abschnitt, laut/leise im Wechsel mit einem lauten Moment je Drittel, Farbe trägt das Kapitel, Typografie bewegt sich, Schluss antwortet auf den Anfang, Zeichen des Gewerks, Bewegung am Scrollen). Klar definiert, was „mit Mühe“ heißt. Ersetzt „Danach nicht abfallen“ (eine kleine Bewegung je Abschnitt reichte Simon nicht).
