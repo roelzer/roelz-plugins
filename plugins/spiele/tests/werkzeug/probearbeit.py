@@ -248,8 +248,10 @@ def main():
     auftraege = [(fall, arm, nr) for fall in arg.faelle.split(",") for nr in range(1, arg.runs + 1) for arm in arme]
     ergebnisse = []
     with cf.ThreadPoolExecutor(arg.parallel) as pool:
-        for r in pool.map(lambda t: ein_lauf(*t, arg.ziel), auftraege):
+        for r in (f.result() for f in cf.as_completed([pool.submit(ein_lauf, *t, arg.ziel) for t in auftraege])):
             ergebnisse.append(r)
+            with open(os.path.join(arg.ziel, "laeufe.jsonl"), "a", encoding="utf-8") as d:   # sofort sichern
+                d.write(json.dumps(r, ensure_ascii=False) + "\n")
             print("%-26s %-5s #%d  Score %.2f  FEHLER %s  %ss  %s$" % (r["fall"], r["arm"], r["nr"], r["score"],
                   len(r["fehler_befunde"]) if r["fehler_befunde"] is not None else "-", r["dauer_s"], r["kosten_usd"]), flush=True)
     with open(os.path.join(arg.ziel, "ergebnis.json"), "w", encoding="utf-8") as d:
