@@ -1,6 +1,6 @@
 # Dev-Team – Anleitung
 
-Stand: November 2026 · Version 3.25.0
+Stand: November 2026 · Version 3.25.1
 
 Dieses Repo enthält Plugins für Claude Code, vor allem **`dev-team`**, **`tool-scout`** und den Personaler **`personal`**. Keines enthält Firmen- oder Kundenwissen; sie dürfen deshalb auch auf einen Arbeitsrechner (wenn dein Arbeitgeber eigene Plugins erlaubt). Das Backoffice-Plugin `firma` liegt bewusst **nicht** hier.
 

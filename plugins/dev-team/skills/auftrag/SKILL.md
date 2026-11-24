@@ -48,7 +48,7 @@ Architekt, Kritiker, verdeckte Abnahmetests, Entwickler usw. nur, wenn der Teamp
 2. `architekt` Modus `entwurf` (Rückgrat, Sicherheits-Grundgerüst, Paketschnitt mit „Schnittstelle zuerst“), bei Oberfläche zugleich `designer` Modus `entwurf` (nach `wissen/oberflaeche.md`, mit Kundenfarben/Logo), danach parallel `kritiker` (Plan, Bauplan-Probe) und bei Berechnungen `fachpruefer` Modus `plan`. Rückfragen in einer Runde an den Architekten. Keine Abwägungsrunde, kein Gastgeber und kein Langfrist-Architekt (nur auf Zuruf).
 3. Startfreigabe (Phase 5) bzw. Autopilot, Freigaben über den Kritiker.
 4. Phase 6: `tester` schreibt die verdeckten Abnahmetests, Prüfsummen festhalten.
-5. **Bauen:** du selbst Paket für Paket mit Test zuerst und der **vollen** Schranke `--rolle solo` (keine Schnellprüfung – Kundenprojekte bleiben streng), dazu der blinde Lauf der verdeckten Tests nach jedem Paket. Vorschau und Werkstatt wie bei Solo (Schritte 3–4), die Werkstatt aber mit voller Schranke. Große, klar trennbare Pakete bis zu 3 `entwickler` parallel nach Phase 7 – ohne Prüfer je Paket.
+5. **Bauen:** du selbst Paket für Paket mit Test zuerst und der **vollen** Schranke `--rolle solo` (keine Schnellprüfung – Kundenprojekte bleiben streng), dazu der blinde Lauf der verdeckten Tests nach jedem Paket. Vorschau und Werkstatt wie bei Solo (Schritte 3–4). Auch hier läuft die Werkstatt mit Schnellprüfung, die volle Schranke gesammelt vor dem Merge. Große, klar trennbare Pakete bis zu 3 `entwickler` parallel nach Phase 7 – ohne Prüfer je Paket.
 6. **Je Meilenstein, parallel:** `tester` Modus `pruefen` (deckt auf), `reviewer` Modus `gesamt`, bei Oberfläche `designer` Modus `treue` (mit Videos der Hauptabläufe), `sicherheitspruefer` Modus `code` (+ `angriff`, wenn neue Angriffsfläche), bei Berechnungen `fachpruefer` Modus `ergebnis`. Eine Fix-Runde mit allen Befunden; Nachprüfung nur bei „kritisch“/„hoch“. Danach die **Feinschliff-Runde** wie bei Solo (Schritt 7).
 7. Ende: `produktpruefer`, Sicherheits-Tor und Unterlagen (`/dev-team:uebergabe`), Merge nach `main`.
 
@@ -58,7 +58,7 @@ Die Phasen 1–9 unten vollständig.
 ## Stufe bestimmen (Kurzwort `voll`)
 Nach der Tabelle und den Risiko-Auslösern im Grundgesetz, nach Risiko, nicht nach Dateizahl. Bei Unsicherheit hochstufen. Sag Simon Stufe und Profil mit einem Satz Begründung; er kann hochstufen.
 
-**Stufe Klein:** ohne Rückfrage → Arbeitsbranch → `entwickler` (ein Paket; Kriterium: ein Test, der den Fehler zeigt) → `reviewer` Modus `paket` **nur**, wenn der Code-Diff 300 Zeilen oder mehr hat oder ein Risiko-Auslöser drin ist (sonst decken Schranke und statische Analyse ab) → Merge → Schranke → kurzer Bericht mit Testnachweis.
+**Kleinigkeiten (Text, Farbe, Größe):** gar kein Auftrag, sondern Werkstatt (Grundgesetz, Ziel 1–2 Minuten). **Stufe Klein** (klarer Fehler): ohne Rückfrage → Arbeitsbranch → **du selbst ohne Agent** (Kriterium: ein Test, der den Fehler zeigt; ein Entwickler-Agent kostet allein beim Start mehrere Minuten) → `reviewer` Modus `paket` **nur**, wenn der Code-Diff 300 Zeilen oder mehr hat oder ein Risiko-Auslöser drin ist (sonst decken Schranke und statische Analyse ab) → Merge → Schranke → kurzer Bericht mit Testnachweis.
 
 ## Phase 1 – Verstehen und Anforderungen festhalten
 1. `git status` (fremde Änderungen nie überschreiben), `CLAUDE.md`, `docs/lastenheft.md`, `docs/ARCHITEKTUR.md`, `docs/risiko-log.md`, `fachwissen/regeln.md`, Lessons-Datei, Fachwissen-Bibliothek (mit Gehirn: `<Gehirn>/02 Wissen/` und die Projektnotiz `<Gehirn>/01 Projekte/<Projekt>.md`).

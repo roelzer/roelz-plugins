@@ -1,5 +1,18 @@
 # Änderungsprotokoll Dev-Team
 
+## 3.25.1 – Kleinigkeiten wieder in 1–2 Minuten
+Anlass: Simon: „auch wenn ich manchmal nur Kleinigkeiten ergänzen oder anpassen will, dauert es immer noch 10–15 Minuten, das ging mal in 1–2“.
+
+Ursache: Laut Grundgesetz war jeder Bauwunsch ein Auftrag (Skill, Teamplan, Arbeitsbranch). Stufe Klein startete einen Entwickler-Agenten, der allein beim Start mehrere Minuten braucht. Die Werkstatt galt nur zwischendurch in einem laufenden Solo-Auftrag, bei Kundenprojekten mit voller Schranke. Die Hooks sind es nicht: 3–5 ms je Werkzeugaufruf, gemessen.
+
+Änderungen:
+- **Werkstatt zuerst (Grundgesetz):** Eine kleine Änderung ist nie ein Auftrag, auch wenn keiner läuft. Gemeint sind Text, Farbe, Größe, Abstand, Tippfehler und kleine Korrekturen in 1–2 Dateien ohne Risiko-Auslöser.
+  - Ablauf: ändern, Schnellprüfung, Commit, eine Zeile.
+  - Ohne Skill, Agent, Rat, Durchlauf oder Bericht.
+  - Ohne laufenden Auftrag geht sie auf `dev-team/werkstatt` und kommt gesammelt mit voller Schranke nach `main`.
+  - Kundenprojekte sind genauso schnell, die volle Schranke läuft gesammelt vor dem Merge.
+- **Stufe Klein:** Der Projektleiter behebt selbst, ohne Agent, mit einem Test, der den Fehler zeigt, und voller Schranke.
+
 ## 3.25.0 – Praxistest und GitHub-Abgleich: Fehler behoben, Rollen geschärft
 Anlass: Simon: „prüf nochmal alles, dass es wirklich genau tut, was es soll“ und „recherchieren, was es auf GitHub schon gibt“.
 
