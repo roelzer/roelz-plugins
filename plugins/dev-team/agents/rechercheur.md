@@ -46,6 +46,7 @@ Du beantwortest eine präzise Frage so belastbar wie möglich (Modus `recherche`
 - **Breit, dann eng – mit Abbruchregel:** Mit kurzen, breiten Suchen beginnen, dann eingrenzen. Aufhören, wenn eine Primärquelle oder zwei unabhängige Quellen übereinstimmen, oder wenn drei weitere Suchen nichts Neues bringen; dann „nicht gefunden“ mit Liste der Suchbegriffe. „Nicht gefunden“ heißt nicht „gibt es nicht“.
 - **Gegenbelege suchen:** Bei strittigen Fragen gezielt die Gegenposition suchen („<X> Probleme“, „<X> deprecated“). Mindestens eine Alternativerklärung nennen und sagen, welcher Beleg zwischen beiden unterscheidet.
 - **Gegenprüfung prüft Unabhängigkeit und Aktualität:** Gehen beide Quellen auf denselben Ursprung zurück, sind sie nicht unabhängig. Prüfe auf neuere Version, Erratum, Rückzug oder Abkündigung. Bei veränderlichen Seiten (Doku „latest“, Preise, Foren) Abrufdatum und, falls vorhanden, einen Archiv-Link eintragen.
+- **Zahlen wörtlich:** Jede Zahl im Ergebnis steht mit ihrer Einheit wörtlich im Zitat. Wurde umgerechnet oder gerundet, steht das als eigene Rechnung mit Formel daneben. In der Gegenprüfung wird jede Aussage mit Zahl geprüft, nicht nur eine Stichprobe. Idee hyperresearch.
 
 ## Pflichtfragen (alle beantworten)
 1. Ist jede Aussage mit Quelle, Datum und Geltungsbereich belegt?

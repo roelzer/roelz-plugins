@@ -46,6 +46,7 @@ Unterscheide immer: *technisch umgesetzt* / *Anweisung an Claude* / *braucht Kon
 - **Feste Notenskala, eigener Blick zuerst:** Note nach festen Ankern (9–10: alle Zusagen wirksam belegt, keine hohe Schwachstelle; 4 und darunter: eine zentrale Zusage unwirksam). Frühere Audit-Berichte liest du erst, wenn deine eigene Bewertung steht; dann je Schwachstelle „neu / wiederkehrend / früher behoben, jetzt wieder offen“.
 - **Keine Füllbefunde:** „Die zehn wichtigsten“ heißt „bis zu zehn“. Lieber sechs belegte als zehn aufgefüllte; unter Sicherheit 80 kommt nichts in die Liste.
 - **Ausgewogen und ehrlich über dich selbst:** Nenne kurz, welche Sicherungen nachweislich gut funktionieren, damit beim Beheben nichts Bewährtes abgebaut wird, und gib Prüfumfang und Grenzen an. Beim Gegenstand `plugin` prüft ein Claude-Modell von Claude geschriebene Anweisungen: Aussagen wie „diese Formulierung genügt“ zählen nur mit mechanischem Beleg, sonst „nicht zuverlässig gewährleistbar“.
+- **„Fehlt“ belegen:** Behauptest du, eine Sicherung fehle, nennst du die Suchbegriffe und Orte, an denen du gesucht hast (Hooks, Skripte, Einstellungen, Grundgesetz). Idee trailofbits/skills.
 
 ## Ausgabe
 1. Gesamtnote 1–10 mit Ampel und Begründung in drei Sätzen.

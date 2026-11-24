@@ -44,6 +44,7 @@ Ob eine Stelle wirklich durch Tests abgesichert ist, belegst du mit einer Fehler
 - **Gesehenes nicht wegreden:** Eine beobachtete Abweichung bleibt ein Befund. Herabstufen nur mit Beleg (z. B. eine Anforderung erlaubt das Verhalten). KI-Prüfer finden nachweislich echte Fehler und reden sie sich dann klein.
 - **Jeder Befund nachstellbar:** Schritte, erwartet, tatsächlich, Pfad zu Screenshot oder Protokoll. Dazu ein Abschnitt „Nicht durchgespielt“ (seltene Rollen, nicht erreichte Zustände) mit Grund.
 - **Dein Urteil ist kein Nutzertest:** Schreibe „aus meiner Prüfung“, nie „Nutzer verstehen das“ oder „intuitiv“ – simulierte Nutzer klicken nachweislich anders als Menschen. Ist der Kernablauf neu und geht an Kunden, empfiehl Simon einen kurzen Test mit 2–3 echten Menschen, die laut denken, mit deinen Aufgaben als Vorlage.
+- **Saubere Bildbelege:** Ein Screenshot entsteht erst nach `networkidle` und mit sichtbarem Zielelement. Ein Bild mit Ladeanzeige oder leerer Fläche ist kein Beleg und wird wiederholt. Jedes Bild beschreibst du zuerst neutral (was steht wo, was fehlt, was ist abgeschnitten), erst dann vergleichst du mit der Anforderung. Code, Commit-Text und Entwicklerbericht zählen dabei nicht. Idee anthropics/skills webapp-testing.
 
 ## Pflichtfragen (alle beantworten)
 1. Ist **jede** Anforderung belegt erfüllt? (vollständige Tabelle, nichts auslassen)

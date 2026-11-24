@@ -13,6 +13,20 @@ marke="$projekt/.dev-team/durchlauf"
 [ -f "$marke" ] || exit 0
 [[ "$eingabe" =~ \"stop_hook_active\"[[:space:]]*:[[:space:]]*true ]] && exit 0
 
+# Die Marke gehört der Sitzung, die zuerst anhält (Zeile „sitzung: <id>“). Andere Fenster im selben Projekt (eine
+# Frage, eine Werkstatt-Änderung) halten normal an – vorher bekamen sie „arbeite still weiter“, und zwei Projektleiter
+# arbeiteten auf demselben Branch. Vorbild ralph-loop (anthropics/claude-plugins-official), dort fünf Issues dazu.
+sitzung=""
+[[ "$eingabe" =~ \"session_id\"[[:space:]]*:[[:space:]]*\"([^\"]+)\" ]] && sitzung="${BASH_REMATCH[1]}"
+if [ -n "$sitzung" ]; then
+  besitzer="$(sed -n 's/^sitzung: //p' "$marke" 2>/dev/null | head -n 1)"
+  if [ -z "$besitzer" ]; then
+    echo "sitzung: $sitzung" >> "$marke" 2>/dev/null
+  elif [ "$besitzer" != "$sitzung" ]; then
+    exit 0
+  fi
+fi
+
 # Laufende Agenten (aus .dev-team/kennzahlen.jsonl, letzte 4 Stunden): Starts minus Agenten, die geendet haben.
 # Enden werden je Agent-Kennung nur einmal gezählt – ein Agent, den die Fertig-Prüfung zurückschickt, endet mehrmals
 # (vorher wurde der Projektleiter dadurch aufgescheucht, obwohl noch ein Agent lief, und schrieb jedes Mal in den Chat).
@@ -42,6 +56,7 @@ if [ -f "$kz" ]; then
   fi
 fi
 
+touch "$marke" 2>/dev/null  # letzte Aktivität des Besitzers (der Sitzungsstart übernimmt nur verwaiste Marken)
 grund="Durchlauf aktiv (Simon hat den Auftrag freigegeben): nicht auf „mach weiter“ warten. Beantworte eine Frage von Simon kurz und arbeite dann still am nächsten Schritt laut docs/STATUS.md weiter: kein Text im Chat, auch keine Bestätigung wie „läuft weiter“ oder ein Status-Link – der Stand steht auf der Team-Tafel. Anhalten nur bei einem festen Stopp (Abschlussbericht, harter Stopp, Frage, ohne die nichts Unabhängiges mehr weitergeht, Simon sagt stopp) – dann zuerst die Datei .dev-team/durchlauf löschen und docs/SITZUNGSUEBERGABE.md entfernen. Laufen Agenten im Hintergrund, beende die Runde erneut, ohne etwas zu schreiben. Ein voller Kontext ist kein Stopp: Übergabe schreiben (Kontext-Wächter), weiterarbeiten."
 printf '{"decision":"block","reason":"%s"}\n' "$grund"
 exit 0

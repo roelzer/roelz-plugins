@@ -17,7 +17,7 @@ Simons Vorgabe: Oberflächen sollen immer topmodern aussehen und einen echten **
 - **Form:** Radien 8–12 px einheitlich, feine Linien (1 px, gedämpft) statt dicker Rahmen, Schatten nur dezent für schwebende Elemente.
 - **Zustände für jeden Bildschirm:** leer (mit Hinweis, was zu tun ist), lädt (Skeleton statt Drehkreisel bei Inhalten), Fehler (verständlich, mit Ausweg), viele Daten (Paging/Scrollen), sehr lange Texte.
 - **Bewegung:** siehe eigener Abschnitt unten – jede Animation hat einen Zweck, nie verspielt.
-- **Dashboards:** Kennzahlen-Karten oben (Wert groß, Vergleich klein, Mini-Verlauf), darunter Verläufe; eine einheitliche Diagramm-Palette; Achsen und Raster dezent; Tooltips mit genauen Werten.
+- **Dashboards:** oben eine kompakte Zeile der wichtigsten Kennzahlen mit Vergleich und Mini-Verlauf, keine riesigen Zahlen-Helden (der Standard-Look von KI-Dashboards, siehe Designer). Darunter Verläufe; eine einheitliche Diagramm-Palette; Achsen und Raster dezent; Tooltips mit genauen Werten.
 - **Handy zuerst mitdenken:** jeder Bildschirm bei 390 px Breite ohne waagrechtes Scrollen, Tippflächen ≥ 44 px.
 - **Barrierefrei:** Kontrast mindestens WCAG AA, alles per Tastatur erreichbar, sichtbarer Fokus.
 

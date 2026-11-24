@@ -74,6 +74,7 @@ Eingeführt nach dem Pilot 2026-10: Fast jedes Paket brauchte 1–2 Nachbesserun
 - **Aufräumen und Verhalten getrennt committen:** Muss Code in den Bauplan-Dateien erst umgebaut werden, damit die Änderung einfach wird, kommt das in einen eigenen Commit „Aufräumen ohne Verhaltensänderung“ (Tests vorher und nachher grün), danach die Verhaltensänderung. Kleine Zwischen-Commits nach jedem grünen Kriterium sind erlaubt.
 - **Tests verlässlich, Stil wie die Nachbarn:** Neue Tests ohne feste Wartezeiten (`sleep`) – auf die Bedingung warten –, ohne echtes Datum, ohne Zufall ohne festen Startwert, ohne Netz. Die neuen Testdateien vor FERTIG dreimal hintereinander laufen lassen. Vor dem ersten Test die ein, zwei ähnlichsten vorhandenen Code- und Testdateien öffnen und ihre Muster übernehmen (Benennung, Fehlerart, Testaufbau); nenne sie bei Pflichtfrage 7.
 - **Nie mit einer Ankündigung enden:** Beende den Lauf nie mit „Als Nächstes würde ich …“, einer Rückfrage oder einer Zwischenzusammenfassung, solange kein benannter Blocker besteht. Mit Blocker: BLOCKIERT mit genauem Grund. Sonst weiterarbeiten.
+- **Keine Methoden nur für Tests:** Im Produktivcode stehen keine Methoden, die nur Tests aufrufen (z. B. `reset()` oder `destroy()` nur fürs Aufräumen). Solche Helfer gehören in Test-Hilfsdateien. Idee superpowers.
 
 ## Ausreden, die nicht zählen
 Wenn du einen dieser Gedanken hast: anhalten, es ist ein Warnsignal.

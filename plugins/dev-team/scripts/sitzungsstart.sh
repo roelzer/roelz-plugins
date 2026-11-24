@@ -148,6 +148,13 @@ fi
 # Neue Sitzung = neuer Container: Die Durchlauf-Marke (.dev-team/, nicht im Repo) fehlt. Sagt die Übergabe, dass der
 # Durchlauf läuft, schaltet der Sitzungsstart ihn selbst wieder ein – sonst fiel der Projektleiter in den
 # Gesprächsmodus und schrieb wieder viel in den Chat (ichkannalles, 04.11.).
+# Eine Marke, deren Besitzer seit 30 Minuten nicht mehr angehalten hat, gilt als verwaist (abgestürzte Sitzung):
+# Eine neue Sitzung mit „Durchlauf: an“ in der Übergabe übernimmt sie. Ein paralleles Fenster neben einem aktiven
+# Projektleiter übernimmt sie nicht.
+if [ -f "$projekt/.dev-team/durchlauf" ] && [ "$quelle" != "compact" ] && grep -q '^sitzung: ' "$projekt/.dev-team/durchlauf" 2>/dev/null \
+   && [ -n "$(find "$projekt/.dev-team/durchlauf" -mmin +30 2>/dev/null)" ]; then
+  rm -f "$projekt/.dev-team/durchlauf" 2>/dev/null
+fi
 if [ -f "$projekt/docs/SITZUNGSUEBERGABE.md" ] && [ ! -f "$projekt/.dev-team/durchlauf" ] \
    && grep -iE 'Durchlauf[^|]{0,40}(\*\*)?[[:space:]]*:?[[:space:]]*(\*\*)?[[:space:]]*an\b|Durchlauf (neu|wieder) (starten|einschalten)' "$projekt/docs/SITZUNGSUEBERGABE.md" 2>/dev/null | grep -viq 'an / aus'; then
   mkdir -p "$projekt/.dev-team" 2>/dev/null && date > "$projekt/.dev-team/durchlauf" 2>/dev/null \
@@ -166,7 +173,7 @@ if [ -f "$projekt/docs/SITZUNGSUEBERGABE.md" ]; then
   echo
   echo "## Sitzungsübergabe"
   if [ "$quelle" = "compact" ]; then
-    echo "Das Gespräch wurde eben automatisch zusammengefasst. Projektleiter: Lies docs/STATUS.md und die Übergabe unten, prüf den Stand kurz mit git (Branch, letzter Commit, Worktrees) und arbeite am nächsten Schritt weiter – ohne Simon zu fragen. Ein laufender Durchlauf (.dev-team/durchlauf) bleibt an."
+    echo "Das Gespräch wurde eben automatisch zusammengefasst. Projektleiter: Lies docs/STATUS.md und die Übergabe unten, prüf den Stand kurz mit git (Branch, letzter Commit, Worktrees) und arbeite am nächsten Schritt weiter – ohne Simon zu fragen. Ein laufender Durchlauf (.dev-team/durchlauf) bleibt an. Wichtig: Nach dem Zusammenfassen ist der Text des Skills auftrag gekürzt (der Schluss fehlt). Lies den Abschnitt deiner aktuellen Phase aus ${plugin}/skills/auftrag/SKILL.md mit Read neu, bevor du den nächsten Agenten startest, und den Abschnitt „Fix-Schleife“ vor jeder Fix-Runde."
   else
     echo "Projektleiter: Lies die Übergabe unten und docs/STATUS.md, prüf den Stand mit git (Branch, letzter Commit, Worktrees). Läuft ein Auftrag und steht dort „Durchlauf: an“, gilt Simons Freigabe weiter: Durchlauf wieder einschalten (mkdir -p .dev-team && date > .dev-team/durchlauf) und am nächsten Schritt weiterarbeiten. Ist der Auftrag abgeschlossen, die Datei löschen."
   fi

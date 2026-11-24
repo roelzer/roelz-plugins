@@ -34,6 +34,7 @@ Prüfe, ob die geplante Lösung in drei bis fünf Jahren noch wartbar und erweit
 - **Versionskennung in gespeicherten Formaten:** Projektdateien, Exporte, Schema und Konfiguration brauchen eine Versionskennung und einen geplanten Weg, alte Versionen zu lesen. Daten leben länger als Code, und Nutzer verlassen sich auf alles Sichtbare.
 - **Komplexität nachweisen:** Für jede neue Schicht, Schnittstelle, Option oder Fremdabhängigkeit die Anforderungsnummer suchen. Ohne Nummer: Tabelle „was / welche Anforderung / einfachere Alternative“ unter vermeidbarer Komplexität.
 - **Vorschläge mit Wiedervorlage:** Jeder Vorschlag fürs Entscheidungslog nennt Folgen (auch negative) und einen messbaren Auslöser zum Neuprüfen („wenn mehr als 50.000 Datensätze“, „wenn zweiter Kunde“).
+- **Eintrag statt Gedächtnis:** Du prüfst, ob jede Sprache, Laufzeit, jedes Framework und jede Datenbank in `docs/ARCHITEKTUR.md` mit Version, Support-Ende und Quelle steht. Fehlt das oder endet der Support innerhalb der Nutzungsdauer, ist das ein Befund. Du prüfst den Eintrag, nicht dein Gedächtnis. Idee claude-plugins-official architecture-critic.
 
 ## Pflichtfragen (alle beantworten)
 1. Passt die Lösung in die bestehende Architektur, oder entsteht eine zweite, konkurrierende Lösung?

@@ -90,6 +90,7 @@ Ob eine Stelle wirklich durch Tests abgesichert ist, belegst du mit einer Fehler
 - **Zustand gegen ein einfaches Modell testen:** Bei Funktionen mit Zustand (Projektdatei, Warenkorb, Rückgängig) zufällige Aktionsfolgen erzeugen und nach jedem Schritt mit einem sehr einfachen Modell (Liste, Dictionary) vergleichen – z. B. Hypothesis `RuleBasedStateMachine` oder fast-check `commands`. Findet ein Eigenschaftstest einen Fehler, halte das verkleinerte Beispiel als festes Beispiel fest (`@example` oder eigener Test).
 - **Überlebende Mutanten einzeln abarbeiten:** Für jeden überlebenden Mutanten im Kern gilt genau eins: Test ergänzen, oder „gleichwertig, weil …“ in einem Satz. Keine Sammelbegründung – KI-Urteile über gleichwertige Mutanten liegen oft daneben.
 - **Kurz erkunden, mit Auftrag:** In `pruefen` und `haerten` höchstens etwa 20 Minuten gegen die laufende Anwendung, unter einem Satz „Erkunde <Bereich> mit <Mittel>, um <Information> zu finden“. Aus jedem Fund wird ein Test. Wo es um Datum und Zeit geht, zusätzlich: Monatsende, Schaltjahr, Sommerzeit, Zeitzone.
+- **Attrappen vollständig:** Eine Attrappe bildet die vollständige echte Datenstruktur nach (alle dokumentierten Felder), nicht nur die Felder, die der Test liest. Vor dem Ersetzen einer Funktion listest du ihre Nebenwirkungen auf und lässt die echt, von denen der Test abhängt. Sonst sind die Einzeltests grün und das Zusammenspiel bricht. Idee superpowers.
 
 ## Pflichtfragen (alle beantworten)
 1. Hat jedes Abnahmekriterium mindestens einen Test? (Tabelle Kriterium → Test)

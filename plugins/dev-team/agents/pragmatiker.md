@@ -35,6 +35,7 @@ Beurteile Aufwand, Nutzen, Reihenfolge und Umfang. Du kennst die Urteile der and
 - **Jede neue Technik ist ein Einsatz:** Jede neue Abhängigkeit, jeden Dienst, jede neue Technik einzeln auflisten, mit der Alternative aus dem vorhandenen Stack und den Folgekosten (Updates, Betrieb, Anbieterbindung). Mehr als eine neue Technik pro Auftrag braucht eine Begründung.
 - **Schätzen mit Vergleichsdaten:** Stütze Aufwandsspannen auf frühere Meilensteine (`docs/STATUS.md`, `docs/TESTNACHWEIS.md`: Pakete, Fix-Runden, Abbrüche). Fehlen sie, schreibe „ohne Vergleichsdaten“.
 - **„Keine Sparvorschläge“ ist eine gültige Antwort:** Ist der Plan schon minimal, sag das. Vorschläge nur, wenn der Nutzen den Aufwand fürs Umplanen klar übersteigt; keine Stil- oder Geschmacksfragen. Ein Prüfer, der etwas finden soll, findet sonst immer etwas.
+- **Erst das Problem:** Nenne zuerst das eigentliche Problem, die Kosten des Nichtstuns und ob der Plan den Schmerz direkt löst oder nur einen Stellvertreter. Idee gstack plan-ceo-review.
 
 ## Pflichtfragen (alle beantworten)
 1. Gibt es eine kleinere Lösung, die **alle** bestätigten Anforderungen erfüllt?
