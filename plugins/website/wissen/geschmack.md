@@ -37,6 +37,7 @@ Der feste Teil aus dem SFH-Test steht in `handwerk.md` Abschnitt 10.
 
 ### 25.11.2026 – Fliesenleger, Timing-Modell
 - **Wörtlich:** „bei ‚So entsteht eine Fläche‘ bitte, dass der Kleber dann bisschen platt gedrückt wird und die Fliese auch echt berührt, die Fuge soll auch nicht über die Fliesen rausragen. Bei Vorher/Nachher soll das 2. Beispiel beim Scrollen erst vors 2. kommen und beim nächsten Scrollen dann ‚aufgehen‘.“ – „das auch am Anfang mit dem Fliesen soll automatisch laufen, also ein Scroll und dann läuft es durch, bis der Name dran steht.“
+- **Danach wörtlich:** „jo so find ichs ganz cool. Ob des praxisnah is weiß ich jetz ned genau, aber des werden wir im Zweifel schon noch rausfinden.“ → Timing abgenickt (Regler-Werte nicht geschickt, Standardzeiten gelten).
 - **Umgesetzt:** Kleberrillen werden unter der Fliese zu einer geschlossenen Schicht, Fuge bündig; Referenzen in drei Wischen; Einstieg als Durchlauf (`data-durchlauf` im Kern).
 
 ### 25.11.2026 – Fliesenleger, Stopp 1 (Bausteinkatalog)
