@@ -1,0 +1,37 @@
+{
+  "id": "l1-kartenstapel",
+  "name": "Kartenstapel aus dem Material",
+  "abschnitt": "leistungen",
+  "lautstaerke": "laut",
+  "bauform": "L1",
+  "was_man_sieht": "Jede Leistung kommt als Karte (Rähmchen, Fliese, Brett) mit einem eigenen Wisch und schiebt sich über die vorige; der Grund nimmt die Farbe der Karte an, ein Zähler zeigt 1 von 3.",
+  "technik": "position: sticky, transform, _kern/schritte.js (ein Wisch je Karte)",
+  "vorbild": "Scale",
+  "slots": [
+    "kopf",
+    "karten[]: {nr, name, text, bild}"
+  ],
+  "stellschrauben": [
+    "--b-grund-1..3",
+    "--b-rahmen",
+    "EINSTELLUNGEN.drehung",
+    "EINSTELLUNGEN.versatz",
+    "data-tempi"
+  ],
+  "abwandeln": [
+    "Kartenform und Rahmen (Rähmchen, Fliese mit Fuge, Brett mit Maserung)",
+    "Richtung (von unten gedreht, von der Seite, aus der Tiefe)",
+    "Grundfarbe wechselt mit oder bleibt"
+  ],
+  "reduzierte_bewegung": "Karten stehen untereinander, kein Stapel",
+  "genutzt_in": [
+    "Honig-Musterseite (25.11.2026): Sorten als Rähmchen"
+  ],
+  "herkunft": "aus der Honig-Musterseite übernommen und neutralisiert; Simon: „die Tafeln auf einzelne Wische“",
+  "gemessen": {
+    "fps_normal": 59,
+    "fps_4x": 60,
+    "datum": "2026-11-25",
+    "renderer": "SwiftShader (nur Vergleich)"
+  }
+}

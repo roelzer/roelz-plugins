@@ -1,0 +1,36 @@
+{
+  "id": "t5-text-folgt-material",
+  "name": "Text folgt dem Material",
+  "abschnitt": "text",
+  "lautstaerke": "laut",
+  "bauform": "T4",
+  "was_man_sieht": "Ein zäher, glänzender Strahl (Honig, Harz, Farbe) zieht mit einem langen Wisch ganz langsam herunter; jede Zeile eines Echos (immer länger gezogen) erscheint, wenn die Spitze ihre Höhe erreicht. Unten sammelt sich das Material flach, am Ende reißt der Strahl ab.",
+  "technik": "Canvas 2D (material.js: Bernstein-Verlauf, Glanzkante, wandernde Fließlinien, Oberfläche mit Ringen), _kern/schritte.js",
+  "vorbild": "eigen (Honig-Musterseite)",
+  "slots": [
+    "zeilen[] (Echo, z. B. Langsam. → Laaaaangsam.)",
+    "unter (ein Satz)"
+  ],
+  "stellschrauben": [
+    "data-tempo (Standard 12,5 s)",
+    "material.js: Farben, KOPF_BIS",
+    "EINSTELLUNGEN.weich",
+    "EINSTELLUNGEN.nachlauf"
+  ],
+  "abwandeln": [
+    "Material (Honig, Harz, Lack, Öl, Schokolade)",
+    "Wort und Echo (Langsam, Sorgfältig, Schicht für Schicht)",
+    "Seite des Strahls und Art der Sammlung (flacher See, Fuge, Gefäß)"
+  ],
+  "reduzierte_bewegung": "alle Zeilen sichtbar, Strahl als Standbild",
+  "genutzt_in": [
+    "Honig-Musterseite (25.11.2026)"
+  ],
+  "herkunft": "aus der Honig-Musterseite; Simon: „sooo gaaanz langsam runterziehen und währenddessen auf der Höhe, wo er gerade ist, kommt die Schrift“",
+  "gemessen": {
+    "fps_normal": 60,
+    "fps_4x": 60,
+    "datum": "2026-11-25",
+    "renderer": "SwiftShader (nur Vergleich)"
+  }
+}

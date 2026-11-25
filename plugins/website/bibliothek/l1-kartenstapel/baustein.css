@@ -1,0 +1,14 @@
+/* Stellschrauben: Farben je Karte (Material des Auftraggebers), Rahmenfarbe, Versatz */
+:root { --b-grund-1: #F1D68A; --b-grund-2: #E5A73C; --b-grund-3: #6E3C12; --b-rahmen: #A97C4F; --b-papier: #FBF1CF; --b-text: #3B200C; --b-versatz: 16px; }
+* { box-sizing: border-box; } body { margin: 0; font: 18px/1.5 system-ui, sans-serif; color: var(--b-text); background: var(--b-papier); }
+.strecke { height: 280vh; position: relative; } .buehne { position: sticky; top: 0; height: 100vh; overflow: hidden; background: var(--b-grund-1); }
+.kopf { position: absolute; left: 6vw; top: 4vh; margin: 0; font-size: clamp(28px, 4vw, 56px); z-index: 3; } .zaehler { font-size: .4em; font-weight: 600; }
+.karte { position: absolute; left: 50%; top: 56%; width: min(960px, 88vw); height: min(520px, 62vh); padding: 14px; display: grid; grid-template-columns: 1.1fr 1fr;
+  background: var(--b-rahmen); border-radius: 3px; box-shadow: 0 30px 60px #0005; transform: translate(-50%, -50%); }
+.bild { background: repeating-linear-gradient(135deg, #0001 0 12px, #0002 12px 24px), var(--ton, #ccc); }
+.k1 { --ton: var(--b-grund-1); } .k2 { --ton: var(--b-grund-2); } .k3 { --ton: var(--b-grund-3); }
+.text { background: var(--b-papier); padding: clamp(16px, 3vw, 40px); display: flex; flex-direction: column; justify-content: center; gap: 10px; }
+.text h3 { margin: 0; font-size: clamp(26px, 3.4vw, 46px); } .nr { margin: 0; font-weight: 700; opacity: .7; } .text p { margin: 0; }
+.danach { height: 60vh; display: grid; place-items: center; }
+@media (max-width: 700px) { .karte { grid-template-columns: 1fr; grid-template-rows: 34% 1fr; height: 68vh; width: 90vw; padding: 10px; } }
+@media (prefers-reduced-motion: reduce) { .strecke { height: auto; } .buehne { position: relative; height: auto; padding: 14vh 0 4vh; } .karte { position: relative; left: auto; top: auto; transform: none; margin: 0 auto 24px; } }

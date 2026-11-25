@@ -1,5 +1,11 @@
 # Änderungsprotokoll Website-Bauer
 
+## 0.5.0 – Bibliothek gefüllt, Grundgerüst, Trainingsprogramm
+- **Bibliothek:** vier Bausteine aus der Honig-Musterseite, neutralisiert, gemessen (59–60 fps auch 4× gedrosselt) und geprüft: `l1-kartenstapel`, `t5-text-folgt-material`, `a3-zelle-mit-figur`, `s5-name-laeuft-voll`.
+- **`_kern/schritte.js`:** die Wisch-Steuerung als wiederverwendbares Gerüst (Haltepunkte über `data-schritte`/`data-tempi`, Klick, Schwung, Wisch, Pfeiltasten). **`_kern/tune.js`:** Schieberegler für alle Dauern mit `?tune`, „Werte kopieren“ für den Chat.
+- **Skill Stopp 1:** zuerst die Bibliothek nutzen und nur Einstieg und fehlende Abschnitte neu bauen. Gerüst aus `_kern` kopieren statt neu erfinden.
+- **Trainingsprogramm** `docs/personal/website-bauer/training.md`: acht verschiedene Interessenten, Ablauf je Seite, Messung (Runden, Minuten je Änderung, getroffene und verfehlte Wünsche).
+
 ## 0.4.3 – Erlebnis-Prüfung, Timing zuerst, Schnellschleife (Honig-Musterseite, 25.11.2026)
 - **`scripts/erlebnis.mjs`:** prüft das Gefühl beim Wischen. Klick, 20 Klicks, Trackpad-Schwung und Handy-Wisch müssen je genau einen Schritt auslösen, ein zweiter Klick darf nicht verschluckt werden. Je Schritt misst sie Stillstand und Ballung der Bewegung. Gegen die alte Honig-Fassung meldet sie drei FEHLER, gegen die neue keinen.
 - **Skill:** neuer Abschnitt 3a „Timing-Modell vor dem Feinbau“ mit `?tune`, außerdem eine Schnellschleife für kleine Änderungen (etwa 2–4 Minuten statt 15).

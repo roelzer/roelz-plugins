@@ -1,1 +1,152 @@
-[]
+[
+  {
+    "id": "a3-zelle-mit-figur",
+    "name": "Ein Werkstück in fünf Schritten, mit Figur",
+    "abschnitt": "ablauf",
+    "lautstaerke": "laut",
+    "bauform": "A1",
+    "was_man_sieht": "Ein Werkstück (hier eine Wabenzelle) geht mit je einem Wisch durch fünf Zustände, der passende Satz leuchtet gleichzeitig auf. Im ersten Schritt fliegt eine gezeichnete Figur (Biene) herein, gibt etwas ab und fliegt hinaus – nach der Uhr, nie stehend.",
+    "technik": "SVG mit clipPath, gezeichnete Figur als SVG mit flatternden Flügeln (CSS), Flug per requestAnimationFrame nach Zeit, _kern/schritte.js",
+    "vorbild": "eigen (Honig-Musterseite)",
+    "slots": [
+      "überschrift",
+      "schritte[5]: Satz",
+      "zustände[5]: Zeichnung",
+      "figur"
+    ],
+    "stellschrauben": [
+      "data-schritte",
+      "data-tempi (Schritt 1 länger für die Figur)",
+      "SCHWELLE (wann ein Satz aufleuchtet)",
+      "Flugdauer der Figur (DAUER)"
+    ],
+    "abwandeln": [
+      "Werkstück und Zustände (Fliese: Untergrund, Abdichtung, Kleber, Fliese, Fuge; Holz: roh, gesägt, gehobelt, geölt, fertig)",
+      "Figur (Biene, Handwerkerhand, Werkzeug) oder ohne Figur",
+      "Anordnung (Werkstück links/rechts, Schritte darunter am Handy)"
+    ],
+    "reduzierte_bewegung": "Endzustand, alle Sätze hell",
+    "genutzt_in": [
+      "Honig-Musterseite (25.11.2026)"
+    ],
+    "herkunft": "aus der Honig-Musterseite übernommen; Texte der Schritte sind dort imkerspezifisch und werden beim Einsatz ersetzt; nur gezeichnet, keine Fotos (Simon: „animiert ODER Bilder“)",
+    "gemessen": {
+      "fps_normal": 60,
+      "fps_4x": 60,
+      "datum": "2026-11-25",
+      "renderer": "SwiftShader (nur Vergleich)"
+    }
+  },
+  {
+    "id": "l1-kartenstapel",
+    "name": "Kartenstapel aus dem Material",
+    "abschnitt": "leistungen",
+    "lautstaerke": "laut",
+    "bauform": "L1",
+    "was_man_sieht": "Jede Leistung kommt als Karte (Rähmchen, Fliese, Brett) mit einem eigenen Wisch und schiebt sich über die vorige; der Grund nimmt die Farbe der Karte an, ein Zähler zeigt 1 von 3.",
+    "technik": "position: sticky, transform, _kern/schritte.js (ein Wisch je Karte)",
+    "vorbild": "Scale",
+    "slots": [
+      "kopf",
+      "karten[]: {nr, name, text, bild}"
+    ],
+    "stellschrauben": [
+      "--b-grund-1..3",
+      "--b-rahmen",
+      "EINSTELLUNGEN.drehung",
+      "EINSTELLUNGEN.versatz",
+      "data-tempi"
+    ],
+    "abwandeln": [
+      "Kartenform und Rahmen (Rähmchen, Fliese mit Fuge, Brett mit Maserung)",
+      "Richtung (von unten gedreht, von der Seite, aus der Tiefe)",
+      "Grundfarbe wechselt mit oder bleibt"
+    ],
+    "reduzierte_bewegung": "Karten stehen untereinander, kein Stapel",
+    "genutzt_in": [
+      "Honig-Musterseite (25.11.2026): Sorten als Rähmchen"
+    ],
+    "herkunft": "aus der Honig-Musterseite übernommen und neutralisiert; Simon: „die Tafeln auf einzelne Wische“",
+    "gemessen": {
+      "fps_normal": 59,
+      "fps_4x": 60,
+      "datum": "2026-11-25",
+      "renderer": "SwiftShader (nur Vergleich)"
+    }
+  },
+  {
+    "id": "s5-name-laeuft-voll",
+    "name": "Name läuft voll",
+    "abschnitt": "schluss",
+    "lautstaerke": "laut",
+    "bauform": "S3",
+    "was_man_sieht": "Der Name steht groß als blasses Material, beim Wisch steigt die Füllung mit einer Wellenkante hinein; erst wenn er voll ist, steigen die Kontaktdaten auf.",
+    "technik": "SVG-Text mit clipPath (Wellenpfad), _kern/schritte.js",
+    "vorbild": "eigen (Honig-Katalog Schluss C)",
+    "slots": [
+      "name",
+      "daten: {überschrift, adresse, telefon, mail}",
+      "fusszeile"
+    ],
+    "stellschrauben": [
+      "--b-fuellung",
+      "--b-leer",
+      "--b-grund",
+      "EINSTELLUNGEN.welle",
+      "EINSTELLUNGEN.datenAb",
+      "data-tempo"
+    ],
+    "abwandeln": [
+      "Material der Füllung (Honig, Farbe, Wasser, Licht)",
+      "Richtung (von unten, von links wie Lack, von oben wie Regen)",
+      "Kante (Welle, gerade Fuge, Pinselstrich)"
+    ],
+    "reduzierte_bewegung": "Name voll, Daten sichtbar",
+    "genutzt_in": [
+      "Honig-Musterseite (25.11.2026)"
+    ],
+    "herkunft": "aus der Honig-Musterseite übernommen und neutralisiert; leerer Zustand als blasses Material statt Umriss (Simon: Umriss sah komisch aus)",
+    "gemessen": {
+      "fps_normal": 60,
+      "fps_4x": 60,
+      "datum": "2026-11-25",
+      "renderer": "SwiftShader (nur Vergleich)"
+    }
+  },
+  {
+    "id": "t5-text-folgt-material",
+    "name": "Text folgt dem Material",
+    "abschnitt": "text",
+    "lautstaerke": "laut",
+    "bauform": "T4",
+    "was_man_sieht": "Ein zäher, glänzender Strahl (Honig, Harz, Farbe) zieht mit einem langen Wisch ganz langsam herunter; jede Zeile eines Echos (immer länger gezogen) erscheint, wenn die Spitze ihre Höhe erreicht. Unten sammelt sich das Material flach, am Ende reißt der Strahl ab.",
+    "technik": "Canvas 2D (material.js: Bernstein-Verlauf, Glanzkante, wandernde Fließlinien, Oberfläche mit Ringen), _kern/schritte.js",
+    "vorbild": "eigen (Honig-Musterseite)",
+    "slots": [
+      "zeilen[] (Echo, z. B. Langsam. → Laaaaangsam.)",
+      "unter (ein Satz)"
+    ],
+    "stellschrauben": [
+      "data-tempo (Standard 12,5 s)",
+      "material.js: Farben, KOPF_BIS",
+      "EINSTELLUNGEN.weich",
+      "EINSTELLUNGEN.nachlauf"
+    ],
+    "abwandeln": [
+      "Material (Honig, Harz, Lack, Öl, Schokolade)",
+      "Wort und Echo (Langsam, Sorgfältig, Schicht für Schicht)",
+      "Seite des Strahls und Art der Sammlung (flacher See, Fuge, Gefäß)"
+    ],
+    "reduzierte_bewegung": "alle Zeilen sichtbar, Strahl als Standbild",
+    "genutzt_in": [
+      "Honig-Musterseite (25.11.2026)"
+    ],
+    "herkunft": "aus der Honig-Musterseite; Simon: „sooo gaaanz langsam runterziehen und währenddessen auf der Höhe, wo er gerade ist, kommt die Schrift“",
+    "gemessen": {
+      "fps_normal": 60,
+      "fps_4x": 60,
+      "datum": "2026-11-25",
+      "renderer": "SwiftShader (nur Vergleich)"
+    }
+  }
+]

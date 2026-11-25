@@ -1,0 +1,38 @@
+{
+  "id": "a3-zelle-mit-figur",
+  "name": "Ein Werkstück in fünf Schritten, mit Figur",
+  "abschnitt": "ablauf",
+  "lautstaerke": "laut",
+  "bauform": "A1",
+  "was_man_sieht": "Ein Werkstück (hier eine Wabenzelle) geht mit je einem Wisch durch fünf Zustände, der passende Satz leuchtet gleichzeitig auf. Im ersten Schritt fliegt eine gezeichnete Figur (Biene) herein, gibt etwas ab und fliegt hinaus – nach der Uhr, nie stehend.",
+  "technik": "SVG mit clipPath, gezeichnete Figur als SVG mit flatternden Flügeln (CSS), Flug per requestAnimationFrame nach Zeit, _kern/schritte.js",
+  "vorbild": "eigen (Honig-Musterseite)",
+  "slots": [
+    "überschrift",
+    "schritte[5]: Satz",
+    "zustände[5]: Zeichnung",
+    "figur"
+  ],
+  "stellschrauben": [
+    "data-schritte",
+    "data-tempi (Schritt 1 länger für die Figur)",
+    "SCHWELLE (wann ein Satz aufleuchtet)",
+    "Flugdauer der Figur (DAUER)"
+  ],
+  "abwandeln": [
+    "Werkstück und Zustände (Fliese: Untergrund, Abdichtung, Kleber, Fliese, Fuge; Holz: roh, gesägt, gehobelt, geölt, fertig)",
+    "Figur (Biene, Handwerkerhand, Werkzeug) oder ohne Figur",
+    "Anordnung (Werkstück links/rechts, Schritte darunter am Handy)"
+  ],
+  "reduzierte_bewegung": "Endzustand, alle Sätze hell",
+  "genutzt_in": [
+    "Honig-Musterseite (25.11.2026)"
+  ],
+  "herkunft": "aus der Honig-Musterseite übernommen; Texte der Schritte sind dort imkerspezifisch und werden beim Einsatz ersetzt; nur gezeichnet, keine Fotos (Simon: „animiert ODER Bilder“)",
+  "gemessen": {
+    "fps_normal": 60,
+    "fps_4x": 60,
+    "datum": "2026-11-25",
+    "renderer": "SwiftShader (nur Vergleich)"
+  }
+}

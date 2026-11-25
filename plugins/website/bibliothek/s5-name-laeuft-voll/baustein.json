@@ -1,0 +1,39 @@
+{
+  "id": "s5-name-laeuft-voll",
+  "name": "Name läuft voll",
+  "abschnitt": "schluss",
+  "lautstaerke": "laut",
+  "bauform": "S3",
+  "was_man_sieht": "Der Name steht groß als blasses Material, beim Wisch steigt die Füllung mit einer Wellenkante hinein; erst wenn er voll ist, steigen die Kontaktdaten auf.",
+  "technik": "SVG-Text mit clipPath (Wellenpfad), _kern/schritte.js",
+  "vorbild": "eigen (Honig-Katalog Schluss C)",
+  "slots": [
+    "name",
+    "daten: {überschrift, adresse, telefon, mail}",
+    "fusszeile"
+  ],
+  "stellschrauben": [
+    "--b-fuellung",
+    "--b-leer",
+    "--b-grund",
+    "EINSTELLUNGEN.welle",
+    "EINSTELLUNGEN.datenAb",
+    "data-tempo"
+  ],
+  "abwandeln": [
+    "Material der Füllung (Honig, Farbe, Wasser, Licht)",
+    "Richtung (von unten, von links wie Lack, von oben wie Regen)",
+    "Kante (Welle, gerade Fuge, Pinselstrich)"
+  ],
+  "reduzierte_bewegung": "Name voll, Daten sichtbar",
+  "genutzt_in": [
+    "Honig-Musterseite (25.11.2026)"
+  ],
+  "herkunft": "aus der Honig-Musterseite übernommen und neutralisiert; leerer Zustand als blasses Material statt Umriss (Simon: Umriss sah komisch aus)",
+  "gemessen": {
+    "fps_normal": 60,
+    "fps_4x": 60,
+    "datum": "2026-11-25",
+    "renderer": "SwiftShader (nur Vergleich)"
+  }
+}

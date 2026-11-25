@@ -9,7 +9,7 @@ Hier liegen fertige, geprüfte Bausteine als neutrale Demos. Ein Auftrag baut si
 - `index.html`: eigenständige Demo mit eigener Scrollstrecke, ohne Kundendaten, ohne fremde Server. Bilder als neutrale Platzhalter (Flächen, Formen), keine echten Personenfotos.
 - `baustein.css`, `baustein.js`: der eigentliche Baustein. Alles Anpassbare steht oben als CSS-Variablen (`--b-farbe-1`, `--b-dauer` …) bzw. als `EINSTELLUNGEN`-Objekt im JS.
 - `baustein.json`: Steckbrief (siehe unten).
-- Bewegung über `_kern/scroll.js` (eigener kleiner Helfer: Fortschritt eines Elements durch den Bildschirm, ein `requestAnimationFrame` je Bild). **Keine GSAP-Dateien im Repo** (Lizenz der Weitergabe ungeklärt); im Kundenprojekt darf GSAP lokal unter `site/vendor/` dazukommen.
+- Bewegung über `_kern/schritte.js` (ein Wisch = eine Animation, mit `?tune`-Schiebereglern aus `_kern/tune.js`); `_kern/scroll.js` nur für frei scrollende Demos (eigener kleiner Helfer: Fortschritt eines Elements durch den Bildschirm, ein `requestAnimationFrame` je Bild). **Keine GSAP-Dateien im Repo** (Lizenz der Weitergabe ungeklärt); im Kundenprojekt darf GSAP lokal unter `site/vendor/` dazukommen.
 
 ## Steckbrief `baustein.json`
 ```json
