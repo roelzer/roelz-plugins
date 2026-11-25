@@ -19,6 +19,8 @@ Der feste Teil aus dem SFH-Test steht in `handwerk.md` Abschnitt 10.
 | **Bewegung ohne Warten:** Figuren werden langsamer, aber bleiben nie stehen. | belegt (ausdrücklich) | Honig, 25.11.: „die Biene wartet jetzt in der Mitte vom Bild und fliegt dann weg“ |
 | **Lebendige Figur statt Punkte** (Biene fliegt herein, füllt, fliegt hinaus). | Vermutung (1, Simons Vorschlag) | Honig, 25.11. |
 | **Text nach dem Moment:** Kontaktdaten erst, wenn der Name voll ist. | belegt (ausdrücklich) | Honig, 25.11. |
+| **Text folgt dem Material:** Schrift erscheint dort und dann, wo das bewegte Material gerade ist (Zeile für Zeile auf Höhe der Honigspitze), statt nach eigener Uhr. | belegt (ausdrücklich) | Honig, 25.11.: „sooo gaaanz langsam runterziehen und währenddessen immer auf der Höhe, wo er gerade ist, kommt die Schrift“ |
+| **Fließendes wirklich langsam:** Zähe Materialien (Honig) brauchen einen langen Wisch (etwa 12 s) mit gleichmäßigem Tempo, nicht einen schnellen Fall. | belegt (ausdrücklich) | Honig, 25.11.: „der Honig ist zu schnell, der könnte doch sooo gaaanz langsam runterziehen“ |
 | **Auch das Verschwinden ist ein Moment.** Wie ein Element geht (Waben verschwinden über dem Foto), muss genauso gestaltet sein wie der Auftritt. Ausblenden oder auf null schrumpfen wirkt billig. | belegt durch eine ausdrückliche Aussage, gilt als Regel (`handwerk.md` 1c, Punkt 9) | Honig: „wie das dann verschwindet … bisschen unspektakulär, hat irgendwie billig auf mich gewirkt“ |
 | **Mühe auch unten.** Untere Abschnitte mit derselben Sorgfalt wie oben. | belegt, Regel (`handwerk.md` 1c) | Schreinerei: „Meterstab … sehr einfach gemacht, ohne Mühe“; „das Wow soll sich durchziehen“ |
 | **Saubere Typografie-Effekte.** Effekte an Buchstaben (Umriss, Füllung) müssen sauber gesetzt sein. `-webkit-text-stroke` mit Artefakten an den Kreuzungen fällt ihm auf. | Vermutung (1) | Honig, Schluss C: „die Leerbuchstaben … sehen schon irgendwie komisch aus“ |
@@ -27,6 +29,10 @@ Der feste Teil aus dem SFH-Test steht in `handwerk.md` Abschnitt 10.
 | **Grafisch vor Foto im Einstieg, solange kein echtes Material da ist.** | Vermutung (1) | Honig: Einstieg A (Wabe) statt B (Rähmchen-Foto) |
 
 ## Einträge
+
+### 25.11.2026 – Benedikts Honig, Abschluss
+- **Wörtlich:** „ja, dafür, dass es nur ein Prototyp ist, ist es okay, auch hier Erkenntnisse usw. natürlich mitnehmen.“
+- **Stand:** Musterseite mit Platzhaltern, online als `benedikts-honig` (Cloudflare Workers). 18 Wische, Erlebnis-Prüfung ohne Fehler.
 
 ### 25.11.2026 – Benedikts Honig, Stopp 2 (zweite Rückmeldung)
 - **Wörtlich (diktiert):** „dass wenn man swipt, man immer nur eine Animation weiterkommt, nicht mit einem kräftigen Swipe durch die Website … dass man die volle Experience mitnimmt. Ganz oben und ganz unten so ein gelber Balken, bei mir über der Notch. Oben Menü schaut auch komplett Scheiße aus. Außerdem der Honig, der reintropft und unten in der Wabe ankommt, sieht komisch und billig aus. Außerdem steht da schon das erste Langsam – cool, wenn das erst kommt, wenn der Honig kommt … wäre auch cooler, wenn es mehr a's werden, also wirklich laaaangsam. Ganz unten … das hat doch anders ausgesehen, dass da wirklich der Name voll wird und nicht so crazy mit den Waben. Und das war komplett überlappend mit dem davor.“

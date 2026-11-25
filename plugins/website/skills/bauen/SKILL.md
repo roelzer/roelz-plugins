@@ -175,6 +175,12 @@ Seine Rückmeldung setzt du um und prüfst neu (Schritt 5).
 - **Ohne `wrangler login`, aber mit Cloudflare-Connector** (Cloud-Sitzung, Honig 25.11.2026): `scripts/cf_manifest.py site manifest.json` → Upload-Sitzung `POST /accounts/{id}/workers/scripts/<name>/assets-upload-session` über den Connector → `CF_KONTO=<id> python3 scripts/cf_hochladen.py site <jwt> '<buckets>' manifest.json` → Worker mit `PUT /workers/scripts/<name>` (Modul `env.ASSETS.fetch(request)`, Bindung `assets`, `assets.config._headers` aus `site/_headers`) → `POST …/subdomain {enabled:true}`. Danach die Live-Adresse ganz durchscrollen (Fehler, CSP, fps) und die Header prüfen.
 - Hat Simon etwas beanstandet, das wieder passieren könnte, schlägst du `/personal:nachschulen` vor.
 
+## Lange Läufe in der Cloud
+Im Honig-Auftrag (25.11.2026) brach ein Hintergrund-Lauf zweimal ab, weil die Umgebung neu gestartet wurde. Danach war eine halbe Runde verloren, und Simon sah eine alte Fassung. Deshalb:
+- Nach jedem fertigen Teilschritt den Stand sichern (`site/` kopieren oder committen) und in `arbeit/stand.md` eine Zeile schreiben, was fertig ist und was noch fehlt.
+- Vor dem Weitermachen nach einem Neustart zuerst `arbeit/stand.md` lesen und mit `diff` gegen den letzten Stand prüfen, was der abgebrochene Lauf schon geändert hat. Nichts davon ungeprüft übernehmen.
+- Simon nie eine Vorschau als neu schicken, ohne vorher nachzusehen, dass seine Punkte drin sind.
+
 ## Ehrlich abbrechen
 Halte an und sag es Simon, wenn:
 - das Ergebnis nur mit Bezahldiensten oder ohne Lizenz ginge,
