@@ -1,5 +1,11 @@
 # Änderungsprotokoll Website-Bauer
 
+## 0.4.3 – Erlebnis-Prüfung, Timing zuerst, Schnellschleife (Honig-Musterseite, 25.11.2026)
+- **`scripts/erlebnis.mjs`:** prüft das Gefühl beim Wischen. Klick, 20 Klicks, Trackpad-Schwung und Handy-Wisch müssen je genau einen Schritt auslösen, ein zweiter Klick darf nicht verschluckt werden. Je Schritt misst sie Stillstand und Ballung der Bewegung. Gegen die alte Honig-Fassung meldet sie drei FEHLER, gegen die neue keinen.
+- **Skill:** neuer Abschnitt 3a „Timing-Modell vor dem Feinbau“ mit `?tune`, außerdem eine Schnellschleife für kleine Änderungen (etwa 2–4 Minuten statt 15).
+- **Neue Muster** in `wissen/geschmack.md`: eine Bildsprache je Baustein, ein Wisch je Stufe mit gleichzeitigem Text, jede Eingabe zählt, Bewegung ohne Warten.
+- **Zu Cloudflare ohne `wrangler login`** über den Connector (`cf_manifest.py`, `cf_hochladen.py`). Die Regel „nur bauen, was Simon sagt“ ist dabei.
+
 ## 0.4.2 – Lernt aus Simons Wahl
 Simon, 24.11.2026: „dass es sich immer anhand meiner Wahl dann selber verbessert“, dazu: „wie das dann verschwindet … bisschen unspektakulär, hat irgendwie billig auf mich gewirkt“.
 - **`wissen/geschmack.md`:** Protokoll jeder Wahl (empfohlen, gewählt, Abweichungen, seine Worte) mit Mustern. Ein Muster ist **belegt** ab drei Einträgen aus zwei Aufträgen oder durch eine ausdrückliche Aussage, vorher ist es eine **Vermutung**, die nur die Reihenfolge im Katalog bestimmt. Der Skill liest das Protokoll vor dem Katalog und schreibt nach jeder Wahl einen Eintrag (ins Plugin, wenn das Repo erreichbar ist, sonst über `/personal:nachschulen`).

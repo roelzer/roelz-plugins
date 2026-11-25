@@ -86,6 +86,12 @@ Simon, 24.11.2026: „Vorschläge für Bausteine liefern, ich wähl aus und dann
 - **Aus der Auswahl wird das Drehbuch** `arbeit/drehbuch.md` (`handwerk.md` 1c): jede Zeile mit laut/leise, Baustein, Übergang, Rolle des Motivs, Farbe und Text-Bewegung. Passt die Auswahl nicht zu den Regeln (z. B. ein Drittel ohne lauten Moment), sag es mit einem Gegenvorschlag, statt still umzubauen.
 - Bei „mach einfach“: Du wählst selbst nach dem Drehbuch und nennst die Auswahl im Bericht.
 
+## 3a. Timing-Modell vor dem Feinbau (Simon, 25.11.2026)
+„Vielleicht sollten wir bei so was in Zukunft erst nur modellieren, mit Timing und so, und dann alles wasserdicht bauen.“
+- Nach der Auswahl legst du die **Schritte und Zeiten** fest, bevor ein Baustein fein gebaut wird. Dafür entsteht eine grobe, laufende Fassung mit einfachen Formen, aber echten Haltepunkten (ein Wisch = ein Schritt) und echten Dauern, als Tabelle oben in `js/seite.js` (`TEMPO`, `SCHRITTE`, `TEMPO_SCHRITT`).
+- Mit `?tune` in der Adresse zeigt die Seite Schieberegler für jede Dauer. Simon stellt am Handy ein und schickt die Werte, die du übernimmst.
+- Erst wenn Simon das Timing abgenickt hat (oder bei „mach einfach“ die Erlebnis-Prüfung ohne Befund ist), kommt der Feinbau: Zeichnung, Material, Abgänge. Das Timing fasst du danach nur noch an, wenn er es sagt.
+
 ## 3b. Entwurf (Stopp 1b)
 - Baue **zuerst nur den Moment** als Durchstich in `site/`: Er läuft grob, mit einfachen Formen. Der Rest der Seite ist noch Platzhalter.
 - Bildserie mit `ablauf.mjs` (Laptop und Handy), dann Simon die Bilder und eine Vorschau-Datei aus `vorschau.mjs` (Abschnitt 6) schicken mit der Frage: „Trägt der Moment? Was soll anders?“
@@ -113,6 +119,8 @@ Simon, 24.11.2026: „Vorschläge für Bausteine liefern, ich wähl aus und dann
   - Zum Schluss `node ${CLAUDE_PLUGIN_ROOT}/scripts/kopfzeilen.mjs website/<name>/site` (strenge Sicherheits-Header mit Hashes, `.assetsignore`). Nach jeder Änderung an eingebetteten Stilen oder Skripten neu laufen lassen.
 
 ## 5. Prüfen (für jede Fassung, auch kleine Änderungen)
+- **Erlebnis-Prüfung** (Simon, 25.11.2026: „ich will solche Checks auch mit drin haben“): `node ${CLAUDE_PLUGIN_ROOT}/scripts/erlebnis.mjs website/<name>/site`. Sie prüft, dass ein Mausrad-Klick, 20 Klicks, ein Trackpad-Schwung und ein Handy-Wisch jeweils genau einen Schritt auslösen und kein zweiter Klick verschluckt wird (FEHLER). Dazu misst sie je Schritt, ob die Animation mittendrin stehen bleibt (über 0,9 s) oder sich zu sehr auf einen Moment ballt (Hinweise mit Werten). Nach dem Veröffentlichen läuft sie noch einmal gegen die Live-Adresse.
+- **Schnellschleife für kleine Änderungen** (Simon: „so kleine Änderungen dauern jedesmal 15 Minuten, das ist ineffizient“): Pro Änderung reichen Syntaxprüfung, Erlebnis-Prüfung oder ein gezielter Bildschirmfoto-Test der betroffenen Stelle und das Hochladen, zusammen etwa 2–4 Minuten. `pruefen.mjs`, `vorschau.mjs` und der komplette Durchlauf laufen nur vor der Übergabe an Dritte und am Ende einer Rückmelde-Runde.
 - `node ${CLAUDE_PLUGIN_ROOT}/scripts/pruefen.mjs website/<name>/site`. Es schreibt `arbeit/pruefung/pruefung.json` und Bildschirmfotos. Jeder P0 wird behoben. Hinweise wägst du ab und begründest sie.
 - Sieh die Bildschirmfotos selbst an, besonders Handy und alle Stellen mit Text auf Bild.
 - **Leistung im Handy-Profil** nach jeder größeren Änderung: `node ${CLAUDE_PLUGIN_ROOT}/scripts/leistung.mjs website/<name>/site` (Lighthouse, Ziel mindestens 90, schreibt `arbeit/pruefung/leistung.json`). Die Abschluss-Sperre verlangt die Messung.
