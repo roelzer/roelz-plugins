@@ -6,7 +6,7 @@ Simon, 25.11.2026: „Ich will den Skill so bauen, dass ich dann geile Websites 
 | # | Interessent | Was es trainiert | Stand |
 |---|---|---|---|
 | 0 | Imker (Benedikts Honig) | Ausgangspunkt, Wisch-Steuerung, Geschmacks-Gedächtnis | fertig (Prototyp) |
-| 1 | Fliesenleger | Handwerk, Material, Vorher/Nachher, erste Seite mit Bibliothek | offen |
+| 1 | Fliesenleger | Handwerk, Material, Vorher/Nachher, erste Seite mit Bibliothek | Wahl B·A·raus·A·A·B, Timing-Modell wartet auf OK |
 | 2 | Café oder Bäckerei | Wärme, Essen, Öffnungszeiten, Foto statt Zeichnung | offen |
 | 3 | Fotograf oder Videograf | Bilder als Star, ruhig, Galerie | offen |
 | 4 | Arztpraxis oder Physio | seriös, Vertrauen, Barrierefreiheit, wenig Show | offen |
@@ -32,9 +32,10 @@ Simon, 25.11.2026: „Fliesenleger lädt übrigens seit 34 Minuten, du hast 20�
 | Schritt | Honig | Fliesen | Bemerkung |
 |---|---|---|---|
 | Katalog (Stopp 1) | 20 min | 51 min | Fliesen zusätzlich mit Bibliothek lesen, `vorschau --pruefen` und `erlebnis.mjs` (allein etwa 8–10 min) |
+| Timing-Modell aus Katalog-Bausteinen | – | 8 min | zusammensetzen, Erlebnis-Prüfung, Artifact |
 | Ganze Seite bauen | 14 min (Lauf) | – | dazu Kritiker-Runden |
 | Kleine Änderung, Schnellschleife | 5–15 min | – | Ziel 2–4 min |
 | `pruefen.mjs` | 5–8 min | – | |
-| `erlebnis.mjs` | 8–10 min | – | |
+| `erlebnis.mjs` | 8–10 min | 1,5 min (17 Schritte) | Dauer wächst mit der Zahl der Schritte |
 
 Regel: Schätzungen kommen aus dieser Tabelle, nicht aus dem Bauch, immer als Spanne. Läuft etwas über die obere Grenze, sage ich es Simon von selbst, mit dem Grund und einer neuen Schätzung.

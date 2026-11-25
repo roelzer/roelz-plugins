@@ -26,9 +26,18 @@ Der feste Teil aus dem SFH-Test steht in `handwerk.md` Abschnitt 10.
 | **Saubere Typografie-Effekte.** Effekte an Buchstaben (Umriss, Füllung) müssen sauber gesetzt sein. `-webkit-text-stroke` mit Artefakten an den Kreuzungen fällt ihm auf. | Vermutung (1) | Honig, Schluss C: „die Leerbuchstaben … sehen schon irgendwie komisch aus“ |
 | **Das Motiv nicht überstrapazieren?** Er wählte in Referenzen und Schluss die Fassung *ohne* das Leitmotiv (schwebende Fotos statt Wabe über Foto, Name läuft voll statt Fahrt in die leere Zelle), obwohl beide empfohlen waren. | Vermutung (1) | Honig: Referenzen C statt A, Schluss C statt A |
 | **Material echt aussehen lassen.** Wo das Material des Auftraggebers selbst die Bewegung macht (Honig läuft, Holz wird gehobelt, Wasser fließt), soll es realistisch wirken, nicht wie ein Symbol (ein gelber Strich als Honigfaden). | Vermutung (1) | Honig, Text C: „den langsam laufenden Honig vielleicht auch noch optisch viel realistischer darstellen“ |
+| **Text-Moment ist kein Pflichtteil.** Beide Male wurde ein reiner Wort-Moment abgelehnt (Honig Text A „Wort für Wort“, Fliesen Text A und B). Im Katalog anbieten, aber nicht empfehlen, solange er nichts Eigenes zeigt. | Vermutung (2 Einträge, 2 Aufträge, fehlt 1 für belegt) | Honig: Text A weg; Fliesen: „den nächsten Teil raus, keins von beiden“ |
+| **Handwerk zeigen statt Symbol.** Er wählt die Fassung, in der die Arbeit selbst abläuft (Kleber, Fliesen, Kreuze, Fuge; Reihe für Reihe fliesen) vor der eleganteren Metapher (Schwamm, Glasur). | Vermutung (2 Wahlen, 1 Auftrag) | Fliesen: Einstieg B statt A, Schluss B statt A |
 | **Grafisch vor Foto im Einstieg, solange kein echtes Material da ist.** | Vermutung (1) | Honig: Einstieg A (Wabe) statt B (Rähmchen-Foto) |
 
 ## Einträge
+
+### 25.11.2026 – Fliesenleger, Stopp 1 (Bausteinkatalog)
+- **Empfohlen:** Einstieg A · Leistungen A · Text A · Ablauf A · Referenzen B · Schluss A
+- **Gewählt:** Einstieg B · Leistungen A · Text-Moment raus · Ablauf A · Referenzen A · Schluss B
+- **Abweichungen von der Empfehlung:** Einstieg B (Kleber, Fliesen, Fugenkreuze, Fuge) statt A (Schwamm wäscht Namen frei); Text-Moment ganz weggelassen; Referenzen A statt B; Schluss B (wird Reihe für Reihe gefliest) statt A (läuft voll Glasur).
+- **Wörtlich:** „B, A, den nächsten Teil raus, keins von beiden, dann A, A, B“
+- **Lesart:** Er nimmt die Fassungen, in denen das Handwerk Schritt für Schritt *gemacht* wird (Fliesen setzen, Reihe für Reihe fliesen), und lässt die eher poetischen Material-Momente weg (Schwamm, Glasur, Fugenmasse mit Wort).
 
 ### 25.11.2026 – Benedikts Honig, Abschluss
 - **Wörtlich:** „ja, dafür, dass es nur ein Prototyp ist, ist es okay, auch hier Erkenntnisse usw. natürlich mitnehmen.“
