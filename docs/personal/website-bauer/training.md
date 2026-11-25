@@ -26,3 +26,15 @@ Simon, 25.11.2026: „Ich will den Skill so bauen, dass ich dann geile Websites 
 | Seite | Runden mit Simon | Minuten je kleiner Änderung | bekannte Wünsche von selbst erfüllt | wieder verfehlt | neu gelernt |
 |---|---|---|---|---|---|
 | 0 Honig | ca. 8 | ca. 15, am Ende ca. 5 | – (Gedächtnis entstand dabei) | – | 17 Muster (geschmack.md), Erlebnis-Prüfung, Wisch-Steuerung |
+
+## Zeiten (gemessen, für ehrliche Schätzungen)
+Simon, 25.11.2026: „Fliesenleger lädt übrigens seit 34 Minuten, du hast 20–30 gesagt, auch so was mit aufnehmen.“
+| Schritt | Honig | Fliesen | Bemerkung |
+|---|---|---|---|
+| Katalog (Stopp 1) | 20 min | über 35 min | Fliesen zusätzlich mit Bibliothek lesen, `vorschau --pruefen` und `erlebnis.mjs` (allein etwa 8–10 min) |
+| Ganze Seite bauen | 14 min (Lauf) | – | dazu Kritiker-Runden |
+| Kleine Änderung, Schnellschleife | 5–15 min | – | Ziel 2–4 min |
+| `pruefen.mjs` | 5–8 min | – | |
+| `erlebnis.mjs` | 8–10 min | – | |
+
+Regel: Schätzungen kommen aus dieser Tabelle, nicht aus dem Bauch, immer als Spanne. Läuft etwas über die obere Grenze, sage ich es Simon von selbst, mit dem Grund und einer neuen Schätzung.
