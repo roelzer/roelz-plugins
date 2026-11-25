@@ -6,7 +6,7 @@ Simon, 25.11.2026: „Ich will den Skill so bauen, dass ich dann geile Websites 
 | # | Interessent | Was es trainiert | Stand |
 |---|---|---|---|
 | 0 | Imker (Benedikts Honig) | Ausgangspunkt, Wisch-Steuerung, Geschmacks-Gedächtnis | fertig (Prototyp) |
-| 1 | Fliesenleger | Handwerk, Material, Vorher/Nachher, erste Seite mit Bibliothek | Wahl B·A·raus·A·A·B, Timing-Modell wartet auf OK |
+| 1 | Fliesenleger | Handwerk, Material, Vorher/Nachher, erste Seite mit Bibliothek | Wahl B·A·raus·A·A·B, Feinbau fertig, wartet auf Rückmeldung |
 | 2 | Café oder Bäckerei | Wärme, Essen, Öffnungszeiten, Foto statt Zeichnung | offen |
 | 3 | Fotograf oder Videograf | Bilder als Star, ruhig, Galerie | offen |
 | 4 | Arztpraxis oder Physio | seriös, Vertrauen, Barrierefreiheit, wenig Show | offen |
@@ -33,6 +33,7 @@ Simon, 25.11.2026: „Fliesenleger lädt übrigens seit 34 Minuten, du hast 20�
 |---|---|---|---|
 | Katalog (Stopp 1) | 20 min | 51 min | Fliesen zusätzlich mit Bibliothek lesen, `vorschau --pruefen` und `erlebnis.mjs` (allein etwa 8–10 min) |
 | Timing-Modell aus Katalog-Bausteinen | – | 8 min | zusammensetzen, Erlebnis-Prüfung, Artifact |
+| Feinbau (5 Bausteine + Rahmen) | – | 50 min (geschätzt 45–60) | Material, Abgänge, Menü, Recht; Erlebnis + pruefen inklusive |
 | Ganze Seite bauen | 14 min (Lauf) | – | dazu Kritiker-Runden |
 | Kleine Änderung, Schnellschleife | 5–15 min | – | Ziel 2–4 min |
 | `pruefen.mjs` | 5–8 min | – | |
