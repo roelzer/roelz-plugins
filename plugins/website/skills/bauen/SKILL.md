@@ -71,15 +71,26 @@ Im SFH-Test kam das erst am Ende auf: Domain und Mail bei IONOS, die Seite lief 
 
 ## 3. Bausteine zur Auswahl (Stopp 1)
 Simon, 24.11.2026: „Vorschläge für Bausteine liefern, ich wähl aus und dann zusammenbauen.“
+- **Zuerst `wissen/geschmack.md` lesen.** Belegte Muster sind Regeln für Katalog und Empfehlung. Vermutungen bestimmen nur die Reihenfolge, z. B. was er öfter gewählt hat, kommt zuerst. Nichts wird deshalb weggelassen.
 - **Katalog bauen:** `arbeit/bausteine/katalog.html`, je Abschnitt (Einstieg, Leistungen, Ablauf, Referenzen, Text-Moment, Schluss) **2–3 Bausteine** aus `wissen/bausteine.md`, schon mit dem Motiv und dem Gewerk-Zeichen des Auftraggebers gefüllt. Jeder Baustein ist eine kleine **laufende** Szene, grob und ohne Feinschliff, mit eigener Scrollstrecke. Darüber stehen Kennung („Einstieg B“), ein Satz, was passiert, und laut oder leise. Die Einstieg-Bausteine sind die 2–3 Hauptideen aus `hauptidee.md`.
+- **Am Handy zeigt die Claude-App HTML-Dateien als Code** (Simon, 24.11.2026). Gibt es das Artifact-Werkzeug, veröffentlichst du Katalog und Vorschau als **privates Artifact** aus dem Quellordner (Seite plus CSS, JS, Bilder, Schriften als Dateien) und schickst Simon den Link. Die HTML-Datei aus `vorschau.mjs` bleibt für den Laptop.
+- **Der Katalog muss am iPhone laufen** (Honig, 24.11.2026: stürzte in der Claude-App ab). Nur sichtbare Bausteine bewegen sich, keine Endlosschleifen, viele Einzelteile auf ein Canvas (`wissen/bausteine.md`, Leistung). `vorschau.mjs … --pruefen` muss ohne FEHLER durchlaufen, bevor Simon die Datei bekommt. Packe aus einem eigenen Quellordner, nicht aus dem Ordner mit den Fotos.
 - **Bilder dazu:** Je Baustein drei Bilder für Anfang, Mitte und Ende mit `ablauf.mjs` nach `arbeit/bausteine/fotos/`. Den Katalog mit `vorschau.mjs arbeit/bausteine <ziel>.html` in eine Datei packen, damit Simon ihn am Handy und in der Claude-App durchscrollen kann.
 - **Zeig Simon in einer Nachricht:**
   - die Katalog-Datei und je Abschnitt ein Bilderblatt,
   - deine Empfehlung als fertige Auswahl („Einstieg B, Leistungen A, Ablauf A, Referenzen C, Text B, Schluss A“) mit einem Satz, warum sie zusammen durchzieht,
   - deine Annahmen, je eine Zeile, und die Bitte um echtes Material.
 - Simon antwortet mit seiner Auswahl, auch gemischt oder mit Änderungswünschen. **In `site/` entsteht vor seiner Wahl nichts.**
+- **Nur bauen, was Simon gesagt hat** (Simon, 25.11.2026: „Bitte auch aufnehmen, was ich sag, und nicht einfach irgendwas erfinden“). Seine Punkte kommen zuerst und vollständig. Eigene Verbesserungen (z. B. Kritiker-Punkte) schlägst du im Bericht vor, baust sie aber nicht ungefragt, und was er „so lassen“ will, fasst du nicht an.
+- **Wahl festhalten, damit das Plugin lernt:** Sofort nach Simons Antwort schreibst du einen Eintrag nach dem Muster in `wissen/geschmack.md` (Empfohlen, Gewählt, Abweichungen, Wörtlich) nach `arbeit/auswahl.md`. Ist das Plugin-Repo `roelz-plugins` erreichbar, trägst du ihn auch dort in `plugins/website/wissen/geschmack.md` ein und prüfst die Muster: neue Vermutung, Vermutung wird belegt, oder Widerspruch. Sonst steht im Bericht: „Geschmack-Eintrag in arbeit/auswahl.md, bitte mit /personal:nachschulen übernehmen.“ Dasselbe gilt für seine Rückmeldungen an Stopp 2.
 - **Aus der Auswahl wird das Drehbuch** `arbeit/drehbuch.md` (`handwerk.md` 1c): jede Zeile mit laut/leise, Baustein, Übergang, Rolle des Motivs, Farbe und Text-Bewegung. Passt die Auswahl nicht zu den Regeln (z. B. ein Drittel ohne lauten Moment), sag es mit einem Gegenvorschlag, statt still umzubauen.
 - Bei „mach einfach“: Du wählst selbst nach dem Drehbuch und nennst die Auswahl im Bericht.
+
+## 3a. Timing-Modell vor dem Feinbau (Simon, 25.11.2026)
+„Vielleicht sollten wir bei so was in Zukunft erst nur modellieren, mit Timing und so, und dann alles wasserdicht bauen.“
+- Nach der Auswahl legst du die **Schritte und Zeiten** fest, bevor ein Baustein fein gebaut wird. Dafür entsteht eine grobe, laufende Fassung mit einfachen Formen, aber echten Haltepunkten (ein Wisch = ein Schritt) und echten Dauern, als Tabelle oben in `js/seite.js` (`TEMPO`, `SCHRITTE`, `TEMPO_SCHRITT`).
+- Mit `?tune` in der Adresse zeigt die Seite Schieberegler für jede Dauer. Simon stellt am Handy ein und schickt die Werte, die du übernimmst.
+- Erst wenn Simon das Timing abgenickt hat (oder bei „mach einfach“ die Erlebnis-Prüfung ohne Befund ist), kommt der Feinbau: Zeichnung, Material, Abgänge. Das Timing fasst du danach nur noch an, wenn er es sagt.
 
 ## 3b. Entwurf (Stopp 1b)
 - Baue **zuerst nur den Moment** als Durchstich in `site/`: Er läuft grob, mit einfachen Formen. Der Rest der Seite ist noch Platzhalter.
@@ -108,6 +119,8 @@ Simon, 24.11.2026: „Vorschläge für Bausteine liefern, ich wähl aus und dann
   - Zum Schluss `node ${CLAUDE_PLUGIN_ROOT}/scripts/kopfzeilen.mjs website/<name>/site` (strenge Sicherheits-Header mit Hashes, `.assetsignore`). Nach jeder Änderung an eingebetteten Stilen oder Skripten neu laufen lassen.
 
 ## 5. Prüfen (für jede Fassung, auch kleine Änderungen)
+- **Erlebnis-Prüfung** (Simon, 25.11.2026: „ich will solche Checks auch mit drin haben“): `node ${CLAUDE_PLUGIN_ROOT}/scripts/erlebnis.mjs website/<name>/site`. Sie prüft, dass ein Mausrad-Klick, 20 Klicks, ein Trackpad-Schwung und ein Handy-Wisch jeweils genau einen Schritt auslösen und kein zweiter Klick verschluckt wird (FEHLER). Dazu misst sie je Schritt, ob die Animation mittendrin stehen bleibt (über 0,9 s) oder sich zu sehr auf einen Moment ballt (Hinweise mit Werten). Nach dem Veröffentlichen läuft sie noch einmal gegen die Live-Adresse.
+- **Schnellschleife für kleine Änderungen** (Simon: „so kleine Änderungen dauern jedesmal 15 Minuten, das ist ineffizient“): Pro Änderung reichen Syntaxprüfung, Erlebnis-Prüfung oder ein gezielter Bildschirmfoto-Test der betroffenen Stelle und das Hochladen, zusammen etwa 2–4 Minuten. `pruefen.mjs`, `vorschau.mjs` und der komplette Durchlauf laufen nur vor der Übergabe an Dritte und am Ende einer Rückmelde-Runde.
 - `node ${CLAUDE_PLUGIN_ROOT}/scripts/pruefen.mjs website/<name>/site`. Es schreibt `arbeit/pruefung/pruefung.json` und Bildschirmfotos. Jeder P0 wird behoben. Hinweise wägst du ab und begründest sie.
 - Sieh die Bildschirmfotos selbst an, besonders Handy und alle Stellen mit Text auf Bild.
 - **Leistung im Handy-Profil** nach jeder größeren Änderung: `node ${CLAUDE_PLUGIN_ROOT}/scripts/leistung.mjs website/<name>/site` (Lighthouse, Ziel mindestens 90, schreibt `arbeit/pruefung/leistung.json`). Die Abschluss-Sperre verlangt die Messung.
@@ -159,7 +172,14 @@ Seine Rückmeldung setzt du um und prüfst neu (Schritt 5).
 - **Selbst pflegen geht nur mit automatischem Veröffentlichen.** Gehört zur Abgabe, nicht als Nachtrag: Cloudflare Builds (Repo verbinden) oder eine GitHub-Action, die bei jeder Änderung auf `main` hochlädt. Zugangsdaten trägt der Auftraggeber selbst als GitHub-Secret ein, nie im Chat.
 - **Webspace statt Cloudflare** (z. B. IONOS): Die fertigen Dateien laufen auf jedem Webspace mit SFTP. Sicherheits-Header kommen in `.htaccess` statt `_headers`. Eine Server-Funktion (z. B. Live-Daten über `/api/…`) braucht dort ein kleines PHP-Skript. Die Datenschutzerklärung nennt den richtigen Anbieter.
 - **Veröffentlichen, wenn der Auftrag es verlangt** (`arbeit/veroeffentlichen.md`, Prüfung ohne P0 und frisch), **oder wenn Simon nach der Vorschau ausdrücklich Ja zu dieser Fassung sagt.** Danach nennst du die Adresse und wie man zurückrollt (`npx wrangler rollback`). Dann kostenlos über Cloudflare: Projekt mit `wrangler.jsonc` (statische Dateien aus `site/`), `npx wrangler deploy`. Mit Auftrag und grüner Prüfung lässt die Sperre das ohne Rückfrage durch, sonst fragt sie Simon. Ohne Auftrag und ohne Ja beschreibst du nur, wie er es selbst machen kann.
+- **Ohne `wrangler login`, aber mit Cloudflare-Connector** (Cloud-Sitzung, Honig 25.11.2026): `scripts/cf_manifest.py site manifest.json` → Upload-Sitzung `POST /accounts/{id}/workers/scripts/<name>/assets-upload-session` über den Connector → `CF_KONTO=<id> python3 scripts/cf_hochladen.py site <jwt> '<buckets>' manifest.json` → Worker mit `PUT /workers/scripts/<name>` (Modul `env.ASSETS.fetch(request)`, Bindung `assets`, `assets.config._headers` aus `site/_headers`) → `POST …/subdomain {enabled:true}`. Danach die Live-Adresse ganz durchscrollen (Fehler, CSP, fps) und die Header prüfen.
 - Hat Simon etwas beanstandet, das wieder passieren könnte, schlägst du `/personal:nachschulen` vor.
+
+## Lange Läufe in der Cloud
+Im Honig-Auftrag (25.11.2026) brach ein Hintergrund-Lauf zweimal ab, weil die Umgebung neu gestartet wurde. Danach war eine halbe Runde verloren, und Simon sah eine alte Fassung. Deshalb:
+- Nach jedem fertigen Teilschritt den Stand sichern (`site/` kopieren oder committen) und in `arbeit/stand.md` eine Zeile schreiben, was fertig ist und was noch fehlt.
+- Vor dem Weitermachen nach einem Neustart zuerst `arbeit/stand.md` lesen und mit `diff` gegen den letzten Stand prüfen, was der abgebrochene Lauf schon geändert hat. Nichts davon ungeprüft übernehmen.
+- Simon nie eine Vorschau als neu schicken, ohne vorher nachzusehen, dass seine Punkte drin sind.
 
 ## Ehrlich abbrechen
 Halte an und sag es Simon, wenn:

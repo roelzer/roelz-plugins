@@ -1,5 +1,5 @@
 // W20 Drehbuch (handwerk.md 1c): liest arbeit/drehbuch.md und prüft, ob sich das Wow durchzieht.
-// Spalten: Abschnitt | laut/leise | Baustein | Übergang hinein | Rolle des Motivs | Grundfarbe | Text-Bewegung
+// Spalten: Abschnitt | laut/leise | Baustein | Übergang hinein | Rolle des Motivs | Grundfarbe | Text-Bewegung | Abgang
 // Rückgabe: Liste [schwere, code, text, beleg]. Eigenes Modul, damit es ohne Browser testbar ist.
 export function drehbuchBefunde(text) {
   const raus = [];
@@ -15,5 +15,9 @@ export function drehbuchBefunde(text) {
   if (motiv < 4) raus.push(["Hinweis", "W20", `Drehbuch: das Motiv kommt nur in ${motiv} Abschnitten vor (Einstieg plus mindestens drei)`, "handwerk.md 1c Punkt 1"]);
   const blass = daten.filter((z) => /^\s*(von unten )?(einblenden|fade|erscheint)\b|^\s*$/i.test(z[3] || "")).length;
   if (blass > 1) raus.push(["Hinweis", "W20", `Drehbuch: ${blass} Abschnitte ohne eigenen Übergang (nur einblenden)`, "handwerk.md 1c Punkt 2"]);
+  if (daten[0].length >= 8) {
+    const weg = daten.filter((z) => /^\s*(aus|ausblenden|fade|verschwindet|schrumpft)\b/i.test(z[7] || "")).length;
+    if (weg) raus.push(["Hinweis", "W20", `Drehbuch: ${weg} Abschnitte gehen nur durch Ausblenden – das Verschwinden ist auch ein Moment (Simon: „hat billig gewirkt“)`, "handwerk.md 1c Punkt 9"]);
+  }
   return raus;
 }

@@ -58,6 +58,8 @@ Risiko: gemessen auf einem Laptop ohne Grafikkarte.
 ## Begleiter (die ganze Seite)
 | Bauform | Was man sieht | Technik | Aufwand | Risiko |
 |---|---|---|---|---|
+| B0 Ein Wisch = eine Animation (Standard, Simon 25.11.2026) | Jeder Wisch, Rad-Schwung oder Pfeil fährt genau eine Szene weiter, auch ein kräftiger Wisch | Haltepunkte = Anfang/Ende jeder Bühne; `touchmove` mit `preventDefault`, Rad summieren und Nachlauf schlucken, Fahrt per `scrollTo` mit Szenendauer; Vorlage: Honig-Musterseite `js/seite.js` „schrittweise“ | mittel | gering |
+| B00 iPhone-Rahmen | Dunkle, durchgehende Kopfleiste bis in die Notch, kein Farbbalken beim Überscrollen | `viewport-fit=cover`, `theme-color`, Kopfleiste mit `padding-top: env(safe-area-inset-top)`, `html { background: <dunkel>; overscroll-behavior: none }` | gering | gering |
 | B1 Fortschritt als Werkzeug | Am Rand füllt sich ein Zollstock oder eine Fugenlehre mit dem Scrollen, Millimeter statt Prozent | SVG, transform | gering | gering |
 | B2 Zeichen des Gewerks | Ein kleines Zeichen (Fugenkreuz, Maßpfeil, Nagel) markiert Überschriften und Übergänge | SVG | gering | gering |
 
@@ -78,3 +80,11 @@ Motiv: eine Musterfliese. Gewerk-Zeichen: das Fugenkreuz. Farben aus dem Materia
 - **Ein Modell, viele Texturen**, wenn 3D: Stripe nutzt ein Buchmodell mit 84 KB für alle Bücher.
 - **Bewegung reduzieren:** Jeder Baustein hat einen ruhigen Zustand für `prefers-reduced-motion` (AirPods: 23 Regeln dafür).
 - Nur `transform`, `opacity`, `clip-path` animieren, nichts, was das Layout neu rechnet (W18).
+- **Viele Einzelteile auf ein Canvas** (Honig-Katalog, 24.11.2026): Eine Wabe aus über 800 SVG-Zellen, die je per CSS-Variable rechnen, kostet bei jedem Bild alle Zellen neu. Ab etwa 200 bewegten Teilen in einer Szene: auf ein `<canvas>` zeichnen oder ein Muster (SVG-`<pattern>`, Maske) mit einer einzigen bewegten Ebene.
+- **Keine Endlosschleifen, nur Sichtbares animieren:** Selbstlauf und Schmuckbänder laufen nur, solange sie im Bild sind (IntersectionObserver), ein Selbstlauf mit 30 Bildern/s reicht, Bereiche außerhalb mit `content-visibility: auto`. Der Honig-Katalog animierte eingebettet alle 17 Bausteine pausenlos und stürzte am iPhone ab. `vorschau.mjs --pruefen` misst das jetzt (FEHLER ab 40 % Leerlauf-Rechenzeit).
+
+## Material echt darstellen (Rezepte)
+Wenn das Material selbst die Bewegung macht, wird es nicht als Symbol gezeichnet (Simon, Honig 24.11.2026). Kleine Fläche, ein Canvas, nur solange sichtbar.
+- **Honig, der läuft:** ein dünner Strahl, der unten in Schlaufen aufläuft und sich legt („Seilwurf“, wie echter Honig vom Löffel). Gezeichnet als Kette aus Punkten mit Trägheit (Verlet), langsam, weil zähflüssig. Darstellung: durchscheinender Bernstein-Verlauf quer zum Strahl (Rand dunkler, Mitte heller), ein schmaler weißer Glanzstreifen auf einer Seite, unten ein Glanzpunkt im See. Dazu leichte Verdickung, wo der Strahl auftrifft. Mit WebGL nur, wenn die Fläche klein bleibt (Brechung, Glanz), sonst Canvas 2D mit Verläufen.
+- **Allgemein:** Durchscheinen (Verlauf und Transparenz), Glanzlicht (eine helle Kante), Trägheit in der Bewegung (Material hat Gewicht) und Kontakt (es staut, spritzt, legt sich). Fehlt eins davon, wirkt es wie Clipart.
+

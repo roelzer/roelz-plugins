@@ -40,10 +40,15 @@ Simon nach der Schreinerei: „das obere ist immer noch am coolsten, nach unten 
 7. **Ein Zeichen des Gewerks taucht immer wieder auf.** Ein kleines grafisches Zeichen aus dem Handwerk zieht sich als Faden durch, z. B. die Beschriftungs-Dreiecke bei Scale, eine Fuge beim Fliesenleger, eine Maßlinie beim Schreiner.
 8. **Die Bewegung hängt am Scrollen und läuft rückwärts mit** (ScrollTrigger mit `scrub`). Einmal abspielen und fertig wirkt billig.
 
+9. **Auch das Verschwinden ist ein Moment** (Simon, Honig 24.11.2026: „wie das dann verschwindet … bisschen unspektakulär, hat irgendwie billig auf mich gewirkt“). Ein Element geht nicht durch Ausblenden oder Schrumpfen auf null, sondern verwandelt sich in den nächsten Zustand: Die Wachsdeckel brechen auf und tropfen ab, die Wabe zieht sich zu einer Zelle zusammen, die zum nächsten Abschnitt wird, das Rähmchen wird zurück in den Kasten geschoben. Im Drehbuch steht deshalb neben „Übergang hinein“ auch, wie der Abschnitt geht.
+
+10. **Figuren mit eigenem Leben laufen nach der Uhr, nicht nach der Scrollstelle** (Honig, 25.11.2026: „die Biene sitzt immer noch manchmal in der Mitte“). Eine Figur, die herein- und hinausfliegt, startet beim Beginn ihres Schritts und fliegt in fester Zeit ganz durch. Hängt sie am Scroll-Fortschritt, bleibt sie stehen, wo der Besucher anhält. Material, das die Szene trägt (Honig, Füllstand), hängt dagegen am Wisch.
+11. **Schrift folgt dem Material:** Gehört ein Text zu einer Bewegung, erscheint er an deren Position (Höhe der Honigspitze) und nicht nach eigener Zeittabelle. Lage über `offsetTop` messen, nicht über die eigene, bewegte Box.
+
 **„Mit Mühe“ heißt:** Ein lauter Moment hat mindestens zwei zusammenspielende Ebenen (z. B. Objekt und Hintergrundfarbe, oder Bild und Text), dauert über mehr als eine Bildschirmhöhe Scrollweg und hat Bezug zum Motiv. Eine einzelne Eigenschaft an einem Element (ein Zollstock klappt auf, eine Linie zeichnet sich) zählt als **leise**, egal wie hübsch sie ist.
 
 **Das Drehbuch** `arbeit/drehbuch.md` legt das vor dem Bauen fest, eine Zeile je Abschnitt:
-`Abschnitt | laut/leise | Baustein (aus wissen/bausteine.md) | Übergang hinein | Rolle des Motivs | Grundfarbe | Text-Bewegung`
+`Abschnitt | laut/leise | Baustein (aus wissen/bausteine.md) | Übergang hinein | Rolle des Motivs | Grundfarbe | Text-Bewegung | Abgang (wie der Abschnitt geht)`
 Die Prüfung dazu: Jedes Drittel hat ein „laut“, das Motiv kommt mindestens dreimal vor, jeder Übergang ist verschieden von „von unten einblenden“, und die letzte Zeile greift die erste auf.
 
 Machart der kleinen Bewegungen: CSS oder SVG, keine zweite WebGL-Fläche, bei reduzierter Bewegung ohne. Nicht jeden Absatz von unten einblenden lassen, das ist Stangenware.
@@ -110,6 +115,7 @@ Gegenmittel ist nicht „das Gegenteil“, sondern die Herleitung aus dem Auftra
 - Prüfhilfen kommen vor der Lieferung raus, z. B. `markers: true` bei GSAP ScrollTrigger (gsap-skills; Prüfskript W19).
 
 ## 10. Simons Geschmack (aus dem SFH-Test, 19.11.2026)
+Das laufende Wahl-Protokoll mit belegten Mustern und Vermutungen steht in `wissen/geschmack.md`.
 Gilt für Simon und als Ausgangspunkt für Auftraggeber, die er mitbringt. Jede Zeile ist ein Zitat oder eine umgesetzte Anmerkung.
 - **Ja:**
   - kräftige, dicke Schrift („gern noch bissle dicker“)

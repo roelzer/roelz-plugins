@@ -1,5 +1,25 @@
 # Änderungsprotokoll Website-Bauer
 
+## 0.4.3 – Erlebnis-Prüfung, Timing zuerst, Schnellschleife (Honig-Musterseite, 25.11.2026)
+- **`scripts/erlebnis.mjs`:** prüft das Gefühl beim Wischen. Klick, 20 Klicks, Trackpad-Schwung und Handy-Wisch müssen je genau einen Schritt auslösen, ein zweiter Klick darf nicht verschluckt werden. Je Schritt misst sie Stillstand und Ballung der Bewegung. Gegen die alte Honig-Fassung meldet sie drei FEHLER, gegen die neue keinen.
+- **Skill:** neuer Abschnitt 3a „Timing-Modell vor dem Feinbau“ mit `?tune`, außerdem eine Schnellschleife für kleine Änderungen (etwa 2–4 Minuten statt 15).
+- **Neue Muster** in `wissen/geschmack.md`: eine Bildsprache je Baustein, ein Wisch je Stufe mit gleichzeitigem Text, jede Eingabe zählt, Bewegung ohne Warten.
+- **Zu Cloudflare ohne `wrangler login`** über den Connector (`cf_manifest.py`, `cf_hochladen.py`). Die Regel „nur bauen, was Simon sagt“ ist dabei.
+
+## 0.4.2 – Lernt aus Simons Wahl
+Simon, 24.11.2026: „dass es sich immer anhand meiner Wahl dann selber verbessert“, dazu: „wie das dann verschwindet … bisschen unspektakulär, hat irgendwie billig auf mich gewirkt“.
+- **`wissen/geschmack.md`:** Protokoll jeder Wahl (empfohlen, gewählt, Abweichungen, seine Worte) mit Mustern. Ein Muster ist **belegt** ab drei Einträgen aus zwei Aufträgen oder durch eine ausdrückliche Aussage, vorher ist es eine **Vermutung**, die nur die Reihenfolge im Katalog bestimmt. Der Skill liest das Protokoll vor dem Katalog und schreibt nach jeder Wahl einen Eintrag (ins Plugin, wenn das Repo erreichbar ist, sonst über `/personal:nachschulen`).
+- **Neue Regel `handwerk.md` 1c, Punkt 9 „Auch das Verschwinden ist ein Moment“.** Im Drehbuch gibt es eine neue Spalte „Abgang“, W20 meldet Abschnitte, die nur ausgeblendet werden.
+- **Kritiker:** Frage 5c zu Simons Geschmack (Abgänge, saubere Schrift-Effekte).
+- Katalog und Vorschau gehen am Handy als privates Artifact raus (die App zeigt HTML-Dateien als Code).
+
+## 0.4.1 – Katalog stürzte am iPhone ab, Baustein-Bibliothek
+Simon, 24.11.2026: „Die Seite stürzt immer wieder ab“ (Honig-Bausteinkatalog in der Claude-App).
+- **Ursache:** Eingebettet liefen alle 17 Bausteine pausenlos, dazu ein Schmuckband mit 865 Wabenzellen. Gemessen wurden 76–86 % Rechenzeit im Leerlauf. Vier Fotos waren 13-mal eingebettet (2,5 MB).
+- **`vorschau.mjs`:** Jedes Bild wird genau einmal eingebettet (CSS über `var(--vb-N)`, `<img>` bekommt die Quelle beim Laden). Ordner wie `fotos/`, `pruefung/` und die eigene Ausgabe kommen nicht mit hinein (ein zweiter Lauf ergab vorher 165 MB). `--pruefen` misst die Leerlauf-Last eingebettet am Handy: FEHLER ab 40 %, Hinweis ab 25 %. Tests dazu.
+- **Regeln** (`wissen/bausteine.md`, Skill Stopp 1): ab etwa 200 bewegten Teilen auf ein Canvas, nur Sichtbares animieren, keine Endlosschleifen, Katalog vor dem Versand mit `--pruefen`.
+- **Baustein-Bibliothek** (Gerüst): `bibliothek/` mit README, Scroll-Helfer `_kern/scroll.js`, `scripts/bibliothek.mjs` (Katalog, Messung, Aufnahmeregeln) und neuer Skill `website:bibliothek` zum Erweitern, wenn Kontingent übrig ist.
+
 ## 0.4.0 – Das Wow zieht sich durch, Bausteine zur Auswahl, Kunden pflegen selbst
 Simon, 24.11.2026: „das obere ist immer noch am coolsten, nach unten hin z. B. der Meterstab war halt sehr einfach wieder gemacht, ohne Mühe, das Wow soll nicht nur oben sein, sondern sich durchziehen“, „Vorschläge für Bausteine liefern, ich wähl aus und dann zusammenbauen“, Kunden pflegen die Seite selbst. Neue Vorbilder: Zoox, AirPods 5, Scale („vor allem Scale ist echt krass“), Stripe Press, ikilledacactus, ausgewertet mit Bildserien, Technik und fps-Messung.
 - **`handwerk.md` 1c „Das Wow zieht sich durch“:** acht Prinzipien aus den Vorbildern (Motiv verwandelt sich mindestens dreimal, eigener Übergang je Abschnitt, laut/leise im Wechsel mit einem lauten Moment je Drittel, Farbe trägt das Kapitel, Typografie bewegt sich, Schluss antwortet auf den Anfang, Zeichen des Gewerks, Bewegung am Scrollen). Klar definiert, was „mit Mühe“ heißt. Ersetzt „Danach nicht abfallen“ (eine kleine Bewegung je Abschnitt reichte Simon nicht).

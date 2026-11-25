@@ -35,9 +35,15 @@ const lokal = (ref, basis) => {
   return p.startsWith(root) && fs.existsSync(p) && fs.statSync(p).isFile() ? p : null;
 };
 const datenUri = (p) => `data:${TYP[path.extname(p).toLowerCase()] || "application/octet-stream"};base64,${fs.readFileSync(p).toString("base64")}`;
+// Bilder nur einmal einbetten (Absturz am iPhone, Honig-Katalog 24.11.2026: 4 Fotos 13-mal eingebettet).
+// Jedes Rasterbild steht genau einmal in window.__VB; CSS nutzt var(--vb-N), <img> bekommt die Quelle beim Laden.
+const geteilt = new Map();
+const teilen = (p) => { if (!/\.(png|jpe?g|webp|avif|gif)$/i.test(p)) return null; if (!geteilt.has(p)) geteilt.set(p, geteilt.size); return geteilt.get(p); };
+const LEER = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+const NICHT_MIT = /(^|[\\/])(fotos|pruefung|vorschau-pruefung|node_modules|arbeit|build|\.git)([\\/]|$)/;
 const cssEinbetten = (css, basis) => css
   .replace(/@import\s+(?:url\()?['"]([^'"]+)['"]\)?\s*;/g, (m, ref) => { const p = lokal(ref, basis); return p ? cssEinbetten(fs.readFileSync(p, "utf8"), path.dirname(p)) : m; })
-  .replace(/url\(\s*(['"]?)([^'")]+)\1\s*\)/g, (m, q, ref) => { const p = lokal(ref, basis); return p ? `url("${datenUri(p)}")` : m; });
+  .replace(/url\(\s*(['"]?)([^'")]+)\1\s*\)/g, (m, q, ref) => { const p = lokal(ref, basis); if (!p) return m; const i = teilen(p); return i == null ? `url("${datenUri(p)}")` : `var(--vb-${i})`; });
 
 let html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const alias = {};
@@ -55,8 +61,11 @@ html = html.replace(/<style([^>]*)>([\s\S]*?)<\/style>/gi, (m, a, css) => `<styl
 const vorrat = {};
 for (const f of fs.readdirSync(root, { recursive: true })) {
   const p = path.join(root, String(f));
-  if (fs.statSync(p).isFile() && /\.(glb|gltf|bin|hdr|json|ktx2|jpe?g|png|webp|avif)$/i.test(p) && fs.statSync(p).size < 25e6)
-    vorrat["/" + path.relative(root, p).split(path.sep).join("/")] = datenUri(p);
+  if (NICHT_MIT.test(path.relative(root, p)) || path.resolve(p) === path.resolve(ziel)) continue;
+  if (fs.statSync(p).isFile() && /\.(glb|gltf|bin|hdr|json|ktx2|jpe?g|png|webp|avif)$/i.test(p) && fs.statSync(p).size < 25e6) {
+    const i = teilen(p);
+    vorrat["/" + path.relative(root, p).split(path.sep).join("/")] = i == null ? datenUri(p) : "@vb:" + i;
+  }
 }
 const buendeln = (opts) => { if (!esbuild) throw new Error("esbuild fehlt"); return esbuild.buildSync({ ...opts, bundle: true, format: "esm", write: false, minify: true, alias, logLevel: "silent",
   loader: { ".glb": "dataurl", ".hdr": "dataurl", ".png": "dataurl", ".jpg": "dataurl", ".webp": "dataurl", ".svg": "dataurl", ".woff2": "dataurl", ".json": "json" } })
@@ -74,7 +83,11 @@ html = html.replace(/<script\b([^>]*)type=["']module["']([^>]*)>([\s\S]*?)<\/scr
   try { return `<script type="module">${buendeln({ stdin: { contents: code, resolveDir: root, loader: "js" } })}</script>`; } catch { return tag; }
 });
 if (im) html = html.replace(im[0], "");
-html = html.replace(/\b(src|poster|href)=["']([^"']+\.(?:png|jpe?g|webp|avif|gif|svg|mp4|webm|ico|woff2?))["']/gi, (m, attr, ref) => { const p = lokal(ref, root); return p ? `${attr}="${datenUri(p)}"` : m; });
+html = html.replace(/\b(src|poster|href)=["']([^"']+\.(?:png|jpe?g|webp|avif|gif|svg|mp4|webm|ico|woff2?))["']/gi, (m, attr, ref) => {
+  const p = lokal(ref, root); if (!p) return m;
+  const i = attr !== "href" ? teilen(p) : null;
+  return i == null ? `${attr}="${datenUri(p)}"` : `${attr}="${LEER}" data-vb-${attr}="${i}"`;
+});
 html = html.replace(/\bsrcset=["']([^"']+)["']/gi, (m, set) => `srcset="${set.split(",").map((t) => { const [u, w] = t.trim().split(/\s+/); const p = lokal(u, root); return (p ? datenUri(p) : u) + (w ? " " + w : ""); }).join(", ")}"`);
 
 // Unterseiten als Abschnitte anhängen, die per Link aufgehen (#seite-impressum …)
@@ -97,8 +110,13 @@ if (unter.size) {
 }
 if (Object.keys(vorrat).length) {
   const ordnerNamen = [...new Set(Object.keys(vorrat).map((k) => k.split("/")[1]))].map((s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
-  const weiche = `<script>(()=>{const D=${JSON.stringify(vorrat)};const f=window.fetch.bind(window);const n=u=>{try{const x=new URL(u,location.href);if(x.protocol!=="file:"&&x.origin!==location.origin)return null;const p=decodeURIComponent(x.pathname);const m=p.match(/\\/(?:${ordnerNamen})\\/.*$/);return m?m[0]:p.replace(/^.*\\//,"/")}catch{return null}};const such=u=>{const k=n(u);if(!k)return null;for(const p in D)if(k===p||k.endsWith(p))return D[p];return null};window.fetch=(u,o)=>{const d=such(typeof u==="string"?u:u.url);return f(d||u,o)};const X=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(m,u,...r){return X.call(this,m,such(u)||u,...r)};const S=Object.getOwnPropertyDescriptor(HTMLImageElement.prototype,"src");Object.defineProperty(HTMLImageElement.prototype,"src",{get(){return S.get.call(this)},set(u){S.set.call(this,such(u)||u)},configurable:true})})();</script>`;
+  const weiche = `<script>(()=>{const D=${JSON.stringify(vorrat)};const f=window.fetch.bind(window);const n=u=>{try{const x=new URL(u,location.href);if(x.protocol!=="file:"&&x.origin!==location.origin)return null;const p=decodeURIComponent(x.pathname);const m=p.match(/\\/(?:${ordnerNamen})\\/.*$/);return m?m[0]:p.replace(/^.*\\//,"/")}catch{return null}};const such=u=>{const k=n(u);if(!k)return null;for(const p in D)if(k===p||k.endsWith(p)){const v=D[p];return v.startsWith("@vb:")?window.__VB[+v.slice(4)]:v}return null};window.fetch=(u,o)=>{const d=such(typeof u==="string"?u:u.url);return f(d||u,o)};const X=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(m,u,...r){return X.call(this,m,such(u)||u,...r)};const S=Object.getOwnPropertyDescriptor(HTMLImageElement.prototype,"src");Object.defineProperty(HTMLImageElement.prototype,"src",{get(){return S.get.call(this)},set(u){S.set.call(this,such(u)||u)},configurable:true})})();</script>`;
   html = html.replace(/<head[^>]*>/i, (h) => h + weiche);
+}
+if (geteilt.size) {
+  const uris = [...geteilt.keys()].map((p) => datenUri(p));
+  const vb = `<script>(()=>{const V=window.__VB=${JSON.stringify(uris)};const r=document.documentElement.style;V.forEach((u,i)=>r.setProperty("--vb-"+i,'url("'+u+'")'));const setz=()=>document.querySelectorAll("[data-vb-src],[data-vb-poster]").forEach(e=>{for(const a of ["src","poster"]){const k=e.getAttribute("data-vb-"+a);if(k!==null){e.setAttribute(a,V[+k]);e.removeAttribute("data-vb-"+a)}}});document.readyState==="loading"?document.addEventListener("DOMContentLoaded",setz):setz()})();</script>`;
+  html = html.replace(/<head[^>]*>/i, (h) => h + vb);
 }
 fs.mkdirSync(path.dirname(path.resolve(ziel)), { recursive: true });
 fs.writeFileSync(ziel, html);
@@ -124,6 +142,15 @@ if (bilder) {
     await p.waitForTimeout(9000); await p.screenshot({ path: path.join(bilder, `eingebettet-${n}-12s.png`) });
     if (gleich(path.join(bilder, `eingebettet-${n}-3s.png`), path.join(bilder, `eingebettet-${n}-12s.png`)))
       befunde.push(`FEHLER eingebettet (${n}): nach 3 und 12 s dasselbe Bild – der Moment spielt in der Vorschau nicht von selbst ab`);
+    if (n === "handy") {
+      // Leerlauf-Last eingebettet: Honig-Katalog (24.11.2026) rechnete 76 % der Zeit Stile neu und stürzte am iPhone ab.
+      const cdp = await p.context().newCDPSession(p); await cdp.send("Performance.enable");
+      const lies = async () => Object.fromEntries((await cdp.send("Performance.getMetrics")).metrics.map((x) => [x.name, x.value]));
+      const m1 = await lies(); await p.waitForTimeout(4000); const m2 = await lies();
+      const last = ["RecalcStyleDuration", "LayoutDuration", "ScriptDuration"].reduce((s, k) => s + (m2[k] - m1[k]), 0) / 4;
+      if (last > 0.4) befunde.push(`FEHLER eingebettet (handy): im Leerlauf ${Math.round(last * 100)} % Rechenzeit (Stile, Layout, Skript) – stürzt am iPhone ab. Nur sichtbare Szenen animieren, Endlosschleifen anhalten, viele Einzelzellen auf ein Canvas (wissen/bausteine.md, Leistung)`);
+      else if (last > 0.25) befunde.push(`Hinweis eingebettet (handy): im Leerlauf ${Math.round(last * 100)} % Rechenzeit – am iPhone knapp`);
+    }
     fehler.forEach((f) => befunde.push(`FEHLER Skript (${n}, eingebettet): ${f}`));
     fs.rmSync(huelle); await p.close();
   }
