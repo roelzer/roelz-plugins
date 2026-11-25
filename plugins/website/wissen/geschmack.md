@@ -9,6 +9,7 @@ Der feste Teil aus dem SFH-Test steht in `handwerk.md` Abschnitt 10.
 ## Muster
 | Muster | Stand | Belege |
 |---|---|---|
+| **Nur bauen, was er gesagt hat.** Seine Punkte zuerst und vollständig, Eigenes nur als Vorschlag. Was er „so lassen“ will, bleibt. | belegt (ausdrücklich), Regel im Skill | Honig, 25.11.: „gegen meinen ausdrücklichen Wunsch hast du diesen Tropfen Honig nicht mehr verändert … dafür hast du jetzt die Waben erneuert“, „Bitte auch aufnehmen, was ich sag, und nicht einfach irgendwas erfinden“ |
 | **Auch das Verschwinden ist ein Moment.** Wie ein Element geht (Waben verschwinden über dem Foto), muss genauso gestaltet sein wie der Auftritt. Ausblenden oder auf null schrumpfen wirkt billig. | belegt durch eine ausdrückliche Aussage, gilt als Regel (`handwerk.md` 1c, Punkt 9) | Honig: „wie das dann verschwindet … bisschen unspektakulär, hat irgendwie billig auf mich gewirkt“ |
 | **Mühe auch unten.** Untere Abschnitte mit derselben Sorgfalt wie oben. | belegt, Regel (`handwerk.md` 1c) | Schreinerei: „Meterstab … sehr einfach gemacht, ohne Mühe“; „das Wow soll sich durchziehen“ |
 | **Saubere Typografie-Effekte.** Effekte an Buchstaben (Umriss, Füllung) müssen sauber gesetzt sein. `-webkit-text-stroke` mit Artefakten an den Kreuzungen fällt ihm auf. | Vermutung (1) | Honig, Schluss C: „die Leerbuchstaben … sehen schon irgendwie komisch aus“ |
@@ -17,6 +18,9 @@ Der feste Teil aus dem SFH-Test steht in `handwerk.md` Abschnitt 10.
 | **Grafisch vor Foto im Einstieg, solange kein echtes Material da ist.** | Vermutung (1) | Honig: Einstieg A (Wabe) statt B (Rähmchen-Foto) |
 
 ## Einträge
+
+### 25.11.2026 – Benedikts Honig, Stopp 2
+- **Wörtlich:** „gegen meinen ausdrücklichen Wunsch hast du ja diesen Tropfen Honig nicht mehr verändert. Der schaut genauso Kacke aus wie davor, dafür hast du jetzt die Waben erneuert – ist okay, die würde ich auch erst mal grob so lassen … Bitte auch aufnehmen, was ich sag, und nicht einfach irgendwas erfinden.“ – „dann dafür Cloudflare anlegen und hoch pushen, falls das nicht geht, mir auf jeden Fall schon mal die HTML zur Verfügung stellen und ausgiebig prüfen, dass die auch clean läuft, weil ich muss es halt morgen gleich weiterschicken.“
 
 ### 24.11.2026 – Benedikts Honig, Stopp 1 (Bausteinkatalog)
 - **Empfohlen:** Einstieg A · Leistungen A · Text A · Ablauf A · Referenzen A · Text C · Schluss A
