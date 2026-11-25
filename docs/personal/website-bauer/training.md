@@ -31,7 +31,7 @@ Simon, 25.11.2026: „Ich will den Skill so bauen, dass ich dann geile Websites 
 Simon, 25.11.2026: „Fliesenleger lädt übrigens seit 34 Minuten, du hast 20–30 gesagt, auch so was mit aufnehmen.“
 | Schritt | Honig | Fliesen | Bemerkung |
 |---|---|---|---|
-| Katalog (Stopp 1) | 20 min | 51 min | Fliesen zusätzlich mit Bibliothek lesen, `vorschau --pruefen` und `erlebnis.mjs` (allein etwa 8–10 min) |
+| Katalog (Stopp 1) | 20 min | 51 min (Firmenseite: 65 min, 6 Abschnitte/13 Bausteine) | Fliesen zusätzlich mit Bibliothek lesen, `vorschau --pruefen` und `erlebnis.mjs` (allein etwa 8–10 min) |
 | Timing-Modell aus Katalog-Bausteinen | – | 8 min | zusammensetzen, Erlebnis-Prüfung, Artifact |
 | Feinbau (5 Bausteine + Rahmen) | – | 50 min (geschätzt 45–60) | Material, Abgänge, Menü, Recht; Erlebnis + pruefen inklusive |
 | Ganze Seite bauen | 14 min (Lauf) | – | dazu Kritiker-Runden |
