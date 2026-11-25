@@ -8,6 +8,9 @@
 //   <script src="schritte.js"></script>
 //   Schritte.start({ fortschritt: (section, p) => { … } });     // p = 0…1 je Bühne
 // Mit ?tune in der Adresse erscheinen Schieberegler für alle Dauern (tune.js, falls geladen).
+// data-durchlauf (Simon, Fliesen: „ein Scroll und dann läuft es durch, bis der Name dran steht“): Die Zwischenschritte
+// sind dann keine Haltepunkte mehr, sondern Zeitmarken. Ein Wisch fährt die ganze Bühne durch, jedes Stück in seiner
+// eigenen Dauer aus data-tempi, ohne Halt dazwischen.
 (function () {
   "use strict";
   var teil = function (p, a, b) { return Math.min(1, Math.max(0, (p - a) / (b - a))); };
@@ -24,7 +27,7 @@
         mass = buehnen.map(function (el) {
           var st = el.querySelector(".strecke"), r = st.getBoundingClientRect(), oben = r.top + y;
           return { el: el, von: oben, bis: oben + st.offsetHeight - H, p: -1,
-            tempo: Number(el.dataset.tempo) || 2000, teile: zahlen(el.dataset.schritte), tempi: zahlen(el.dataset.tempi) };
+            tempo: Number(el.dataset.tempo) || 2000, teile: zahlen(el.dataset.schritte), tempi: zahlen(el.dataset.tempi), durch: el.hasAttribute("data-durchlauf") };
         });
       }
       function tick() {
@@ -40,6 +43,12 @@
         var max = document.documentElement.scrollHeight - hoehe(), l = [{ y: 0, dauer: 900 }];
         mass.forEach(function (m) {
           l.push({ y: Math.max(0, Math.round(m.von)), dauer: 1000 });
+          if (m.durch) {   // ein Haltepunkt am Ende, die Teile werden zu Stücken der Fahrt
+            var stuecke = [], summe = 0;
+            (m.teile || []).concat([1]).forEach(function (f, i) { var d = m.tempi ? m.tempi[i] : m.tempo; summe += d; stuecke.push({ y: Math.round(m.von + (m.bis - m.von) * f), dauer: d }); });
+            l.push({ y: Math.min(max, Math.round(m.bis)), dauer: summe, stuecke: stuecke });
+            return;
+          }
           (m.teile || []).forEach(function (f, i) { l.push({ y: Math.round(m.von + (m.bis - m.von) * f), dauer: m.tempi ? m.tempi[i] : m.tempo }); });
           l.push({ y: Math.min(max, Math.round(m.bis)), dauer: m.tempi ? m.tempi[(m.teile || []).length] : m.tempo });
         });
@@ -56,6 +65,18 @@
         var dauer = ziel.dauer;
         if (r < 0) { var oben = hp.filter(function (h) { return h.y > ziel.y; })[0]; dauer = oben ? oben.dauer * 0.7 : 900; }
         var von = y, weg = ziel.y - y, t0 = performance.now(); faehrt = true;
+        if (r > 0 && ziel.stuecke) {   // Durchlauf: Stück für Stück in eigener Dauer, sanft an und aus, dazwischen gleichmäßig
+          var st = ziel.stuecke.filter(function (x) { return x.y > y + 8; }), a = y, k = 0, tk = t0;
+          (function s(j) {
+            var x = st[k], q = Math.min(1, (j - tk) / x.dauer), e = q;
+            if (st.length === 1) e = q < 0.5 ? 2 * q * q : 1 - Math.pow(-2 * q + 2, 2) / 2;
+            else if (k === 0) e = q * q * (2 - q);  else if (k === st.length - 1) e = q * (1 + q - q * q);
+            window.scrollTo(0, a + (x.y - a) * Math.min(1, Math.max(0, e)));
+            if (q >= 1) { a = x.y; k++; tk = j; }
+            if (k < st.length) requestAnimationFrame(s); else faehrt = false;
+          })(t0);
+          return;
+        }
         (function s(j) {
           var q = Math.min(1, (j - t0) / dauer), e = q < 0.5 ? 2 * q * q : 1 - Math.pow(-2 * q + 2, 2) / 2;
           window.scrollTo(0, von + weg * e);

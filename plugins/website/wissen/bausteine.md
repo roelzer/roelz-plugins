@@ -58,7 +58,7 @@ Risiko: gemessen auf einem Laptop ohne Grafikkarte.
 ## Begleiter (die ganze Seite)
 | Bauform | Was man sieht | Technik | Aufwand | Risiko |
 |---|---|---|---|---|
-| B0 Ein Wisch = eine Animation (Standard, Simon 25.11.2026) | Jeder Wisch, Rad-Schwung oder Pfeil fährt genau eine Szene weiter, auch ein kräftiger Wisch | Haltepunkte = Anfang/Ende jeder Bühne; `touchmove` mit `preventDefault`, Rad summieren und Nachlauf schlucken, Fahrt per `scrollTo` mit Szenendauer; Vorlage: Honig-Musterseite `js/seite.js` „schrittweise“ | mittel | gering |
+| B0 Ein Wisch = eine Animation (Standard, Simon 25.11.2026) | Jeder Wisch, Rad-Schwung oder Pfeil fährt genau eine Szene weiter, auch ein kräftiger Wisch | Haltepunkte = Anfang/Ende jeder Bühne; `touchmove` mit `preventDefault`, Rad summieren und Nachlauf schlucken, Fahrt per `scrollTo` mit Szenendauer; Vorlage: `bibliothek/_kern/schritte.js`. Für einen Einstieg, der nach einem Wisch ganz durchläuft: `data-durchlauf` (Zwischenschritte werden Zeitmarken, Fliesen 25.11.) | mittel | gering |
 | B00 iPhone-Rahmen | Dunkle, durchgehende Kopfleiste bis in die Notch, kein Farbbalken beim Überscrollen | `viewport-fit=cover`, `theme-color`, Kopfleiste mit `padding-top: env(safe-area-inset-top)`, `html { background: <dunkel>; overscroll-behavior: none }` | gering | gering |
 | B1 Fortschritt als Werkzeug | Am Rand füllt sich ein Zollstock oder eine Fugenlehre mit dem Scrollen, Millimeter statt Prozent | SVG, transform | gering | gering |
 | B2 Zeichen des Gewerks | Ein kleines Zeichen (Fugenkreuz, Maßpfeil, Nagel) markiert Überschriften und Übergänge | SVG | gering | gering |

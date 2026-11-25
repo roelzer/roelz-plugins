@@ -26,11 +26,18 @@ Der feste Teil aus dem SFH-Test steht in `handwerk.md` Abschnitt 10.
 | **Saubere Typografie-Effekte.** Effekte an Buchstaben (Umriss, Füllung) müssen sauber gesetzt sein. `-webkit-text-stroke` mit Artefakten an den Kreuzungen fällt ihm auf. | Vermutung (1) | Honig, Schluss C: „die Leerbuchstaben … sehen schon irgendwie komisch aus“ |
 | **Das Motiv nicht überstrapazieren?** Er wählte in Referenzen und Schluss die Fassung *ohne* das Leitmotiv (schwebende Fotos statt Wabe über Foto, Name läuft voll statt Fahrt in die leere Zelle), obwohl beide empfohlen waren. | Vermutung (1) | Honig: Referenzen C statt A, Schluss C statt A |
 | **Material echt aussehen lassen.** Wo das Material des Auftraggebers selbst die Bewegung macht (Honig läuft, Holz wird gehobelt, Wasser fließt), soll es realistisch wirken, nicht wie ein Symbol (ein gelber Strich als Honigfaden). | Vermutung (1) | Honig, Text C: „den langsam laufenden Honig vielleicht auch noch optisch viel realistischer darstellen“ |
+| **Physik muss stimmen.** Was sich berührt, berührt sich wirklich (Fliese liegt auf dem Kleber, der platt gedrückt wird); Füllungen ragen nicht über ihre Kante. | Vermutung (1) | Fliesen, Timing: „Kleber platt gedrückt … Fliese echt berührt … Fuge nicht über die Fliesen rausragen“ |
+| **Der Einstieg darf ein Durchlauf sein.** Ein Wisch, dann läuft die ganze Eröffnung durch bis zum Namen. Ein Wisch je Stufe gilt für Inhalts-Szenen, ein Wisch je Stück wird beim Einstieg zäh. | Vermutung (1) | Fliesen: „ein Scroll und dann läuft es durch, bis der Name dran steht“ |
+| **Ein Ereignis je Wisch.** Kommt etwas Neues herein und passiert dann etwas damit, sind das zwei Wische. | Vermutung (1) | Fliesen, Referenzen: „erst vors 1. kommen und beim nächsten Scrollen dann aufgehen“ |
 | **Text-Moment ist kein Pflichtteil.** Beide Male wurde ein reiner Wort-Moment abgelehnt (Honig Text A „Wort für Wort“, Fliesen Text A und B). Im Katalog anbieten, aber nicht empfehlen, solange er nichts Eigenes zeigt. | Vermutung (2 Einträge, 2 Aufträge, fehlt 1 für belegt) | Honig: Text A weg; Fliesen: „den nächsten Teil raus, keins von beiden“ |
 | **Handwerk zeigen statt Symbol.** Er wählt die Fassung, in der die Arbeit selbst abläuft (Kleber, Fliesen, Kreuze, Fuge; Reihe für Reihe fliesen) vor der eleganteren Metapher (Schwamm, Glasur). | Vermutung (2 Wahlen, 1 Auftrag) | Fliesen: Einstieg B statt A, Schluss B statt A |
 | **Grafisch vor Foto im Einstieg, solange kein echtes Material da ist.** | Vermutung (1) | Honig: Einstieg A (Wabe) statt B (Rähmchen-Foto) |
 
 ## Einträge
+
+### 25.11.2026 – Fliesenleger, Timing-Modell
+- **Wörtlich:** „bei ‚So entsteht eine Fläche‘ bitte, dass der Kleber dann bisschen platt gedrückt wird und die Fliese auch echt berührt, die Fuge soll auch nicht über die Fliesen rausragen. Bei Vorher/Nachher soll das 2. Beispiel beim Scrollen erst vors 2. kommen und beim nächsten Scrollen dann ‚aufgehen‘.“ – „das auch am Anfang mit dem Fliesen soll automatisch laufen, also ein Scroll und dann läuft es durch, bis der Name dran steht.“
+- **Umgesetzt:** Kleberrillen werden unter der Fliese zu einer geschlossenen Schicht, Fuge bündig; Referenzen in drei Wischen; Einstieg als Durchlauf (`data-durchlauf` im Kern).
 
 ### 25.11.2026 – Fliesenleger, Stopp 1 (Bausteinkatalog)
 - **Empfohlen:** Einstieg A · Leistungen A · Text A · Ablauf A · Referenzen B · Schluss A

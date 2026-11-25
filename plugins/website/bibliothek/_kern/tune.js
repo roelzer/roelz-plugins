@@ -15,7 +15,7 @@
       var zeilen = [];
       buehnen.forEach(function (el) {
         var id = el.id || "?", tempi = el.dataset.tempi ? el.dataset.tempi.split(",").map(Number) : [Number(el.dataset.tempo) || 2000];
-        if (gespeichert[id]) tempi = gespeichert[id];
+        if (gespeichert[id] && gespeichert[id].length === tempi.length) tempi = gespeichert[id];   // Schrittzahl geändert: alte Werte verwerfen
         tempi.forEach(function (ms, i) {
           var z = document.createElement("label");
           z.setAttribute("style", "display:grid;grid-template-columns:9em 1fr 4em;gap:8px;align-items:center;margin:4px 0");
