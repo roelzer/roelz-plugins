@@ -22,6 +22,7 @@ Der feste Teil aus dem SFH-Test steht in `handwerk.md` Abschnitt 10.
 | **Bewegung ohne Warten:** Figuren werden langsamer, aber bleiben nie stehen. | belegt (ausdrücklich) | Honig, 25.11.: „die Biene wartet jetzt in der Mitte vom Bild und fliegt dann weg“ |
 | **Lebendige Figur statt Punkte** (Biene fliegt herein, füllt, fliegt hinaus). | Vermutung (1, Simons Vorschlag) | Honig, 25.11. |
 | **Text nach dem Moment:** Kontaktdaten erst, wenn der Name voll ist. | belegt (ausdrücklich) | Honig, 25.11. |
+| **Kein Gendern mit Sonderzeichen** (Doppelpunkt, Sternchen, Binnen-I). Grundform, in Stellentiteln „(m/w/d)“. Auch wenn die Vorlage des Auftraggebers so gendert, erst fragen, bevor es übernommen wird. | belegt (ausdrücklich) | Firmenseite, 26.11.: „:innen … schaut echt scheiße aus“ |
 | **Text passt zum Bild:** Jeder Satz beschreibt genau, was gerade zu sehen ist. Ein Ort, eine Zahl, ein Gebiet im Text muss im selben Moment im Bild erkennbar sein. | belegt (ausdrücklich) | Firmenseite, 26.11.: „nach [Projektort] stimmt das, was man sieht, nicht mehr mit dem Text“ |
 | **Text folgt dem Material:** Schrift erscheint dort und dann, wo das bewegte Material gerade ist (Zeile für Zeile auf Höhe der Honigspitze), statt nach eigener Uhr. | belegt (ausdrücklich) | Honig, 25.11.: „sooo gaaanz langsam runterziehen und währenddessen immer auf der Höhe, wo er gerade ist, kommt die Schrift“ |
 | **Fließendes wirklich langsam:** Zähe Materialien (Honig) brauchen einen langen Wisch (etwa 12 s) mit gleichmäßigem Tempo, nicht einen schnellen Fall. | belegt (ausdrücklich) | Honig, 25.11.: „der Honig ist zu schnell, der könnte doch sooo gaaanz langsam runterziehen“ |
@@ -40,6 +41,10 @@ Der feste Teil aus dem SFH-Test steht in `handwerk.md` Abschnitt 10.
 | **Grafisch vor Foto im Einstieg, solange kein echtes Material da ist.** | Vermutung (1) | Honig: Einstieg A (Wabe) statt B (Rähmchen-Foto) |
 
 ## Einträge
+
+### 26.11.2026 – Firmenseite, Unterseiten (Sprache)
+- **Wörtlich:** „schauen soweit gut aus, aber gendern wir gerade auch schon mit :innen? find ich schaut echt scheiße aus.“
+- **Umgesetzt:** kein Doppelpunkt, Sternchen oder Binnen-I; männliche Grundform, Stellentitel mit „(m/w/d)“.
 
 ### 26.11.2026 – Firmenseite, Zwischenteile (Vitrine, Werk, Pause, Für wen, Projekte, Kontakt)
 - **Wörtlich:** „an sich cool, aber das mit dem Ende, da stimmt nach [Projektort] das, was man sieht, nicht mehr mit dem Text.“

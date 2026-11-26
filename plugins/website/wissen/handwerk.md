@@ -157,3 +157,6 @@ Eine zweite Sitzung hat den Entwurf durchgesehen und zehn Fehler gefunden. Jeder
 
 ## 12. Klebende Leisten (Simon, 26.11.2026: „bei manchen springt das Menü ab nem Punkt nach oben, das ist komisch“)
 Eine klebende Sprungleiste unter einem Kopf, der beim Runterscrollen ausblendet, darf nicht per `transform` mitspringen: Sie ruckt dann an einem Punkt nach oben, auch solange sie noch im Fluss steht. Auf Seiten mit Sprungleiste bleibt der Kopf stehen, und die Leiste klebt ruhig darunter (`body:has(.sprungleiste) .seitenkopf.weg { transform: none }`). Prüfen: Lage von Kopf und Leiste beim Scrollen in Schritten messen, sie dürfen sich nur einmal (beim Ankleben) ändern.
+
+## 13. Sprache: kein Gendern mit Sonderzeichen (Simon, 26.11.2026: „:innen … schaut echt scheiße aus“)
+Keine Doppelpunkte, Sternchen oder Binnen-I. Grundform verwenden, in Stellenanzeigen „(m/w/d)“ hinter den Titel. Gendert der Auftraggeber selbst so, im Bericht nachfragen statt es still zu übernehmen. Prüfen: `grep -E '[A-Za-zäöüß]+[:*]in(nen)?\b'` über alle Seiten und Daten.
