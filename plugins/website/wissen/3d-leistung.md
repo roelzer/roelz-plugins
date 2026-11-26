@@ -92,3 +92,10 @@ Für Produkte eines Herstellers trägt dieser Einstieg: Das echte Produkt steht 
 - Atmosphäre nicht vergessen (Bodennebel, Lichtinsel hinter dem Objekt, Tiefenunschärfe am Laptop), sonst wirkt die Bühne leer.
 - Ohne Grafikkarte (SwiftShader) misst man nur Vergleichswerte; die Seite braucht eine eigene Software-Stufe (Pixeldichte 0,5, ohne Nachbearbeitung).
 - Nicht als Look kopieren (Skill 2a): Die Technik passt zu Herstellern mit echten Produkten, Bühne, Farben und Bewegung werden je Auftrag neu bestimmt.
+
+
+## Ladezeit beim Öffnen (Simon, 26.11.2026: „am Anfang hat es bisschen geladen, weil das wohl schon auch viel Rechenleistung braucht“)
+- In den ersten ~100 ms steht schon der Startzustand der ersten Szene als leichtes SVG oder Standbild, deckungsgleich mit der 3D-Kamera. WebGL übernimmt dahinter ohne Sprung. Das Warten wird Teil des Moments.
+- Nur die Shader der ersten Bühne sofort übersetzen, alle weiteren gestaffelt im Leerlauf (`renderer.compileAsync`, `requestIdleCallback`), spätestens bevor der Besucher sie erreicht. Alles auf einmal vorab zu übersetzen verursacht das Warten am Anfang.
+- Schwere Geometrie erst bei Bedarf erzeugen, three.js gebündelt und minifiziert.
+- Messen: Zeit bis zum ersten Bild und bis zur ersten Bühne bedienbar, im iPhone-Profil mit 4× CPU-Drosselung.
