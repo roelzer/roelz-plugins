@@ -153,3 +153,7 @@ Eine zweite Sitzung hat den Entwurf durchgesehen und zehn Fehler gefunden. Jeder
    - Prüfen und Liefern mit `scripts/vorschau.mjs --pruefen`: Es packt die Seite in eine einzelne HTML-Datei, die Simon per Doppelklick öffnet, und fotografiert sie eingebettet nach 3 und 12 s.
 12. **Der Kontakt bleibt immer erreichbar** (Schreinerei-Test). Die Kopfleiste war am Desktop während der 260vh langen Bühne ausgeblendet, damit nichts überlappt. Wer schon beim Schrank anrufen wollte, fand keinen Weg. Blendest du die Navigation aus, bleibt mindestens der Kontakt-Knopf sichtbar, oben rechts, klein, ohne den Moment zu überdecken.
 
+
+
+## 12. Klebende Leisten (Simon, 26.11.2026: „bei manchen springt das Menü ab nem Punkt nach oben, das ist komisch“)
+Eine klebende Sprungleiste unter einem Kopf, der beim Runterscrollen ausblendet, darf nicht per `transform` mitspringen: Sie ruckt dann an einem Punkt nach oben, auch solange sie noch im Fluss steht. Auf Seiten mit Sprungleiste bleibt der Kopf stehen, und die Leiste klebt ruhig darunter (`body:has(.sprungleiste) .seitenkopf.weg { transform: none }`). Prüfen: Lage von Kopf und Leiste beim Scrollen in Schritten messen, sie dürfen sich nur einmal (beim Ankleben) ändern.
