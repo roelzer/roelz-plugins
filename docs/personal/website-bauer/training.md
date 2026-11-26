@@ -34,6 +34,8 @@ Simon, 25.11.2026: „Fliesenleger lädt übrigens seit 34 Minuten, du hast 20�
 | Katalog (Stopp 1) | 20 min | 51 min (Firmenseite: 65 min, 6 Abschnitte/13 Bausteine) | Fliesen zusätzlich mit Bibliothek lesen, `vorschau --pruefen` und `erlebnis.mjs` (allein etwa 8–10 min) |
 | Timing-Modell aus Katalog-Bausteinen | – | 8 min | zusammensetzen, Erlebnis-Prüfung, Artifact |
 | Feinbau (5 Bausteine + Rahmen) | – | 50 min (geschätzt 45–60) | Material, Abgänge, Menü, Recht; Erlebnis + pruefen inklusive |
+| Konzept (Wesen, Stil, 14 Vorbilder) | – | 38 min (Firmenseite) | traf beim ersten Mal |
+| 3D-Durchstich ein Baustein, 4 Qualitätsrunden | – | 95 min (geschätzt 60–90) | Firmenseite T1, three.js |
 | Ganze Seite bauen | 14 min (Lauf) | – | dazu Kritiker-Runden |
 | Kleine Änderung, Schnellschleife | 5–15 min | – | Ziel 2–4 min |
 | `pruefen.mjs` | 5–8 min | – | |
