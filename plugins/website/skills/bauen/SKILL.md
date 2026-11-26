@@ -80,6 +80,14 @@ Simon, 26.11.2026: „primär wollen wir mitnehmen, was wir von den guten Websit
 6. **Zeit sichtbar machen:** Die Zeit geht in Recherche, Bewegungsqualität und Selbstkritik, nicht ins schnelle Zusammenstecken. Vor der Lieferung jeden Baustein gegen die fotografierten Vorbilder halten: Würde er neben ihnen bestehen? Wenn nein, weiterbauen oder weglassen.
 7. **Vorschlag zuerst, schnell:** Bevor gebaut wird, bekommt Simon in etwa 30–40 Minuten das Konzept: Wesen, Stil, 6–8 Techniken aus den Vorbildern mit Bild und je einem Satz, wie sie hier aussehen. Erst nach seinem Ja wird der Katalog gebaut, dann mit voller Sorgfalt.
 
+## 2b. Nicht warten, weiterbauen (Simon, 26.11.2026)
+„Wenn ich nicht antworte, dann bau einfach schon mal andere Teile weiter. Je mehr fertig ist, wozu ich Feedback geben kann, wenn ich wieder da bin, umso besser.“
+- Eine offene Frage hält nur den Teil an, den sie betrifft. Alles andere läuft weiter, mit der vernünftigsten Annahme, die im Bericht steht (z. B. Fotos statt Firmenvideo, bis die Freigabe da ist).
+- Unabhängige Teile parallel bauen (je ein Lauf, eigener Ordner). Jeder fertige Teil geht sofort mit Bilderblatt an Simon.
+- Grenzen bleiben: nichts veröffentlichen, nichts in fremde Repos, nichts Unumkehrbares ohne sein Wort.
+
+**Modelle:** Gestaltung, 3D und Bauen laufen auf Opus (Qualität entscheidet, und genau dort lag der Unterschied). Reine Routine (Prüfskripte laufen lassen, Dateien packen, Bilder fotografieren) darf ein kleineres Modell machen, wenn es Zeit oder Kontingent spart.
+
 ## 3. Bausteine zur Auswahl (Stopp 1)
 - **Die Bibliothek liefert Technik, nicht den Look** (Simon, 26.11.2026, nach dem Firmen-Katalog: „diese Webseite ist ja eigentlich eins zu eins die Honigseite, nur andere Infos … das schaffe ich von der Hand schneller, einfach die Farben ändern“). Aus `bibliothek/` nimmst du nur den Kern (`_kern/schritte.js`, `tune.js`) und bewährte Lösungen für Technikprobleme. Kein Baustein darf aussehen oder sich bewegen wie in einem früheren Auftrag. Jeder Auftrag wird von Grund auf neu gedacht, nach Abschnitt 2a.
 - **Grundgerüst jeder Seite:** `bibliothek/_kern/schritte.js` (ein Wisch = eine Animation, Haltepunkte über `data-schritte`/`data-tempi`) und `bibliothek/_kern/tune.js` (Schieberegler mit `?tune`) nach `site/js/` kopieren und einbinden. Nicht neu erfinden.
