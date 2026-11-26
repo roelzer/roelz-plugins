@@ -23,6 +23,9 @@ Der feste Teil aus dem SFH-Test steht in `handwerk.md` Abschnitt 10.
 | **Lebendige Figur statt Punkte** (Biene fliegt herein, füllt, fliegt hinaus). | Vermutung (1, Simons Vorschlag) | Honig, 25.11. |
 | **Text nach dem Moment:** Kontaktdaten erst, wenn der Name voll ist. | belegt (ausdrücklich) | Honig, 25.11. |
 | **Kein Gendern mit Sonderzeichen** (Doppelpunkt, Sternchen, Binnen-I). Grundform, in Stellentiteln „(m/w/d)“. Auch wenn die Vorlage des Auftraggebers so gendert, erst fragen, bevor es übernommen wird. | belegt (ausdrücklich) | Firmenseite, 26.11.: „:innen … schaut echt scheiße aus“ |
+| **Ein Objekt nur einmal ausführlich, Geschichte folgt dem echten Weg** (z. B. Netz → Leitung → ins Haus → Produkt). Wiederholte Auftritte desselben Objekts wirken doppelt. | Vermutung (1, ausdrücklich) | Firmenseite, 26.11. |
+| **Gleicher Detailgrad für alle Modelle.** Neben einem sehr guten Modell fällt ein schnell gebautes sofort auf. | Vermutung (1, ausdrücklich) | Firmenseite, 26.11.: „bei [Produkt B] merkt man, dass es schnell erstellt wurde“ |
+| **Licht-Effekte dosieren:** Scheinwerfer ja, aber nicht ausbrennen. | Vermutung (1) | Firmenseite, 26.11.: „überzogen, zu hell fast“ |
 | **Text passt zum Bild:** Jeder Satz beschreibt genau, was gerade zu sehen ist. Ein Ort, eine Zahl, ein Gebiet im Text muss im selben Moment im Bild erkennbar sein. | belegt (ausdrücklich) | Firmenseite, 26.11.: „nach [Projektort] stimmt das, was man sieht, nicht mehr mit dem Text“ |
 | **Text folgt dem Material:** Schrift erscheint dort und dann, wo das bewegte Material gerade ist (Zeile für Zeile auf Höhe der Honigspitze), statt nach eigener Uhr. | belegt (ausdrücklich) | Honig, 25.11.: „sooo gaaanz langsam runterziehen und währenddessen immer auf der Höhe, wo er gerade ist, kommt die Schrift“ |
 | **Fließendes wirklich langsam:** Zähe Materialien (Honig) brauchen einen langen Wisch (etwa 12 s) mit gleichmäßigem Tempo, nicht einen schnellen Fall. | belegt (ausdrücklich) | Honig, 25.11.: „der Honig ist zu schnell, der könnte doch sooo gaaanz langsam runterziehen“ |
@@ -41,6 +44,10 @@ Der feste Teil aus dem SFH-Test steht in `handwerk.md` Abschnitt 10.
 | **Grafisch vor Foto im Einstieg, solange kein echtes Material da ist.** | Vermutung (1) | Honig: Einstieg A (Wabe) statt B (Rähmchen-Foto) |
 
 ## Einträge
+
+### 26.11.2026 – Firmenseite, ganze Startseite angesehen
+- **Wörtlich (gekürzt):** „schaut echt mega cool aus. Allerdings an manchen Stellen hat es noch ein bisschen gehangen … Wo es in die Produktvorstellung geht, überspringt es das erste Produkt … das Licht, was da so reinscheint, ist ein bisschen überzogen, zu hell fast … cool, wenn es wie im Scheinwerferlicht steht … die Isolierung vom [Produkt] schaut echt top aus … bei [Produkt B] merkt man, dass es schnell erstellt wurde … Einzelheiten detaillierter … der Übergang aus dem Rohr in den [Produkt A] kann man besser machen, und dann gehen wir schon wieder [Produkt A] durch … vielleicht das Netz als Einstieg, dann durchs Rohr, dass man sieht, dass es ins Haus geht, und dann der Aufbau … erst innen das Gehäuse, dann die Isolierung drumrum, die weiße Zeichnung der Isolierung steht noch und füllt sich dann.“
+- **Lehren:** Ein Objekt nur einmal ausführlich zeigen. Die Geschichte folgt dem echten Weg (Netz → Rohr → ins Haus → Produkt). Aufbau in echten Fertigungsschritten (innen nach außen). Licht-Effekte zurückhaltend dosieren. Alle Modelle brauchen den Detailgrad des besten Modells, sonst fällt der Unterschied auf.
 
 ### 26.11.2026 – Firmenseite, Unterseiten (Sprache)
 - **Wörtlich:** „schauen soweit gut aus, aber gendern wir gerade auch schon mit :innen? find ich schaut echt scheiße aus.“
