@@ -26,9 +26,17 @@ Der feste Teil aus dem SFH-Test steht in `handwerk.md` Abschnitt 10.
 | **Saubere Typografie-Effekte.** Effekte an Buchstaben (Umriss, Füllung) müssen sauber gesetzt sein. `-webkit-text-stroke` mit Artefakten an den Kreuzungen fällt ihm auf. | Vermutung (1) | Honig, Schluss C: „die Leerbuchstaben … sehen schon irgendwie komisch aus“ |
 | **Das Motiv nicht überstrapazieren?** Er wählte in Referenzen und Schluss die Fassung *ohne* das Leitmotiv (schwebende Fotos statt Wabe über Foto, Name läuft voll statt Fahrt in die leere Zelle), obwohl beide empfohlen waren. | Vermutung (1) | Honig: Referenzen C statt A, Schluss C statt A |
 | **Material echt aussehen lassen.** Wo das Material des Auftraggebers selbst die Bewegung macht (Honig läuft, Holz wird gehobelt, Wasser fließt), soll es realistisch wirken, nicht wie ein Symbol (ein gelber Strich als Honigfaden). | Vermutung (1) | Honig, Text C: „den langsam laufenden Honig vielleicht auch noch optisch viel realistischer darstellen“ |
-| **Grafisch vor Foto im Einstieg, solange kein echtes Material da ist.** | Vermutung (1) | Honig: Einstieg A (Wabe) statt B (Rähmchen-Foto) |
+| **Grafisch vor Foto im Einstieg, solange kein echtes Material da ist.** | Vermutung (1), **Widerspruch**: sobald echte Fotos da sind, gilt das Gegenteil | Honig: Einstieg A (Wabe) statt B (Rähmchen-Foto); Zweiradladen 26.11.: alle Logo-Grafik-Bausteine „schrott“ |
+| **Echte Fotos schlagen gezeichnete Logo-Animation.** Gibt es echte Fotos des Auftraggebers, bauen die Bausteine auf ihnen auf (schweben, wachsen, Wechselwort daneben). Ein nachgezeichnetes Logo als animierte Grafik (Strahlen laden, wird zum Rad) gilt als „falscher Stil“. | Vermutung (1, deutlich) | Zweiradladen 26.11.: „marken und fotos is ool, alled andere schrott. vielleicht falscher stil“ |
+| **Ruhige Typo-Bausteine gefallen** (Wechselwort, Marken auf einem Ring, Text groß auf hellem Grund). | Vermutung (2) | Honig: Text C, Schluss C (Name läuft voll); Zweiradladen: Marken B (Marken-Ring) |
 
 ## Einträge
+
+### 26.11.2026 – Zweiradladen (Test), Stopp 1 (Runde 1)
+- **Empfohlen:** Einstieg A · Leistungen B · Text A · Ablauf B · Marken A · Text C · Schluss C (alles mit der nachgezeichneten Logo-Sonne als Leitmotiv)
+- **Gewählt:** nur Marken A, B, C (schwebende eigene Fotos mit Wechselwort, Marken-Ring, Ladenfoto wächst)
+- **Abweichungen:** alle grafischen Logo-Bausteine abgelehnt.
+- **Wörtlich:** „marken und fotos is ool, alled andere schrott. vielleicht falscher stil“
 
 ### 25.11.2026 – Benedikts Honig, Abschluss
 - **Wörtlich:** „ja, dafür, dass es nur ein Prototyp ist, ist es okay, auch hier Erkenntnisse usw. natürlich mitnehmen.“
