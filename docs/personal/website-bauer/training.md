@@ -36,6 +36,8 @@ Simon, 25.11.2026: „Fliesenleger lädt übrigens seit 34 Minuten, du hast 20�
 | Feinbau (5 Bausteine + Rahmen) | – | 50 min (geschätzt 45–60) | Material, Abgänge, Menü, Recht; Erlebnis + pruefen inklusive |
 | Konzept (Wesen, Stil, 14 Vorbilder) | – | 38 min (Firmenseite) | traf beim ersten Mal |
 | 3D-Durchstich ein Baustein, 4 Qualitätsrunden | – | 95 min (geschätzt 60–90) | Firmenseite T1, three.js |
+| 3D zwei Bühnen im selben Renderer (parallel zu nächster Zeile) | – | 60 min (geschätzt 90–120) | Firmenseite T2+T3 |
+| 3D-Szene Gelände bei Nacht + Nachbesserung | – | 52 + 20 min | Firmenseite T5; erste Fassung zweite Hälfte zu billig, eigene Sichtprüfung fing es ab |
 | Ganze Seite bauen | 14 min (Lauf) | – | dazu Kritiker-Runden |
 | Kleine Änderung, Schnellschleife | 5–15 min | – | Ziel 2–4 min |
 | `pruefen.mjs` | 5–8 min | – | |
