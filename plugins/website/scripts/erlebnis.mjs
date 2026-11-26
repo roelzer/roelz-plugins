@@ -10,6 +10,7 @@
 // 2. Bewegung je Schritt (Pfeiltaste nach unten, bis zum Ende): Bilder alle ~60 ms, Unterschied von Bild zu Bild.
 //    Hinweis „steht mitten im Schritt“: über 0,9 s fast nichts bewegt sich, obwohl davor und danach etwas passiert.
 //    Hinweis „ballt sich“: über 60 % der Bewegung in weniger als 12 % der Schrittdauer (wirkt zu schnell).
+// 0. Seiten ohne section[data-buehne] (Unterseiten, normal scrollend) werden nur auf „Mausrad bewegt“ geprüft.
 // Ausgabe: FEHLER/Hinweis-Zeilen und erlebnis.json. FEHLER nur bei der Eingabe, Bewegung sind Hinweise mit Werten.
 import fs from "node:fs";
 import path from "node:path";
@@ -38,6 +39,26 @@ const befunde = [], ergebnis = { eingabe: {}, schritte: [] };
 const ruhig = async (p, ms = 500) => { let y = -1, gleich = 0; for (let i = 0; i < 400 && gleich < ms / 50; i++) { const n = await p.evaluate(() => scrollY); gleich = n === y ? gleich + 1 : 0; y = n; await p.waitForTimeout(50); } return y; };
 
 const b = await pw.chromium.launch();
+// ---------- 0. Normal scrollende Seite? ----------
+// Unterseiten (Datenblätter, Kontakt) scrollen bewusst normal: ohne section[data-buehne] gibt es keine Schritte zu prüfen.
+// Dann prüfen wir nur, dass das Mausrad überhaupt bewegt, und melden die Seite als „frei scrollend“ statt Fehler.
+{
+  const p = await b.newPage({ viewport: { width: 1366, height: 768 } });
+  await p.goto(url); await p.waitForTimeout(1200);
+  const buehnen = await p.evaluate(() => document.querySelectorAll("section[data-buehne]").length);
+  if (!buehnen) {
+    await p.mouse.move(683, 400); await p.mouse.wheel(0, 300); await p.waitForTimeout(600);
+    const y = await p.evaluate(() => scrollY), hoch = await p.evaluate(() => document.documentElement.scrollHeight > innerHeight + 4);
+    ergebnis.frei = true;
+    if (hoch && y === 0) befunde.push("FEHLER Eingabe: Normal scrollende Seite bewegt sich beim Mausrad nicht");
+    fs.writeFileSync(path.join(aus, "erlebnis.json"), JSON.stringify({ ...ergebnis, befunde }, null, 2));
+    for (const z of befunde) console.log(z);
+    if (!befunde.length) console.log("Frei scrollende Seite (keine Bühne mit data-buehne): Schritt-Prüfung entfällt, Mausrad bewegt die Seite");
+    await b.close(); if (server) server.close();
+    process.exit(befunde.some((z) => z.startsWith("FEHLER")) ? 1 : 0);
+  }
+  await p.close();
+}
 // ---------- 1. Eingabe ----------
 {
   const p = await b.newPage({ viewport: { width: 1366, height: 768 } });
