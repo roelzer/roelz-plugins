@@ -38,6 +38,9 @@ Simon, 25.11.2026: „Fliesenleger lädt übrigens seit 34 Minuten, du hast 20�
 | 3D-Durchstich ein Baustein, 4 Qualitätsrunden | – | 95 min (geschätzt 60–90) | Firmenseite T1, three.js |
 | 3D zwei Bühnen im selben Renderer (parallel zu nächster Zeile) | – | 60 min (geschätzt 90–120) | Firmenseite T2+T3 |
 | 3D-Szene Gelände bei Nacht + Nachbesserung | – | 52 + 20 min | Firmenseite T5; erste Fassung zweite Hälfte zu billig, eigene Sichtprüfung fing es ab |
+| 3D-Startseite zusammensetzen (11 Kapitel, ein Renderer, Übergänge, Messen) | – | 165 min (geschätzt 120–180) | Firmenseite |
+| Unterseiten (je 2–4 Seiten, Datenblatt-Stil) | – | 45–120 min je Lauf | Firmenseite, Lighthouse 99–100 |
+| Gesamtpaket montieren und prüfen (13 Seiten) | – | 10 min | kleineres Modell reichte |
 | Ganze Seite bauen | 14 min (Lauf) | – | dazu Kritiker-Runden |
 | Kleine Änderung, Schnellschleife | 5–15 min | – | Ziel 2–4 min |
 | `pruefen.mjs` | 5–8 min | – | |
