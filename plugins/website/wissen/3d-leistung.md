@@ -82,3 +82,13 @@ Der Haus-Rundgang in 3D lief in beiden Läufen in das Zeitlimit von 60 Minuten: 
 ## Messen
 - Das Prüfskript misst ohne Grafikkarte. Seine fps-Werte sind **nur ein Vergleich** (robust oder fragil), keine Abnahme.
 - **Die Abnahme macht Simons Laptop:** An Stopp 2 öffnet er die Seite lokal und scrollt durch. Zeigt die Seite ruckelt: Pixeldichte senken, Fläche verkleinern, auf Bildfolge oder Standbild ausweichen.
+
+
+## Rezept: Konstruktion wird Material (26.11.2026, Technik-Firma, von Simon angenommen: „schaut klasse aus“)
+Für Produkte eines Herstellers trägt dieser Einstieg: Das echte Produkt steht erst als leuchtende Konstruktionszeichnung (Kanten, gestrichelt verdeckte Linien, Bemaßung, Mittelachse, schwebende Messpunkte) auf dunkler Studio-Bühne. Eine glühende Scan-Front (Shader: Dissolve entlang der Höhe, schmaler Glührand in Markenfarbe) baut Schicht für Schicht das Material auf, Bauteile setzen sich mit Nachschwingen, ein Streiflicht zieht seitlich über die Kante, die Kamera fährt schwer in den Blickwinkel des Hersteller-Renderings. Text erst danach.
+- Modell prozedural nach dem Produkt-Rendering des Herstellers, so nah wie möglich, Bestandteile mit dem Auftraggeber abgleichen.
+- PMREM/RoomEnvironment, MeshPhysicalMaterial, gebürstete Normal-Map aus Canvas, Licht dreht mit der Kamera (sonst brennt eine Seitenansicht aus).
+- Linien am Handy mit `Line2`/`LineMaterial` in Pixelbreite, 1-px-Linien wirken dort zu dünn.
+- Atmosphäre nicht vergessen (Bodennebel, Lichtinsel hinter dem Objekt, Tiefenunschärfe am Laptop), sonst wirkt die Bühne leer.
+- Ohne Grafikkarte (SwiftShader) misst man nur Vergleichswerte; die Seite braucht eine eigene Software-Stufe (Pixeldichte 0,5, ohne Nachbearbeitung).
+- Nicht als Look kopieren (Skill 2a): Die Technik passt zu Herstellern mit echten Produkten, Bühne, Farben und Bewegung werden je Auftrag neu bestimmt.

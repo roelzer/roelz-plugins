@@ -10,7 +10,7 @@
 // Mit ?tune in der Adresse erscheinen Schieberegler für alle Dauern (tune.js, falls geladen).
 // data-durchlauf (Simon, Fliesen: „ein Scroll und dann läuft es durch, bis der Name dran steht“): Die Zwischenschritte
 // sind dann keine Haltepunkte mehr, sondern Zeitmarken. Ein Wisch fährt die ganze Bühne durch, jedes Stück in seiner
-// eigenen Dauer aus data-tempi, ohne Halt dazwischen.
+// eigenen Dauer aus data-tempi, ohne Halt dazwischen. data-halt="0.6" macht einzelne Zeitmarken wieder zu Haltepunkten.
 (function () {
   "use strict";
   var teil = function (p, a, b) { return Math.min(1, Math.max(0, (p - a) / (b - a))); };
@@ -43,10 +43,14 @@
         var max = document.documentElement.scrollHeight - hoehe(), l = [{ y: 0, dauer: 900 }];
         mass.forEach(function (m) {
           l.push({ y: Math.max(0, Math.round(m.von)), dauer: 1000 });
-          if (m.durch) {   // ein Haltepunkt am Ende, die Teile werden zu Stücken der Fahrt
-            var stuecke = [], summe = 0;
-            (m.teile || []).concat([1]).forEach(function (f, i) { var d = m.tempi ? m.tempi[i] : m.tempo; summe += d; stuecke.push({ y: Math.round(m.von + (m.bis - m.von) * f), dauer: d }); });
-            l.push({ y: Math.min(max, Math.round(m.bis)), dauer: summe, stuecke: stuecke });
+          if (m.durch) {   // Haltepunkt am Ende (und an data-halt), die Teile dazwischen werden zu Stücken der Fahrt
+            // data-halt="0.62" (26.11.2026) macht eine Zeitmarke zum Haltepunkt (Wisch 1 = Aufbau, Wisch 2 = Abgang).
+            var halte = zahlen(m.el.dataset.halt) || [], stuecke = [], summe = 0;
+            (m.teile || []).concat([1]).forEach(function (f, i) {
+              var d = m.tempi ? m.tempi[i] : m.tempo, y = Math.round(m.von + (m.bis - m.von) * f);
+              summe += d; stuecke.push({ y: y, dauer: d });
+              if (f === 1 || halte.indexOf(f) >= 0) { l.push({ y: Math.min(max, y), dauer: summe, stuecke: stuecke }); stuecke = []; summe = 0; }
+            });
             return;
           }
           (m.teile || []).forEach(function (f, i) { l.push({ y: Math.round(m.von + (m.bis - m.von) * f), dauer: m.tempi ? m.tempi[i] : m.tempo }); });
@@ -92,7 +96,9 @@
       window.addEventListener("wheel", function (e) {
         if (e.ctrlKey) return; e.preventDefault();
         var jetzt = performance.now(), st = Math.abs(e.deltaY) * (e.deltaMode === 1 ? 30 : 1);
-        var neu = jetzt - radZeit > 140 || st > radStaerke * 1.4 + 4; radZeit = jetzt; radStaerke = st;
+        // Ein abklingender Schwung (jedes Ereignis schwächer als das vorige) zählt erst nach 400 ms Pause als neu,
+        // sonst löst sein Nachlauf nach einer langen Fahrt einen zweiten Schritt aus.
+        var pause = jetzt - radZeit, neu = pause > 400 || (pause > 140 && st > radStaerke * 1.15) || st > radStaerke * 1.4 + 4; radZeit = jetzt; radStaerke = st;
         if (neu && st >= 1 && !faehrt) fahre(e.deltaY > 0 ? 1 : -1);
       }, { passive: false });
       window.addEventListener("keydown", function (e) {
