@@ -39,6 +39,11 @@ Der feste Teil aus dem SFH-Test steht in `handwerk.md` Abschnitt 10.
 
 ## Einträge
 
+### 26.11.2026 – Firmenseite, Konzept 2 (Wesen → Stil → 8 Techniken von Spitzenseiten)
+- **Wörtlich:** „ja, Richtung an sich find ich schon mal cool so, ja.“
+- **Stand:** Stil „Technik im Studiolicht“ (3D-Produkte auf dunkler Bühne, nur Wärme glüht), Techniken nach Igloo, AirPods, Scale, Oryzo, Helion, Lando, Zoox. Nächster Schritt: Durchstich Einstieg (T1) in voller Qualität.
+- **Lehre:** Das Konzept mit Bildern der Vorbilder in 40 Minuten traf, der umgefärbte Katalog in 65 Minuten nicht.
+
 ### 26.11.2026 – Firmenseite, Grundsatz-Rückmeldung zum Vorgehen
 - **Wörtlich (diktiert, gekürzt):** „diese Idee, dass wir uns gewisse Bausteine merken, das ist gut, aber primär wollen wir mitnehmen, was wir von den guten Websites lernen. Diese Webseite ist ja eigentlich eins zu eins die Honigseite, nur andere Infos … das schaffe ich von der Hand schneller, einfach die Farben ändern. … Honig, das ist ein Stil, der ist sehr verspielt, eher so billig zeichnerisch, passt vielleicht zur Honigseite, aber zu [der Firma] passt der überhaupt nicht. … der die Seite analysiert und das Wesen einer Firma und dann klar sagen kann: welcher Stil passt hierzu, wie animieren wir was. … ich will, dass die Zeit effizient genutzt wird und das Ergebnis danach auch dementsprechend aussieht. … sonst wären beide Kunden sauer, weil sie genau die gleiche Seite haben. Komplett neu denken. Ich will die größten Sachen der coolsten Websites. … das mit den Rohren und den Wärmehäusern finde ich an sich cool, aber du siehst selber, wie schlecht das animiert ist, krieg ich in PowerPoint in 5 Minuten besser hin.“
 - **Folge:** Skill Abschnitt 2a (Wesen → Stil → Lernen von den Besten → kein Wiederholen → PowerPoint-Test → Konzept zuerst). Bibliothek nur noch für Technik.
