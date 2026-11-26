@@ -83,7 +83,9 @@ Simon, 26.11.2026: „primär wollen wir mitnehmen, was wir von den guten Websit
 ## 2b. Nicht warten, weiterbauen (Simon, 26.11.2026)
 „Wenn ich nicht antworte, dann bau einfach schon mal andere Teile weiter. Je mehr fertig ist, wozu ich Feedback geben kann, wenn ich wieder da bin, umso besser.“
 - Eine offene Frage hält nur den Teil an, den sie betrifft. Alles andere läuft weiter, mit der vernünftigsten Annahme, die im Bericht steht (z. B. Fotos statt Firmenvideo, bis die Freigabe da ist).
-- Unabhängige Teile parallel bauen (je ein Lauf, eigener Ordner). Jeder fertige Teil geht sofort mit Bilderblatt an Simon.
+- Unabhängige Teile parallel bauen (je ein Lauf, eigener Ordner). Jeder fertige Teil geht sofort mit Bilderblatt an Simon, **und ohne auf seine Antwort zu warten geht es mit dem nächsten Baustein weiter** (Simon: „gern teilen, wenn was fertig ist, dann kann ich gleich bewerten, aber trotzdem weiterbauen mit dem nächsten Stein – falls ich den Auftrag geb und ins Bett geh, kann ich in der Früh gleich alle Bausteine bewerten“).
+- Vor dem Start legst du dir die Reihenfolge der Bausteine fest (aus Konzept/Drehbuch) und arbeitest sie ab, bis alles steht oder Kontingent bzw. Zeitrahmen aufgebraucht sind. Ist der Plan durch, kommen der Zusammenbau und dann die Unterseiten. Kommt zwischendurch Feedback, wird es vor dem nächsten Baustein eingearbeitet.
+- Jeder Baustein bleibt einzeln ansehbar (eigene Datei + Bilderblatt), damit Simon morgens alles der Reihe nach bewerten kann. Am Ende eine Übersicht: was fertig ist, was offen, welche Annahmen getroffen wurden.
 - Grenzen bleiben: nichts veröffentlichen, nichts in fremde Repos, nichts Unumkehrbares ohne sein Wort.
 
 **Modelle:** Gestaltung, 3D und Bauen laufen auf Opus (Qualität entscheidet, und genau dort lag der Unterschied). Reine Routine (Prüfskripte laufen lassen, Dateien packen, Bilder fotografieren) darf ein kleineres Modell machen, wenn es Zeit oder Kontingent spart.
