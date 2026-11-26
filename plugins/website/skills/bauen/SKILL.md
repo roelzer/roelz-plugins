@@ -90,6 +90,19 @@ Simon, 26.11.2026: „primär wollen wir mitnehmen, was wir von den guten Websit
 
 **Modelle:** Gestaltung, 3D und Bauen laufen auf Opus (Qualität entscheidet, und genau dort lag der Unterschied). Reine Routine (Prüfskripte laufen lassen, Dateien packen, Bilder fotografieren) darf ein kleineres Modell machen, wenn es Zeit oder Kontingent spart.
 
+## 2c. Große Seiten in Etappen (Firmenseite, 26.11.2026 – so traf es)
+Nach angenommenem Konzept (2a) nicht alles auf einmal bauen, sondern in dieser Reihenfolge, jeder Schritt als eigener Lauf mit eigenem Ordner unter `arbeit/` und eigener Datei für Simon:
+1. **Durchstich eines Moments in voller Qualität** (meist der Einstieg), mit mindestens drei Verbesserungsrunden gegen die fotografierten Vorbild-Bildfolgen. Simons Ja zum Niveau abwarten, bevor mehr gebaut wird.
+2. **Die übrigen lauten Momente** einzeln oder zu zweit, parallel in getrennten Ordnern. Gemeinsame Modelle (Produkt, Glas-Shader) nur einmal im Code, mit Detailstufen.
+3. **Zwischenteile** (leisere Abschnitte) als eigene Seite zum Bewerten, bevor sie eingebaut werden.
+4. **Zusammenbau**: ein Renderer, Szenen bauen bei Annäherung und freigeben bei Abstand, Übergänge zwischen den Kapiteln gestalten, Frame-Zeiten aller Wische messen.
+5. **Unterseiten**: ein ruhiger Moment oben, darunter Datenblatt-Typografie, normal scrollend (keine Schritt-Steuerung), alle Inhalte der alten Seite, technische Daten als Text-Tabelle statt Bild, Lighthouse am Handy 95+. Kopf, Fuß und Menü einmal bauen und von allen Unterseiten übernehmen.
+6. **Vorlagen** für wiederkehrende Seiten (Projektbericht, News, Stelle) mit Daten als JSON, damit ein Export aus dem alten CMS alle füllt.
+7. **Gesamtpaket**: alle Seiten in einem Ordner, Linkprüfung 0 Fehler, Konsole 0 auf allen Seiten, Zip, `offene-punkte.md` (liefern / klären / Annahmen / technisch offen) und die **Mappe**: `node ${CLAUDE_PLUGIN_ROOT}/scripts/mappe.mjs <ordner> <ziel>.html` – eine Datei mit allen Seiten, die Links zwischen den Seiten funktionieren (Simon will eine Datei antippen, nicht entpacken).
+Jeder fertige Schritt geht sofort an Simon (2b). Gemessene Zeiten (Firmenseite): Durchstich 95 min, weitere Kapitel 35–75 min, Zwischenteile 72 min, Zusammenbau 165 min, Unterseiten 45–120 min, Gesamtpaket 10 min.
+
+**Vertraulich bei Firmen-Aufträgen** (Arbeitgeber, Kunden): Alle Dateien liegen außerhalb des öffentlichen Plugin-Repos. Was ins Repo zurückfließt (Geschmack, Regeln, Zeiten), wird neutralisiert: keine Firmen-, Produkt-, Orts- oder Personennamen, stattdessen „Firmenseite“, „[Produkt A]“, „[Ort]“. Eine Seite mit echtem Logo und Texten wird nicht von selbst als Link veröffentlicht, auch nicht privat.
+
 ## 3. Bausteine zur Auswahl (Stopp 1)
 - **Die Bibliothek liefert Technik, nicht den Look** (Simon, 26.11.2026, nach dem Firmen-Katalog: „diese Webseite ist ja eigentlich eins zu eins die Honigseite, nur andere Infos … das schaffe ich von der Hand schneller, einfach die Farben ändern“). Aus `bibliothek/` nimmst du nur den Kern (`_kern/schritte.js`, `tune.js`) und bewährte Lösungen für Technikprobleme. Kein Baustein darf aussehen oder sich bewegen wie in einem früheren Auftrag. Jeder Auftrag wird von Grund auf neu gedacht, nach Abschnitt 2a.
 - **Grundgerüst jeder Seite:** `bibliothek/_kern/schritte.js` (ein Wisch = eine Animation, Haltepunkte über `data-schritte`/`data-tempi`) und `bibliothek/_kern/tune.js` (Schieberegler mit `?tune`) nach `site/js/` kopieren und einbinden. Nicht neu erfinden.
@@ -179,6 +192,8 @@ Es braucht `esbuild` und `playwright` (`npm i -D esbuild playwright` in `arbeit/
 - was das Prüfskript und der Kritiker noch bemängeln,
 - was niemand geprüft hat: mindestens wie flüssig es auf seinem Laptop läuft und wie es in Safari bzw. am iPhone aussieht. Bitte ihn, einmal durchzuscrollen. **„Fertig“ meldest du erst nach seinem Test**, ohne Grafikkarte misst du die Leistung nicht.
 - die Austauschliste (was er liefern muss).
+
+Bei **mehreren Seiten** zusätzlich die Mappe (`scripts/mappe.mjs`, siehe 2c), damit Simon alle Seiten in einer Datei durchklicken kann.
 
 Seine Rückmeldung setzt du um und prüfst neu (Schritt 5).
 

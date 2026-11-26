@@ -65,6 +65,12 @@ Je Kriterium eine Note 1–10 mit einem Satz Begründung und einem Bildbeleg. Ge
    - Antwortet der Schluss auf den Anfang?
    Liegt ein Drittel mehr als 2 Punkte unter dem ersten, ist das ❌, und die Gestaltung ist höchstens 6. Simon: „das Wow soll nicht nur oben sein, sondern sich durchziehen“, „der Meterstab war sehr einfach gemacht, ohne Mühe“.
 5c. **Simons Geschmack:** Prüfe die belegten Muster in `wissen/geschmack.md`. Wie verschwinden die Elemente? Ausblenden oder Schrumpfen auf null ist ⚠️ (Simon: „hat billig gewirkt“). Sind Schrift-Effekte sauber, ohne Artefakte?
+5e. **Fachlich richtig?** Hält die Seite die Konventionen des Fachs ein (z. B. Vorlauf rot, Rücklauf blau; Leitungen sauber verbunden, nichts endet im Nichts; jedes Haus angeschlossen)? Wird das Standardprodukt gezeigt, nicht nur die Spitzenvariante? Fachleute sehen solche Fehler sofort (Simon, 26.11.2026).
+5f. **Gleicher Detailgrad?** Liegt ein Modell oder Bild deutlich unter dem besten der Seite („merkt man, dass es schnell erstellt wurde“)? Nenne das schwächste Element.
+5g. **Kommt ein Objekt doppelt ausführlich vor?** Folgt die Geschichte dem echten Weg (z. B. Netz → Leitung → ins Haus → Produkt)? Wiederholte große Auftritte desselben Objekts sind ⚠️.
+5h. **Licht und Effekte dosiert?** Brennt ein Scheinwerfer oder Bloom etwas aus, sodass Material nicht mehr lesbar ist? Dann ⚠️.
+5i. **Ruckelt etwas?** Lies die Frame-Zeiten (längster Frame je Wisch). Über 100 ms an einer Stelle ist ⚠️, über 300 ms ❌ – Simon merkt jeden Hänger („an manchen Stellen hat es gehangen, das ist natürlich schade“).
+5j. **Sprache:** Kein Gendern mit Doppelpunkt, Sternchen oder Binnen-I (Simon: „schaut echt scheiße aus“).
 6. Steht irgendwo eine Aussage, die erfunden wirkt (Zahlen, Kunden, Versprechen, Lebenslauf)?
 7. Stimmen die Messwerte des Prüfskripts mit deinem Eindruck überein?
 8. Bei Verbesserung: Sind alle Inhalte und Funktionen aus der Inhaltsliste erhalten?

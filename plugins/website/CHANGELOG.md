@@ -1,5 +1,13 @@
 # Änderungsprotokoll Website-Bauer
 
+## 0.7.0 – Große Seiten in Etappen, Mappe, schärferer Kritiker
+- **Skill 2c:** Ablauf für große Seiten nach angenommenem Konzept (Durchstich → laute Momente → Zwischenteile → Zusammenbau → Unterseiten → Vorlagen → Gesamtpaket), gemessene Zeiten, Vertraulichkeit bei Firmen-Aufträgen (neutralisieren, nichts mit echtem Branding von selbst veröffentlichen).
+- **`scripts/mappe.mjs`:** eine Datei mit allen Seiten einer mehrseitigen Website, Links zwischen den Seiten funktionieren, gemeinsame Bilder/Skripte nur einmal (43,6 → 6,5 MB).
+- **`vorschau.mjs`:** findet esbuild auch vom Aufrufort aus (`build/`, `arbeit/build/`); vorher fehlte das 3D-Bündel stillschweigend.
+- **`erlebnis.mjs`:** normal scrollende Seiten (ohne Bühne) werden erkannt statt als Fehler gemeldet.
+- **Kritiker:** neue Pflichtfragen 5d–5j (Text passt zum Bild, Fachkonventionen, gleicher Detailgrad, Objekt doppelt, Licht dosiert, Ruckeln per Frame-Zeiten, kein Gendern mit Sonderzeichen).
+- **Wissen:** 3D-Ladezeit (Sofort-Bild, gestaffeltes Übersetzen), Ruckeln messen (resize-Sprung, discard, Materialvarianten vorwärmen), Rezept „Konstruktion wird Material“, klebende Leisten, Sprache, Uhrzeiten in Simons Zeitzone, nicht warten und weiterbauen.
+
 ## 0.6.0 – Jeder Auftrag neu gedacht
 - **Skill 2a:** Vor jedem Katalog Wesen der Firma → Stil benennen → mindestens 6 Spitzenseiten auswerten (welche Technik, wie verwandelt) → gegen die letzten Aufträge abgleichen → PowerPoint-Test für laute Momente → erst Konzept an Simon, dann bauen.
 - **Bibliothek nur noch für Technik** (`_kern`), nicht für den Look. Grund: Der Firmen-Katalog war „eins zu eins die Honigseite, nur andere Infos“.

@@ -20,7 +20,8 @@ const wert = (n) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : n
 const [ordner, ziel] = args.filter((a, i) => !a.startsWith("--") && !(i > 0 && args[i - 1].startsWith("--")));
 if (!ordner || !ziel) { console.error("Aufruf: node vorschau.mjs <site-ordner> <ziel.html> [--pruefen <bilder-ordner>]"); process.exit(2); }
 const root = path.resolve(ordner);
-const orte = [process.cwd(), root, path.dirname(root), path.join(path.dirname(root), "arbeit", "build"), path.dirname(new URL(import.meta.url).pathname)];
+// esbuild/playwright suchen: Arbeitsordner, Site, darüber und die üblichen build-Ordner (arbeit/build), auch vom Aufrufort aus
+const orte = [process.cwd(), path.join(process.cwd(), "build"), path.join(process.cwd(), "arbeit", "build"), root, path.dirname(root), path.join(path.dirname(root), "build"), path.join(path.dirname(root), "arbeit", "build"), path.dirname(new URL(import.meta.url).pathname)];
 const lade = (name) => { for (const o of orte) { try { return require(require.resolve(name, { paths: [o] })); } catch {} } try { return require(name); } catch { return null; } };
 const esbuild = lade("esbuild");
 if (!esbuild) console.error("Hinweis: esbuild fehlt (npm i -D esbuild in arbeit/build) – Module mit import werden nicht gebündelt.");
