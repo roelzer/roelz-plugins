@@ -1,5 +1,10 @@
 # Änderungsprotokoll Website-Bauer
 
+## 0.6.0 – Jeder Auftrag neu gedacht
+- **Skill 2a:** Vor jedem Katalog Wesen der Firma → Stil benennen → mindestens 6 Spitzenseiten auswerten (welche Technik, wie verwandelt) → gegen die letzten Aufträge abgleichen → PowerPoint-Test für laute Momente → erst Konzept an Simon, dann bauen.
+- **Bibliothek nur noch für Technik** (`_kern`), nicht für den Look. Grund: Der Firmen-Katalog war „eins zu eins die Honigseite, nur andere Infos“.
+- **`_kern`:** `data-durchlauf` (ein Wisch fährt die ganze Bühne), `tune.js` eingeklappt, nur sichtbare Bühne, `<meta name="tune">` fürs Artifact, verwirft alte Werte bei neuer Schrittzahl.
+
 ## 0.5.0 – Bibliothek gefüllt, Grundgerüst, Trainingsprogramm
 - **Bibliothek:** vier Bausteine aus der Honig-Musterseite, neutralisiert, gemessen (59–60 fps auch 4× gedrosselt) und geprüft: `l1-kartenstapel`, `t5-text-folgt-material`, `a3-zelle-mit-figur`, `s5-name-laeuft-voll`.
 - **`_kern/schritte.js`:** die Wisch-Steuerung als wiederverwendbares Gerüst (Haltepunkte über `data-schritte`/`data-tempi`, Klick, Schwung, Wisch, Pfeiltasten). **`_kern/tune.js`:** Schieberegler für alle Dauern mit `?tune`, „Werte kopieren“ für den Chat.
