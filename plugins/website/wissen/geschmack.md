@@ -22,6 +22,7 @@ Der feste Teil aus dem SFH-Test steht in `handwerk.md` Abschnitt 10.
 | **Bewegung ohne Warten:** Figuren werden langsamer, aber bleiben nie stehen. | belegt (ausdrücklich) | Honig, 25.11.: „die Biene wartet jetzt in der Mitte vom Bild und fliegt dann weg“ |
 | **Lebendige Figur statt Punkte** (Biene fliegt herein, füllt, fliegt hinaus). | Vermutung (1, Simons Vorschlag) | Honig, 25.11. |
 | **Text nach dem Moment:** Kontaktdaten erst, wenn der Name voll ist. | belegt (ausdrücklich) | Honig, 25.11. |
+| **Text passt zum Bild:** Jeder Satz beschreibt genau, was gerade zu sehen ist. Ein Ort, eine Zahl, ein Gebiet im Text muss im selben Moment im Bild erkennbar sein. | belegt (ausdrücklich) | Firmenseite, 26.11.: „nach [Projektort] stimmt das, was man sieht, nicht mehr mit dem Text“ |
 | **Text folgt dem Material:** Schrift erscheint dort und dann, wo das bewegte Material gerade ist (Zeile für Zeile auf Höhe der Honigspitze), statt nach eigener Uhr. | belegt (ausdrücklich) | Honig, 25.11.: „sooo gaaanz langsam runterziehen und währenddessen immer auf der Höhe, wo er gerade ist, kommt die Schrift“ |
 | **Fließendes wirklich langsam:** Zähe Materialien (Honig) brauchen einen langen Wisch (etwa 12 s) mit gleichmäßigem Tempo, nicht einen schnellen Fall. | belegt (ausdrücklich) | Honig, 25.11.: „der Honig ist zu schnell, der könnte doch sooo gaaanz langsam runterziehen“ |
 | **Auch das Verschwinden ist ein Moment.** Wie ein Element geht (Waben verschwinden über dem Foto), muss genauso gestaltet sein wie der Auftritt. Ausblenden oder auf null schrumpfen wirkt billig. | belegt durch eine ausdrückliche Aussage, gilt als Regel (`handwerk.md` 1c, Punkt 9) | Honig: „wie das dann verschwindet … bisschen unspektakulär, hat irgendwie billig auf mich gewirkt“ |
@@ -33,20 +34,24 @@ Der feste Teil aus dem SFH-Test steht in `handwerk.md` Abschnitt 10.
 | **Der Einstieg darf ein Durchlauf sein.** Ein Wisch, dann läuft die ganze Eröffnung durch bis zum Namen. Ein Wisch je Stufe gilt für Inhalts-Szenen, ein Wisch je Stück wird beim Einstieg zäh. | Vermutung (1) | Fliesen: „ein Scroll und dann läuft es durch, bis der Name dran steht“ |
 | **Ein Ereignis je Wisch.** Kommt etwas Neues herein und passiert dann etwas damit, sind das zwei Wische. | Vermutung (1) | Fliesen, Referenzen: „erst vors 1. kommen und beim nächsten Scrollen dann aufgehen“ |
 | **Echtes Produkt in 3D, das sich verwandelt** (Zeichnung wird Material, gläserne Hülle, Explosionsansicht, Fahrt durchs Produkt, Studiolicht, schwere Kamera) trifft bei Technik-Firmen. | Vermutung (4 Einträge, 1 Auftrag – fehlt ein zweiter Auftrag für belegt) | Firmenseite: T1 „schaut klasse aus“, T2/T3 und T5 „beides echt mega“, T4 „wirklich beeindruckend“ |
-| **Industrie/B2B: hochwertig statt Schema.** (Idee Rohre → Wärme → Häuser gefällt ihm, nur die Umsetzung war billig.) Für ein Technik-Unternehmen keine flachen gezeichneten Schemata (Häuschen, Kästen, Strichrohre) – wirkt billig. Lieber die echten Produkte realistisch (3D) zeigen, mit einem Wow-Moment statt der wörtlichen Erklärung. | Vermutung (1, ausdrücklich) | Firmenseite, 26.11.: „Alles schlecht außer die Farben“, Gründe: Zeichnungen billig, Ideen zu brav, nicht hochwertig |
+| **Industrie/B2B: hochwertig statt Schema.** (Idee Netz → Häuser gefällt ihm, nur die Umsetzung war billig.) Für ein Technik-Unternehmen keine flachen gezeichneten Schemata (Häuschen, Kästen, Strichlinien) – wirkt billig. Lieber die echten Produkte realistisch (3D) zeigen, mit einem Wow-Moment statt der wörtlichen Erklärung. | Vermutung (1, ausdrücklich) | Firmenseite, 26.11.: „Alles schlecht außer die Farben“, Gründe: Zeichnungen billig, Ideen zu brav, nicht hochwertig |
 | **Text-Moment ist kein Pflichtteil.** Beide Male wurde ein reiner Wort-Moment abgelehnt (Honig Text A „Wort für Wort“, Fliesen Text A und B). Im Katalog anbieten, aber nicht empfehlen, solange er nichts Eigenes zeigt. | Vermutung (2 Einträge, 2 Aufträge, fehlt 1 für belegt) | Honig: Text A weg; Fliesen: „den nächsten Teil raus, keins von beiden“ |
 | **Handwerk zeigen statt Symbol.** Er wählt die Fassung, in der die Arbeit selbst abläuft (Kleber, Fliesen, Kreuze, Fuge; Reihe für Reihe fliesen) vor der eleganteren Metapher (Schwamm, Glasur). | Vermutung (2 Wahlen, 1 Auftrag) | Fliesen: Einstieg B statt A, Schluss B statt A |
 | **Grafisch vor Foto im Einstieg, solange kein echtes Material da ist.** | Vermutung (1) | Honig: Einstieg A (Wabe) statt B (Rähmchen-Foto) |
 
 ## Einträge
 
-### 26.11.2026 – Firmenseite, T4 Rohr „ein Objekt, viele Rollen“
-- **Wörtlich:** „also an sich echt sehr cool, muss ich sagen, das ist wirklich beeindruckend. Das Rohr hängt bisschen, wenn es sich rollt. Aber ist stark auf jeden Fall.“
+### 26.11.2026 – Firmenseite, Zwischenteile (Vitrine, Werk, Pause, Für wen, Projekte, Kontakt)
+- **Wörtlich:** „an sich cool, aber das mit dem Ende, da stimmt nach [Projektort] das, was man sieht, nicht mehr mit dem Text.“
+- **Lehre:** Über einem Dorf stand der Satz zum Firmensitz, über einem gleichmäßigen Punkteraster eine Zahl für einen Landkreis, der gar nicht zu sehen war. Jeder Satz muss genau beschreiben, was in diesem Moment im Bild ist.
+
+### 26.11.2026 – Firmenseite, T4 Produkt C „ein Objekt, viele Rollen“
+- **Wörtlich:** „also an sich echt sehr cool, muss ich sagen, das ist wirklich beeindruckend. Das [Produkt] hängt bisschen, wenn es sich rollt. Aber ist stark auf jeden Fall.“
 - **Lehre:** Ruckeln fällt ihm sofort auf, auch in einem sonst starken Moment. Jede Verformungs-Animation (Biegen, Rollen) vor der Lieferung mit Frame-Zeiten messen, nicht nur Durchschnitts-fps.
 
-### 26.11.2026 – Firmenseite, 3D-Kapitel Speicher, Station, Wärmenetz
-- **Wörtlich:** „also beides echt mega. Zum 3D-Modell vom Puffer noch: in die Box vorne soll das Gleiche rein wie in die Übergabestation, das sieht super aus.“
-- **Was traf:** gläserne Hülle mit Schichtung und glühender Wendel, Explosionsansicht mit Leitlinien, Dorf bei Nacht mit glühenden Trassen und Fahrt durchs Rohr in den Speicher. Bauteile, die in mehreren Szenen vorkommen, sollen gleich aussehen (Box am Speicher = Innenleben der Station).
+### 26.11.2026 – Firmenseite, 3D-Kapitel Produkt A, Produkt B, Netz
+- **Wörtlich:** „also beides echt mega. Zum 3D-Modell von [Produkt A] noch: in die Box vorne soll das Gleiche rein wie in [Produkt B], das sieht super aus.“
+- **Was traf:** gläserne Hülle mit sichtbarem, glühendem Innenleben, Explosionsansicht mit Leitlinien, Ort bei Nacht mit glühendem Netz und Kamerafahrt durch das Produkt. Bauteile, die in mehreren Szenen vorkommen, sollen gleich aussehen (Box an Produkt A = Innenleben von Produkt B).
 
 ### 26.11.2026 – Firmenseite, Durchstich Einstieg (3D, „Konstruktion wird Stahl“)
 - **Wörtlich:** „ja, also ggf. müssen wir an die genauen Bestandteile nochmal ran, aber an sich schaut's klasse aus.“
@@ -55,19 +60,19 @@ Der feste Teil aus dem SFH-Test steht in `handwerk.md` Abschnitt 10.
 
 ### 26.11.2026 – Firmenseite, Konzept 2 (Wesen → Stil → 8 Techniken von Spitzenseiten)
 - **Wörtlich:** „ja, Richtung an sich find ich schon mal cool so, ja.“
-- **Stand:** Stil „Technik im Studiolicht“ (3D-Produkte auf dunkler Bühne, nur Wärme glüht), Techniken nach Igloo, AirPods, Scale, Oryzo, Helion, Lando, Zoox. Nächster Schritt: Durchstich Einstieg (T1) in voller Qualität.
+- **Stand:** Stil „Technik im Studiolicht“ (3D-Produkte auf dunkler Bühne, nur die Energie glüht), Techniken nach Igloo, AirPods, Scale, Oryzo, Helion, Lando, Zoox. Nächster Schritt: Durchstich Einstieg (T1) in voller Qualität.
 - **Lehre:** Das Konzept mit Bildern der Vorbilder in 40 Minuten traf, der umgefärbte Katalog in 65 Minuten nicht.
 
 ### 26.11.2026 – Firmenseite, Grundsatz-Rückmeldung zum Vorgehen
-- **Wörtlich (diktiert, gekürzt):** „diese Idee, dass wir uns gewisse Bausteine merken, das ist gut, aber primär wollen wir mitnehmen, was wir von den guten Websites lernen. Diese Webseite ist ja eigentlich eins zu eins die Honigseite, nur andere Infos … das schaffe ich von der Hand schneller, einfach die Farben ändern. … Honig, das ist ein Stil, der ist sehr verspielt, eher so billig zeichnerisch, passt vielleicht zur Honigseite, aber zu [der Firma] passt der überhaupt nicht. … der die Seite analysiert und das Wesen einer Firma und dann klar sagen kann: welcher Stil passt hierzu, wie animieren wir was. … ich will, dass die Zeit effizient genutzt wird und das Ergebnis danach auch dementsprechend aussieht. … sonst wären beide Kunden sauer, weil sie genau die gleiche Seite haben. Komplett neu denken. Ich will die größten Sachen der coolsten Websites. … das mit den Rohren und den Wärmehäusern finde ich an sich cool, aber du siehst selber, wie schlecht das animiert ist, krieg ich in PowerPoint in 5 Minuten besser hin.“
+- **Wörtlich (diktiert, gekürzt):** „diese Idee, dass wir uns gewisse Bausteine merken, das ist gut, aber primär wollen wir mitnehmen, was wir von den guten Websites lernen. Diese Webseite ist ja eigentlich eins zu eins die Honigseite, nur andere Infos … das schaffe ich von der Hand schneller, einfach die Farben ändern. … Honig, das ist ein Stil, der ist sehr verspielt, eher so billig zeichnerisch, passt vielleicht zur Honigseite, aber zu [der Firma] passt der überhaupt nicht. … der die Seite analysiert und das Wesen einer Firma und dann klar sagen kann: welcher Stil passt hierzu, wie animieren wir was. … ich will, dass die Zeit effizient genutzt wird und das Ergebnis danach auch dementsprechend aussieht. … sonst wären beide Kunden sauer, weil sie genau die gleiche Seite haben. Komplett neu denken. Ich will die größten Sachen der coolsten Websites. … das mit [dem Netz und den Häusern] finde ich an sich cool, aber du siehst selber, wie schlecht das animiert ist, krieg ich in PowerPoint in 5 Minuten besser hin.“
 - **Folge:** Skill Abschnitt 2a (Wesen → Stil → Lernen von den Besten → kein Wiederholen → PowerPoint-Test → Konzept zuerst). Bibliothek nur noch für Technik.
 
 ### 26.11.2026 – Firmenseite (Industrie, B2B, Neuaufbau), Stopp 1
-- **Empfohlen:** Einstieg B · Produkte B · Zahlen A · Projekte A · Zielgruppen A · Schluss A (alles gezeichnet: Pufferspeicher lädt sich, Wärmelinie zieht durch)
+- **Empfohlen:** Einstieg B · Produkte B · Zahlen A · Projekte A · Zielgruppen A · Schluss A (alles gezeichnet: Produkt lädt sich, Linie zieht durch)
 - **Gewählt:** nichts – „Alles schlecht außer die Farben. Da müssen wir nochmal ran.“
 - **Wörtlich:** „Alles schlecht außer die Farben. Da müssen wir nochmal ran“
 - **Gründe (Simon per Auswahl bestätigt):** Zeichnungen billig (flache Schemata wie Infografik), Ideen zu brav (zu wörtlich, kein Wow), wirkt nicht hochwertig (leere Flächen, Folien-Look). Gesehen: HTML am Handy.
-- **Richtung für Katalog 2 (Simon):** Technik in 3D – Speicher, Rohr, Übergabestation als realistische Objekte, die sich beim Wischen drehen und aufschneiden.
+- **Richtung für Katalog 2 (Simon):** Technik in 3D – die Produkte als realistische Objekte, die sich beim Wischen drehen und aufschneiden.
 
 ### 25.11.2026 – Fliesenleger, Timing-Modell
 - **Wörtlich:** „bei ‚So entsteht eine Fläche‘ bitte, dass der Kleber dann bisschen platt gedrückt wird und die Fliese auch echt berührt, die Fuge soll auch nicht über die Fliesen rausragen. Bei Vorher/Nachher soll das 2. Beispiel beim Scrollen erst vors 2. kommen und beim nächsten Scrollen dann ‚aufgehen‘.“ – „das auch am Anfang mit dem Fliesen soll automatisch laufen, also ein Scroll und dann läuft es durch, bis der Name dran steht.“
