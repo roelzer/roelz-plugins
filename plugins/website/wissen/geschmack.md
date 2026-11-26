@@ -32,13 +32,17 @@ Der feste Teil aus dem SFH-Test steht in `handwerk.md` Abschnitt 10.
 | **Physik muss stimmen.** Was sich berührt, berührt sich wirklich (Fliese liegt auf dem Kleber, der platt gedrückt wird); Füllungen ragen nicht über ihre Kante. | Vermutung (1) | Fliesen, Timing: „Kleber platt gedrückt … Fliese echt berührt … Fuge nicht über die Fliesen rausragen“ |
 | **Der Einstieg darf ein Durchlauf sein.** Ein Wisch, dann läuft die ganze Eröffnung durch bis zum Namen. Ein Wisch je Stufe gilt für Inhalts-Szenen, ein Wisch je Stück wird beim Einstieg zäh. | Vermutung (1) | Fliesen: „ein Scroll und dann läuft es durch, bis der Name dran steht“ |
 | **Ein Ereignis je Wisch.** Kommt etwas Neues herein und passiert dann etwas damit, sind das zwei Wische. | Vermutung (1) | Fliesen, Referenzen: „erst vors 1. kommen und beim nächsten Scrollen dann aufgehen“ |
-| **Echtes Produkt in 3D, das sich verwandelt** (Zeichnung wird Material, gläserne Hülle, Explosionsansicht, Fahrt durchs Produkt, Studiolicht, schwere Kamera) trifft bei Technik-Firmen. | Vermutung (3 Einträge, 1 Auftrag – fehlt ein zweiter Auftrag für belegt) | Firmenseite: T1 „schaut klasse aus“, T2/T3 und T5 „beides echt mega“ |
+| **Echtes Produkt in 3D, das sich verwandelt** (Zeichnung wird Material, gläserne Hülle, Explosionsansicht, Fahrt durchs Produkt, Studiolicht, schwere Kamera) trifft bei Technik-Firmen. | Vermutung (4 Einträge, 1 Auftrag – fehlt ein zweiter Auftrag für belegt) | Firmenseite: T1 „schaut klasse aus“, T2/T3 und T5 „beides echt mega“, T4 „wirklich beeindruckend“ |
 | **Industrie/B2B: hochwertig statt Schema.** (Idee Rohre → Wärme → Häuser gefällt ihm, nur die Umsetzung war billig.) Für ein Technik-Unternehmen keine flachen gezeichneten Schemata (Häuschen, Kästen, Strichrohre) – wirkt billig. Lieber die echten Produkte realistisch (3D) zeigen, mit einem Wow-Moment statt der wörtlichen Erklärung. | Vermutung (1, ausdrücklich) | Firmenseite, 26.11.: „Alles schlecht außer die Farben“, Gründe: Zeichnungen billig, Ideen zu brav, nicht hochwertig |
 | **Text-Moment ist kein Pflichtteil.** Beide Male wurde ein reiner Wort-Moment abgelehnt (Honig Text A „Wort für Wort“, Fliesen Text A und B). Im Katalog anbieten, aber nicht empfehlen, solange er nichts Eigenes zeigt. | Vermutung (2 Einträge, 2 Aufträge, fehlt 1 für belegt) | Honig: Text A weg; Fliesen: „den nächsten Teil raus, keins von beiden“ |
 | **Handwerk zeigen statt Symbol.** Er wählt die Fassung, in der die Arbeit selbst abläuft (Kleber, Fliesen, Kreuze, Fuge; Reihe für Reihe fliesen) vor der eleganteren Metapher (Schwamm, Glasur). | Vermutung (2 Wahlen, 1 Auftrag) | Fliesen: Einstieg B statt A, Schluss B statt A |
 | **Grafisch vor Foto im Einstieg, solange kein echtes Material da ist.** | Vermutung (1) | Honig: Einstieg A (Wabe) statt B (Rähmchen-Foto) |
 
 ## Einträge
+
+### 26.11.2026 – Firmenseite, T4 Rohr „ein Objekt, viele Rollen“
+- **Wörtlich:** „also an sich echt sehr cool, muss ich sagen, das ist wirklich beeindruckend. Das Rohr hängt bisschen, wenn es sich rollt. Aber ist stark auf jeden Fall.“
+- **Lehre:** Ruckeln fällt ihm sofort auf, auch in einem sonst starken Moment. Jede Verformungs-Animation (Biegen, Rollen) vor der Lieferung mit Frame-Zeiten messen, nicht nur Durchschnitts-fps.
 
 ### 26.11.2026 – Firmenseite, 3D-Kapitel Speicher, Station, Wärmenetz
 - **Wörtlich:** „also beides echt mega. Zum 3D-Modell vom Puffer noch: in die Box vorne soll das Gleiche rein wie in die Übergabestation, das sieht super aus.“

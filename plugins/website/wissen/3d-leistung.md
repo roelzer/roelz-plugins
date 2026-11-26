@@ -99,3 +99,6 @@ Für Produkte eines Herstellers trägt dieser Einstieg: Das echte Produkt steht 
 - Nur die Shader der ersten Bühne sofort übersetzen, alle weiteren gestaffelt im Leerlauf (`renderer.compileAsync`, `requestIdleCallback`), spätestens bevor der Besucher sie erreicht. Alles auf einmal vorab zu übersetzen verursacht das Warten am Anfang.
 - Schwere Geometrie erst bei Bedarf erzeugen, three.js gebündelt und minifiziert.
 - Messen: Zeit bis zum ersten Bild und bis zur ersten Bühne bedienbar, im iPhone-Profil mit 4× CPU-Drosselung.
+
+## Ruckeln messen, nicht nur fps (Simon, 26.11.2026: „das Rohr hängt bisschen, wenn es sich rollt“)
+Durchschnitts-fps verdecken einzelne Hänger. Für jede Bühne mit Verformung, Materialwechsel oder Farbwechsel die Frame-Zeiten über genau diesen Wisch aufzeichnen (CDP-Performance-Profil, iPhone-Profil, 4× Drosselung): Median, 95. Perzentil, längster Frame. Häufige Ursachen: neue Shader-Programme beim Umschalten (vorab `compileAsync`), zu viele Segmente in gebogener Geometrie, Schattenkarte jedes Bild neu, CSS-Übergang auf einer Fläche neben WebGL.
