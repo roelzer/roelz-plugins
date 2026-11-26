@@ -43,4 +43,6 @@ Simon, 25.11.2026: „Fliesenleger lädt übrigens seit 34 Minuten, du hast 20�
 | `pruefen.mjs` | 5–8 min | – | |
 | `erlebnis.mjs` | 8–10 min | 1,5 min (17 Schritte) | Dauer wächst mit der Zahl der Schritte |
 
+Uhrzeiten immer in Simons Zeit (Deutschland, MEZ/MESZ) angeben, nicht in der Uhr der Arbeitsumgebung (läuft in UTC, also eine bzw. zwei Stunden hinterher). 26.11.: „16:45–17:15“ gesagt, gemeint war Umgebungszeit, bei Simon also 17:45–18:15 – er fragte um 17:30 nach.
+
 Regel: Schätzungen kommen aus dieser Tabelle, nicht aus dem Bauch, immer als Spanne. Läuft etwas über die obere Grenze, sage ich es Simon von selbst, mit dem Grund und einer neuen Schätzung.
