@@ -27,7 +27,7 @@ Der feste Teil aus dem SFH-Test steht in `handwerk.md` Abschnitt 10.
 | **Ein Objekt nur einmal ausführlich, Geschichte folgt dem echten Weg** (z. B. Netz → Leitung → ins Haus → Produkt). Wiederholte Auftritte desselben Objekts wirken doppelt. | Vermutung (1, ausdrücklich) | Firmenseite, 26.11. |
 | **Gleicher Detailgrad für alle Modelle.** Neben einem sehr guten Modell fällt ein schnell gebautes sofort auf. | Vermutung (1, ausdrücklich) | Firmenseite, 26.11.: „bei [Produkt B] merkt man, dass es schnell erstellt wurde“ |
 | **Fachkonventionen des Auftraggebers einhalten** (z. B. Vorlauf rot, Rücklauf blau) und technische Verbindungen sauber zeichnen. Fachleute sehen Fehler sofort. | belegt (ausdrücklich) | Firmenseite, 26.11.: „Vorlauf machen wir immer rot und Rücklauf blau“, „wie die verbunden sind, ist unsauber“ |
-| **Licht-Effekte dosieren:** Scheinwerfer ja, aber nicht ausbrennen. | Vermutung (1) | Firmenseite, 26.11.: „überzogen, zu hell fast“ |
+| **Licht-Effekte dosieren:** Scheinwerfer ja, aber nicht ausbrennen; leuchtendes Inneres ebenso. | belegt (3 Einträge) | Firmenseite, 26.11.: „überzogen, zu hell fast“ |
 | **Text passt zum Bild:** Jeder Satz beschreibt genau, was gerade zu sehen ist. Ein Ort, eine Zahl, ein Gebiet im Text muss im selben Moment im Bild erkennbar sein. | belegt (ausdrücklich) | Firmenseite, 26.11.: „nach [Projektort] stimmt das, was man sieht, nicht mehr mit dem Text“ |
 | **Text folgt dem Material:** Schrift erscheint dort und dann, wo das bewegte Material gerade ist (Zeile für Zeile auf Höhe der Honigspitze), statt nach eigener Uhr. | belegt (ausdrücklich) | Honig, 25.11.: „sooo gaaanz langsam runterziehen und währenddessen immer auf der Höhe, wo er gerade ist, kommt die Schrift“ |
 | **Fließendes wirklich langsam:** Zähe Materialien (Honig) brauchen einen langen Wisch (etwa 12 s) mit gleichmäßigem Tempo, nicht einen schnellen Fall. | belegt (ausdrücklich) | Honig, 25.11.: „der Honig ist zu schnell, der könnte doch sooo gaaanz langsam runterziehen“ |
@@ -46,6 +46,10 @@ Der feste Teil aus dem SFH-Test steht in `handwerk.md` Abschnitt 10.
 | **Grafisch vor Foto im Einstieg, solange kein echtes Material da ist.** | Vermutung (1) | Honig: Einstieg A (Wabe) statt B (Rähmchen-Foto) |
 
 ## Einträge
+
+### 27.11.2026 – Firmenseite, nach Umbau 3
+- **Wörtlich:** „cool, Übergang von [Produkt B] aus dem Produkt zur nur [Produkt B] ist noch wenig unsauber. Im Rohr könnte man ja machen, dass man im Wasser quasi schwimmt, weil sonst denken Leute vielleicht, in den Rohren ist Luft. Außerdem, schau dir mal an, ist in einem T-Stück ja so eine Muffe verbaut, dass man das irgendwie darstellt. Und das Innere vom [Produkt A] scheint dann so arg im Licht.“
+- **Lehren:** Physik und Medium zeigen (Wasser statt Luft). Echte Bauteile an Verbindungsstellen darstellen. Ein Objekt, das von einer Szene in die nächste wechselt, bleibt dasselbe Objekt ohne Sprung. Leuchtendes Inneres dosieren.
 
 ### 27.11.2026 – Firmenseite, nach Umbau 2
 - **Wörtlich:** „wenn sich hier gleich unter dem E die Übergabe aufbaut, da sollen die Bestandteile mit reinfliegen. Außerdem: oben der Vorlauf wird ja schon markiert, unten ist der Rücklauf, den kann man auch noch markieren. Wenn sich vom Dorf die Trassen aufbauen, sind die immer noch nicht sauber verbunden. Die Ansicht, dass die Straße aufgeht und dann durchs Rohr geflossen wird und dann so ins Haus, fand ich besser als das jetzt. Man soll quasi in der Leitung fahren, dann knickt man ab, weil man ja durchs T-Stück ins Haus geht, und dann ist man dort im Keller.“
