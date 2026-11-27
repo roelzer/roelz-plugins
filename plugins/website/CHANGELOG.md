@@ -1,6 +1,7 @@
 # Änderungsprotokoll Website-Bauer
 
 ## 0.7.0 – Große Seiten in Etappen, Mappe, schärferer Kritiker
+- **Handy:** `mappe.mjs` läuft in der abgeschotteten Vorschau der Claude-App (Seitenwechsel per postMessage) und packt den Inhalt mit gzip; neues `scripts/leicht.py` verkleinert die Bilder einer Kopie (Firmenseite 8,0 → 3,4 MB).
 - **Skill 2c:** Ablauf für große Seiten nach angenommenem Konzept (Durchstich → laute Momente → Zwischenteile → Zusammenbau → Unterseiten → Vorlagen → Gesamtpaket), gemessene Zeiten, Vertraulichkeit bei Firmen-Aufträgen (neutralisieren, nichts mit echtem Branding von selbst veröffentlichen).
 - **`scripts/mappe.mjs`:** eine Datei mit allen Seiten einer mehrseitigen Website, Links zwischen den Seiten funktionieren, gemeinsame Bilder/Skripte nur einmal (43,6 → 6,5 MB).
 - **`vorschau.mjs`:** findet esbuild auch vom Aufrufort aus (`build/`, `arbeit/build/`); vorher fehlte das 3D-Bündel stillschweigend.

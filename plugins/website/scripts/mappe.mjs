@@ -13,6 +13,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
+import zlib from "node:zlib";
 
 const [ordner, ziel] = process.argv.slice(2);
 if (!ordner || !ziel) { console.error("Aufruf: node mappe.mjs <site-ordner> <ziel.html>"); process.exit(2); }
@@ -54,8 +55,9 @@ const html = `<!doctype html><html lang="de"><head><meta charset="utf-8">
 <style>html,body{margin:0;height:100%;background:#1c1f22;overflow:hidden}iframe{position:fixed;inset:0;width:100%;height:100%;border:0;display:block}</style>
 </head><body><iframe id="f" title="Website"></iframe>
 <script>
-const SEITEN = ${js(seiten)};
-const TEILE = ${js(teile)};
+// Inhalt gzip-gepackt (Skripte schrumpfen auf ein Viertel), entpackt im Browser mit DecompressionStream.
+let SEITEN = {}, TEILE = [];
+const PAKET = "${zlib.gzipSync(Buffer.from(JSON.stringify({ seiten, teile })), { level: 9 }).toString("base64")}";
 const voll = (t) => t.replace(/\\u00a7\\u00a7B(\\d+)\\u00a7\\u00a7/g, (m, i) => TEILE[+i]);
 const f = document.getElementById("f");
 function ziel(roh) {
@@ -75,7 +77,12 @@ function lade(seite, anker, neu) {
 addEventListener("message", (e) => { const z = e.data && e.data.mappe && ziel(e.data.mappe); if (z) lade(z.seite, z.anker, true); });
 function ausHash() { let p; try { p = new URLSearchParams(location.hash.slice(1)); } catch (e) { p = new URLSearchParams(); } lade(p.get("seite") || "index", p.get("a") ? "#" + p.get("a") : "", false); }
 addEventListener("popstate", ausHash);
-ausHash();
+(async () => {
+  const roh = Uint8Array.from(atob(PAKET), (c) => c.charCodeAt(0));
+  const text = await new Response(new Blob([roh]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
+  ({ seiten: SEITEN, teile: TEILE } = JSON.parse(text));
+  ausHash();
+})();
 </script></body></html>`;
 fs.writeFileSync(ziel, html);
 fs.rmSync(tmp, { recursive: true, force: true });
