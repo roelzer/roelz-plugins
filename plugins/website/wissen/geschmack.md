@@ -30,9 +30,15 @@ Der feste Teil aus dem SFH-Test steht in `handwerk.md` Abschnitt 10.
 | **Echte Fotos schlagen gezeichnete Logo-Animation.** Gibt es echte Fotos des Auftraggebers, bauen die Bausteine auf ihnen auf (schweben, wachsen, Wechselwort daneben). Ein nachgezeichnetes Logo als animierte Grafik (Strahlen laden, wird zum Rad) gilt als „falscher Stil“. | Vermutung (1, deutlich) | Zweiradladen 26.11.: „marken und fotos is ool, alled andere schrott. vielleicht falscher stil“ |
 | **Kein selbstgebautes 3D-Hauptobjekt.** Aus Grundformen modellierte Objekte (Rad aus Rohren und Tori) wirken billig, auch mit gutem Licht. 3D nur mit echtem, fotografisch guten Modell; sonst echte Fotos/Video. | belegt durch ausdrückliche Aussage | Zweiradladen 27.11.: „trägt 0 das rad is ja soooo schlecht“ |
 | **Logo und echtes Bild müssen im Einstieg sichtbar sein.** Ein Objekt auf leerem Grund ohne Logo und Foto ist „nix“. | Vermutung (1, deutlich) | Zweiradladen 27.11.: „kein logo kein bild. nix.“ |
+| **Vorbilder aus der Branche zuerst.** Der Stil der großen Marken der Branche (echte Fotos vollflächig, Markenfarbe als Signal, schmale fette Typo, Zahlen, Kacheln) traf nach drei verworfenen Runden. Bei Branchenseiten früh 10+ Branchen-Vorbilder fotografieren. | Vermutung (1, deutlich) | Zweiradladen 27.11.: „ansich viel besser“ |
+| **Gezeichnete Symbole nur präzise.** Grobe Skizzen (Rad aus wenigen Strichen) fallen ab; wenn gezeichnet, dann technisch richtig wie bei Canyon. | Vermutung (1) | Zweiradladen 27.11.: „skizierten rädern is noch ausbaufähig“ → gewählt: saubere Silhouetten |
 | **Ruhige Typo-Bausteine gefallen** (Wechselwort, Marken auf einem Ring, Text groß auf hellem Grund). | Vermutung (2) | Honig: Text C, Schluss C (Name läuft voll); Zweiradladen: Marken B (Marken-Ring) |
 
 ## Einträge
+
+### 27.11.2026 – Zweiradladen (Test), Entwurf im Marken-Stil
+- **Gezeigt:** nach Recherche von 14 Fahrrad-Websites: Foto-Einstieg mit Logo und Shirt-Spruch, Schwarz/Weiß/Gelb, schmale fette Großbuchstaben, Zahlenband, Makrofoto Werkstatt, Bildkacheln, gewählte Marken-Bausteine.
+- **Wörtlich:** „ansich viel besser. das mit den skizierten rädern is noch ausbaufähig das bruachen wir noch bisschen anders“ – auf Rückfrage: saubere Silhouetten wie bei Canyon.
 
 ### 27.11.2026 – Zweiradladen (Test), Stopp 1b
 - **Gezeigt:** selbstgebautes 3D-E-Bike (three.js, Grundformen), dreht sich, Akku leuchtet, zerlegt sich; heller Grund, nur Text daneben.
