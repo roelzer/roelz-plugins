@@ -35,6 +35,10 @@ for (const n of namen) {
   seiten[n] = fs.readFileSync(aus, "utf8");
 }
 
+// Jede Seite meldet Klicks auf Seiten-Links selbst an die Mappe (postMessage). Zugriff von außen auf das iframe
+// (contentDocument) und history.pushState sind in abgeschotteten Vorschauen (Claude-App am Handy) gesperrt.
+const fang = '<script>document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest("a[href]");if(!a)return;var h=a.getAttribute("href");if(/^mappe:|^(\\.\\/)?[\\w-]+\\.html/.test(h)){e.preventDefault();parent.postMessage({mappe:h},"*");}},true);<\/script>';
+for (const n of namen) seiten[n] = /<\/body>/i.test(seiten[n]) ? seiten[n].replace(/<\/body>(?![\s\S]*<\/body>)/i, fang + "</body>") : seiten[n] + fang;
 const teile = [], nr = new Map();
 const merk = (t) => { if (!nr.has(t)) { nr.set(t, teile.length); teile.push(t); } return `§§B${nr.get(t)}§§`; };
 for (const n of namen) {
@@ -61,21 +65,15 @@ function ziel(roh) {
 }
 function lade(seite, anker, neu) {
   if (!SEITEN[seite]) seite = "index";
-  f.srcdoc = voll(SEITEN[seite]);
-  f.onload = () => {
-    const d = f.contentDocument;
-    d.addEventListener("click", (e) => {
-      const a = e.target.closest && e.target.closest("a[href]"); if (!a) return;
-      const z = ziel(a.getAttribute("href")); if (!z) return;
-      e.preventDefault(); lade(z.seite, z.anker, true);
-    }, true);
-    if (anker) { const el = d.getElementById(anker.slice(1)); if (el) el.scrollIntoView(); }
-    f.contentWindow.focus();
-  };
+  let html = voll(SEITEN[seite]);
+  if (anker) { const k = html.lastIndexOf("</bo" + "dy>"), z = "<scr" + "ipt>addEventListener('load',function(){var el=document.getElementById(" + JSON.stringify(anker.slice(1)) + ");if(el)el.scrollIntoView();});</scr" + "ipt>"; html = k >= 0 ? html.slice(0, k) + z + html.slice(k) : html + z; }
+  f.srcdoc = html;
+  f.onload = () => { try { f.contentWindow.focus(); } catch (e) {} };
   const h = "#seite=" + seite + (anker ? "&a=" + anker.slice(1) : "");
-  if (neu) history.pushState(null, "", h); else history.replaceState(null, "", h);
+  try { if (neu) history.pushState(null, "", h); else history.replaceState(null, "", h); } catch (e) {}
 }
-function ausHash() { const p = new URLSearchParams(location.hash.slice(1)); lade(p.get("seite") || "index", p.get("a") ? "#" + p.get("a") : "", false); }
+addEventListener("message", (e) => { const z = e.data && e.data.mappe && ziel(e.data.mappe); if (z) lade(z.seite, z.anker, true); });
+function ausHash() { let p; try { p = new URLSearchParams(location.hash.slice(1)); } catch (e) { p = new URLSearchParams(); } lade(p.get("seite") || "index", p.get("a") ? "#" + p.get("a") : "", false); }
 addEventListener("popstate", ausHash);
 ausHash();
 </script></body></html>`;
