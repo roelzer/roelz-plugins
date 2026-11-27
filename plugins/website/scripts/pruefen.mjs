@@ -340,7 +340,14 @@ for (const [name, breite, hoehe] of GERAETE) {
         if (weg || o < 0.5) continue;
         // je Textzeile ein Kasten (umbrechende Links in einem Absatz würden als großer Kasten sonst fälschlich überlappen)
         const rg = document.createRange(); rg.selectNodeContents(e);
-        const zeilen = [...rg.getClientRects()].filter((r) => r.width >= 4 && r.height >= 8 && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth);
+        // Zeilen, die unter einer festen Leiste liegen (Kopfleiste mit eigener Fläche), sieht niemand: nicht werten
+        const verdeckt = (r) => {
+          const o = document.elementFromPoint(Math.min(innerWidth - 1, Math.max(0, r.left + r.width / 2)), Math.min(innerHeight - 1, Math.max(0, r.top + r.height / 2)));
+          if (!o || o === e || e.contains(o) || o.contains(e)) return false;
+          for (let n = o; n && n.nodeType === 1; n = n.parentElement) { const p = getComputedStyle(n).position; if (p === "fixed" || p === "sticky") return !n.contains(e) && getComputedStyle(n).backgroundColor !== "rgba(0, 0, 0, 0)"; }
+          return false;
+        };
+        const zeilen = [...rg.getClientRects()].filter((r) => r.width >= 4 && r.height >= 8 && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth && !verdeckt(r));
         if (zeilen.length) kaesten.push({ e, zeilen });
       }
       const treffer = [];

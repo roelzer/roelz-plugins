@@ -28,9 +28,15 @@ Der feste Teil aus dem SFH-Test steht in `handwerk.md` Abschnitt 10.
 | **Material echt aussehen lassen.** Wo das Material des Auftraggebers selbst die Bewegung macht (Honig läuft, Holz wird gehobelt, Wasser fließt), soll es realistisch wirken, nicht wie ein Symbol (ein gelber Strich als Honigfaden). | Vermutung (1) | Honig, Text C: „den langsam laufenden Honig vielleicht auch noch optisch viel realistischer darstellen“ |
 | **Grafisch vor Foto im Einstieg, solange kein echtes Material da ist.** | Vermutung (1), **Widerspruch**: sobald echte Fotos da sind, gilt das Gegenteil | Honig: Einstieg A (Wabe) statt B (Rähmchen-Foto); Zweiradladen 26.11.: alle Logo-Grafik-Bausteine „schrott“ |
 | **Echte Fotos schlagen gezeichnete Logo-Animation.** Gibt es echte Fotos des Auftraggebers, bauen die Bausteine auf ihnen auf (schweben, wachsen, Wechselwort daneben). Ein nachgezeichnetes Logo als animierte Grafik (Strahlen laden, wird zum Rad) gilt als „falscher Stil“. | Vermutung (1, deutlich) | Zweiradladen 26.11.: „marken und fotos is ool, alled andere schrott. vielleicht falscher stil“ |
+| **Kein selbstgebautes 3D-Hauptobjekt.** Aus Grundformen modellierte Objekte (Rad aus Rohren und Tori) wirken billig, auch mit gutem Licht. 3D nur mit echtem, fotografisch guten Modell; sonst echte Fotos/Video. | belegt durch ausdrückliche Aussage | Zweiradladen 27.11.: „trägt 0 das rad is ja soooo schlecht“ |
+| **Logo und echtes Bild müssen im Einstieg sichtbar sein.** Ein Objekt auf leerem Grund ohne Logo und Foto ist „nix“. | Vermutung (1, deutlich) | Zweiradladen 27.11.: „kein logo kein bild. nix.“ |
 | **Ruhige Typo-Bausteine gefallen** (Wechselwort, Marken auf einem Ring, Text groß auf hellem Grund). | Vermutung (2) | Honig: Text C, Schluss C (Name läuft voll); Zweiradladen: Marken B (Marken-Ring) |
 
 ## Einträge
+
+### 27.11.2026 – Zweiradladen (Test), Stopp 1b
+- **Gezeigt:** selbstgebautes 3D-E-Bike (three.js, Grundformen), dreht sich, Akku leuchtet, zerlegt sich; heller Grund, nur Text daneben.
+- **Wörtlich:** „trägt 0 das rad is ja soooo schlecht. aber auch so, kein logo kein bild. nix. dann recherchier mal wie die websites der größten marken aussehen und wie die schönsten radwebsites ausschauen und schau dir da was ab“
 
 ### 26.11.2026 – Zweiradladen (Test), Stopp 1 (Runde 1)
 - **Empfohlen:** Einstieg A · Leistungen B · Text A · Ablauf B · Marken A · Text C · Schluss C (alles mit der nachgezeichneten Logo-Sonne als Leitmotiv)
